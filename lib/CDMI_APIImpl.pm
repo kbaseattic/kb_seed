@@ -3371,11 +3371,23 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_function has a value which is a string
 	feature_length has a value which is an int
 	feature_publications has a value which is a pubrefs
+	feature_location has a value which is a locations
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
 	0: a string
 	1: a string
 	2: a string
+locations is a reference to a list where each element is a location
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
 
 </pre>
 
@@ -3393,11 +3405,23 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_function has a value which is a string
 	feature_length has a value which is an int
 	feature_publications has a value which is a pubrefs
+	feature_location has a value which is a locations
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
 	0: a string
 	1: a string
 	2: a string
+locations is a reference to a list where each element is a location
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
 
 
 =end text
@@ -4288,8 +4312,8 @@ actual ER-model model, the connection from Complex to Reaction goes through
 ReactionComplex).  Since Roles also connect to fids, the connection between
 fids and Reactions is induced.
 
-The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will
-be included with the ID in the output. If only, the compound name will be included
+The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will 
+be included with the ID in the output. If only, the compound name will be included 
 instead of the ID. If 0, only the ID will be included. The default is 0.
 
 =back
@@ -4654,7 +4678,7 @@ field_name is a string
 
 =item Description
 
-text_search performs a search against a full-text index maintained
+text_search performs a search against a full-text index maintained 
 for the CDMI. The parameter "input" is the text string to be searched for.
 The parameter "entities" defines the entities to be searched. If the list
 is empty, all indexed entities will be searched. The "start" and "count"
@@ -6572,6 +6596,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
+feature_location has a value which is a locations
 
 </pre>
 
@@ -6585,6 +6610,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
+feature_location has a value which is a locations
 
 
 =end text

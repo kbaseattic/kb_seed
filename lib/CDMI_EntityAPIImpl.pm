@@ -1590,7 +1590,7 @@ properties of the tree.
 sub get_entity_AlignmentTree
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_AlignmentTree
 
@@ -1662,7 +1662,7 @@ fields_AlignmentTree is a reference to a hash where the following keys are defin
 sub all_entities_AlignmentTree
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_AlignmentTree
 
@@ -1752,7 +1752,7 @@ date and time at which the annotation was made
 sub get_entity_Annotation
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Annotation
 
@@ -1818,7 +1818,7 @@ fields_Annotation is a reference to a hash where the following keys are defined:
 sub all_entities_Annotation
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Annotation
 
@@ -1900,7 +1900,7 @@ It has the following fields:
 sub get_entity_AtomicRegulon
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_AtomicRegulon
 
@@ -1960,7 +1960,7 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 sub all_entities_AtomicRegulon
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_AtomicRegulon
 
@@ -2034,7 +2034,7 @@ Descriptive text indicating the nature and use of this attribute.
 sub get_entity_Attribute
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Attribute
 
@@ -2096,7 +2096,7 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 sub all_entities_Attribute
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Attribute
 
@@ -2178,7 +2178,7 @@ descriptive name for this biomass
 sub get_entity_Biomass
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Biomass
 
@@ -2242,7 +2242,7 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 sub all_entities_Biomass
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Biomass
 
@@ -2316,7 +2316,7 @@ contains this compound
 sub get_entity_BiomassCompound
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_BiomassCompound
 
@@ -2378,7 +2378,7 @@ fields_BiomassCompound is a reference to a hash where the following keys are def
 sub all_entities_BiomassCompound
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_BiomassCompound
 
@@ -2468,7 +2468,7 @@ common name for the compartment
 sub get_entity_Compartment
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Compartment
 
@@ -2534,7 +2534,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 sub all_entities_Compartment
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Compartment
 
@@ -2614,7 +2614,7 @@ date and time of the last change to this complex's definition
 sub get_entity_Complex
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Complex
 
@@ -2678,7 +2678,7 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub all_entities_Complex
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Complex
 
@@ -2795,7 +2795,7 @@ atomic mass of the compound
 sub get_entity_Compound
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Compound
 
@@ -2869,7 +2869,7 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub all_entities_Compound
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Compound
 
@@ -2948,7 +2948,7 @@ ID of this contig from the core (source) database
 sub get_entity_Contig
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Contig
 
@@ -3010,7 +3010,7 @@ fields_Contig is a reference to a hash where the following keys are defined:
 sub all_entities_Contig
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Contig
 
@@ -3092,7 +3092,7 @@ base pairs that make up this sequence
 sub get_entity_ContigChunk
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ContigChunk
 
@@ -3154,7 +3154,7 @@ fields_ContigChunk is a reference to a hash where the following keys are defined
 sub all_entities_ContigChunk
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ContigChunk
 
@@ -3232,7 +3232,7 @@ number of base pairs in the contig
 sub get_entity_ContigSequence
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ContigSequence
 
@@ -3294,7 +3294,7 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub all_entities_ContigSequence
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ContigSequence
 
@@ -3372,7 +3372,7 @@ Description of how this coregulated set was derived.
 sub get_entity_CoregulatedSet
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_CoregulatedSet
 
@@ -3434,7 +3434,7 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 sub all_entities_CoregulatedSet
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_CoregulatedSet
 
@@ -3514,7 +3514,7 @@ content of the diagram, in PNG format
 sub get_entity_Diagram
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Diagram
 
@@ -3578,7 +3578,7 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub all_entities_Diagram
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Diagram
 
@@ -3660,7 +3660,7 @@ hold the name of the replacement EC number.
 sub get_entity_EcNumber
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_EcNumber
 
@@ -3724,7 +3724,7 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 sub all_entities_EcNumber
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_EcNumber
 
@@ -3798,7 +3798,7 @@ Publication or lab relevant to this experiment.
 sub get_entity_Experiment
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Experiment
 
@@ -3860,7 +3860,7 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub all_entities_Experiment
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Experiment
 
@@ -3959,7 +3959,7 @@ members.
 sub get_entity_Family
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Family
 
@@ -4023,7 +4023,7 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub all_entities_Family
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Family
 
@@ -4131,7 +4131,7 @@ may also have comments.
 sub get_entity_Feature
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Feature
 
@@ -4199,7 +4199,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub all_entities_Feature
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Feature
 
@@ -4369,7 +4369,7 @@ source
 sub get_entity_Genome
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Genome
 
@@ -4455,7 +4455,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub all_entities_Genome
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Genome
 
@@ -4539,7 +4539,7 @@ without the identifying prefix (if one is present).
 sub get_entity_Identifier
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Identifier
 
@@ -4603,7 +4603,7 @@ fields_Identifier is a reference to a hash where the following keys are defined:
 sub all_entities_Identifier
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Identifier
 
@@ -4693,7 +4693,7 @@ type of the medium (aerobic or anaerobic)
 sub get_entity_Media
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Media
 
@@ -4759,7 +4759,7 @@ fields_Media is a reference to a hash where the following keys are defined:
 sub all_entities_Media
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Media
 
@@ -4883,7 +4883,7 @@ number of annotations used to build the model
 sub get_entity_Model
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Model
 
@@ -4959,7 +4959,7 @@ fields_Model is a reference to a hash where the following keys are defined:
 sub all_entities_Model
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Model
 
@@ -5060,7 +5060,7 @@ ask Chris
 sub get_entity_ModelCompartment
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ModelCompartment
 
@@ -5128,7 +5128,7 @@ fields_ModelCompartment is a reference to a hash where the following keys are de
 sub all_entities_ModelCompartment
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ModelCompartment
 
@@ -5194,7 +5194,7 @@ It has the following fields:
 sub get_entity_OTU
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_OTU
 
@@ -5254,7 +5254,7 @@ fields_OTU is a reference to a hash where the following keys are defined:
 sub all_entities_OTU
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_OTU
 
@@ -5333,7 +5333,7 @@ pairings.
 sub get_entity_PairSet
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_PairSet
 
@@ -5395,7 +5395,7 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 sub all_entities_PairSet
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_PairSet
 
@@ -5465,7 +5465,7 @@ It has the following fields:
 sub get_entity_Pairing
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Pairing
 
@@ -5525,7 +5525,7 @@ fields_Pairing is a reference to a hash where the following keys are defined:
 sub all_entities_Pairing
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Pairing
 
@@ -5591,7 +5591,7 @@ It has the following fields:
 sub get_entity_ProbeSet
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ProbeSet
 
@@ -5651,7 +5651,7 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub all_entities_ProbeSet
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ProbeSet
 
@@ -5729,7 +5729,7 @@ the protein's amino acids.
 sub get_entity_ProteinSequence
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ProteinSequence
 
@@ -5791,7 +5791,7 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 sub all_entities_ProteinSequence
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ProteinSequence
 
@@ -5872,7 +5872,7 @@ Hyperlink of the article. The text is the article title.
 sub get_entity_Publication
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Publication
 
@@ -5934,7 +5934,7 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub all_entities_Publication
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Publication
 
@@ -6037,7 +6037,7 @@ direction of this reaction (> for forward-only,
 sub get_entity_Reaction
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Reaction
 
@@ -6107,7 +6107,7 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub all_entities_Reaction
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Reaction
 
@@ -6188,7 +6188,7 @@ ask Chris
 sub get_entity_ReactionRule
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_ReactionRule
 
@@ -6252,7 +6252,7 @@ fields_ReactionRule is a reference to a hash where the following keys are define
 sub all_entities_ReactionRule
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_ReactionRule
 
@@ -6361,7 +6361,7 @@ to the reagent's specified compartment.
 sub get_entity_Reagent
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Reagent
 
@@ -6429,7 +6429,7 @@ fields_Reagent is a reference to a hash where the following keys are defined:
 sub all_entities_Reagent
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Reagent
 
@@ -6517,7 +6517,7 @@ ask Chris
 sub get_entity_Requirement
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Requirement
 
@@ -6583,7 +6583,7 @@ fields_Requirement is a reference to a hash where the following keys are defined
 sub all_entities_Requirement
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Requirement
 
@@ -6659,7 +6659,7 @@ TRUE if a role is hypothetical, else FALSE
 sub get_entity_Role
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Role
 
@@ -6721,7 +6721,7 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub all_entities_Role
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Role
 
@@ -6789,7 +6789,7 @@ It has the following fields:
 sub get_entity_SSCell
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_SSCell
 
@@ -6849,7 +6849,7 @@ fields_SSCell is a reference to a hash where the following keys are defined:
 sub all_entities_SSCell
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_SSCell
 
@@ -6939,7 +6939,7 @@ region occupied by this particular machine.
 sub get_entity_SSRow
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_SSRow
 
@@ -7003,7 +7003,7 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 sub all_entities_SSRow
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_SSRow
 
@@ -7081,7 +7081,7 @@ number, is usually displayed everywhere.
 sub get_entity_Scenario
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Scenario
 
@@ -7143,7 +7143,7 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub all_entities_Scenario
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Scenario
 
@@ -7210,7 +7210,7 @@ It has the following fields:
 sub get_entity_Source
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Source
 
@@ -7270,7 +7270,7 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub all_entities_Source
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Source
 
@@ -7408,7 +7408,7 @@ annotation.
 sub get_entity_Subsystem
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Subsystem
 
@@ -7484,7 +7484,7 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub all_entities_Subsystem
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Subsystem
 
@@ -7550,7 +7550,7 @@ It has the following fields:
 sub get_entity_SubsystemClass
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_SubsystemClass
 
@@ -7610,7 +7610,7 @@ fields_SubsystemClass is a reference to a hash where the following keys are defi
 sub all_entities_SubsystemClass
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_SubsystemClass
 
@@ -7709,7 +7709,7 @@ be in this list.
 sub get_entity_TaxonomicGrouping
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_TaxonomicGrouping
 
@@ -7777,7 +7777,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 sub all_entities_TaxonomicGrouping
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_TaxonomicGrouping
 
@@ -7882,7 +7882,7 @@ commentary text about the variant
 sub get_entity_Variant
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Variant
 
@@ -7950,7 +7950,7 @@ fields_Variant is a reference to a hash where the following keys are defined:
 sub all_entities_Variant
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Variant
 
@@ -8024,7 +8024,7 @@ means
 sub get_entity_Variation
 {
     my($self, $ids, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_entity_Variation
 
@@ -8086,7 +8086,7 @@ fields_Variation is a reference to a hash where the following keys are defined:
 sub all_entities_Variation
 {
     my($self, $start, $count, $fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN all_entities_Variation
 
@@ -8180,7 +8180,7 @@ or unknown (0).
 sub get_relationship_AffectsLevelOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_AffectsLevelOf
 
@@ -8260,7 +8260,7 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_IsAffectedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsAffectedIn
 
@@ -8398,7 +8398,7 @@ alignment
 sub get_relationship_Aligns
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Aligns
 
@@ -8498,7 +8498,7 @@ fields_AlignmentTree is a reference to a hash where the following keys are defin
 sub get_relationship_IsAlignedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsAlignedBy
 
@@ -8586,7 +8586,7 @@ It has the following fields:
 sub get_relationship_Concerns
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Concerns
 
@@ -8666,7 +8666,7 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub get_relationship_IsATopicOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsATopicOf
 
@@ -8760,7 +8760,7 @@ It has the following fields:
 sub get_relationship_Contains
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Contains
 
@@ -8844,7 +8844,7 @@ fields_SSCell is a reference to a hash where the following keys are defined:
 sub get_relationship_IsContainedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsContainedIn
 
@@ -8953,7 +8953,7 @@ It has the following fields:
 sub get_relationship_Describes
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Describes
 
@@ -9053,7 +9053,7 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_IsDescribedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDescribedBy
 
@@ -9161,7 +9161,7 @@ Location of the reaction's node on the diagram.
 sub get_relationship_Displays
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Displays
 
@@ -9255,7 +9255,7 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub get_relationship_IsDisplayedOn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDisplayedOn
 
@@ -9345,7 +9345,7 @@ It has the following fields:
 sub get_relationship_Encompasses
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Encompasses
 
@@ -9425,7 +9425,7 @@ fields_Encompasses is a reference to a hash where the following keys are defined
 sub get_relationship_IsEncompassedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsEncompassedIn
 
@@ -9519,7 +9519,7 @@ sequence order.
 sub get_relationship_GeneratedLevelsFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_GeneratedLevelsFor
 
@@ -9599,7 +9599,7 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_WasGeneratedFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_WasGeneratedFrom
 
@@ -9701,7 +9701,7 @@ TRUE if this is an expert assertion, else FALSE
 sub get_relationship_HasAssertionFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasAssertionFrom
 
@@ -9785,7 +9785,7 @@ fields_Identifier is a reference to a hash where the following keys are defined:
 sub get_relationship_Asserts
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Asserts
 
@@ -9891,7 +9891,7 @@ alias for the compound assigned by the source
 sub get_relationship_HasCompoundAliasFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasCompoundAliasFrom
 
@@ -9983,7 +9983,7 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_UsesAliasForCompound
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_UsesAliasForCompound
 
@@ -10093,7 +10093,7 @@ or unknown (0).
 sub get_relationship_HasIndicatedSignalFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasIndicatedSignalFrom
 
@@ -10183,7 +10183,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IndicatesSignalFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IndicatesSignalFor
 
@@ -10280,7 +10280,7 @@ It has the following fields:
 sub get_relationship_HasMember
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasMember
 
@@ -10368,7 +10368,7 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub get_relationship_IsMemberOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsMemberOf
 
@@ -10476,7 +10476,7 @@ but should not be included in the modelling process.
 sub get_relationship_HasParticipant
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasParticipant
 
@@ -10566,7 +10566,7 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub get_relationship_ParticipatesIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_ParticipatesIn
 
@@ -10692,7 +10692,7 @@ maximum flux of the compound for this media
 sub get_relationship_HasPresenceOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasPresenceOf
 
@@ -10794,7 +10794,7 @@ fields_Media is a reference to a hash where the following keys are defined:
 sub get_relationship_IsPresentIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsPresentIn
 
@@ -10896,7 +10896,7 @@ alias for the reaction assigned by the source
 sub get_relationship_HasReactionAliasFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasReactionAliasFrom
 
@@ -10984,7 +10984,7 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_UsesAliasForReaction
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_UsesAliasForReaction
 
@@ -11100,7 +11100,7 @@ It has the following fields:
 sub get_relationship_HasRepresentativeOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasRepresentativeOf
 
@@ -11206,7 +11206,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRepresentedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRepresentedIn
 
@@ -11299,7 +11299,7 @@ Sequence number of this experiment in the various result vectors.
 sub get_relationship_HasResultsIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasResultsIn
 
@@ -11379,7 +11379,7 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_HasResultsFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasResultsFor
 
@@ -11467,7 +11467,7 @@ It has the following fields:
 sub get_relationship_HasSection
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasSection
 
@@ -11547,7 +11547,7 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub get_relationship_IsSectionOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsSectionOf
 
@@ -11640,7 +11640,7 @@ It has the following fields:
 sub get_relationship_HasStep
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasStep
 
@@ -11724,7 +11724,7 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub get_relationship_IsStepOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsStepOf
 
@@ -11824,7 +11824,7 @@ It has the following fields:
 sub get_relationship_HasUsage
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasUsage
 
@@ -11916,7 +11916,7 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUsageOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsUsageOf
 
@@ -12012,7 +12012,7 @@ as a string, but may in fact be a number.
 sub get_relationship_HasValueFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasValueFor
 
@@ -12094,7 +12094,7 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_HasValueIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasValueIn
 
@@ -12225,7 +12225,7 @@ is a functioning part of the subsystem.
 sub get_relationship_Includes
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Includes
 
@@ -12325,7 +12325,7 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_IsIncludedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsIncludedIn
 
@@ -12427,7 +12427,7 @@ sequence order.
 sub get_relationship_IndicatedLevelsFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IndicatedLevelsFor
 
@@ -12515,7 +12515,7 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_HasLevelsFrom
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasLevelsFrom
 
@@ -12617,7 +12617,7 @@ It has the following fields:
 sub get_relationship_Involves
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Involves
 
@@ -12711,7 +12711,7 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub get_relationship_IsInvolvedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInvolvedIn
 
@@ -12817,7 +12817,7 @@ It has the following fields:
 sub get_relationship_IsARequirementIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsARequirementIn
 
@@ -12915,7 +12915,7 @@ fields_Model is a reference to a hash where the following keys are defined:
 sub get_relationship_IsARequirementOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsARequirementOf
 
@@ -13024,7 +13024,7 @@ direction of region (+ or -)
 sub get_relationship_IsAlignedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsAlignedIn
 
@@ -13110,7 +13110,7 @@ fields_Contig is a reference to a hash where the following keys are defined:
 sub get_relationship_IsAlignmentFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsAlignmentFor
 
@@ -13209,7 +13209,7 @@ It has the following fields:
 sub get_relationship_IsAnnotatedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsAnnotatedBy
 
@@ -13299,7 +13299,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_Annotates
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Annotates
 
@@ -13393,7 +13393,7 @@ It has the following fields:
 sub get_relationship_IsBindingSiteFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsBindingSiteFor
 
@@ -13479,7 +13479,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsBoundBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsBoundBy
 
@@ -13581,7 +13581,7 @@ It has the following fields:
 sub get_relationship_IsClassFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsClassFor
 
@@ -13673,7 +13673,7 @@ fields_SubsystemClass is a reference to a hash where the following keys are defi
 sub get_relationship_IsInClass
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInClass
 
@@ -13789,7 +13789,7 @@ TRUE for the representative genome of the set, else FALSE.
 sub get_relationship_IsCollectionOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsCollectionOf
 
@@ -13893,7 +13893,7 @@ fields_OTU is a reference to a hash where the following keys are defined:
 sub get_relationship_IsCollectedInto
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsCollectedInto
 
@@ -14006,7 +14006,7 @@ It has the following fields:
 sub get_relationship_IsComposedOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsComposedOf
 
@@ -14110,7 +14110,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsComponentOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsComponentOf
 
@@ -14200,7 +14200,7 @@ It has the following fields:
 sub get_relationship_IsComprisedOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsComprisedOf
 
@@ -14282,7 +14282,7 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 sub get_relationship_Comprises
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Comprises
 
@@ -14392,7 +14392,7 @@ It has the following fields:
 sub get_relationship_IsConfiguredBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsConfiguredBy
 
@@ -14494,7 +14494,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_ReflectsStateOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_ReflectsStateOf
 
@@ -14584,7 +14584,7 @@ It has the following fields:
 sub get_relationship_IsConsistentWith
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsConsistentWith
 
@@ -14666,7 +14666,7 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 sub get_relationship_IsConsistentTo
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsConsistentTo
 
@@ -14768,7 +14768,7 @@ TRUE if this transcription factor is an effector
 sub get_relationship_IsControlledUsing
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsControlledUsing
 
@@ -14856,7 +14856,7 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 sub get_relationship_Controls
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Controls
 
@@ -14952,7 +14952,7 @@ Pearson correlation coefficient for this coregulation.
 sub get_relationship_IsCoregulatedWith
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsCoregulatedWith
 
@@ -15034,7 +15034,7 @@ fields_IsCoregulatedWith is a reference to a hash where the following keys are d
 sub get_relationship_HasCoregulationWith
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasCoregulationWith
 
@@ -15138,7 +15138,7 @@ expression data experiments
 sub get_relationship_IsCoupledTo
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsCoupledTo
 
@@ -15218,7 +15218,7 @@ fields_IsCoupledTo is a reference to a hash where the following keys are defined
 sub get_relationship_IsCoupledWith
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsCoupledWith
 
@@ -15318,7 +15318,7 @@ It has the following fields:
 sub get_relationship_IsDefaultFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDefaultFor
 
@@ -15410,7 +15410,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 sub get_relationship_RunsByDefaultIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_RunsByDefaultIn
 
@@ -15508,7 +15508,7 @@ It has the following fields:
 sub get_relationship_IsDefaultLocationOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDefaultLocationOf
 
@@ -15598,7 +15598,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 sub get_relationship_HasDefaultLocation
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasDefaultLocation
 
@@ -15698,7 +15698,7 @@ X).
 sub get_relationship_IsDeterminedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDeterminedBy
 
@@ -15778,7 +15778,7 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 sub get_relationship_Determines
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Determines
 
@@ -15886,7 +15886,7 @@ It has the following fields:
 sub get_relationship_IsDividedInto
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDividedInto
 
@@ -15986,7 +15986,7 @@ fields_Model is a reference to a hash where the following keys are defined:
 sub get_relationship_IsDivisionOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsDivisionOf
 
@@ -16080,7 +16080,7 @@ It has the following fields:
 sub get_relationship_IsExemplarOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsExemplarOf
 
@@ -16166,7 +16166,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_HasAsExemplar
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasAsExemplar
 
@@ -16256,7 +16256,7 @@ It has the following fields:
 sub get_relationship_IsFamilyFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsFamilyFor
 
@@ -16338,7 +16338,7 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub get_relationship_DeterminesFunctionOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_DeterminesFunctionOf
 
@@ -16430,7 +16430,7 @@ It has the following fields:
 sub get_relationship_IsFormedOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsFormedOf
 
@@ -16514,7 +16514,7 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 sub get_relationship_IsFormedInto
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsFormedInto
 
@@ -16608,7 +16608,7 @@ It has the following fields:
 sub get_relationship_IsFunctionalIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsFunctionalIn
 
@@ -16694,7 +16694,7 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub get_relationship_HasFunctional
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasFunctional
 
@@ -16783,7 +16783,7 @@ It has the following fields:
 sub get_relationship_IsGroupFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsGroupFor
 
@@ -16863,7 +16863,7 @@ fields_IsGroupFor is a reference to a hash where the following keys are defined:
 sub get_relationship_IsInGroup
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInGroup
 
@@ -16960,7 +16960,7 @@ It has the following fields:
 sub get_relationship_IsImplementedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsImplementedBy
 
@@ -17048,7 +17048,7 @@ fields_Variant is a reference to a hash where the following keys are defined:
 sub get_relationship_Implements
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Implements
 
@@ -17142,7 +17142,7 @@ It has the following fields:
 sub get_relationship_IsInPair
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInPair
 
@@ -17226,7 +17226,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsPairOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsPairOf
 
@@ -17324,7 +17324,7 @@ It has the following fields:
 sub get_relationship_IsInstantiatedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInstantiatedBy
 
@@ -17414,7 +17414,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 sub get_relationship_IsInstanceOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInstanceOf
 
@@ -17545,7 +17545,7 @@ forward and "-" if it is backward.
 sub get_relationship_IsLocatedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsLocatedIn
 
@@ -17639,7 +17639,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsLocusFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsLocusFor
 
@@ -17765,7 +17765,7 @@ It has the following fields:
 sub get_relationship_IsModeledBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsModeledBy
 
@@ -17883,7 +17883,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_Models
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Models
 
@@ -17974,7 +17974,7 @@ It has the following fields:
 sub get_relationship_IsNamedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsNamedBy
 
@@ -18056,7 +18056,7 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 sub get_relationship_Names
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Names
 
@@ -18177,7 +18177,7 @@ It has the following fields:
 sub get_relationship_IsOwnerOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsOwnerOf
 
@@ -18287,7 +18287,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsOwnedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsOwnedBy
 
@@ -18393,7 +18393,7 @@ reaction
 sub get_relationship_IsProposedLocationOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsProposedLocationOf
 
@@ -18481,7 +18481,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 sub get_relationship_HasProposedLocationIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasProposedLocationIn
 
@@ -18577,7 +18577,7 @@ It has the following fields:
 sub get_relationship_IsProteinFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsProteinFor
 
@@ -18663,7 +18663,7 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 sub get_relationship_Produces
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Produces
 
@@ -18772,7 +18772,7 @@ reaction
 sub get_relationship_IsRealLocationOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRealLocationOf
 
@@ -18864,7 +18864,7 @@ fields_ModelCompartment is a reference to a hash where the following keys are de
 sub get_relationship_HasRealLocationIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasRealLocationIn
 
@@ -18957,7 +18957,7 @@ It has the following fields:
 sub get_relationship_IsRegulatedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRegulatedIn
 
@@ -19043,7 +19043,7 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRegulatedSetOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRegulatedSetOf
 
@@ -19148,7 +19148,7 @@ It has the following fields:
 sub get_relationship_IsRelevantFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRelevantFor
 
@@ -19244,7 +19244,7 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRelevantTo
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRelevantTo
 
@@ -19343,7 +19343,7 @@ It has the following fields:
 sub get_relationship_IsRequiredBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRequiredBy
 
@@ -19435,7 +19435,7 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub get_relationship_Requires
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Requires
 
@@ -19523,7 +19523,7 @@ It has the following fields:
 sub get_relationship_IsRoleOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRoleOf
 
@@ -19601,7 +19601,7 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub get_relationship_HasRole
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasRole
 
@@ -19689,7 +19689,7 @@ It has the following fields:
 sub get_relationship_IsRowOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRowOf
 
@@ -19769,7 +19769,7 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRoleFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsRoleFor
 
@@ -19859,7 +19859,7 @@ It has the following fields:
 sub get_relationship_IsSequenceOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsSequenceOf
 
@@ -19939,7 +19939,7 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub get_relationship_HasAsSequence
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasAsSequence
 
@@ -20042,7 +20042,7 @@ It has the following fields:
 sub get_relationship_IsSubInstanceOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsSubInstanceOf
 
@@ -20136,7 +20136,7 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_Validates
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Validates
 
@@ -20216,7 +20216,7 @@ It has the following fields:
 sub get_relationship_IsSuperclassOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsSuperclassOf
 
@@ -20288,7 +20288,7 @@ fields_IsSuperclassOf is a reference to a hash where the following keys are defi
 sub get_relationship_IsSubclassOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsSubclassOf
 
@@ -20382,7 +20382,7 @@ It has the following fields:
 sub get_relationship_IsTargetOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsTargetOf
 
@@ -20468,7 +20468,7 @@ fields_ModelCompartment is a reference to a hash where the following keys are de
 sub get_relationship_Targets
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Targets
 
@@ -20588,7 +20588,7 @@ It has the following fields:
 sub get_relationship_IsTaxonomyOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsTaxonomyOf
 
@@ -20698,7 +20698,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 sub get_relationship_IsInTaxa
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsInTaxa
 
@@ -20810,7 +20810,7 @@ an output. If two, the compound is an auxiliary output.
 sub get_relationship_IsTerminusFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsTerminusFor
 
@@ -20904,7 +20904,7 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub get_relationship_HasAsTerminus
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HasAsTerminus
 
@@ -21009,7 +21009,7 @@ ask Chris
 sub get_relationship_IsTriggeredBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsTriggeredBy
 
@@ -21095,7 +21095,7 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub get_relationship_Triggers
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Triggers
 
@@ -21193,7 +21193,7 @@ It has the following fields:
 sub get_relationship_IsUsedAs
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsUsedAs
 
@@ -21283,7 +21283,7 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUseOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsUseOf
 
@@ -21388,7 +21388,7 @@ It has the following fields:
 sub get_relationship_Manages
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Manages
 
@@ -21484,7 +21484,7 @@ fields_Model is a reference to a hash where the following keys are defined:
 sub get_relationship_IsManagedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsManagedBy
 
@@ -21576,7 +21576,7 @@ It has the following fields:
 sub get_relationship_OperatesIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_OperatesIn
 
@@ -21660,7 +21660,7 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUtilizedIn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsUtilizedIn
 
@@ -21752,7 +21752,7 @@ It has the following fields:
 sub get_relationship_Overlaps
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Overlaps
 
@@ -21834,7 +21834,7 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub get_relationship_IncludesPartOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IncludesPartOf
 
@@ -21940,7 +21940,7 @@ It has the following fields:
 sub get_relationship_ParticipatesAs
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_ParticipatesAs
 
@@ -22038,7 +22038,7 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub get_relationship_IsParticipationOf
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsParticipationOf
 
@@ -22149,7 +22149,7 @@ It has the following fields:
 sub get_relationship_ProducedResultsFor
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_ProducedResultsFor
 
@@ -22251,7 +22251,7 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_HadResultsProducedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_HadResultsProducedBy
 
@@ -22359,7 +22359,7 @@ where 1 is the best
 sub get_relationship_ProjectsOnto
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_ProjectsOnto
 
@@ -22439,7 +22439,7 @@ fields_ProjectsOnto is a reference to a hash where the following keys are define
 sub get_relationship_IsProjectedOnto
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsProjectedOnto
 
@@ -22539,7 +22539,7 @@ It has the following fields:
 sub get_relationship_Provided
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Provided
 
@@ -22631,7 +22631,7 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasProvidedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_WasProvidedBy
 
@@ -22743,7 +22743,7 @@ Location of the compound's node on the diagram.
 sub get_relationship_Shows
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Shows
 
@@ -22841,7 +22841,7 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub get_relationship_IsShownOn
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsShownOn
 
@@ -22951,7 +22951,7 @@ It has the following fields:
 sub get_relationship_Submitted
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Submitted
 
@@ -23053,7 +23053,7 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasSubmittedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_WasSubmittedBy
 
@@ -23168,7 +23168,7 @@ It has the following fields:
 sub get_relationship_Uses
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_Uses
 
@@ -23274,7 +23274,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUsedBy
 {
     my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
-    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN get_relationship_IsUsedBy
 
@@ -23288,6 +23288,2434 @@ sub get_relationship_IsUsedBy
 
 
 =head1 TYPES
+
+
+
+=head2 annotator
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 annotation_time
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 comment
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 fid
+
+=over 4
+
+
+
+=item Description
+
+a fid is a "feature id".  A feature represents an ordered list of regions from
+the contigs of a genome.  Features all have types.  This allows you to speak
+of not only protein-encoding genes (PEGs) and RNAs, but also binding sites,
+large regions, etc.  The location of a fid is defined as a list of
+"location of a contiguous DNA string" pieces (see the description of the
+type "location")
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 protein_family
+
+=over 4
+
+
+
+=item Description
+
+A protein_family is thought of as a set of isofunctional, homologous protein sequences.
+This is not exactly what other groups have meant by "protein families".  There is no
+hierarchy of super-family, family, sub-family.  We plan on loading different collections
+of protein families, but in many cases there will need to be a transformation into the
+concept used by Kbase.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 role
+
+=over 4
+
+
+
+=item Description
+
+The concept of "role" or "functional role" is basically an atomic functional unit.
+The "function of a protein" is made up of one or more roles.  That is, a bifunctional protein
+with an assigned function of
+
+   5-Enolpyruvylshikimate-3-phosphate synthase (EC 2.5.1.19) / Cytidylate kinase (EC 2.7.4.14)
+
+would implement two distinct roles (the "function1 / function2" notation is intended to assert
+that the initial part of the protein implements function1, and the terminal part of the protein
+implements function2).  It is worth noting that a protein often implements multiple roles due
+to broad specificity.  In this case, we suggest describing the protein function as
+
+     function1 @ function2
+
+That is the ' / ' separator is used to represent multiple roles implemented by distinct
+domains of the protein, while ' @ ' is used to represent multiple roles implemented by
+distinct domains.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 subsystem
+
+=over 4
+
+
+
+=item Description
+
+A substem is composed of two components: a set of roles that are gathered to be annotated
+simultaneously and a spreadsheet depicting the proteins within each genome that implement
+the roles.  The set of roles may correspond to a pathway, a complex, an inventory (say, "transporters")
+or whatever other principle an annotator used to formulate the subsystem.
+
+The subsystem spreadsheet is a list of "rows", each representing the subsytem in a specific genome.
+Each row includes a variant code (indicating what version of the molecular machine exists in the
+genome) and cells.  Each cell is a 2-tuple:
+
+     [role,protein-encoding genes that implement the role in the genome]
+
+Annotators construct subsystems, and in the process impose a controlled vocabulary
+for roles and functions.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 variant
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 variant_of_subsystem
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a subsystem
+1: a variant
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a subsystem
+1: a variant
+
+
+=end text
+
+=back
+
+
+
+=head2 variant_subsystem_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a variant_of_subsystem
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a variant_of_subsystem
+
+=end text
+
+=back
+
+
+
+=head2 type_of_fid
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 types_of_fids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a type_of_fid
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a type_of_fid
+
+=end text
+
+=back
+
+
+
+=head2 length
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 begin
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 strand
+
+=over 4
+
+
+
+=item Description
+
+In encodings of locations, we often specify strands.  We specify the strand
+as '+' or '-'
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 contig
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 region_of_dna
+
+=over 4
+
+
+
+=item Description
+
+A region of DNA is maintained as a tuple of four components:
+
+                the contig
+                the beginning position (from 1)
+                the strand
+                the length
+
+           We often speak of "a region".  By "location", we mean a sequence
+           of regions from the same genome (perhaps from distinct contigs).
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 4 items:
+0: a contig
+1: a begin
+2: a strand
+3: a length
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 4 items:
+0: a contig
+1: a begin
+2: a strand
+3: a length
+
+
+=end text
+
+=back
+
+
+
+=head2 location
+
+=over 4
+
+
+
+=item Description
+
+a "location" refers to a sequence of regions
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a region_of_dna
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a region_of_dna
+
+=end text
+
+=back
+
+
+
+=head2 region_of_dna_string
+
+=over 4
+
+
+
+=item Description
+
+we often need to represent regions or locations as
+strings.  We would use something like
+
+     contigA_200+100,contigA_402+188
+
+to represent a location composed of two regions
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 region_of_dna_strings
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a region_of_dna_string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a region_of_dna_string
+
+=end text
+
+=back
+
+
+
+=head2 location_string
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 dna
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 function
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 protein
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 md5
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 genome
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 taxonomic_group
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 annotation
+
+=over 4
+
+
+
+=item Description
+
+The Kbase stores annotations relating to features.  Each annotation
+is a 3-tuple:
+
+     the text of the annotation (often a record of assertion of function)
+
+     the annotator attaching the annotation to the feature
+
+     the time (in seconds from the epoch) at which the annotation was attached
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 3 items:
+0: a comment
+1: an annotator
+2: an annotation_time
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 3 items:
+0: a comment
+1: an annotator
+2: an annotation_time
+
+
+=end text
+
+=back
+
+
+
+=head2 pubref
+
+=over 4
+
+
+
+=item Description
+
+The Kbase will include a growing body of literature supporting protein
+functions, asserted phenotypes, etc.  References are encoded as 3-tuples:
+
+     an id (often a PubMed ID)
+
+     a URL to the paper
+
+     a title of the paper
+
+The URL and title are often missing (but, can usually be inferred from the pubmed ID).
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 3 items:
+0: a string
+1: a string
+2: a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 3 items:
+0: a string
+1: a string
+2: a string
+
+
+=end text
+
+=back
+
+
+
+=head2 scored_fid
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a fid
+1: a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a fid
+1: a float
+
+
+=end text
+
+=back
+
+
+
+=head2 annotations
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an annotation
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an annotation
+
+=end text
+
+=back
+
+
+
+=head2 pubrefs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a pubref
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a pubref
+
+=end text
+
+=back
+
+
+
+=head2 roles
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a role
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a role
+
+=end text
+
+=back
+
+
+
+=head2 scored_fids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a scored_fid
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a scored_fid
+
+=end text
+
+=back
+
+
+
+=head2 locations
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a location
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a location
+
+=end text
+
+=back
+
+
+
+=head2 proteins
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a protein
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a protein
+
+=end text
+
+=back
+
+
+
+=head2 functions
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a function
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a function
+
+=end text
+
+=back
+
+
+
+=head2 taxonomic_groups
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a taxonomic_group
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a taxonomic_group
+
+=end text
+
+=back
+
+
+
+=head2 subsystems
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a subsystem
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a subsystem
+
+=end text
+
+=back
+
+
+
+=head2 contigs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a contig
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a contig
+
+=end text
+
+=back
+
+
+
+=head2 md5s
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a md5
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a md5
+
+=end text
+
+=back
+
+
+
+=head2 genomes
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a genome
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a genome
+
+=end text
+
+=back
+
+
+
+=head2 pair_of_fids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a fid
+1: a fid
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a fid
+1: a fid
+
+
+=end text
+
+=back
+
+
+
+=head2 pairs_of_fids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a pair_of_fids
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a pair_of_fids
+
+=end text
+
+=back
+
+
+
+=head2 protein_families
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a protein_family
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a protein_family
+
+=end text
+
+=back
+
+
+
+=head2 score
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a float
+</pre>
+
+=end html
+
+=begin text
+
+a float
+
+=end text
+
+=back
+
+
+
+=head2 evidence
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a pair_of_fids
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a pair_of_fids
+
+=end text
+
+=back
+
+
+
+=head2 fids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fid
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fid
+
+=end text
+
+=back
+
+
+
+=head2 row
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a variant
+1: a reference to a hash where the key is a role and the value is a fids
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a variant
+1: a reference to a hash where the key is a role and the value is a fids
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_function_pair
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a fid
+1: a function
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a fid
+1: a function
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_function_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fid_function_pair
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fid_function_pair
+
+=end text
+
+=back
+
+
+
+=head2 fc_protein_family
+
+=over 4
+
+
+
+=item Description
+
+A functionally coupled protein family identifies a family and two scores
+that indicate the coupling strength: a co-expression score and a
+co-occurrence score.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 3 items:
+0: a protein_family
+1: a score
+2: a function
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 3 items:
+0: a protein_family
+1: a score
+2: a function
+
+
+=end text
+
+=back
+
+
+
+=head2 fc_protein_families
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fc_protein_family
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fc_protein_family
+
+=end text
+
+=back
+
+
+
+=head2 aux
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 fields
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 complex
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 complexes
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a complex
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a complex
+
+=end text
+
+=back
+
+
+
+=head2 name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 reaction
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 reactions
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a reaction
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a reaction
+
+=end text
+
+=back
+
+
+
+=head2 complex_data
+
+=over 4
+
+
+
+=item Description
+
+Reactions do not connect directly to roles.  Rather, the conceptual model is that one or more roles
+together form a complex.  A complex implements one or more reactions.  The actual data relating
+to a complex is spread over two entities: Complex and ReactionComplex. It is convenient to be
+able to offer access to the complex name, the reactions it implements, and the roles that make it up
+in a single invocation.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+complex_name has a value which is a name
+complex_roles has a value which is a roles
+complex_reactions has a value which is a reactions
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+complex_name has a value which is a name
+complex_roles has a value which is a roles
+complex_reactions has a value which is a reactions
+
+
+=end text
+
+=back
+
+
+
+=head2 genome_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+complete has a value which is an int
+contigs has a value which is an int
+dna_size has a value which is an int
+gc_content has a value which is a float
+genetic_code has a value which is an int
+pegs has a value which is an int
+rnas has a value which is an int
+scientific_name has a value which is a string
+taxonomy has a value which is a string
+genome_md5 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+complete has a value which is an int
+contigs has a value which is an int
+dna_size has a value which is an int
+gc_content has a value which is a float
+genetic_code has a value which is an int
+pegs has a value which is an int
+rnas has a value which is an int
+scientific_name has a value which is a string
+taxonomy has a value which is a string
+genome_md5 has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 feature_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+feature_id has a value which is a fid
+genome_name has a value which is a string
+feature_function has a value which is a string
+feature_length has a value which is an int
+feature_publications has a value which is a pubrefs
+feature_location has a value which is a locations
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+feature_id has a value which is a fid
+genome_name has a value which is a string
+feature_function has a value which is a string
+feature_length has a value which is an int
+feature_publications has a value which is a pubrefs
+feature_location has a value which is a locations
+
+
+=end text
+
+=back
+
+
+
+=head2 expert
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 source
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 function_assertion
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 4 items:
+0: an id
+1: a function
+2: a source
+3: an expert
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 4 items:
+0: an id
+1: a function
+2: a source
+3: an expert
+
+
+=end text
+
+=back
+
+
+
+=head2 function_assertions
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a function_assertion
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a function_assertion
+
+=end text
+
+=back
+
+
+
+=head2 regulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 regulon_size
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 regulon_size_pair
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a regulon
+1: a regulon_size
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a regulon
+1: a regulon_size
+
+
+=end text
+
+=back
+
+
+
+=head2 regulon_size_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a regulon_size_pair
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a regulon_size_pair
+
+=end text
+
+=back
+
+
+
+=head2 regulons
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a regulon
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a regulon
+
+=end text
+
+=back
+
+
+
+=head2 protein_sequence
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 dna_sequence
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 name_parameter
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ss_var_role_tuple
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 3 items:
+0: a subsystem
+1: a variant
+2: a role
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 3 items:
+0: a subsystem
+1: a variant
+2: a role
+
+
+=end text
+
+=back
+
+
+
+=head2 ss_var_role_tuples
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a ss_var_role_tuple
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a ss_var_role_tuple
+
+=end text
+
+=back
+
+
+
+=head2 genome_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 entity_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 weight
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 field_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 search_hit
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a weight
+1: a reference to a hash where the key is a field_name and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a weight
+1: a reference to a hash where the key is a field_name and the value is a string
+
+
+=end text
+
+=back
 
 
 
