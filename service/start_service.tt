@@ -4,6 +4,7 @@ export KB_RUNTIME=[% kb_runtime %]
 export PATH=$KB_TOP/bin:$KB_RUNTIME/bin:$PATH
 export PERL5LIB=$KB_TOP/lib
 export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_name %]
+export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
 
 pid_file=$KB_SERVICE_DIR/service.pid
 
