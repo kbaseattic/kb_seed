@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<object label="JOB" trackhistory="0" >
+	<scalar label="ID" weblabel="Job ID" source="PPO:SchedulerDB:ID" />
+	<scalar label="PROCESSID" weblabel="Process ID" source="PPO:SchedulerDB:PROCESSID" hidden="1"/>
+	<scalar label="COMMAND" weblabel="Command" source="PPO:SchedulerDB:COMMAND" />
+	<scalar label="PRIORITY" weblabel="Priority" source="PPO:SchedulerDB:PRIORITY" />
+	<scalar label="USER" weblabel="User" source="PPO:SchedulerDB:USER" />
+	<scalar label="STATUS" weblabel="Status" source="PPO:SchedulerDB:STATUS" />
+	<scalar label="STATE" weblabel="" source="PPO:SchedulerDB:STATE" />
+	<scalar label="QUEUE" weblabel="Queue" source="PPO:SchedulerDB:QUEUE" />
+	<scalar label="QUEUETIME" weblabel="Time queued" source="PPO:SchedulerDB:QUEUETIME" function="figmodel->date($QUEUETIME$) hidden="1" />
+	<scalar label="START" weblabel="Time started" source="PPO:SchedulerDB:START" function="figmodel->date($START$) hidden="1" />
+	<scalar label="FINISHED" weblabel="Time finished" source="PPO:SchedulerDB:FINISHED" function="figmodel->date($FINISHED$) hidden="1" />
+	<webcontrol label="KILL" weblabel="Kill job" function="javalink(ajax(FIGMODELScheduler->delete($ID$))" />
+</object>
+  
+<object label="QUEUE" trackhistory="0" >
+  	<scalar label="NAME" weblabel="" />
+  	<scalar label="TYPE" weblabel="" />
+  	<scalar label="MAXPROCESSES" weblabel="" />
+</object>
