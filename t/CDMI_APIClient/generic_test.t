@@ -16,8 +16,7 @@ my $url         = 'http://140.221.92.46:5000';
 
 my $test_method = METHOD TO TEST AGAINST;
 my @additional_args = (
-
-
+        [],
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -28,7 +27,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO OU LOAD YOUR DATA
+my $all_available_data = HOW DO YOU LOAD YOUR DATA
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
