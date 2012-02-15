@@ -14,9 +14,10 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = 'genomes_to_md5s';
+my $test_method = METHOD TO TEST AGAINST;
 my @additional_args = (
-        []
+
+
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,7 +28,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = HOW DO OU LOAD YOUR DATA
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -43,10 +44,10 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-	{'id' => 'kb|g.3093', 'expected' => '94518bb814a8a79e60637ee6f92ce3bd'},
-	{'id' => 'kb|g.5458', 'expected' => '15ade9db34c4a556f56aa39805192a9f'},
-	{'id' => 'kb|g.1554', 'expected' => '4a1b448b1dc98b56dec5dcb092d49f4d'},
-	{'id' => 'kb|g.2620', 'expected' => 'dc4fb05c22adbc14908f9c857a2ad9f5'},
+    {
+        'id' => '',                 #id to check against
+        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
+    },
 ];
 
 #
@@ -54,11 +55,13 @@ my $sample_data = [
 #
 ############
 
+my @args_count = @additional_args || 1;
+
 plan('tests' =>
-      3 * (scalar keys %$all_available_data) * @additional_args
-    + 2 * @$sample_data * @additional_args
-    + 1 * @random_subset * @additional_args
-    + 7 * @additional_args);
+      3 * (scalar keys %$all_available_data) * @args_count
+    + 2 * @$sample_data * @args_count
+    + 1 * @random_subset * @args_count
+    + 7 * @args_count);
 
 foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
