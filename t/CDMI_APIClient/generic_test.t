@@ -13,7 +13,8 @@ use CDMI_EntityAPIClient;
 # CONFIGURE THESE
 #
 my $url         = 'http://140.221.92.46:5000';
-my $test_method = 'genomes_to_md5s';
+
+my $test_method = 'HOW DO YOU LOAD YOUR DATA';
 
 my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
@@ -22,7 +23,8 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = SOME SAMPLE SET
+#for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
@@ -36,11 +38,12 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 my $sample_data = [
-	{'id' => 'kb|g.3093', 'expected' => '94518bb814a8a79e60637ee6f92ce3bd'},
-	{'id' => 'kb|g.5458', 'expected' => '15ade9db34c4a556f56aa39805192a9f'},
-	{'id' => 'kb|g.1554', 'expected' => '4a1b448b1dc98b56dec5dcb092d49f4d'},
-	{'id' => 'kb|g.2620', 'expected' => 'dc4fb05c22adbc14908f9c857a2ad9f5'},
+    {
+        'id' => '',         #The ID you're testing against
+        'expected' => ''    #The known expected value
+    }
 ];
+
 #
 #
 #

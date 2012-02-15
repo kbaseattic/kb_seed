@@ -13,7 +13,7 @@ use CDMI_EntityAPIClient;
 # CONFIGURE THESE
 #
 my $url         = 'http://140.221.92.46:5000';
-my $test_method = 'genomes_to_md5s';
+my $test_method = 'genomes_to_contigs';
 
 my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
@@ -36,10 +36,22 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 my $sample_data = [
-	{'id' => 'kb|g.3093', 'expected' => '94518bb814a8a79e60637ee6f92ce3bd'},
-	{'id' => 'kb|g.5458', 'expected' => '15ade9db34c4a556f56aa39805192a9f'},
-	{'id' => 'kb|g.1554', 'expected' => '4a1b448b1dc98b56dec5dcb092d49f4d'},
-	{'id' => 'kb|g.2620', 'expected' => 'dc4fb05c22adbc14908f9c857a2ad9f5'},
+	{'id' => 'kb|g.3093', 'expected' => [ 'kb|g.3093.c.0', 'kb|g.3093.c.1' ]},
+	{'id' => 'kb|g.5458', 'expected' => [ 'kb|g.5458.c.1' ]},
+	{'id' => 'kb|g.1554', 'expected' => [
+                           'kb|g.1554.c.0',
+                           'kb|g.1554.c.1',
+                           'kb|g.1554.c.2',
+                           'kb|g.1554.c.3',
+                           'kb|g.1554.c.4',
+                           'kb|g.1554.c.5',
+                           'kb|g.1554.c.6',
+                           'kb|g.1554.c.7',
+                           'kb|g.1554.c.8',
+                           'kb|g.1554.c.9'
+                         ]
+                        },
+	{'id' => 'kb|g.2620', 'expected' => [ 'kb|g.2620.c.0',]},
 ];
 #
 #
