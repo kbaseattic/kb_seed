@@ -8,11 +8,13 @@ DEPLOY_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
 
 SERVER_MODULE = CDMI_API
 SERVICE = cdmi_api
+SERVICE_PORT = 7032
 
 SERVICE_DIR = $(TARGET)/services/$(SERVICE)
 
 TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
-TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE)
+TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE) \
+	--define kb_service_port=$(SERVICE_PORT)
 
 
 all: bin
@@ -22,7 +24,7 @@ bin: $(BIN_PERL)
 $(BIN_DIR)/%: scripts/%.pl 
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
-deploy: deploy-dir deploy-scripts deploy-libs deploy-services
+deploy: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
@@ -47,3 +49,6 @@ deploy-services:
 	chmod +x $(TARGET)/services/$(SERVICE)/start_service
 	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
+
+deploy-monit:
+	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
