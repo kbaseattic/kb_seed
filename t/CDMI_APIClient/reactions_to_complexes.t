@@ -64,6 +64,10 @@ foreach my $datum (keys %$all_available_data) {
         ok($results, "Got results for $datum");
 #        is(scalar keys %$results, 1, "Only retrieved results for $datum");
 #        ok($results->{$datum}, "Retrieved results for $datum");
+        ok(scalar (keys %$results) <= 1, "Only retrieved results for $datum, or no results");
+		my $cond_res = "success";
+		$cond_res = $results->{$datum} if (scalar( keys %$results ) == 1);
+		ok($cond_res, "Retrieved results for $datum");
     }
 }
 
