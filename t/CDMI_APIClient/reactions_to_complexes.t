@@ -14,21 +14,23 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = 'contigs_to_lengths';
+my $test_method = "reactions_to_complexes";
 my @additional_args = (
         [],
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
-           #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
+            #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
 my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
 
 
-#
-# CONFIGURE THIS TO LOAD YOUR DATA
-#
-my $all_available_data = $cdmie->all_entities_Contig(0,100,['id']);
-#for example, $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = $cdmie->all_entities_Reaction(0,100,['id']);
+
+
+#my $good_data = $cdmie->all_entities_Reaction(101, 5, ['id']);
+#$good_data = $cdmi->reactions_to_complexes([keys %$good_data]);
+#print STDOUT Data::Dumper->Dump([$good_data]);
+
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
@@ -43,10 +45,16 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-	{'id' => 'kb|g.3.c.20', 'expected' => '255'},
-	{'id' => 'kb|g.3.c.30', 'expected' => '95885'},
-	{'id' => 'kb|g.3.c.40', 'expected' => '109514'},
-	{'id' => 'kb|g.3.c.50', 'expected' => '16421'},
+    {
+        'id' => '437C8F9C-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => [
+                                                      'B8558800-5392-11E1-8CD2-A9B7B226DF1C',
+                                                      'B855BC44-5392-11E1-8CD2-A9B7B226DF1C',
+                                                      'B855F40C-5392-11E1-8CD2-A9B7B226DF1C',
+                                                      'B8558800-5392-11E1-8CD2-A9B7B226DF1C',
+                                                      'B855BC44-5392-11E1-8CD2-A9B7B226DF1C',
+                                                      'B855F40C-5392-11E1-8CD2-A9B7B226DF1C'
+                                                    ]
+    }
 ];
 
 #
@@ -66,8 +74,10 @@ foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
         my $results = $cdmi->$test_method( [ $datum ], @$args);
         ok($results, "Got results for $datum");
-        is(scalar keys %$results, 1, "Only retrieved results for $datum");
-        ok($results->{$datum}, "Retrieved results for $datum");
+        ok(scalar (keys %$results) <= 1, "Only retrieved results for $datum, or no results");
+		my $cond_res = "success";
+		$cond_res = $results->{$datum} if (scalar( keys %$results ) == 1);
+		ok($cond_res, "Retrieved results for $datum");
     }
 }
 

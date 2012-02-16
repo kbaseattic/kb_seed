@@ -1,0 +1,3 @@
+fid methods: ping bob about missing methods
+
+write tests against JSON-RPC server directly
