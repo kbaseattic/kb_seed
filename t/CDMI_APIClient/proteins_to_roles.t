@@ -27,6 +27,10 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 
 my $all_available_data = $cdmie->all_entities_ProteinSequence(0,100,['id']);
 
+my $good_data = $cdmie->all_entities_ProteinSequence(101, 5, ['id']);
+$good_data = $cdmi->proteins_to_roles([keys %$good_data]);
+print STDOUT Data::Dumper->Dump([$good_data]);
+
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
 my $num_sample = int rand(@all_available_keys);
@@ -39,7 +43,25 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 
-my $sample_data = [];
+my $sample_data = [ 
+     { 'id' => '000096544b249f1d28d28957625b7753', 'expected' => [
+                                                  'Acetylornithine aminotransferase (EC 2.6.1.11)'
+                                                ] },
+     { 'id' => '000096c494c83b46f9e8a99cf185b877', 'expected' => [
+                                                  'Phycocyanobilin:ferredoxin oxidoreductase PcyA (EC 1.3.7.5)',
+                                                  'ferredoxin-dependent biliverdin reductase '
+                                                ] },
+     { 'id' => '00009693bee3925a7da2716c9063476f', 'expected' => [
+                                                  'ISCps3, transposase orfA'
+                                                ] },
+     { 'id' => '00009b96f4119b8876c59df7da6681f6', 'expected' => [
+                                                  'Adenosylcobinamide kinase (EC 2.7.1.156)',
+                                                  'Thiamine kinase (EC 2.7.1.89)'
+                                                ] },
+     { 'id' => '000094ddcd5c5895cda34bb0f9e9919e', 'expected' => [
+                                                  'hypothetical protein'
+                                                ] }
+];
 #    {
 #        'id' => '',                 #id to check against
 #        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.

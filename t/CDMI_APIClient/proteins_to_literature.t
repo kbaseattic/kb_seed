@@ -27,6 +27,10 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 
 my $all_available_data = $cdmie->all_entities_ProteinSequence(0,100,['id']);
 
+#my $good_data = $cdmie->all_entities_ProteinSequence(101, 5, ['id']);
+#$good_data = $cdmi->proteins_to_literature([keys %$good_data]);
+#print STDOUT Data::Dumper->Dump([$good_data]);
+
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
 my $num_sample = int rand(@all_available_keys);
@@ -38,6 +42,7 @@ for (0..$num_sample) {
 #
 # SAMPLE DATA IS OPTIONAL
 #
+# Doesn't seem to be any literature data loaded yet...
 
 my $sample_data = [];
 #    {

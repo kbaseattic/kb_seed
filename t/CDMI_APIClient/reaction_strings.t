@@ -28,7 +28,10 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
 my $all_available_data = $cdmie->all_entities_Reaction(0,100,['id']);
-#for example, $cdmie->all_entities_Genome(0,100,['id']);
+
+my $good_data = $cdmie->all_entities_Reaction(101, 5, ['id']);
+$good_data = $cdmi->reaction_strings([keys %$good_data], "");
+print STDOUT Data::Dumper->Dump([$good_data]);
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
@@ -42,12 +45,13 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 
-my $sample_data = [];
-#    {
-#        'id' => '',                 #id to check against
-#        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-#    },
-#];
+my $sample_data = [
+	{ 'id' => '437AAB0A-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => 'H2O + Phosphate + PPi + Triphosphate <=> H2O + Phosphate + PPi + Triphosphate' },
+	{ 'id' => '43778BD2-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => 'ATP + ADP + 5-Hydroxymethyldeoxycytidylate + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-diphosphate <=> ATP + ADP + 5-Hydroxymethyldeoxycytidylate + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-diphosphate' },
+	{ 'id' => '4374FAD4-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => 'H2O + NAD + NADH + NH3 + (2) H+ + Hydroxylamine <=> H2O + NAD + NADH + NH3 + (2) H+ + Hydroxylamine' },
+	{ 'id' => '437C8F9C-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => 'ATP + NAD + PPi + Nicotinamide ribonucleotide <=> ATP + NAD + PPi + Nicotinamide ribonucleotide' },
+	{ 'id' => '43792A6E-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => 'ATP + ADP + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-diphosphate + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-triphosphate <=> ATP + ADP + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-diphosphate + 2\'-Deoxy-5-hydroxymethylcytidine-5\'-triphosphate' }
+];
 
 #
 #
@@ -76,7 +80,7 @@ foreach my $sample (@$sample_data) {
         ok($sample->{'id'}, "Found known sample $sample->{'id'}");
         $sample->{'results'} = $cdmi->$test_method( [ $sample->{'id'} ], @$args )->{ $sample->{'id'} };
         my $expectations_key = @$args ? $args : 'expected';
-        is_deeply($sample->{'results'}, $sample->{$expectations_key}, "Results match expectations");
+        is($sample->{'results'}, $sample->{'expected'}, "Results match expectations");
     }
 }
 

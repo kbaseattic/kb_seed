@@ -27,6 +27,10 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 
 my $all_available_data = $cdmie->all_entities_ProteinSequence(0,100,['id']);
 
+#my $good_data = $cdmie->all_entities_ProteinSequence(101, 5, ['id']);
+#$good_data = $cdmi->proteins_to_fids([keys %$good_data]);
+#print STDOUT Data::Dumper->Dump([$good_data]);
+
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
 my $num_sample = int rand(@all_available_keys);
@@ -39,12 +43,13 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 
-my $sample_data = [];
-#    {
-#        'id' => '',                 #id to check against
-#        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-#    },
-#];
+my $sample_data = [
+	{ 'id' => '000096544b249f1d28d28957625b7753', 'expected' => ['kb|g.2620.peg.2274'] },
+	{ 'id' => '000096c494c83b46f9e8a99cf185b877', 'expected' => ['kb|g.155.peg.1265', 'kb|g.4353.peg.3684'] },
+    { 'id' => '00009693bee3925a7da2716c9063476f', 'expected' => ['kb|g.4480.peg.3408', 'kb|g.4480.peg.3797'] },
+    { 'id' => '00009b96f4119b8876c59df7da6681f6', 'expected' => ['kb|g.2811.peg.492'] },
+    { 'id' => '000094ddcd5c5895cda34bb0f9e9919e', 'expected' => ['kb|g.1796.peg.653'] }
+];
 
 #
 #

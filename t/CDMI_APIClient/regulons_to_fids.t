@@ -23,11 +23,6 @@ my @additional_args = (
 my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
 
-my $good_data = $cdmie->all_entities_AtomicRegulon(101,5,['id']);
-use Data::Dumper;
-$good_data = $cdmi->regulons_to_fids([keys %$good_data]);
-print STDOUT Data::Dumper->Dump([ $good_data ]);
-
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
