@@ -7,6 +7,7 @@ use Test::More;
 
 use CDMI_APIClient;
 use CDMI_EntityAPIClient;
+use Data::Dumper;
 
 ############
 #
@@ -14,7 +15,7 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = "proteins_to_fids";
 my @additional_args = (
         [],
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
@@ -24,11 +25,11 @@ my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
 
 
-#
-# CONFIGURE THIS TO LOAD YOUR DATA
-#
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
-#for example, $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = $cdmie->all_entities_ProteinSequence(0,100,['id']);
+
+#my $good_data = $cdmie->all_entities_ProteinSequence(101, 5, ['id']);
+#$good_data = $cdmi->proteins_to_fids([keys %$good_data]);
+#print STDOUT Data::Dumper->Dump([$good_data]);
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
@@ -43,10 +44,11 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{ 'id' => '000096544b249f1d28d28957625b7753', 'expected' => ['kb|g.2620.peg.2274'] },
+	{ 'id' => '000096c494c83b46f9e8a99cf185b877', 'expected' => ['kb|g.155.peg.1265', 'kb|g.4353.peg.3684'] },
+    { 'id' => '00009693bee3925a7da2716c9063476f', 'expected' => ['kb|g.4480.peg.3408', 'kb|g.4480.peg.3797'] },
+    { 'id' => '00009b96f4119b8876c59df7da6681f6', 'expected' => ['kb|g.2811.peg.492'] },
+    { 'id' => '000094ddcd5c5895cda34bb0f9e9919e', 'expected' => ['kb|g.1796.peg.653'] }
 ];
 
 #
@@ -57,7 +59,7 @@ my $sample_data = [
 my @args_count = @additional_args || 1;
 
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
+      3 * (scalar keys %$all_available_data) * @args_count
     + 2 * @$sample_data * @args_count
     + 1 * @random_subset * @args_count
     + 7 * @args_count);
@@ -66,8 +68,10 @@ foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
         my $results = $cdmi->$test_method( [ $datum ], @$args);
         ok($results, "Got results for $datum");
-        ok(scalar keys %$results <= 1, "Only retrieved results for $datum");
-        #ok($results->{$datum}, "Retrieved results for $datum");
+        ok(scalar (keys %$results) <= 1, "Only retrieved results for $datum, or no results");
+		my $cond_res = "success";
+		$cond_res = $results->{$datum} if (scalar( keys %$results ) == 1);
+		ok($cond_res, "Retrieved results for $datum");
     }
 }
 

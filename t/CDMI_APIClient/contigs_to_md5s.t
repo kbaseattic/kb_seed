@@ -14,9 +14,10 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'contigs_to_md5s';
 my @additional_args = (
         [],
+
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,7 +28,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
+my $all_available_data = $cdmie->all_entities_Contig(0,100,['id']);
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -43,10 +44,10 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{'id' => 'kb|g.3.c.20', 'expected' => 'a840944fd99339de22c6806f764e4530'},
+	{'id' => 'kb|g.3.c.30', 'expected' => '86594764516a69cb42ba7029372739f7'},
+	{'id' => 'kb|g.3.c.40', 'expected' => '96b554a65e33418e5c141ec467ff0f59'},
+	{'id' => 'kb|g.3.c.50', 'expected' => 'f19cba23b25053af5278ac6355705611'},
 ];
 
 #
@@ -57,7 +58,7 @@ my $sample_data = [
 my @args_count = @additional_args || 1;
 
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
+      3 * (scalar keys %$all_available_data) * @args_count
     + 2 * @$sample_data * @args_count
     + 1 * @random_subset * @args_count
     + 7 * @args_count);
@@ -66,8 +67,8 @@ foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
         my $results = $cdmi->$test_method( [ $datum ], @$args);
         ok($results, "Got results for $datum");
-        ok(scalar keys %$results <= 1, "Only retrieved results for $datum");
-        #ok($results->{$datum}, "Retrieved results for $datum");
+        is(scalar keys %$results, 1, "Only retrieved results for $datum");
+        ok($results->{$datum}, "Retrieved results for $datum");
     }
 }
 

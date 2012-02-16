@@ -14,9 +14,10 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'complexes_to_complex_data';
 my @additional_args = (
         [],
+
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,7 +28,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
+my $all_available_data = $cdmie->all_entities_Complex(0,100,['id']);
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -43,10 +44,43 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{'id' => 'B730B33C-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => {
+                                                      'complex_roles' => [
+                                                                           'B730B33C-5392-11E1-8CD2-A9B7B226DF1C'
+                                                                         ],
+                                                      'complex_name' => '',
+                                                      'complex_reactions' => [
+                                                                               '0'
+                                                                             ]
+                                                    }
+},
+	{'id' => 'B73043D4-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => {
+                                                      'complex_roles' => [
+                                                                           'B73043D4-5392-11E1-8CD2-A9B7B226DF1C'
+                                                                         ],
+                                                      'complex_name' => '',
+                                                      'complex_reactions' => [
+                                                                               '0'
+                                                                             ]
+                                                    }},
+	{'id' => 'B73924F4-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => {
+                                                      'complex_roles' => [
+                                                                           'B73924F4-5392-11E1-8CD2-A9B7B226DF1C'
+                                                                         ],
+                                                      'complex_name' => '',
+                                                      'complex_reactions' => [
+                                                                               '0'
+                                                                             ]
+                                                    }},
+	{'id' => 'B72FD016-5392-11E1-8CD2-A9B7B226DF1C', 'expected' => {
+                                                      'complex_roles' => [
+                                                                           'B72FD016-5392-11E1-8CD2-A9B7B226DF1C'
+                                                                         ],
+                                                      'complex_name' => '',
+                                                      'complex_reactions' => [
+                                                                               '0'
+                                                                             ]
+                                                    }},
 ];
 
 #
@@ -57,7 +91,7 @@ my $sample_data = [
 my @args_count = @additional_args || 1;
 
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
+      3 * (scalar keys %$all_available_data) * @args_count
     + 2 * @$sample_data * @args_count
     + 1 * @random_subset * @args_count
     + 7 * @args_count);
@@ -66,8 +100,8 @@ foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
         my $results = $cdmi->$test_method( [ $datum ], @$args);
         ok($results, "Got results for $datum");
-        ok(scalar keys %$results <= 1, "Only retrieved results for $datum");
-        #ok($results->{$datum}, "Retrieved results for $datum");
+        is(scalar keys %$results, 1, "Only retrieved results for $datum");
+        ok($results->{$datum}, "Retrieved results for $datum");
     }
 }
 

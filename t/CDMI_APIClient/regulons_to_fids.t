@@ -14,7 +14,7 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'regulons_to_fids';
 my @additional_args = (
         [],
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
@@ -23,11 +23,10 @@ my @additional_args = (
 my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
 
-
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
+my $all_available_data = $cdmie->all_entities_AtomicRegulon(0, 100, ['id']);
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -41,12 +40,12 @@ for (0..$num_sample) {
 #
 # SAMPLE DATA IS OPTIONAL
 #
-
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{ 'id' => 'kb|g.0.ar.191', 'expected' => [ 'kb|g.0.peg.3741', 'kb|g.0.peg.3831', 'kb|g.0.peg.4087' ] },
+    { 'id' => 'kb|g.0.ar.193', 'expected' => [ 'kb|g.0.peg.124', 'kb|g.0.peg.1709', 'kb|g.0.peg.1873' ] },
+    { 'id' => 'kb|g.0.ar.190', 'expected' => [ 'kb|g.0.peg.1403', 'kb|g.0.peg.2342', 'kb|g.0.peg.328' ] },
+    { 'id' => 'kb|g.0.ar.192', 'expected' => [ 'kb|g.0.peg.3481', 'kb|g.0.peg.4043', 'kb|g.0.peg.4054' ] },
+    { 'id' => 'kb|g.0.ar.194', 'expected' => [ 'kb|g.0.peg.2346', 'kb|g.0.peg.3200', 'kb|g.0.peg.3281' ] }
 ];
 
 #

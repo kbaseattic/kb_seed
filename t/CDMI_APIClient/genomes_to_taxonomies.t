@@ -14,9 +14,10 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'genomes_to_taxonomies';
 my @additional_args = (
         [],
+
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,7 +28,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
+my $all_available_data = $cdmie->all_entities_Genome(0,100,['id']);
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -43,10 +44,53 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{
+	    'id' => 'kb|g.86',
+	    'expected' =>
+             [
+                         'Bacteria',
+                         'Proteobacteria',
+                         'Gammaproteobacteria',
+                         'Pseudomonadales',
+                         'Pseudomonadaceae',
+                         'Pseudomonas',
+                         'Pseudomonas fluorescens HK44'
+                       ]
+
+	},
+	{
+	    'id' => 'kb|g.27',
+	    'expected' =>
+                    [
+                         'Bacteria',
+                         'Proteobacteria',
+                         'Alphaproteobacteria',
+                         'Rhodospirillales',
+                         'Acetobacteraceae',
+                         'Gluconacetobacter',
+                         'Gluconacetobacter sp. SXCC-1'
+                       ]
+
+
+	},
+	{
+	    'id' => 'kb|g.3084',
+	    'expected' =>
+                    [
+                           'Bacteria',
+                           'Firmicutes',
+                           'Bacillales',
+                           'Bacillaceae',
+                           'Bacillus',
+                           'Bacillus cereus group',
+                           'Bacillus thuringiensis BMB171'
+                         ]
+
+
+
+	}
+
+
 ];
 
 #

@@ -14,9 +14,9 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'otu_members';
 my @additional_args = (
-        [],
+        []
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,7 +27,7 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
+my $all_available_data = $cdmie->all_entities_Genome(0,100,['id']);
 #for example, $cdmie->all_entities_Genome(0,100,['id']);
 
 my @random_subset = ();
@@ -43,10 +43,50 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{'id' => 'kb|g.3093', 'expected' => [ 'kb|g.3093' ] },
+	{'id' => 'kb|g.1614', 'expected' => [
+                           'kb|g.1554',
+                           'kb|g.1614',
+                           'kb|g.1736',
+                           'kb|g.1737',
+                           'kb|g.2193',
+                           'kb|g.2971',
+                           'kb|g.3380',
+                           'kb|g.3463',
+                           'kb|g.3465',
+                           'kb|g.3556'
+                         ]
+},
+	{'id' => 'kb|g.1554', 'expected' => [
+                           'kb|g.1554',
+                           'kb|g.1614',
+                           'kb|g.1736',
+                           'kb|g.1737',
+                           'kb|g.2193',
+                           'kb|g.2971',
+                           'kb|g.3380',
+                           'kb|g.3463',
+                           'kb|g.3465',
+                           'kb|g.3556'
+                         ]},
+	{'id' => 'kb|g.2620', 'expected' => [
+                           'kb|g.114',
+                           'kb|g.153',
+                           'kb|g.154',
+                           'kb|g.155',
+                           'kb|g.156',
+                           'kb|g.2617',
+                           'kb|g.2618',
+                           'kb|g.2619',
+                           'kb|g.2620',
+                           'kb|g.3148',
+                           'kb|g.3149',
+                           'kb|g.3727',
+                           'kb|g.3728',
+                           'kb|g.3729',
+                           'kb|g.3730'
+                         ]
+},
 ];
 
 #
@@ -54,13 +94,11 @@ my $sample_data = [
 #
 ############
 
-my @args_count = @additional_args || 1;
-
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
-    + 2 * @$sample_data * @args_count
-    + 1 * @random_subset * @args_count
-    + 7 * @args_count);
+      2 * (scalar keys %$all_available_data) * @additional_args
+    + 2 * @$sample_data * @additional_args
+    + 1 * @random_subset * @additional_args
+    + 7 * @additional_args);
 
 foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {

@@ -14,9 +14,10 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = 'locations_to_fids';
 my @additional_args = (
         [],
+
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
             #GIVE IT A LIST OF ARRAYREFS. EACH SUB ARRAYREF IS A SET OF ARGS TO TRY WITH
 
@@ -27,15 +28,35 @@ my $cdmie = CDMI_EntityAPIClient->new($url);
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
 #
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
-#for example, $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = $cdmie->all_entities_Genome(0,100,['id', 'domain']);
+my $all_locations = {};
+foreach my $key (keys %$all_available_data) {
+    if ($all_available_data->{$key}->{'domain'} ne 'Eukaryota') {
+        next;
+    }
+
+    my $fids = $cdmi->genomes_to_fids([$key], []);
+
+    my $throttle = 0;
+    foreach my $fid (@{$fids->{$key}}) {
+        my $locations = $cdmi->fids_to_locations([$fid]);
+        foreach my $key (keys %$locations) {
+            my $val = $locations->{$key}->[0];
+            my $dna_string = "$val->[0]_$val->[1]$val->[2]$val->[3]";
+            $all_locations->{$key} = $dna_string;
+        }
+        last if $throttle++ > 10;
+    }
+
+}
+$all_available_data = $all_locations;
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
 my $num_sample = int rand(@all_available_keys);
 
 for (0..$num_sample) {
-    push @random_subset, $all_available_data->{ $all_available_keys[int rand @all_available_keys] }->{'id'};
+    push @random_subset, $all_available_data->{ $all_available_keys[int rand @all_available_keys] };
 }
 
 #
@@ -43,10 +64,9 @@ for (0..$num_sample) {
 #
 
 my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
+	{'id' => 'kb|g.1087.c.0_2111515+76', 'expected' => [
+                                          'kb|g.1087.rna.99'
+                                        ]},
 ];
 
 #
@@ -57,19 +77,18 @@ my $sample_data = [
 my @args_count = @additional_args || 1;
 
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
+      3 * (scalar keys %$all_available_data) * @args_count
     + 2 * @$sample_data * @args_count
     + 1 * @random_subset * @args_count
     + 7 * @args_count);
 
-foreach my $datum (keys %$all_available_data) {
-    foreach my $args (@additional_args) {
-        my $results = $cdmi->$test_method( [ $datum ], @$args);
-        ok($results, "Got results for $datum");
-        ok(scalar keys %$results <= 1, "Only retrieved results for $datum");
-        #ok($results->{$datum}, "Retrieved results for $datum");
-    }
+foreach my $fid (keys %$all_available_data) {
+    my $location = $all_available_data->{$fid};
+    my $checked_fid = $cdmi->locations_to_fids([$location]);
+    is(scalar keys %$checked_fid, 1, "Only retrieved results for $location");
+    is($fid, $checked_fid->{$location}->[0], "FID is as expected");
 }
+
 
 foreach my $sample (@$sample_data) {
     foreach my $args (@additional_args) {

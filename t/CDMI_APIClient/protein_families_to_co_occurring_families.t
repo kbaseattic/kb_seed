@@ -14,7 +14,7 @@ use CDMI_EntityAPIClient;
 #
 my $url         = 'http://140.221.92.46:5000';
 
-my $test_method = METHOD TO TEST AGAINST;
+my $test_method = "protein_families_to_co_occurring_families";
 my @additional_args = (
         [],
     );     #ANYTHING EXTRA TO GIVE YOUR TEST METHOD
@@ -24,11 +24,7 @@ my $cdmi = CDMI_APIClient->new($url);
 my $cdmie = CDMI_EntityAPIClient->new($url);
 
 
-#
-# CONFIGURE THIS TO LOAD YOUR DATA
-#
-my $all_available_data = HOW DO YOU LOAD YOUR DATA
-#for example, $cdmie->all_entities_Genome(0,100,['id']);
+my $all_available_data = $cdmie->all_entities_Family(0,100,['id']);
 
 my @random_subset = ();
 my @all_available_keys = keys %$all_available_data;
@@ -42,12 +38,12 @@ for (0..$num_sample) {
 # SAMPLE DATA IS OPTIONAL
 #
 
-my $sample_data = [
-    {
-        'id' => '',                 #id to check against
-        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
-    },
-];
+my $sample_data = [];
+#    {
+#        'id' => '',                 #id to check against
+#        $additional_args[0] => [],  #additional arg set to check against, or use 'expected if nothing.
+#    },
+#];
 
 #
 #
@@ -57,7 +53,7 @@ my $sample_data = [
 my @args_count = @additional_args || 1;
 
 plan('tests' =>
-      2 * (scalar keys %$all_available_data) * @args_count
+      3 * (scalar keys %$all_available_data) * @args_count
     + 2 * @$sample_data * @args_count
     + 1 * @random_subset * @args_count
     + 7 * @args_count);
@@ -66,8 +62,8 @@ foreach my $datum (keys %$all_available_data) {
     foreach my $args (@additional_args) {
         my $results = $cdmi->$test_method( [ $datum ], @$args);
         ok($results, "Got results for $datum");
-        ok(scalar keys %$results <= 1, "Only retrieved results for $datum");
-        #ok($results->{$datum}, "Retrieved results for $datum");
+        is(scalar keys %$results, 1, "Only retrieved results for $datum");
+        ok($results->{$datum}, "Retrieved results for $datum");
     }
 }
 
