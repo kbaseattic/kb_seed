@@ -69,7 +69,7 @@ foreach my $entity (keys(%{$entityMap})) {
 			return 1;
 		};
 		#  Test 7 - Does the get_entity function run?
-		ok( $result == 1, "Did get_entity_".$entity." successfully run?" );
+		ok( defined($result) && $result == 1, "Did get_entity_".$entity." successfully run?" );
 		ok( defined $output->{$object->{id}}->{id}, "Does get_entity_".$entity." return an id of the first object?" );
 		#  RELATIONSHIP TESTS: Now we test each relationship one at a time;
 		foreach my $relationship (keys(%{$entityMap->{$entity}})) {
@@ -79,7 +79,7 @@ foreach my $entity (keys(%{$entityMap})) {
 				return 1;
 			};
 			#  Test 7 - Does the get_entity function run?
-			ok( $result == 1, "Did get_relationship_".$relationship." successfully run?" );
+			ok( defined($result) && $result == 1, "Did get_relationship_".$relationship." successfully run?" );
 			ok( defined $output, "Does get_relationship_".$relationship." return a result?" );
 			if (!defined($output->[0])) {
 				print "No objects for relationship ".$entity."->".$relationship." in database. No further tests of this relationship are possible.\n";
