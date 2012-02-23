@@ -101,6 +101,8 @@ sub new_for_script_with_type
     my ($loadDirectory, $dbd, $dbName, $sock, $userData, $dbhost, $port, $dbms);
     my ($local, $url);
 
+    $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
+
     # Parse the command line.
     my $rc = GetOptions(%options,
 			"local"		  => \$local,

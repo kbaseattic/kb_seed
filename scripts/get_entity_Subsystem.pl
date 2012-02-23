@@ -50,7 +50,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'name', 'version', 'curator', 'notes', 'description', 'usable', 'private', 'cluster_based', 'experimental' );
+my @all_fields = ( 'version', 'curator', 'notes', 'description', 'usable', 'private', 'cluster_based', 'experimental' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Subsystem [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

@@ -18,9 +18,9 @@ has 'sap' => (isa => 'SAP', is => 'ro', required => 1);
 has 'id' => (isa => 'Str', is => 'ro', required => 1);
 has 'genome' => (isa => 'SapGenome', is => 'ro', required => 1);
 
-has 'length' => (isa => 'Num', is => 'ro', lazy => 1, builder => '_build_length');
-has 'last_peg' => (isa => 'Str', is => 'ro', lazy => 1, builder => '_build_last_peg', clearer => 'clear_last_peg');
-has 'first_peg' => (isa => 'Str', is => 'ro', lazy => 1, builder => '_build_first_peg', clearer => 'clear_first_peg');
+has 'length' => (isa => 'Maybe[Num]', is => 'ro', lazy => 1, builder => '_build_length');
+has 'last_peg' => (isa => 'Maybe[Str]', is => 'ro', lazy => 1, builder => '_build_last_peg', clearer => 'clear_last_peg');
+has 'first_peg' => (isa => 'Maybe[Str]', is => 'ro', lazy => 1, builder => '_build_first_peg', clearer => 'clear_first_peg');
 
 sub clear_peg_cache
 {

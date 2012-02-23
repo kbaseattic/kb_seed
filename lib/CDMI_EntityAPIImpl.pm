@@ -299,6 +299,105 @@ our $entity_field_defs = {
 
 };
 
+our $entity_field_rels = {
+    'AlignmentTree' => {
+    },
+    'Annotation' => {
+    },
+    'AtomicRegulon' => {
+    },
+    'Attribute' => {
+    },
+    'Biomass' => {
+	    'name' => 'BiomassName',
+    },
+    'BiomassCompound' => {
+    },
+    'Compartment' => {
+    },
+    'Complex' => {
+	    'name' => 'ComplexName',
+    },
+    'Compound' => {
+    },
+    'Contig' => {
+    },
+    'ContigChunk' => {
+    },
+    'ContigSequence' => {
+    },
+    'CoregulatedSet' => {
+    },
+    'Diagram' => {
+	    'content' => 'DiagramContent',
+    },
+    'EcNumber' => {
+    },
+    'Experiment' => {
+    },
+    'Family' => {
+	    'family_function' => 'FamilyFunction',
+    },
+    'Feature' => {
+    },
+    'Genome' => {
+	    'phenotype' => 'GenomeSequencePhenotype',
+    },
+    'Identifier' => {
+    },
+    'Media' => {
+    },
+    'Model' => {
+    },
+    'ModelCompartment' => {
+	    'label' => 'ModelCompartmentLabel',
+    },
+    'OTU' => {
+    },
+    'PairSet' => {
+    },
+    'Pairing' => {
+    },
+    'ProbeSet' => {
+    },
+    'ProteinSequence' => {
+    },
+    'Publication' => {
+    },
+    'Reaction' => {
+    },
+    'ReactionRule' => {
+    },
+    'Reagent' => {
+    },
+    'Requirement' => {
+    },
+    'Role' => {
+    },
+    'SSCell' => {
+    },
+    'SSRow' => {
+    },
+    'Scenario' => {
+    },
+    'Source' => {
+    },
+    'Subsystem' => {
+    },
+    'SubsystemClass' => {
+    },
+    'TaxonomicGrouping' => {
+	    'alias' => 'TaxonomicGroupingAlias',
+    },
+    'Variant' => {
+	    'role_rule' => 'VariantRole',
+    },
+    'Variation' => {
+	    'notes' => 'VariationNotes',
+    },
+
+};
+
 our $relationship_field_defs = {
     'AffectsLevelOf' => {
 	to_link => 1, from_link => 1,
@@ -1027,6 +1126,326 @@ our $relationship_field_defs = {
 
 };
 
+our $relationship_field_rels = {
+    'AffectsLevelOf' => {
+    },
+    'IsAffectedIn' => {
+    },
+    'Aligns' => {
+    },
+    'IsAlignedBy' => {
+    },
+    'Concerns' => {
+    },
+    'IsATopicOf' => {
+    },
+    'Contains' => {
+    },
+    'IsContainedIn' => {
+    },
+    'Describes' => {
+    },
+    'IsDescribedBy' => {
+    },
+    'Displays' => {
+    },
+    'IsDisplayedOn' => {
+    },
+    'Encompasses' => {
+    },
+    'IsEncompassedIn' => {
+    },
+    'GeneratedLevelsFor' => {
+    },
+    'WasGeneratedFrom' => {
+    },
+    'HasAssertionFrom' => {
+    },
+    'Asserts' => {
+    },
+    'HasCompoundAliasFrom' => {
+    },
+    'UsesAliasForCompound' => {
+    },
+    'HasIndicatedSignalFrom' => {
+    },
+    'IndicatesSignalFor' => {
+    },
+    'HasMember' => {
+    },
+    'IsMemberOf' => {
+    },
+    'HasParticipant' => {
+    },
+    'ParticipatesIn' => {
+    },
+    'HasPresenceOf' => {
+    },
+    'IsPresentIn' => {
+    },
+    'HasReactionAliasFrom' => {
+    },
+    'UsesAliasForReaction' => {
+    },
+    'HasRepresentativeOf' => {
+    },
+    'IsRepresentedIn' => {
+    },
+    'HasResultsIn' => {
+    },
+    'HasResultsFor' => {
+    },
+    'HasSection' => {
+    },
+    'IsSectionOf' => {
+    },
+    'HasStep' => {
+    },
+    'IsStepOf' => {
+    },
+    'HasUsage' => {
+    },
+    'IsUsageOf' => {
+    },
+    'HasValueFor' => {
+    },
+    'HasValueIn' => {
+    },
+    'Includes' => {
+    },
+    'IsIncludedIn' => {
+    },
+    'IndicatedLevelsFor' => {
+    },
+    'HasLevelsFrom' => {
+    },
+    'Involves' => {
+    },
+    'IsInvolvedIn' => {
+    },
+    'IsARequirementIn' => {
+    },
+    'IsARequirementOf' => {
+    },
+    'IsAlignedIn' => {
+    },
+    'IsAlignmentFor' => {
+    },
+    'IsAnnotatedBy' => {
+    },
+    'Annotates' => {
+    },
+    'IsBindingSiteFor' => {
+    },
+    'IsBoundBy' => {
+    },
+    'IsClassFor' => {
+    },
+    'IsInClass' => {
+    },
+    'IsCollectionOf' => {
+    },
+    'IsCollectedInto' => {
+    },
+    'IsComposedOf' => {
+    },
+    'IsComponentOf' => {
+    },
+    'IsComprisedOf' => {
+    },
+    'Comprises' => {
+    },
+    'IsConfiguredBy' => {
+    },
+    'ReflectsStateOf' => {
+    },
+    'IsConsistentWith' => {
+    },
+    'IsConsistentTo' => {
+    },
+    'IsControlledUsing' => {
+    },
+    'Controls' => {
+    },
+    'IsCoregulatedWith' => {
+    },
+    'HasCoregulationWith' => {
+    },
+    'IsCoupledTo' => {
+    },
+    'IsCoupledWith' => {
+    },
+    'IsDefaultFor' => {
+    },
+    'RunsByDefaultIn' => {
+    },
+    'IsDefaultLocationOf' => {
+    },
+    'HasDefaultLocation' => {
+    },
+    'IsDeterminedBy' => {
+    },
+    'Determines' => {
+    },
+    'IsDividedInto' => {
+    },
+    'IsDivisionOf' => {
+    },
+    'IsExemplarOf' => {
+    },
+    'HasAsExemplar' => {
+    },
+    'IsFamilyFor' => {
+    },
+    'DeterminesFunctionOf' => {
+    },
+    'IsFormedOf' => {
+    },
+    'IsFormedInto' => {
+    },
+    'IsFunctionalIn' => {
+    },
+    'HasFunctional' => {
+    },
+    'IsGroupFor' => {
+    },
+    'IsInGroup' => {
+    },
+    'IsImplementedBy' => {
+    },
+    'Implements' => {
+    },
+    'IsInPair' => {
+    },
+    'IsPairOf' => {
+    },
+    'IsInstantiatedBy' => {
+    },
+    'IsInstanceOf' => {
+    },
+    'IsLocatedIn' => {
+    },
+    'IsLocusFor' => {
+    },
+    'IsModeledBy' => {
+    },
+    'Models' => {
+    },
+    'IsNamedBy' => {
+    },
+    'Names' => {
+    },
+    'IsOwnerOf' => {
+    },
+    'IsOwnedBy' => {
+    },
+    'IsProposedLocationOf' => {
+    },
+    'HasProposedLocationIn' => {
+    },
+    'IsProteinFor' => {
+    },
+    'Produces' => {
+    },
+    'IsRealLocationOf' => {
+    },
+    'HasRealLocationIn' => {
+    },
+    'IsRegulatedIn' => {
+    },
+    'IsRegulatedSetOf' => {
+    },
+    'IsRelevantFor' => {
+    },
+    'IsRelevantTo' => {
+    },
+    'IsRequiredBy' => {
+    },
+    'Requires' => {
+    },
+    'IsRoleOf' => {
+    },
+    'HasRole' => {
+    },
+    'IsRowOf' => {
+    },
+    'IsRoleFor' => {
+    },
+    'IsSequenceOf' => {
+    },
+    'HasAsSequence' => {
+    },
+    'IsSubInstanceOf' => {
+    },
+    'Validates' => {
+    },
+    'IsSuperclassOf' => {
+    },
+    'IsSubclassOf' => {
+    },
+    'IsTargetOf' => {
+    },
+    'Targets' => {
+    },
+    'IsTaxonomyOf' => {
+    },
+    'IsInTaxa' => {
+    },
+    'IsTerminusFor' => {
+    },
+    'HasAsTerminus' => {
+    },
+    'IsTriggeredBy' => {
+    },
+    'Triggers' => {
+    },
+    'IsUsedAs' => {
+    },
+    'IsUseOf' => {
+    },
+    'Manages' => {
+    },
+    'IsManagedBy' => {
+    },
+    'OperatesIn' => {
+    },
+    'IsUtilizedIn' => {
+    },
+    'Overlaps' => {
+    },
+    'IncludesPartOf' => {
+    },
+    'ParticipatesAs' => {
+    },
+    'IsParticipationOf' => {
+    },
+    'ProducedResultsFor' => {
+    },
+    'HadResultsProducedBy' => {
+    },
+    'ProjectsOnto' => {
+    },
+    'IsProjectedOnto' => {
+    },
+    'Provided' => {
+    },
+    'WasProvidedBy' => {
+    },
+    'Shows' => {
+    },
+    'IsShownOn' => {
+    },
+    'Submitted' => {
+    },
+    'WasSubmittedBy' => {
+    },
+    'Uses' => {
+    },
+    'IsUsedBy' => {
+    },
+
+};
+
 our $relationship_entities = {
     'AffectsLevelOf' => [ 'Experiment', 'AtomicRegulon' ],
     'IsAffectedIn' => [ 'AtomicRegulon', 'Experiment' ],
@@ -1206,6 +1625,7 @@ sub _validate_fields_for_entity
     my $cdmi = $self->{db};
     my $q = $cdmi->{_dbh}->quote;
 
+    my @rel_fields;
     my @qfields;
     my @sfields;
     my @bad_fields;
@@ -1217,11 +1637,17 @@ sub _validate_fields_for_entity
 	    push(@bad_fields, $field);
 	    next;
 	}
-		
-	push(@sfields, $field);
-	my $qfield = $q . $field . $q;
-	$have_id = 1 if $field eq 'id';
-	push(@qfields, $qfield);
+	if (my $rel = $entity_field_rels->{$tbl}->{$field})
+	{
+	    push(@rel_fields, [$field, $rel]);
+	}
+	else
+	{
+	    push(@sfields, $field);
+	    my $qfield = $q . $field . $q;
+	    $have_id = 1 if $field eq 'id';
+	    push(@qfields, $qfield);
+	}
     }
 
     if (@bad_fields)
@@ -1229,13 +1655,13 @@ sub _validate_fields_for_entity
 	die "The following fields are invalid in entity $tbl: @bad_fields";
     }
 
-    if (!$have_id && $ensure_id)
+    if (!$have_id && ($ensure_id || @rel_fields))
     {
 	unshift(@sfields, 'id');
 	unshift(@qfields, $q . 'id' . $q);
     }
 
-    return(\@sfields, \@qfields);
+    return(\@sfields, \@qfields, \@rel_fields);
 }
 
 sub _validate_fields_for_relationship
@@ -1284,7 +1710,7 @@ sub _get_entity
 {
     my($self, $ctx, $tbl, $ids, $fields) = @_;
 
-    my($sfields, $qfields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
     
     my $filter = "id IN (" . join(", ", map { '?' } @$ids) . ")";
 
@@ -1306,6 +1732,21 @@ sub _get_entity
     # print STDERR "$qry\n";
     $sth->execute(@$ids);
     my $out = $sth->fetchall_hashref('id');
+
+    #
+    # Now query for the fields that are in separate relations.
+    #
+    for my $ent (@$rel_fields)
+    {
+	my($field, $rel) = @$ent;
+	my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	$sth->execute(@$ids);
+	while (my $row = $sth->fetchrow_arrayref())
+	{
+	    my($id, $val) = @$row;
+	    push(@{$out->{$id}->{$field}}, $val);
+	}
+    }
     return $out;
 }    
 
@@ -1319,15 +1760,34 @@ sub _get_relationship
 	die "Unknown relationship $relationship";
     }
 
-    my($from_link, $to_link) = $is_converse ? qw(to_link from_link) :  qw(from_link to_link);
+    my %link_name_map;
+    my($from_link, $to_link);
+    if ($is_converse)
+    {
+	($from_link, $to_link) = qw(to_link from_link);
+	%link_name_map = ( from_link => 'to_link', to_link => 'from_link');
+    }
+    else
+    {
+	($from_link, $to_link) = qw(from_link to_link);
+	%link_name_map = ( from_link => 'from_link', to_link => 'to_link');
+    }
+    for my $f (@$rel_fields)
+    {
+	if (!exists $link_name_map{$f})
+	{
+	    $link_name_map{$f} = $f;
+	}
+    }
 
     my $cdmi = $self->{db};
     my $q = $cdmi->{_dbh}->quote;
 
-    my($from_sfields, $from_qfields) = $self->_validate_fields_for_entity($from_tbl, $from_fields, 0);
-    my($to_sfields, $to_qfields) = $self->_validate_fields_for_entity($to_tbl, $to_fields, 0);
+    my($from_sfields, $from_qfields, $from_relfields) = $self->_validate_fields_for_entity($from_tbl, $from_fields, 0);
+    my($to_sfields, $to_qfields, $to_relfields) = $self->_validate_fields_for_entity($to_tbl, $to_fields, 0);
 
-    my($rel_sfields, $rel_qfields) = $self->_validate_fields_for_relationship($relationship, $rel_fields, $from_link);
+    my @trans_rel_fields = map { $link_name_map{$_} } @$rel_fields;
+    my($rel_sfields, $rel_qfields) = $self->_validate_fields_for_relationship($relationship, \@trans_rel_fields, $from_link);
     
     my $filter = "$from_link IN (" . join(", ", map { '?' } @$ids) . ")";
 
@@ -1362,6 +1822,8 @@ sub _get_relationship
     my $res = $sth->fetchall_arrayref();
 
     my $out = [];
+
+    my(%from_keys_for_rel, %to_keys_for_rel);
     for my $ent (@$res)
     {
 	my($fout, $rout, $tout) = ({}, {}, {});
@@ -1378,11 +1840,74 @@ sub _get_relationship
 	for my $fld (@$rel_sfields)
 	{
 	    my $v = shift @$ent;
-	    $rout->{$fld} = $v;
+	    $rout->{$link_name_map{$fld}} = $v;
 	}
-	
-	push(@$out, [$fout, $rout, $tout]);
+	my $row = [$fout, $rout, $tout];
+
+	if (@$from_relfields)
+	{
+	    push(@{$from_keys_for_rel{$fout->{id}}}, $row);
+	}
+
+	if (@$to_relfields)
+	{
+	    push(@{$to_keys_for_rel{$tout->{id}}}, $row);
+	}
+
+	push(@$out, $row);
     }
+
+    if (@$from_relfields)
+    {
+	my %ids = keys %from_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$from_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$from_keys_for_rel{$id}})
+		{
+		    push(@{$row->[0]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+    if (@$to_relfields)
+    {
+	my %ids = keys %to_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$to_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$to_keys_for_rel{$id}})
+		{
+		    push(@{$row->[2]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+
     return $out;
 }    
 
@@ -1390,43 +1915,12 @@ sub _all_entities
 {
     my($self, $ctx, $tbl, $start, $count, $fields) = @_;
 
-    my $valid_fields = $entity_field_defs->{$tbl};
-
-    my $have_id;
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
 
     my $cdmi = $self->{db};
     my $q = $cdmi->{_dbh}->quote;
 
-    my @qfields;
-    my @sfields;
-    my @bad_fields;
-    for my $field (@$fields)
-    {
-	$field =~ s/-/_/g;
-	if (!$valid_fields->{$field})
-	{
-	    push(@bad_fields, $field);
-	    next;
-	}
-		
-	push(@sfields, $field);
-	my $qfield = $q . $field . $q;
-	$have_id = 1 if $field eq 'id';
-	push(@qfields, $qfield);
-    }
-
-    if (@bad_fields)
-    {
-	die "The following fields are invalid in entity $tbl: @bad_fields";
-    }
-
-    if (!$have_id)
-    {
-	unshift(@sfields, 'id');
-	unshift(@qfields, $q . 'id' . $q);
-    }
-    
-    my $qstr = join(", ", @qfields);
+    my $qstr = join(", ", @$qfields);
 
     my $attrs = {};
     my $dbk = $cdmi->{_dbh};
@@ -1449,6 +1943,29 @@ sub _all_entities
     # print STDERR "$qry\n";
     $sth->execute();
     my $out = $sth->fetchall_hashref('id');
+
+    #
+    # Now query for the fields that are in separate relations.
+    #
+    my @ids = keys %$out;
+    if (@ids)
+    {
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+	
+	for my $ent (@$rel_fields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+		push(@{$out->{$id}->{$field}}, $val);
+	    }
+	}
+    }
+
     return $out;
 }    
 
@@ -2126,7 +2643,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -2140,7 +2657,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -2209,7 +2726,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -2224,7 +2741,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -2563,7 +3080,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Complex
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 </pre>
@@ -2577,7 +3094,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Complex
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 
@@ -2644,7 +3161,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Complex
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 </pre>
@@ -2659,7 +3176,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Complex
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 
@@ -3464,7 +3981,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -3478,7 +3995,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -3545,7 +4062,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -3560,7 +4077,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -3890,7 +4407,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -3904,7 +4421,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -3990,7 +4507,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -4005,7 +4522,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -4238,7 +4755,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -4263,7 +4780,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -4409,7 +4926,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -4435,7 +4952,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -4989,7 +5506,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -5005,7 +5522,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -5091,7 +5608,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -5108,7 +5625,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -7642,7 +8159,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7658,7 +8175,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -7742,7 +8259,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7759,7 +8276,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -7806,7 +8323,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variant
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -7822,7 +8339,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variant
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -7912,7 +8429,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variant
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -7929,7 +8446,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variant
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -7979,7 +8496,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7992,7 +8509,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -8054,7 +8571,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -8068,7 +8585,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -8890,7 +9407,7 @@ fields_Describes is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -8923,7 +9440,7 @@ fields_Describes is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -8987,7 +9504,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Subsystem
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -9020,7 +9537,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Subsystem
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -9088,7 +9605,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Displays is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	location has a value which is a rectangle
@@ -9118,7 +9635,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Displays is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	location has a value which is a rectangle
@@ -9207,7 +9724,7 @@ rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -9237,7 +9754,7 @@ rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -10218,7 +10735,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -10245,7 +10762,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -10323,7 +10840,7 @@ fields_HasMember is a reference to a hash where the following keys are defined:
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -10350,7 +10867,7 @@ fields_HasMember is a reference to a hash where the following keys are defined:
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -11028,7 +11545,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
@@ -11036,7 +11553,7 @@ fields_HasRepresentativeOf is a reference to a hash where the following keys are
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -11064,7 +11581,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
@@ -11072,7 +11589,7 @@ fields_HasRepresentativeOf is a reference to a hash where the following keys are
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -11135,7 +11652,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -11150,7 +11667,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -11171,7 +11688,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -11186,7 +11703,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -11581,7 +12098,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_ReactionRule
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -11606,7 +12123,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_ReactionRule
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -11680,7 +12197,7 @@ fields_HasStep is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 </pre>
@@ -11705,7 +12222,7 @@ fields_HasStep is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 
@@ -12957,7 +13474,7 @@ fields_IsAlignedIn is a reference to a hash where the following keys are defined
 	dir has a value which is a string
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -12983,7 +13500,7 @@ fields_IsAlignedIn is a reference to a hash where the following keys are defined
 	dir has a value which is a string
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -13058,7 +13575,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Contig
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 fields_IsAlignedIn is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	start has a value which is an int
@@ -13084,7 +13601,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Contig
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	notes has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 fields_IsAlignedIn is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	start has a value which is an int
@@ -13722,7 +14239,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -13757,7 +14274,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -13833,7 +14350,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
@@ -13868,7 +14385,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
@@ -13937,7 +14454,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
@@ -13972,7 +14489,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
@@ -14055,7 +14572,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -14090,7 +14607,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -14145,7 +14662,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_BiomassCompound is a reference to a hash where the following keys are defined:
@@ -14169,7 +14686,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_BiomassCompound is a reference to a hash where the following keys are defined:
@@ -14240,7 +14757,7 @@ fields_IsComprisedOf is a reference to a hash where the following keys are defin
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -14264,7 +14781,7 @@ fields_IsComprisedOf is a reference to a hash where the following keys are defin
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -14326,7 +14843,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
@@ -14360,7 +14877,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
@@ -14440,7 +14957,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -14474,7 +14991,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -15069,7 +15586,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -15092,7 +15609,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -15173,7 +15690,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -15196,7 +15713,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -15825,7 +16342,7 @@ fields_IsDividedInto is a reference to a hash where the following keys are defin
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -15858,7 +16375,7 @@ fields_IsDividedInto is a reference to a hash where the following keys are defin
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -15921,7 +16438,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
@@ -15954,7 +16471,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
@@ -16201,7 +16718,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
@@ -16225,7 +16742,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
@@ -16296,7 +16813,7 @@ fields_IsFamilyFor is a reference to a hash where the following keys are defined
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -16320,7 +16837,7 @@ fields_IsFamilyFor is a reference to a hash where the following keys are defined
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	family_function has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -16731,7 +17248,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -16754,7 +17271,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -16820,7 +17337,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -16843,7 +17360,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -16897,7 +17414,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_SSRow
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -16924,7 +17441,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_SSRow
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -17000,7 +17517,7 @@ fields_IsImplementedBy is a reference to a hash where the following keys are def
 	id has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -17027,7 +17544,7 @@ fields_IsImplementedBy is a reference to a hash where the following keys are def
 	id has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	role_rule has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
 	code has a value which is a string
 	type has a value which is a string
 	comment has a value which is a string
@@ -17268,7 +17785,7 @@ fields_IsInstantiatedBy is a reference to a hash where the following keys are de
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -17296,7 +17813,7 @@ fields_IsInstantiatedBy is a reference to a hash where the following keys are de
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -17359,7 +17876,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
@@ -17387,7 +17904,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
@@ -17683,7 +18200,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
@@ -17725,7 +18242,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
@@ -17821,7 +18338,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -17863,7 +18380,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -18100,7 +18617,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
@@ -18138,7 +18655,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
@@ -18229,7 +18746,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -18267,7 +18784,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -18698,7 +19215,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
@@ -18727,7 +19244,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
@@ -18815,7 +19332,7 @@ fields_IsRealLocationOf is a reference to a hash where the following keys are de
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -18844,7 +19361,7 @@ fields_IsRealLocationOf is a reference to a hash where the following keys are de
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -19078,7 +19595,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
@@ -19109,7 +19626,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
@@ -19195,7 +19712,7 @@ fields_IsRelevantFor is a reference to a hash where the following keys are defin
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -19226,7 +19743,7 @@ fields_IsRelevantFor is a reference to a hash where the following keys are defin
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -20323,7 +20840,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsTargetOf is a reference to a hash where the following keys are defined:
@@ -20349,7 +20866,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsTargetOf is a reference to a hash where the following keys are defined:
@@ -20422,7 +20939,7 @@ fields_IsTargetOf is a reference to a hash where the following keys are defined:
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -20448,7 +20965,7 @@ fields_IsTargetOf is a reference to a hash where the following keys are defined:
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	compartment_index has a value which is an int
-	label has a value which is a string
+	label has a value which is a reference to a list where each element is a string
 	pH has a value which is a float
 	potential has a value which is a float
 
@@ -20505,7 +21022,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -20520,7 +21037,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -20543,7 +21060,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -20558,7 +21075,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -20632,7 +21149,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
@@ -20642,7 +21159,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -20670,7 +21187,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
@@ -20680,7 +21197,7 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
-	alias has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -20938,7 +21455,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Role
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -20964,7 +21481,7 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Role
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -21050,7 +21567,7 @@ fields_IsTriggeredBy is a reference to a hash where the following keys are defin
 	type has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 </pre>
@@ -21076,7 +21593,7 @@ fields_IsTriggeredBy is a reference to a hash where the following keys are defin
 	type has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 	mod_date has a value which is a string
 
 
@@ -21330,7 +21847,7 @@ fields_Manages is a reference to a hash where the following keys are defined:
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -21361,7 +21878,7 @@ fields_Manages is a reference to a hash where the following keys are defined:
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -21423,7 +21940,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 fields_Manages is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
@@ -21454,7 +21971,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
-	name has a value which is a string
+	name has a value which is a reference to a list where each element is a string
 fields_Manages is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
@@ -21700,7 +22217,7 @@ fields_Overlaps is a reference to a hash where the following keys are defined:
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -21724,7 +22241,7 @@ fields_Overlaps is a reference to a hash where the following keys are defined:
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -21787,7 +22304,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
@@ -21811,7 +22328,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
@@ -22086,7 +22603,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -22120,7 +22637,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -22193,7 +22710,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
@@ -22227,7 +22744,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
@@ -22666,7 +23183,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Shows is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	location has a value which is a rectangle
@@ -22698,7 +23215,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 fields_Shows is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	location has a value which is a rectangle
@@ -22791,7 +23308,7 @@ rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -22823,7 +23340,7 @@ rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
-	content has a value which is a string
+	content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -22889,7 +23406,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -22923,7 +23440,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -22995,7 +23512,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
@@ -23029,7 +23546,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
@@ -23097,7 +23614,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
@@ -23133,7 +23650,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
@@ -23218,7 +23735,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -23254,7 +23771,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	domain has a value which is a string
 	genetic_code has a value which is an int
 	gc_content has a value which is a float
-	phenotype has a value which is a string
+	phenotype has a value which is a reference to a list where each element is a string
 	md5 has a value which is a string
 	source_id has a value which is a string
 
@@ -23377,7 +23894,7 @@ a string
 
 =item Description
 
-a fid is a "feature id".  A feature represents an ordered list of regions from
+A fid is a "feature id".  A feature represents an ordered list of regions from
 the contigs of a genome.  Features all have types.  This allows you to speak
 of not only protein-encoding genes (PEGs) and RNAs, but also binding sites,
 large regions, etc.  The location of a fid is defined as a list of
@@ -23855,6 +24372,32 @@ a reference to a list where each element is a region_of_dna
 
 
 
+=head2 locations
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a location
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a location
+
+=end text
+
+=back
+
+
+
 =head2 region_of_dna_string
 
 =over 4
@@ -24303,6 +24846,90 @@ a reference to a list where each element is a role
 
 
 
+=head2 optional
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 role_with_flag
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a role
+1: an optional
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a role
+1: an optional
+
+
+=end text
+
+=back
+
+
+
+=head2 roles_with_flags
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a role_with_flag
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a role_with_flag
+
+=end text
+
+=back
+
+
+
 =head2 scored_fids
 
 =over 4
@@ -24322,32 +24949,6 @@ a reference to a list where each element is a scored_fid
 =begin text
 
 a reference to a list where each element is a scored_fid
-
-=end text
-
-=back
-
-
-
-=head2 locations
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a list where each element is a location
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a list where each element is a location
 
 =end text
 
@@ -24797,9 +25398,8 @@ a reference to a list where each element is a fid_function_pair
 
 =item Description
 
-A functionally coupled protein family identifies a family and two scores
-that indicate the coupling strength: a co-expression score and a
-co-occurrence score.
+A functionally coupled protein family identifies a family, a score, and a function
+(of the related family)
 
 
 =item Definition
@@ -24934,6 +25534,64 @@ a string
 
 
 
+=head2 complex_with_flag
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a complex
+1: an optional
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a complex
+1: an optional
+
+
+=end text
+
+=back
+
+
+
+=head2 complexes_with_flags
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a complex_with_flag
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a complex_with_flag
+
+=end text
+
+=back
+
+
+
 =head2 complexes
 
 =over 4
@@ -25060,7 +25718,7 @@ in a single invocation.
 <pre>
 a reference to a hash where the following keys are defined:
 complex_name has a value which is a name
-complex_roles has a value which is a roles
+complex_roles has a value which is a roles_with_flags
 complex_reactions has a value which is a reactions
 
 </pre>
@@ -25071,7 +25729,7 @@ complex_reactions has a value which is a reactions
 
 a reference to a hash where the following keys are defined:
 complex_name has a value which is a name
-complex_roles has a value which is a roles
+complex_roles has a value which is a roles_with_flags
 complex_reactions has a value which is a reactions
 
 
@@ -25129,6 +25787,66 @@ genome_md5 has a value which is a string
 
 
 
+=head2 regulon_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+regulon_id has a value which is a string
+regulon_set has a value which is a fids
+tfs has a value which is a fids
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+regulon_id has a value which is a string
+regulon_set has a value which is a fids
+tfs has a value which is a fids
+
+
+=end text
+
+=back
+
+
+
+=head2 regulons_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a regulon_data
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a regulon_data
+
+=end text
+
+=back
+
+
+
 =head2 feature_data
 
 =over 4
@@ -25146,7 +25864,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
-feature_location has a value which is a locations
+feature_location has a value which is a location
 
 </pre>
 
@@ -25160,7 +25878,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
-feature_location has a value which is a locations
+feature_location has a value which is a location
 
 
 =end text
@@ -25951,7 +26669,7 @@ description has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 mod_date has a value which is a string
-name has a value which is a string
+name has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -25962,7 +26680,7 @@ name has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 mod_date has a value which is a string
-name has a value which is a string
+name has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -26052,7 +26770,7 @@ name has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-name has a value which is a string
+name has a value which is a reference to a list where each element is a string
 mod_date has a value which is a string
 
 </pre>
@@ -26063,7 +26781,7 @@ mod_date has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-name has a value which is a string
+name has a value which is a reference to a list where each element is a string
 mod_date has a value which is a string
 
 
@@ -26259,7 +26977,7 @@ reason has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 name has a value which is a string
-content has a value which is a string
+content has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -26270,7 +26988,7 @@ content has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 name has a value which is a string
-content has a value which is a string
+content has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -26359,7 +27077,7 @@ source has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 type has a value which is a string
-family_function has a value which is a string
+family_function has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -26370,7 +27088,7 @@ family_function has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 type has a value which is a string
-family_function has a value which is a string
+family_function has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -26440,7 +27158,7 @@ contigs has a value which is an int
 domain has a value which is a string
 genetic_code has a value which is an int
 gc_content has a value which is a float
-phenotype has a value which is a string
+phenotype has a value which is a reference to a list where each element is a string
 md5 has a value which is a string
 source_id has a value which is a string
 
@@ -26462,7 +27180,7 @@ contigs has a value which is an int
 domain has a value which is a string
 genetic_code has a value which is an int
 gc_content has a value which is a float
-phenotype has a value which is a string
+phenotype has a value which is a reference to a list where each element is a string
 md5 has a value which is a string
 source_id has a value which is a string
 
@@ -26603,7 +27321,7 @@ annotation_count has a value which is an int
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 compartment_index has a value which is an int
-label has a value which is a string
+label has a value which is a reference to a list where each element is a string
 pH has a value which is a float
 potential has a value which is a float
 
@@ -26616,7 +27334,7 @@ potential has a value which is a float
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 compartment_index has a value which is an int
-label has a value which is a string
+label has a value which is a reference to a list where each element is a string
 pH has a value which is a float
 potential has a value which is a float
 
@@ -27211,7 +27929,7 @@ id has a value which is a string
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
-alias has a value which is a string
+alias has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -27224,7 +27942,7 @@ id has a value which is a string
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
-alias has a value which is a string
+alias has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -27246,7 +27964,7 @@ alias has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-role_rule has a value which is a string
+role_rule has a value which is a reference to a list where each element is a string
 code has a value which is a string
 type has a value which is a string
 comment has a value which is a string
@@ -27259,7 +27977,7 @@ comment has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-role_rule has a value which is a string
+role_rule has a value which is a reference to a list where each element is a string
 code has a value which is a string
 type has a value which is a string
 comment has a value which is a string
@@ -27284,7 +28002,7 @@ comment has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-notes has a value which is a string
+notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -27294,7 +28012,7 @@ notes has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-notes has a value which is a string
+notes has a value which is a reference to a list where each element is a string
 
 
 =end text

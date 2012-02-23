@@ -12,8 +12,7 @@ instances of the CDM (Central Data Model).  A basic familiarity with these routi
 will allow the user to extract data from the CS (Central Store).  We anticipate
 supporting numerous sparse CDMIs in the PS (Persistent Store).
 
-Basic Themes:
-------------
+=head2 Basic Themes
 
 There are several broad categories of routines supported in the CDMI-API.
 
@@ -50,8 +49,7 @@ We have attempted to package this specific search in a convenient form.  We anti
 that the number of queries of this last class will grow (especially as new entities are
 added to the model).
 
-Batching queries:
-----------------
+=head2 Batching queries
 
 A majority of the CS-API routines take a list of ids as input.  Each id may be thought
 of as input to a query that produces an output result.  We support processing an input list,
@@ -1759,14 +1757,9 @@ sub protein_families_to_proteins
 
 <pre>
 $protein_families is a protein_families
-$return is a reference to a hash where the key is a protein_family and the value is a fid_function_pairs
+$return is a reference to a hash where the key is a protein_family and the value is a function
 protein_families is a reference to a list where each element is a protein_family
 protein_family is a string
-fid_function_pairs is a reference to a list where each element is a fid_function_pair
-fid_function_pair is a reference to a list containing 2 items:
-	0: a fid
-	1: a function
-fid is a string
 function is a string
 
 </pre>
@@ -1776,14 +1769,9 @@ function is a string
 =begin text
 
 $protein_families is a protein_families
-$return is a reference to a hash where the key is a protein_family and the value is a fid_function_pairs
+$return is a reference to a hash where the key is a protein_family and the value is a function
 protein_families is a reference to a list where each element is a protein_family
 protein_family is a string
-fid_function_pairs is a reference to a list where each element is a fid_function_pair
-fid_function_pair is a reference to a list containing 2 items:
-	0: a fid
-	1: a function
-fid is a string
 function is a string
 
 
@@ -1794,8 +1782,7 @@ function is a string
 =item Description
 
 protein_families_to_functions can be used to extract the set of functions assigned to the fids
-that make up the family.  Each input protein_family is mapped to a set of 2-tuples composed of
-a feature id (fid) and the function currently assigned to the fid.
+that make up the family.  Each input protein_family is mapped to a family function.
 
 =back
 
@@ -1809,13 +1796,19 @@ sub protein_families_to_functions
     #BEGIN protein_families_to_functions
                     my $kb = $self->{db};
     $return = {};
-    for my $id (@$protein_families) {
-        my @resultRows = $kb->GetAll("HasMember Feature",
-                                      "HasMember(from-link) = ?", [$id],
-				     [qw(Feature(id) Feature(function))]);
-	if (@resultRows != 0) {
-                $return->{$id} = \@resultRows;
-        }
+    my $n = @$protein_families;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $constraint = "Family(id) IN $targets";
+
+    my @res = $kb->GetAll('Family',
+			  $constraint,
+			  $protein_families,
+			  'Family(id) Family(family_function)');
+
+    foreach my $tuple (@res)
+    {
+	my($ff,$func) = @$tuple;
+	$return->{$ff} = $func;
     }
     #END protein_families_to_functions
     return($return);
@@ -1888,16 +1881,23 @@ sub protein_families_to_co_occurring_families
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN protein_families_to_co_occurring_families
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
-    for my $id (@$protein_families) {
-        my @resultRows = $kb->GetAll("IsCoupledTo",
-                                      "IsCoupledTo(from-link) = ?", [$id],
-				     [qw(IsCoupledTo(to-link) IsCoupledTo(co-expression-evidence) IsCoupledTo(co-occurrence-evidence))]);
 
+    my $n = @$protein_families;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $constraint = "IsCoupledTo(from_link) IN $targets";
+    my @res = $kb->GetAll('IsCoupledTo Family',
+			  $constraint,
+			  $protein_families,
+			  'IsCoupledTo(from_link) IsCoupledTo(to_link) IsCoupledTo(co_occurrence_evidence) Family(family_function)');
 
-	if (@resultRows != 0) {
-		$return->{$id} = \@resultRows;
+    foreach my $tuple (grep { $_->[0] ne $_->[1] } @res)
+    {
+	my($from,$to,$sc,$func) = @$tuple;
+	if ($sc >= 10)
+	{
+	    push(@{$return->{$from}},[$to,$sc,$func]);
 	}
     }
     #END protein_families_to_co_occurring_families
@@ -3133,11 +3133,15 @@ complexes is a reference to a list where each element is a complex
 complex is a string
 complex_data is a reference to a hash where the following keys are defined:
 	complex_name has a value which is a name
-	complex_roles has a value which is a roles
+	complex_roles has a value which is a roles_with_flags
 	complex_reactions has a value which is a reactions
 name is a string
-roles is a reference to a list where each element is a role
+roles_with_flags is a reference to a list where each element is a role_with_flag
+role_with_flag is a reference to a list containing 2 items:
+	0: a role
+	1: an optional
 role is a string
+optional is a string
 reactions is a reference to a list where each element is a reaction
 reaction is a string
 
@@ -3153,11 +3157,15 @@ complexes is a reference to a list where each element is a complex
 complex is a string
 complex_data is a reference to a hash where the following keys are defined:
 	complex_name has a value which is a name
-	complex_roles has a value which is a roles
+	complex_roles has a value which is a roles_with_flags
 	complex_reactions has a value which is a reactions
 name is a string
-roles is a reference to a list where each element is a role
+roles_with_flags is a reference to a list where each element is a role_with_flag
+role_with_flag is a reference to a list containing 2 items:
+	0: a role
+	1: an optional
 role is a string
+optional is a string
 reactions is a reference to a list where each element is a reaction
 reaction is a string
 
@@ -3211,17 +3219,18 @@ sub complexes_to_complex_data
     @res    = $kb->GetAll('Complex IsTriggeredBy',
 			  $complex_constraint,
 			  $complexes,
-			  'Complex(id) IsTriggeredBy(to-link)');
+			  'Complex(id) IsTriggeredBy(to-link) IsTriggeredBy(optional)');
 
     foreach my $tuple (@res)
     {
-	my($cid,$role) = @$tuple;
-	$to_roles{$cid}->{$role} = 1;
+	my($cid,$role,$optional) = @$tuple;
+	$to_roles{$cid}->{$role} = $optional;
     }
     foreach my $cid (@$complexes)
     {
 	my $complex_name      = $to_name{$cid} || '';
-	my $complex_roles     = $to_roles{$cid} ?     [sort keys(%{$to_roles{$cid}})] : [];
+	my $complex_roles     = defined($to_roles{$cid}) ?     
+	                        [map { [$_,$to_roles{$cid}->{$_}] } sort keys(%{$to_roles{$cid}})] : [];
 	my $complex_reactions = $to_reactions{$cid} ? [sort keys(%{$to_reactions{$cid}})] : [];
 	$return->{$cid} = { complex_name      => $complex_name,
 			    complex_roles     => $complex_roles,
@@ -3350,6 +3359,133 @@ sub genomes_to_genome_data
 
 
 
+=head2 fids_to_regulon_data
+
+  $return = $obj->fids_to_regulon_data($fids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$fids is a fids
+$return is a reference to a hash where the key is a fid and the value is a regulons_data
+fids is a reference to a list where each element is a fid
+fid is a string
+regulons_data is a reference to a list where each element is a regulon_data
+regulon_data is a reference to a hash where the following keys are defined:
+	regulon_id has a value which is a string
+	regulon_set has a value which is a fids
+	tfs has a value which is a fids
+
+</pre>
+
+=end html
+
+=begin text
+
+$fids is a fids
+$return is a reference to a hash where the key is a fid and the value is a regulons_data
+fids is a reference to a list where each element is a fid
+fid is a string
+regulons_data is a reference to a list where each element is a regulon_data
+regulon_data is a reference to a hash where the following keys are defined:
+	regulon_id has a value which is a string
+	regulon_set has a value which is a fids
+	tfs has a value which is a fids
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub fids_to_regulon_data
+{
+    my($self, $fids) = @_;
+    my $ctx = $CDMI_APIServer::CallContext;
+    my($return);
+    #BEGIN fids_to_regulon_data
+    $return = {};
+    if (@$fids < 1)  { return $return }
+    my $kb = $self->{db};
+    my $n = @$fids;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $fid_constraint       = "IsRegulatedIn(from-link) IN $targets";
+    my @res = $kb->GetAll('IsRegulatedIn',
+			  $fid_constraint,
+			  $fids,
+			  'IsRegulatedIn(from-link) IsRegulatedIn(to-link)'
+			  );
+    my %to_reg;
+    my %regulons;
+    foreach my $tuple (@res)
+    {
+	my($fid,$regulon) = @$tuple;
+	$to_reg{$fid}->{$regulon} = 1;
+	$regulons{$regulon} = {};
+    }
+    my @sets = keys(%regulons);
+    if (@sets == 0) { return $return }
+
+    $n       = @sets;
+    $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $reg_constraint       = "IsRegulatedSetOf(from-link) IN $targets";
+    @res = $kb->GetAll('IsRegulatedSetOf',
+		       $reg_constraint,
+		       \@sets,,
+		       'IsRegulatedSetOf(from-link) IsRegulatedSetOf(to-link)'
+		       );
+
+    foreach my $tuple (@res)
+    {
+	my($regulon,$fid) = @$tuple;
+	$regulons{$regulon}->{$fid} = 1;
+    }
+    my %controls;
+    $reg_constraint       = "IsControlledUsing(from-link) IN $targets";
+    @res = $kb->GetAll('IsControlledUsing',
+		       $reg_constraint,
+		       \@sets,
+		       'IsControlledUsing(from-link) IsControlledUsing(to-link)'
+		       );
+
+    foreach my $tuple (@res)
+    {
+	my($regulon,$fid) = @$tuple;
+	$controls{$regulon}->{$fid} = 1;
+    }
+
+    foreach my $fid (keys(%to_reg))
+    {
+	my $regulons_data = [];
+	my $regH = $to_reg{$fid};
+	foreach my $reg_in (keys(%$regH))
+	{
+	    my @mem = keys(%{$regulons{$reg_in}});
+	    my @tfs = keys(%{$controls{$reg_in}});
+	    push(@$regulons_data,{ regulon_set => \@mem,
+				   regulon_id  => $reg_in,
+				   tfs         => \@tfs });
+	}
+	$return->{$fid} = $regulons_data;
+    }
+    #END fids_to_regulon_data
+    return($return);
+}
+
+
+
+
 =head2 fids_to_feature_data
 
   $return = $obj->fids_to_feature_data($fids)
@@ -3371,13 +3507,12 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_function has a value which is a string
 	feature_length has a value which is an int
 	feature_publications has a value which is a pubrefs
-	feature_location has a value which is a locations
+	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
 	0: a string
 	1: a string
 	2: a string
-locations is a reference to a list where each element is a location
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -3405,13 +3540,12 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_function has a value which is a string
 	feature_length has a value which is an int
 	feature_publications has a value which is a pubrefs
-	feature_location has a value which is a locations
+	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
 	0: a string
 	1: a string
 	2: a string
-locations is a reference to a list where each element is a location
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -3449,16 +3583,29 @@ sub fids_to_feature_data
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
     my $fid_constraint       = "Feature(id) IN $targets";
     my $produces_constraint =  "Produces(from-link) IN $targets";
+    my $loc_constraint       = "IsLocatedIn(from-link) IN $targets";
     my %genome;
     my %function;
     my %len;
     my %publications;
+    my %location;
+    my @locs = $kb->GetAll('IsLocatedIn',
+			  $loc_constraint,
+			  $fids,
+			  'IsLocatedIn(from-link) IsLocatedIn(to-link) IsLocatedIn(begin) IsLocatedIn(dir) IsLocatedIn(len) IsLocatedIn(ordinal)'
+			  );
+    foreach my $tuple (sort { ($a->[0] cmp $b->[0]) or ($a->[5] <=> $b->[5]) } @locs)
+    {
+	my($fid,$contig,$begin,$dir,$len) = @$tuple;
+	push(@{$location{$fid}},[$contig,$begin,$dir,$len]);
+    }
 
     my @res = $kb->GetAll('Feature IsOwnedBy Genome',
 			  $fid_constraint,
 			  $fids,
 			  'Feature(id) Genome(scientific-name) Feature(function) Feature(sequence-length)'
 			  );
+
     foreach my $tuple (@res)
     {
 	my($fid,$genome_name,$function,$length) = @$tuple;
@@ -3467,12 +3614,11 @@ sub fids_to_feature_data
 	$len{$fid}         = $length;
     }
 
-    my @res = $kb->GetAll('Produces ProteinSequence IsATopicOf Publication',
+    my @res = $kb->GetAll('Feature Produces ProteinSequence IsATopicOf Publication',
 			  $produces_constraint,
 			  $fids,
 			  'Feature(id) IsATopicOf(to-link) Publication(citation)'
 			  );
-    my @pubrefs = map { [$_->[0], $_->[1]->link(), $_->[1]->text() ] } @res;
     foreach my $tuple (@res)
     {
 	my($fid,$pubid,$url) = @$tuple;
@@ -3483,11 +3629,13 @@ sub fids_to_feature_data
     {
 	my $function = $function{$fid}     || '';
 	my $pubrefs  = $publications{$fid} || [];
+	my $loc      = $location{$fid} || [];
 	$return->{$fid} = { feature_id 		 => $fid,
 			    genome_name 	 => $genome{$fid},
 			    feature_function 	 => $function,
 			    feature_length 	 => $len{$fid},
-			    feature_publications => $pubrefs
+			    feature_publications => $pubrefs,
+			    feature_location     => $loc
 			   };
     }
     return($return);
@@ -3592,9 +3740,9 @@ sub equiv_sequence_assertions
 
 
 
-=head2 fids_to_regulons
+=head2 fids_to_atomic_regulons
 
-  $return = $obj->fids_to_regulons($fids)
+  $return = $obj->fids_to_atomic_regulons($fids)
 
 =over 4
 
@@ -3638,19 +3786,19 @@ regulon_size is an int
 
 =item Description
 
-The fids_to_regulons allows one to map fids into regulons that contain the fids.
+The fids_to_atomic_regulons allows one to map fids into regulons that contain the fids.
 Normally a fid will be in at most one regulon, but we support multiple regulons.
 
 =back
 
 =cut
 
-sub fids_to_regulons
+sub fids_to_atomic_regulons
 {
     my($self, $fids) = @_;
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
-    #BEGIN fids_to_regulons
+    #BEGIN fids_to_atomic_regulons
                     $return = {};
     my $kb = $self->{db};
     for my $fid (@$fids)
@@ -3663,19 +3811,19 @@ sub fids_to_regulons
         if (@res != 0) {
 		my %counts;
 		$counts{$_->[0]}++ foreach @res;
-		$return->{$fid} = [ each(%counts) ];
+		while (my($ar,$n) = each %counts) { push(@{$return->{$fid}},[$ar,$n]) }
         }
     }
-    #END fids_to_regulons
+    #END fids_to_atomic_regulons
     return($return);
 }
 
 
 
 
-=head2 regulons_to_fids
+=head2 atomic_regulons_to_fids
 
-  $return = $obj->regulons_to_fids($regulons)
+  $return = $obj->atomic_regulons_to_fids($regulons)
 
 =over 4
 
@@ -3711,38 +3859,38 @@ fid is a string
 
 =item Description
 
-The regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
+The atomic_regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
 Regulons may arise from several sources; hence, fids can be in multiple regulons.
 
 =back
 
 =cut
 
-sub regulons_to_fids
+sub atomic_regulons_to_fids
 {
     my($self, $regulons) = @_;
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
-    #BEGIN regulons_to_fids
-                $return = {};
-    if (@$regulons < 1)  { return $return }
-
+    #BEGIN atomic_regulons_to_fids
+    $return = {};
+    if (@$regulons < 1) { return $return }
     my $kb = $self->{db};
     my $n = @$regulons;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $regulon_constraint = "IsFormedOf(from-link) IN $targets";
+    my $ar_constraint = "IsFormedOf(from-link) IN $targets";
 
     my @res = $kb->GetAll('IsFormedOf',
-			  $regulon_constraint,
+			  $ar_constraint,
 			  $regulons,
 			  'IsFormedOf(from-link) IsFormedOf(to-link)');
 
     foreach my $tuple (@res)
     {
-	my($regulon,$fid) = @$tuple;
-	push(@{$return->{$regulon}},$fid);
+	my($ar,$fid) = @$tuple;
+	push(@{$return->{$ar}},$fid);
     }
-    #END regulons_to_fids
+
+    #END atomic_regulons_to_fids
     return($return);
 }
 
@@ -4072,11 +4220,15 @@ sub roles_to_fids
 
 <pre>
 $reactions is a reactions
-$return is a reference to a hash where the key is a reaction and the value is a complexes
+$return is a reference to a hash where the key is a reaction and the value is a complexes_with_flags
 reactions is a reference to a list where each element is a reaction
 reaction is a string
-complexes is a reference to a list where each element is a complex
+complexes_with_flags is a reference to a list where each element is a complex_with_flag
+complex_with_flag is a reference to a list containing 2 items:
+	0: a complex
+	1: an optional
 complex is a string
+optional is a string
 
 </pre>
 
@@ -4085,11 +4237,15 @@ complex is a string
 =begin text
 
 $reactions is a reactions
-$return is a reference to a hash where the key is a reaction and the value is a complexes
+$return is a reference to a hash where the key is a reaction and the value is a complexes_with_flags
 reactions is a reference to a list where each element is a reaction
 reaction is a string
-complexes is a reference to a list where each element is a complex
+complexes_with_flags is a reference to a list where each element is a complex_with_flag
+complex_with_flag is a reference to a list containing 2 items:
+	0: a complex
+	1: an optional
 complex is a string
+optional is a string
 
 
 =end text
@@ -4112,7 +4268,7 @@ sub reactions_to_complexes
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN reactions_to_complexes
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
 
     for my $reaction (@$reactions)
@@ -4123,7 +4279,9 @@ sub reactions_to_complexes
 				'IsStepOf(to-link)');
 	if (@comp)
 	{
-	    $return->{$reaction} = \@comp;
+	    my %tmp = map { $_ => 1 } @comp;
+	    my $comp = [sort keys(%tmp)];
+	    $return->{$reaction} = $comp;
 	}
     }
 
@@ -4326,7 +4484,7 @@ sub roles_to_complexes
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN roles_to_complexes
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if ((! $roles) || (@$roles == 0)) { return $return }
 
@@ -4337,12 +4495,12 @@ sub roles_to_complexes
     my @res = $kb->GetAll('Triggers Complex',
 			  $role_constraint,
 			  $roles,
-			  'Triggers(from-link) Triggers(to-link)');
+			  'Triggers(from-link) Triggers(to-link) Triggers(optional)');
 
     foreach my $tuple (@res)
     {
-	my($role,$complex) = @$tuple;
-	push(@{$return->{$role}},$complex);
+	my($role,$complex,$optional) = @$tuple;
+	push(@{$return->{$role}},[$complex,$optional]);
     }
 
     #END roles_to_complexes
@@ -4827,7 +4985,7 @@ a string
 
 =item Description
 
-a fid is a "feature id".  A feature represents an ordered list of regions from
+A fid is a "feature id".  A feature represents an ordered list of regions from
 the contigs of a genome.  Features all have types.  This allows you to speak
 of not only protein-encoding genes (PEGs) and RNAs, but also binding sites,
 large regions, etc.  The location of a fid is defined as a list of
@@ -5305,6 +5463,32 @@ a reference to a list where each element is a region_of_dna
 
 
 
+=head2 locations
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a location
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a location
+
+=end text
+
+=back
+
+
+
 =head2 region_of_dna_string
 
 =over 4
@@ -5753,6 +5937,90 @@ a reference to a list where each element is a role
 
 
 
+=head2 optional
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 role_with_flag
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a role
+1: an optional
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a role
+1: an optional
+
+
+=end text
+
+=back
+
+
+
+=head2 roles_with_flags
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a role_with_flag
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a role_with_flag
+
+=end text
+
+=back
+
+
+
 =head2 scored_fids
 
 =over 4
@@ -5772,32 +6040,6 @@ a reference to a list where each element is a scored_fid
 =begin text
 
 a reference to a list where each element is a scored_fid
-
-=end text
-
-=back
-
-
-
-=head2 locations
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a list where each element is a location
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a list where each element is a location
 
 =end text
 
@@ -6247,9 +6489,8 @@ a reference to a list where each element is a fid_function_pair
 
 =item Description
 
-A functionally coupled protein family identifies a family and two scores
-that indicate the coupling strength: a co-expression score and a
-co-occurrence score.
+A functionally coupled protein family identifies a family, a score, and a function
+(of the related family)
 
 
 =item Definition
@@ -6384,6 +6625,64 @@ a string
 
 
 
+=head2 complex_with_flag
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a complex
+1: an optional
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a complex
+1: an optional
+
+
+=end text
+
+=back
+
+
+
+=head2 complexes_with_flags
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a complex_with_flag
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a complex_with_flag
+
+=end text
+
+=back
+
+
+
 =head2 complexes
 
 =over 4
@@ -6510,7 +6809,7 @@ in a single invocation.
 <pre>
 a reference to a hash where the following keys are defined:
 complex_name has a value which is a name
-complex_roles has a value which is a roles
+complex_roles has a value which is a roles_with_flags
 complex_reactions has a value which is a reactions
 
 </pre>
@@ -6521,7 +6820,7 @@ complex_reactions has a value which is a reactions
 
 a reference to a hash where the following keys are defined:
 complex_name has a value which is a name
-complex_roles has a value which is a roles
+complex_roles has a value which is a roles_with_flags
 complex_reactions has a value which is a reactions
 
 
@@ -6579,6 +6878,66 @@ genome_md5 has a value which is a string
 
 
 
+=head2 regulon_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+regulon_id has a value which is a string
+regulon_set has a value which is a fids
+tfs has a value which is a fids
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+regulon_id has a value which is a string
+regulon_set has a value which is a fids
+tfs has a value which is a fids
+
+
+=end text
+
+=back
+
+
+
+=head2 regulons_data
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a regulon_data
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a regulon_data
+
+=end text
+
+=back
+
+
+
 =head2 feature_data
 
 =over 4
@@ -6596,7 +6955,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
-feature_location has a value which is a locations
+feature_location has a value which is a location
 
 </pre>
 
@@ -6610,7 +6969,7 @@ genome_name has a value which is a string
 feature_function has a value which is a string
 feature_length has a value which is an int
 feature_publications has a value which is a pubrefs
-feature_location has a value which is a locations
+feature_location has a value which is a location
 
 
 =end text

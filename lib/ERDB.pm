@@ -4684,13 +4684,10 @@ sub Delete {
     my ($self, $entityName, $objectID, %options) = @_;
     # Declare the return variable.
     my $retVal = Stats->new();
-    # Find out if we're in test mode.
-    my $testMode = $options{testMode};
+    # Encode the object ID.
+    my $idParameter = $self->EncodeField("$entityName(id)", $objectID);
     # Get the DBKernel object.
     my $db = $self->{_dbh};
-    # Memorize the filter clause and parameters for the GET calls below.
-    my $filter = "$entityName(id) = ?";
-    my $parms = [$objectID];
     # We're going to generate all the paths branching out from the starting
     # entity. One of the things we have to be careful about is preventing loops.
     # We'll use a hash to determine if we've hit a loop.
@@ -4720,8 +4717,15 @@ sub Delete {
         $alreadyFound{$myEntityName} = 1;
         # Figure out if we need to delete this entity.
         if ($myEntityName ne $entityName || ! $options{keepRoot}) {
-            # Yes, put it on the path list.
-            push @fromPathList, [@stackedPath, $myEntityName];
+            # Get the entity data.
+            my $entityData = $self->_GetStructure($myEntityName);
+            # Loop through the entity's relations. A DELETE command will be
+            # needed for each of them.
+            my $relations = $entityData->{Relations};
+            for my $relation (keys %{$relations}) {
+                my @augmentedList = (@stackedPath, $relation);
+                push @fromPathList, \@augmentedList;
+            }
         }
         # Now we need to look for relationships connected to this entity.
         my $relationshipList = $self->{_metaData}->{Relationships};
@@ -4739,9 +4743,9 @@ sub Delete {
                     my $toEntity = $relationship->{to};
                     if (! exists $alreadyFound{$toEntity}) {
                         # Here we have a new entity that's dependent on
-                        # the current entity, so we need to look at it later.
+                        # the current entity, so we need to stack it.
                         my @stackList = (@augmentedList, $toEntity);
-                        push @todoList, \@stackList;
+                        push @fromPathList, \@stackList;
                     } else {
                         Trace("$toEntity ignored because it occurred previously.") if T(4);
                     }
@@ -4750,13 +4754,8 @@ sub Delete {
             # Now check the TO field. In this case only the relationship needs
             # deletion.
             if ($relationship->{to} eq $myEntityName) {
-                # Check to see if we're going back the way we came.
-                my $fromEntity = $relationship->{from};
-                if ($fromEntity ne $myEntityName && ! grep { $_ eq $fromEntity } @stackedPath) {
-                    # We're not, so we stack this path.
-                    my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
-                    push @toPathList, \@augmentedList;
-                }
+                my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
+                push @toPathList, \@augmentedList;
             }
         }
     }
@@ -4765,54 +4764,50 @@ sub Delete {
     # the to-list may need to pass through some of the entities the
     # from-list would delete.
     my %stackList = ( from_link => \@fromPathList, to_link => \@toPathList );
-    # Now it's time to do the deletes.
+    # Now it's time to do the deletes. We do it in two passes.
     for my $keyName ('to_link', 'from_link') {
         # Get the list for this key.
         my @pathList = @{$stackList{$keyName}};
         Trace(scalar(@pathList) . " entries in path list for $keyName.") if T(3);
         # Loop through this list.
         while (my $path = pop @pathList) {
-            # Get the path we're using to drive the delete. We delete records from the
-            # last table in the list.
+            # Get the table whose rows are to be deleted.
             my @pathTables = @{$path};
+            # Start the DELETE statement. We need to call DBKernel because the
+            # syntax of a DELETE-USING varies among DBMSs.
             my $target = $pathTables[$#pathTables];
-            # Build the path for the query. We use the query to find the records to delete.
-            my $pathString = join(" ", @pathTables);
-            # How we proceed depends on whether this is an entity or a relationship.
-            if ($self->IsEntity($target)) {
-                # Here we're deleting entity instances. Get the IDs of all the instances
-                # to delete.
-                my @ids = $self->GetFlat($pathString, $filter, $parms, "$target(id)");
-                # Now we need a list of all the relations used by this entity.
-                my $entityData = $self->FindEntity($target);
-                for my $relation (keys %{$entityData->{Relations}}) {
-                    # Form a statement to delete the identified instances for this relation.
-                    my $stmt = "DELETE FROM $self->{_quote}$relation$self->{_quote} WHERE id = ?";
-                    # Perform the delete for each identified instance.
-                    my $deleted = 0;
-                    for my $id (@ids) {
-                        if (! $testMode) {
-                            $deleted += $db->SQL($stmt, 0, $id);
-                        }
-                    }
-                    Trace("$deleted records deleted from $relation via path $pathString.") if T(3);
-                    $retVal->Add($relation, $deleted);
+            my $stmt = $db->SetUsing(@pathTables);
+            # Now start the WHERE. The first thing is the ID field from the starting table. That
+            # starting table will either be the entity relation or one of the entity's
+            # sub-relations.
+            $stmt .= " WHERE $pathTables[0].id = ?";
+            # Now we run through the remaining entities in the path, connecting them up.
+            for (my $i = 1; $i <= $#pathTables; $i += 2) {
+                # Connect the current relationship to the preceding entity.
+                my ($entity, $rel) = @pathTables[$i-1,$i];
+                # The style of connection depends on the direction of the relationship.
+                $stmt .= " AND $entity.id = $rel.$keyName";
+                if ($i + 1 <= $#pathTables) {
+                    # Here there's a next entity, so connect that to the relationship's
+                    # to-link.
+                    my $entity2 = $pathTables[$i+1];
+                    $stmt .= " AND $rel.to_link = $entity2.id";
                 }
+            }
+            # Now we have our desired DELETE statement.
+            if ($options{testMode}) {
+                # Here the user wants to trace without executing.
+                Trace($stmt) if T(0);
             } else {
-                # Here we're deleting relationship instances. We use from/to pairs to
-                # identify these records.
-                my @pairs = $self->GetAll($pathString, $filter, $parms, "$target(from-link) $target(to-link)");
-                # Form a statemen to delete the identified instances for this relationship.
-                my $stmt = "DELETE FROM $self->{_quote}$target$self->{_quote} WHERE from_link = ? AND to_link = ?";
-                # Loop through the pairs, deleting.
-                my $deleted = 0;
-                for my $pair (@pairs) {
-                    if (! $testMode) {
-                        $deleted += $db->SQL($stmt, 0, @$pair);
-                    }
-                }
-                Trace("$deleted records deleted from $target via path $pathString.") if T(3);
-                $retVal->Add($target, $deleted);
+                # Here we can delete. Note that the SQL method dies with a confession
+                # if an error occurs, so we just go ahead and do it without handling
+                # errors afterward.
+                Trace("Executing delete from $target using '$idParameter'.") if T(3);
+                my $rv = $db->SQL($stmt, 0, $idParameter);
+                # Accumulate the statistics for this delete. The only rows deleted
+                # are from the target table, so we use its name to record the
+                # statistic.
+                $retVal->Add($target, $rv);
             }
         }
     }
@@ -5887,6 +5882,10 @@ sub _SetupSQL {
                 my $fieldName = $1;
                 my $len = $nameLength + length $fieldName;
                 my $pos = pos($filterString) - $len;
+                # Convert any underscores in the field name to hyphens.
+                # This is to allow users to specify the real SQL field name
+                # instead of its ERDB name.
+                $fieldName =~ tr/_/-/;
                 # Insure the field exists.
                 if (!exists $fieldList->{$fieldName}) {
                     Confess("Field $fieldName not found for object $objectName.");

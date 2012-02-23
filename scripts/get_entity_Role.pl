@@ -50,7 +50,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'hypothetical', 'description' );
+my @all_fields = ( 'hypothetical' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Role [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

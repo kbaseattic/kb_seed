@@ -50,7 +50,7 @@ sub fids_to_annotations
 	if ($result->is_error) {
 	    die "Error invoking fids_to_annotations: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_annotations: " . $self->{client}->status_line;
@@ -79,7 +79,7 @@ sub fids_to_functions
 	if ($result->is_error) {
 	    die "Error invoking fids_to_functions: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_functions: " . $self->{client}->status_line;
@@ -117,7 +117,7 @@ sub fids_to_literature
 	if ($result->is_error) {
 	    die "Error invoking fids_to_literature: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_literature: " . $self->{client}->status_line;
@@ -150,7 +150,7 @@ sub fids_to_protein_families
 	if ($result->is_error) {
 	    die "Error invoking fids_to_protein_families: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_protein_families: " . $self->{client}->status_line;
@@ -180,7 +180,7 @@ sub fids_to_roles
 	if ($result->is_error) {
 	    die "Error invoking fids_to_roles: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_roles: " . $self->{client}->status_line;
@@ -211,7 +211,7 @@ sub fids_to_subsystems
 	if ($result->is_error) {
 	    die "Error invoking fids_to_subsystems: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_subsystems: " . $self->{client}->status_line;
@@ -254,7 +254,7 @@ sub fids_to_co_occurring_fids
 	if ($result->is_error) {
 	    die "Error invoking fids_to_co_occurring_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_co_occurring_fids: " . $self->{client}->status_line;
@@ -295,7 +295,7 @@ sub fids_to_locations
 	if ($result->is_error) {
 	    die "Error invoking fids_to_locations: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_locations: " . $self->{client}->status_line;
@@ -326,7 +326,7 @@ sub locations_to_fids
 	if ($result->is_error) {
 	    die "Error invoking locations_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking locations_to_fids: " . $self->{client}->status_line;
@@ -360,7 +360,7 @@ sub locations_to_dna_sequences
 	if ($result->is_error) {
 	    die "Error invoking locations_to_dna_sequences: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking locations_to_dna_sequences: " . $self->{client}->status_line;
@@ -391,7 +391,7 @@ sub proteins_to_fids
 	if ($result->is_error) {
 	    die "Error invoking proteins_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking proteins_to_fids: " . $self->{client}->status_line;
@@ -425,7 +425,7 @@ sub proteins_to_protein_families
 	if ($result->is_error) {
 	    die "Error invoking proteins_to_protein_families: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking proteins_to_protein_families: " . $self->{client}->status_line;
@@ -461,7 +461,7 @@ sub proteins_to_literature
 	if ($result->is_error) {
 	    die "Error invoking proteins_to_literature: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking proteins_to_literature: " . $self->{client}->status_line;
@@ -498,7 +498,7 @@ sub proteins_to_functions
 	if ($result->is_error) {
 	    die "Error invoking proteins_to_functions: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking proteins_to_functions: " . $self->{client}->status_line;
@@ -542,7 +542,7 @@ sub proteins_to_roles
 	if ($result->is_error) {
 	    die "Error invoking proteins_to_roles: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking proteins_to_roles: " . $self->{client}->status_line;
@@ -572,7 +572,7 @@ sub roles_to_proteins
 	if ($result->is_error) {
 	    die "Error invoking roles_to_proteins: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking roles_to_proteins: " . $self->{client}->status_line;
@@ -602,7 +602,7 @@ sub roles_to_subsystems
 	if ($result->is_error) {
 	    die "Error invoking roles_to_subsystems: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking roles_to_subsystems: " . $self->{client}->status_line;
@@ -633,7 +633,7 @@ sub roles_to_protein_families
 	if ($result->is_error) {
 	    die "Error invoking roles_to_protein_families: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking roles_to_protein_families: " . $self->{client}->status_line;
@@ -665,7 +665,7 @@ sub fids_to_coexpressed_fids
 	if ($result->is_error) {
 	    die "Error invoking fids_to_coexpressed_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_coexpressed_fids: " . $self->{client}->status_line;
@@ -695,7 +695,7 @@ sub protein_families_to_fids
 	if ($result->is_error) {
 	    die "Error invoking protein_families_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking protein_families_to_fids: " . $self->{client}->status_line;
@@ -725,7 +725,7 @@ sub protein_families_to_proteins
 	if ($result->is_error) {
 	    die "Error invoking protein_families_to_proteins: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking protein_families_to_proteins: " . $self->{client}->status_line;
@@ -737,8 +737,7 @@ sub protein_families_to_proteins
 =head2 $result = protein_families_to_functions(protein_families)
 
 protein_families_to_functions can be used to extract the set of functions assigned to the fids
-that make up the family.  Each input protein_family is mapped to a set of 2-tuples composed of
-a feature id (fid) and the function currently assigned to the fid.
+that make up the family.  Each input protein_family is mapped to a family function.
 
 =cut
 
@@ -755,7 +754,7 @@ sub protein_families_to_functions
 	if ($result->is_error) {
 	    die "Error invoking protein_families_to_functions: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking protein_families_to_functions: " . $self->{client}->status_line;
@@ -787,7 +786,7 @@ sub protein_families_to_co_occurring_families
 	if ($result->is_error) {
 	    die "Error invoking protein_families_to_co_occurring_families: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking protein_families_to_co_occurring_families: " . $self->{client}->status_line;
@@ -824,7 +823,7 @@ sub co_occurrence_evidence
 	if ($result->is_error) {
 	    die "Error invoking co_occurrence_evidence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking co_occurrence_evidence: " . $self->{client}->status_line;
@@ -854,7 +853,7 @@ sub contigs_to_sequences
 	if ($result->is_error) {
 	    die "Error invoking contigs_to_sequences: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking contigs_to_sequences: " . $self->{client}->status_line;
@@ -886,7 +885,7 @@ sub contigs_to_lengths
 	if ($result->is_error) {
 	    die "Error invoking contigs_to_lengths: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking contigs_to_lengths: " . $self->{client}->status_line;
@@ -919,7 +918,7 @@ sub contigs_to_md5s
 	if ($result->is_error) {
 	    die "Error invoking contigs_to_md5s: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking contigs_to_md5s: " . $self->{client}->status_line;
@@ -953,7 +952,7 @@ sub md5s_to_genomes
 	if ($result->is_error) {
 	    die "Error invoking md5s_to_genomes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking md5s_to_genomes: " . $self->{client}->status_line;
@@ -986,7 +985,7 @@ sub genomes_to_md5s
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_md5s: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_md5s: " . $self->{client}->status_line;
@@ -1016,7 +1015,7 @@ sub genomes_to_contigs
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_contigs: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_contigs: " . $self->{client}->status_line;
@@ -1046,7 +1045,7 @@ sub genomes_to_fids
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_fids: " . $self->{client}->status_line;
@@ -1105,7 +1104,7 @@ sub genomes_to_taxonomies
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_taxonomies: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_taxonomies: " . $self->{client}->status_line;
@@ -1138,7 +1137,7 @@ sub genomes_to_subsystems
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_subsystems: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_subsystems: " . $self->{client}->status_line;
@@ -1169,7 +1168,7 @@ sub subsystems_to_genomes
 	if ($result->is_error) {
 	    die "Error invoking subsystems_to_genomes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking subsystems_to_genomes: " . $self->{client}->status_line;
@@ -1201,7 +1200,7 @@ sub subsystems_to_fids
 	if ($result->is_error) {
 	    die "Error invoking subsystems_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking subsystems_to_fids: " . $self->{client}->status_line;
@@ -1232,7 +1231,7 @@ sub subsystems_to_roles
 	if ($result->is_error) {
 	    die "Error invoking subsystems_to_roles: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking subsystems_to_roles: " . $self->{client}->status_line;
@@ -1266,7 +1265,7 @@ sub subsystems_to_spreadsheets
 	if ($result->is_error) {
 	    die "Error invoking subsystems_to_spreadsheets: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking subsystems_to_spreadsheets: " . $self->{client}->status_line;
@@ -1296,7 +1295,7 @@ sub all_roles_used_in_models
 	if ($result->is_error) {
 	    die "Error invoking all_roles_used_in_models: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_roles_used_in_models: " . $self->{client}->status_line;
@@ -1324,7 +1323,7 @@ sub complexes_to_complex_data
 	if ($result->is_error) {
 	    die "Error invoking complexes_to_complex_data: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking complexes_to_complex_data: " . $self->{client}->status_line;
@@ -1352,10 +1351,38 @@ sub genomes_to_genome_data
 	if ($result->is_error) {
 	    die "Error invoking genomes_to_genome_data: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking genomes_to_genome_data: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = fids_to_regulon_data(fids)
+
+
+
+=cut
+
+sub fids_to_regulon_data
+{
+    my($self, @args) = @_;
+
+    @args == 1 or die "Invalid argument count (expecting 1)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.fids_to_regulon_data",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking fids_to_regulon_data: " . $result->error_message;
+	} else {
+	    return @{$result->result};
+	}
+    } else {
+	die "Error invoking fids_to_regulon_data: " . $self->{client}->status_line;
     }
 }
 
@@ -1380,7 +1407,7 @@ sub fids_to_feature_data
 	if ($result->is_error) {
 	    die "Error invoking fids_to_feature_data: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_feature_data: " . $self->{client}->status_line;
@@ -1412,7 +1439,7 @@ sub equiv_sequence_assertions
 	if ($result->is_error) {
 	    die "Error invoking equiv_sequence_assertions: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking equiv_sequence_assertions: " . $self->{client}->status_line;
@@ -1421,59 +1448,59 @@ sub equiv_sequence_assertions
 
 
 
-=head2 $result = fids_to_regulons(fids)
+=head2 $result = fids_to_atomic_regulons(fids)
 
-The fids_to_regulons allows one to map fids into regulons that contain the fids.
+The fids_to_atomic_regulons allows one to map fids into regulons that contain the fids.
 Normally a fid will be in at most one regulon, but we support multiple regulons.
 
 =cut
 
-sub fids_to_regulons
+sub fids_to_atomic_regulons
 {
     my($self, @args) = @_;
 
     @args == 1 or die "Invalid argument count (expecting 1)";
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_API.fids_to_regulons",
+	method => "CDMI_API.fids_to_atomic_regulons",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
-	    die "Error invoking fids_to_regulons: " . $result->error_message;
+	    die "Error invoking fids_to_atomic_regulons: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
-	die "Error invoking fids_to_regulons: " . $self->{client}->status_line;
+	die "Error invoking fids_to_atomic_regulons: " . $self->{client}->status_line;
     }
 }
 
 
 
-=head2 $result = regulons_to_fids(regulons)
+=head2 $result = atomic_regulons_to_fids(regulons)
 
-The regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
+The atomic_regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
 Regulons may arise from several sources; hence, fids can be in multiple regulons.
 
 =cut
 
-sub regulons_to_fids
+sub atomic_regulons_to_fids
 {
     my($self, @args) = @_;
 
     @args == 1 or die "Invalid argument count (expecting 1)";
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_API.regulons_to_fids",
+	method => "CDMI_API.atomic_regulons_to_fids",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
-	    die "Error invoking regulons_to_fids: " . $result->error_message;
+	    die "Error invoking atomic_regulons_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
-	die "Error invoking regulons_to_fids: " . $self->{client}->status_line;
+	die "Error invoking atomic_regulons_to_fids: " . $self->{client}->status_line;
     }
 }
 
@@ -1501,7 +1528,7 @@ sub fids_to_protein_sequences
 	if ($result->is_error) {
 	    die "Error invoking fids_to_protein_sequences: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_protein_sequences: " . $self->{client}->status_line;
@@ -1529,7 +1556,7 @@ sub fids_to_proteins
 	if ($result->is_error) {
 	    die "Error invoking fids_to_proteins: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_proteins: " . $self->{client}->status_line;
@@ -1558,7 +1585,7 @@ sub fids_to_dna_sequences
 	if ($result->is_error) {
 	    die "Error invoking fids_to_dna_sequences: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_dna_sequences: " . $self->{client}->status_line;
@@ -1595,7 +1622,7 @@ sub roles_to_fids
 	if ($result->is_error) {
 	    die "Error invoking roles_to_fids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking roles_to_fids: " . $self->{client}->status_line;
@@ -1625,7 +1652,7 @@ sub reactions_to_complexes
 	if ($result->is_error) {
 	    die "Error invoking reactions_to_complexes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking reactions_to_complexes: " . $self->{client}->status_line;
@@ -1654,7 +1681,7 @@ sub reaction_strings
 	if ($result->is_error) {
 	    die "Error invoking reaction_strings: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking reaction_strings: " . $self->{client}->status_line;
@@ -1690,7 +1717,7 @@ sub roles_to_complexes
 	if ($result->is_error) {
 	    die "Error invoking roles_to_complexes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking roles_to_complexes: " . $self->{client}->status_line;
@@ -1718,7 +1745,7 @@ sub fids_to_subsystem_data
 	if ($result->is_error) {
 	    die "Error invoking fids_to_subsystem_data: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_subsystem_data: " . $self->{client}->status_line;
@@ -1746,7 +1773,7 @@ sub representative
 	if ($result->is_error) {
 	    die "Error invoking representative: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking representative: " . $self->{client}->status_line;
@@ -1774,7 +1801,7 @@ sub otu_members
 	if ($result->is_error) {
 	    die "Error invoking otu_members: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking otu_members: " . $self->{client}->status_line;
@@ -1802,7 +1829,7 @@ sub fids_to_genomes
 	if ($result->is_error) {
 	    die "Error invoking fids_to_genomes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking fids_to_genomes: " . $self->{client}->status_line;
@@ -1834,7 +1861,7 @@ sub text_search
 	if ($result->is_error) {
 	    die "Error invoking text_search: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking text_search: " . $self->{client}->status_line;
@@ -1916,7 +1943,7 @@ sub get_entity_AlignmentTree
 	if ($result->is_error) {
 	    die "Error invoking get_entity_AlignmentTree: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_AlignmentTree: " . $self->{client}->status_line;
@@ -1944,7 +1971,7 @@ sub all_entities_AlignmentTree
 	if ($result->is_error) {
 	    die "Error invoking all_entities_AlignmentTree: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_AlignmentTree: " . $self->{client}->status_line;
@@ -1998,7 +2025,7 @@ sub get_entity_Annotation
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Annotation: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Annotation: " . $self->{client}->status_line;
@@ -2026,7 +2053,7 @@ sub all_entities_Annotation
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Annotation: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Annotation: " . $self->{client}->status_line;
@@ -2078,7 +2105,7 @@ sub get_entity_AtomicRegulon
 	if ($result->is_error) {
 	    die "Error invoking get_entity_AtomicRegulon: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_AtomicRegulon: " . $self->{client}->status_line;
@@ -2106,7 +2133,7 @@ sub all_entities_AtomicRegulon
 	if ($result->is_error) {
 	    die "Error invoking all_entities_AtomicRegulon: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_AtomicRegulon: " . $self->{client}->status_line;
@@ -2148,7 +2175,7 @@ sub get_entity_Attribute
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Attribute: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Attribute: " . $self->{client}->status_line;
@@ -2176,7 +2203,7 @@ sub all_entities_Attribute
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Attribute: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Attribute: " . $self->{client}->status_line;
@@ -2224,7 +2251,7 @@ sub get_entity_Biomass
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Biomass: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Biomass: " . $self->{client}->status_line;
@@ -2252,7 +2279,7 @@ sub all_entities_Biomass
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Biomass: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Biomass: " . $self->{client}->status_line;
@@ -2294,7 +2321,7 @@ sub get_entity_BiomassCompound
 	if ($result->is_error) {
 	    die "Error invoking get_entity_BiomassCompound: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_BiomassCompound: " . $self->{client}->status_line;
@@ -2322,7 +2349,7 @@ sub all_entities_BiomassCompound
 	if ($result->is_error) {
 	    die "Error invoking all_entities_BiomassCompound: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_BiomassCompound: " . $self->{client}->status_line;
@@ -2376,7 +2403,7 @@ sub get_entity_Compartment
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Compartment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Compartment: " . $self->{client}->status_line;
@@ -2404,7 +2431,7 @@ sub all_entities_Compartment
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Compartment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Compartment: " . $self->{client}->status_line;
@@ -2450,7 +2477,7 @@ sub get_entity_Complex
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Complex: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Complex: " . $self->{client}->status_line;
@@ -2478,7 +2505,7 @@ sub all_entities_Complex
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Complex: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Complex: " . $self->{client}->status_line;
@@ -2551,7 +2578,7 @@ sub get_entity_Compound
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Compound: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Compound: " . $self->{client}->status_line;
@@ -2579,7 +2606,7 @@ sub all_entities_Compound
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Compound: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Compound: " . $self->{client}->status_line;
@@ -2626,7 +2653,7 @@ sub get_entity_Contig
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Contig: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Contig: " . $self->{client}->status_line;
@@ -2654,7 +2681,7 @@ sub all_entities_Contig
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Contig: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Contig: " . $self->{client}->status_line;
@@ -2704,7 +2731,7 @@ sub get_entity_ContigChunk
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ContigChunk: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ContigChunk: " . $self->{client}->status_line;
@@ -2732,7 +2759,7 @@ sub all_entities_ContigChunk
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ContigChunk: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ContigChunk: " . $self->{client}->status_line;
@@ -2778,7 +2805,7 @@ sub get_entity_ContigSequence
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ContigSequence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ContigSequence: " . $self->{client}->status_line;
@@ -2806,7 +2833,7 @@ sub all_entities_ContigSequence
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ContigSequence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ContigSequence: " . $self->{client}->status_line;
@@ -2852,7 +2879,7 @@ sub get_entity_CoregulatedSet
 	if ($result->is_error) {
 	    die "Error invoking get_entity_CoregulatedSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_CoregulatedSet: " . $self->{client}->status_line;
@@ -2880,7 +2907,7 @@ sub all_entities_CoregulatedSet
 	if ($result->is_error) {
 	    die "Error invoking all_entities_CoregulatedSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_CoregulatedSet: " . $self->{client}->status_line;
@@ -2926,7 +2953,7 @@ sub get_entity_Diagram
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Diagram: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Diagram: " . $self->{client}->status_line;
@@ -2954,7 +2981,7 @@ sub all_entities_Diagram
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Diagram: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Diagram: " . $self->{client}->status_line;
@@ -3002,7 +3029,7 @@ sub get_entity_EcNumber
 	if ($result->is_error) {
 	    die "Error invoking get_entity_EcNumber: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_EcNumber: " . $self->{client}->status_line;
@@ -3030,7 +3057,7 @@ sub all_entities_EcNumber
 	if ($result->is_error) {
 	    die "Error invoking all_entities_EcNumber: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_EcNumber: " . $self->{client}->status_line;
@@ -3072,7 +3099,7 @@ sub get_entity_Experiment
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Experiment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Experiment: " . $self->{client}->status_line;
@@ -3100,7 +3127,7 @@ sub all_entities_Experiment
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Experiment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Experiment: " . $self->{client}->status_line;
@@ -3165,7 +3192,7 @@ sub get_entity_Family
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Family: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Family: " . $self->{client}->status_line;
@@ -3193,7 +3220,7 @@ sub all_entities_Family
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Family: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Family: " . $self->{client}->status_line;
@@ -3263,7 +3290,7 @@ sub get_entity_Feature
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Feature: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Feature: " . $self->{client}->status_line;
@@ -3291,7 +3318,7 @@ sub all_entities_Feature
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Feature: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Feature: " . $self->{client}->status_line;
@@ -3405,7 +3432,7 @@ sub get_entity_Genome
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Genome: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Genome: " . $self->{client}->status_line;
@@ -3433,7 +3460,7 @@ sub all_entities_Genome
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Genome: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Genome: " . $self->{client}->status_line;
@@ -3483,7 +3510,7 @@ sub get_entity_Identifier
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Identifier: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Identifier: " . $self->{client}->status_line;
@@ -3511,7 +3538,7 @@ sub all_entities_Identifier
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Identifier: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Identifier: " . $self->{client}->status_line;
@@ -3565,7 +3592,7 @@ sub get_entity_Media
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Media: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Media: " . $self->{client}->status_line;
@@ -3593,7 +3620,7 @@ sub all_entities_Media
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Media: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Media: " . $self->{client}->status_line;
@@ -3671,7 +3698,7 @@ sub get_entity_Model
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Model: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Model: " . $self->{client}->status_line;
@@ -3699,7 +3726,7 @@ sub all_entities_Model
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Model: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Model: " . $self->{client}->status_line;
@@ -3762,7 +3789,7 @@ sub get_entity_ModelCompartment
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ModelCompartment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ModelCompartment: " . $self->{client}->status_line;
@@ -3790,7 +3817,7 @@ sub all_entities_ModelCompartment
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ModelCompartment: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ModelCompartment: " . $self->{client}->status_line;
@@ -3826,7 +3853,7 @@ sub get_entity_OTU
 	if ($result->is_error) {
 	    die "Error invoking get_entity_OTU: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_OTU: " . $self->{client}->status_line;
@@ -3854,7 +3881,7 @@ sub all_entities_OTU
 	if ($result->is_error) {
 	    die "Error invoking all_entities_OTU: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_OTU: " . $self->{client}->status_line;
@@ -3901,7 +3928,7 @@ sub get_entity_PairSet
 	if ($result->is_error) {
 	    die "Error invoking get_entity_PairSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_PairSet: " . $self->{client}->status_line;
@@ -3929,7 +3956,7 @@ sub all_entities_PairSet
 	if ($result->is_error) {
 	    die "Error invoking all_entities_PairSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_PairSet: " . $self->{client}->status_line;
@@ -3969,7 +3996,7 @@ sub get_entity_Pairing
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Pairing: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Pairing: " . $self->{client}->status_line;
@@ -3997,7 +4024,7 @@ sub all_entities_Pairing
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Pairing: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Pairing: " . $self->{client}->status_line;
@@ -4033,7 +4060,7 @@ sub get_entity_ProbeSet
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ProbeSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ProbeSet: " . $self->{client}->status_line;
@@ -4061,7 +4088,7 @@ sub all_entities_ProbeSet
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ProbeSet: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ProbeSet: " . $self->{client}->status_line;
@@ -4107,7 +4134,7 @@ sub get_entity_ProteinSequence
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ProteinSequence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ProteinSequence: " . $self->{client}->status_line;
@@ -4135,7 +4162,7 @@ sub all_entities_ProteinSequence
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ProteinSequence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ProteinSequence: " . $self->{client}->status_line;
@@ -4184,7 +4211,7 @@ sub get_entity_Publication
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Publication: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Publication: " . $self->{client}->status_line;
@@ -4212,7 +4239,7 @@ sub all_entities_Publication
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Publication: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Publication: " . $self->{client}->status_line;
@@ -4275,7 +4302,7 @@ sub get_entity_Reaction
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Reaction: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Reaction: " . $self->{client}->status_line;
@@ -4303,7 +4330,7 @@ sub all_entities_Reaction
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Reaction: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Reaction: " . $self->{client}->status_line;
@@ -4350,7 +4377,7 @@ sub get_entity_ReactionRule
 	if ($result->is_error) {
 	    die "Error invoking get_entity_ReactionRule: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_ReactionRule: " . $self->{client}->status_line;
@@ -4378,7 +4405,7 @@ sub all_entities_ReactionRule
 	if ($result->is_error) {
 	    die "Error invoking all_entities_ReactionRule: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_ReactionRule: " . $self->{client}->status_line;
@@ -4449,7 +4476,7 @@ sub get_entity_Reagent
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Reagent: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Reagent: " . $self->{client}->status_line;
@@ -4477,7 +4504,7 @@ sub all_entities_Reagent
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Reagent: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Reagent: " . $self->{client}->status_line;
@@ -4529,7 +4556,7 @@ sub get_entity_Requirement
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Requirement: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Requirement: " . $self->{client}->status_line;
@@ -4557,7 +4584,7 @@ sub all_entities_Requirement
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Requirement: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Requirement: " . $self->{client}->status_line;
@@ -4601,7 +4628,7 @@ sub get_entity_Role
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Role: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Role: " . $self->{client}->status_line;
@@ -4629,7 +4656,7 @@ sub all_entities_Role
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Role: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Role: " . $self->{client}->status_line;
@@ -4667,7 +4694,7 @@ sub get_entity_SSCell
 	if ($result->is_error) {
 	    die "Error invoking get_entity_SSCell: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_SSCell: " . $self->{client}->status_line;
@@ -4695,7 +4722,7 @@ sub all_entities_SSCell
 	if ($result->is_error) {
 	    die "Error invoking all_entities_SSCell: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_SSCell: " . $self->{client}->status_line;
@@ -4751,7 +4778,7 @@ sub get_entity_SSRow
 	if ($result->is_error) {
 	    die "Error invoking get_entity_SSRow: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_SSRow: " . $self->{client}->status_line;
@@ -4779,7 +4806,7 @@ sub all_entities_SSRow
 	if ($result->is_error) {
 	    die "Error invoking all_entities_SSRow: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_SSRow: " . $self->{client}->status_line;
@@ -4825,7 +4852,7 @@ sub get_entity_Scenario
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Scenario: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Scenario: " . $self->{client}->status_line;
@@ -4853,7 +4880,7 @@ sub all_entities_Scenario
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Scenario: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Scenario: " . $self->{client}->status_line;
@@ -4890,7 +4917,7 @@ sub get_entity_Source
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Source: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Source: " . $self->{client}->status_line;
@@ -4918,7 +4945,7 @@ sub all_entities_Source
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Source: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Source: " . $self->{client}->status_line;
@@ -5010,7 +5037,7 @@ sub get_entity_Subsystem
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Subsystem: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Subsystem: " . $self->{client}->status_line;
@@ -5038,7 +5065,7 @@ sub all_entities_Subsystem
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Subsystem: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Subsystem: " . $self->{client}->status_line;
@@ -5074,7 +5101,7 @@ sub get_entity_SubsystemClass
 	if ($result->is_error) {
 	    die "Error invoking get_entity_SubsystemClass: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_SubsystemClass: " . $self->{client}->status_line;
@@ -5102,7 +5129,7 @@ sub all_entities_SubsystemClass
 	if ($result->is_error) {
 	    die "Error invoking all_entities_SubsystemClass: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_SubsystemClass: " . $self->{client}->status_line;
@@ -5163,7 +5190,7 @@ sub get_entity_TaxonomicGrouping
 	if ($result->is_error) {
 	    die "Error invoking get_entity_TaxonomicGrouping: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_TaxonomicGrouping: " . $self->{client}->status_line;
@@ -5191,7 +5218,7 @@ sub all_entities_TaxonomicGrouping
 	if ($result->is_error) {
 	    die "Error invoking all_entities_TaxonomicGrouping: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_TaxonomicGrouping: " . $self->{client}->status_line;
@@ -5258,7 +5285,7 @@ sub get_entity_Variant
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Variant: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Variant: " . $self->{client}->status_line;
@@ -5286,7 +5313,7 @@ sub all_entities_Variant
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Variant: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Variant: " . $self->{client}->status_line;
@@ -5328,7 +5355,7 @@ sub get_entity_Variation
 	if ($result->is_error) {
 	    die "Error invoking get_entity_Variation: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_entity_Variation: " . $self->{client}->status_line;
@@ -5356,7 +5383,7 @@ sub all_entities_Variation
 	if ($result->is_error) {
 	    die "Error invoking all_entities_Variation: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking all_entities_Variation: " . $self->{client}->status_line;
@@ -5398,7 +5425,7 @@ sub get_relationship_AffectsLevelOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_AffectsLevelOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_AffectsLevelOf: " . $self->{client}->status_line;
@@ -5426,7 +5453,7 @@ sub get_relationship_IsAffectedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsAffectedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsAffectedIn: " . $self->{client}->status_line;
@@ -5492,7 +5519,7 @@ sub get_relationship_Aligns
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Aligns: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Aligns: " . $self->{client}->status_line;
@@ -5520,7 +5547,7 @@ sub get_relationship_IsAlignedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsAlignedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsAlignedBy: " . $self->{client}->status_line;
@@ -5556,7 +5583,7 @@ sub get_relationship_Concerns
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Concerns: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Concerns: " . $self->{client}->status_line;
@@ -5584,7 +5611,7 @@ sub get_relationship_IsATopicOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsATopicOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsATopicOf: " . $self->{client}->status_line;
@@ -5622,7 +5649,7 @@ sub get_relationship_Contains
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Contains: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Contains: " . $self->{client}->status_line;
@@ -5650,7 +5677,7 @@ sub get_relationship_IsContainedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsContainedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsContainedIn: " . $self->{client}->status_line;
@@ -5687,7 +5714,7 @@ sub get_relationship_Describes
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Describes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Describes: " . $self->{client}->status_line;
@@ -5715,7 +5742,7 @@ sub get_relationship_IsDescribedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDescribedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDescribedBy: " . $self->{client}->status_line;
@@ -5757,7 +5784,7 @@ sub get_relationship_Displays
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Displays: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Displays: " . $self->{client}->status_line;
@@ -5785,7 +5812,7 @@ sub get_relationship_IsDisplayedOn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDisplayedOn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDisplayedOn: " . $self->{client}->status_line;
@@ -5823,7 +5850,7 @@ sub get_relationship_Encompasses
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Encompasses: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Encompasses: " . $self->{client}->status_line;
@@ -5851,7 +5878,7 @@ sub get_relationship_IsEncompassedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsEncompassedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsEncompassedIn: " . $self->{client}->status_line;
@@ -5893,7 +5920,7 @@ sub get_relationship_GeneratedLevelsFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_GeneratedLevelsFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_GeneratedLevelsFor: " . $self->{client}->status_line;
@@ -5921,7 +5948,7 @@ sub get_relationship_WasGeneratedFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_WasGeneratedFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_WasGeneratedFrom: " . $self->{client}->status_line;
@@ -5967,7 +5994,7 @@ sub get_relationship_HasAssertionFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasAssertionFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasAssertionFrom: " . $self->{client}->status_line;
@@ -5995,7 +6022,7 @@ sub get_relationship_Asserts
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Asserts: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Asserts: " . $self->{client}->status_line;
@@ -6037,7 +6064,7 @@ sub get_relationship_HasCompoundAliasFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasCompoundAliasFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasCompoundAliasFrom: " . $self->{client}->status_line;
@@ -6065,7 +6092,7 @@ sub get_relationship_UsesAliasForCompound
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_UsesAliasForCompound: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_UsesAliasForCompound: " . $self->{client}->status_line;
@@ -6113,7 +6140,7 @@ sub get_relationship_HasIndicatedSignalFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasIndicatedSignalFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasIndicatedSignalFrom: " . $self->{client}->status_line;
@@ -6141,7 +6168,7 @@ sub get_relationship_IndicatesSignalFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IndicatesSignalFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IndicatesSignalFor: " . $self->{client}->status_line;
@@ -6178,7 +6205,7 @@ sub get_relationship_HasMember
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasMember: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasMember: " . $self->{client}->status_line;
@@ -6206,7 +6233,7 @@ sub get_relationship_IsMemberOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsMemberOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsMemberOf: " . $self->{client}->status_line;
@@ -6252,7 +6279,7 @@ sub get_relationship_HasParticipant
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasParticipant: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasParticipant: " . $self->{client}->status_line;
@@ -6280,7 +6307,7 @@ sub get_relationship_ParticipatesIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_ParticipatesIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_ParticipatesIn: " . $self->{client}->status_line;
@@ -6332,7 +6359,7 @@ sub get_relationship_HasPresenceOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasPresenceOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasPresenceOf: " . $self->{client}->status_line;
@@ -6360,7 +6387,7 @@ sub get_relationship_IsPresentIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsPresentIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsPresentIn: " . $self->{client}->status_line;
@@ -6402,7 +6429,7 @@ sub get_relationship_HasReactionAliasFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasReactionAliasFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasReactionAliasFrom: " . $self->{client}->status_line;
@@ -6430,7 +6457,7 @@ sub get_relationship_UsesAliasForReaction
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_UsesAliasForReaction: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_UsesAliasForReaction: " . $self->{client}->status_line;
@@ -6468,7 +6495,7 @@ sub get_relationship_HasRepresentativeOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasRepresentativeOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasRepresentativeOf: " . $self->{client}->status_line;
@@ -6496,7 +6523,7 @@ sub get_relationship_IsRepresentedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRepresentedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRepresentedIn: " . $self->{client}->status_line;
@@ -6537,7 +6564,7 @@ sub get_relationship_HasResultsIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasResultsIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasResultsIn: " . $self->{client}->status_line;
@@ -6565,7 +6592,7 @@ sub get_relationship_HasResultsFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasResultsFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasResultsFor: " . $self->{client}->status_line;
@@ -6601,7 +6628,7 @@ sub get_relationship_HasSection
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasSection: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasSection: " . $self->{client}->status_line;
@@ -6629,7 +6656,7 @@ sub get_relationship_IsSectionOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsSectionOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsSectionOf: " . $self->{client}->status_line;
@@ -6666,7 +6693,7 @@ sub get_relationship_HasStep
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasStep: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasStep: " . $self->{client}->status_line;
@@ -6694,7 +6721,7 @@ sub get_relationship_IsStepOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsStepOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsStepOf: " . $self->{client}->status_line;
@@ -6730,7 +6757,7 @@ sub get_relationship_HasUsage
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasUsage: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasUsage: " . $self->{client}->status_line;
@@ -6758,7 +6785,7 @@ sub get_relationship_IsUsageOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsUsageOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsUsageOf: " . $self->{client}->status_line;
@@ -6800,7 +6827,7 @@ sub get_relationship_HasValueFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasValueFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasValueFor: " . $self->{client}->status_line;
@@ -6828,7 +6855,7 @@ sub get_relationship_HasValueIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasValueIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasValueIn: " . $self->{client}->status_line;
@@ -6887,7 +6914,7 @@ sub get_relationship_Includes
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Includes: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Includes: " . $self->{client}->status_line;
@@ -6915,7 +6942,7 @@ sub get_relationship_IsIncludedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsIncludedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsIncludedIn: " . $self->{client}->status_line;
@@ -6957,7 +6984,7 @@ sub get_relationship_IndicatedLevelsFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IndicatedLevelsFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IndicatedLevelsFor: " . $self->{client}->status_line;
@@ -6985,7 +7012,7 @@ sub get_relationship_HasLevelsFrom
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasLevelsFrom: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasLevelsFrom: " . $self->{client}->status_line;
@@ -7021,7 +7048,7 @@ sub get_relationship_Involves
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Involves: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Involves: " . $self->{client}->status_line;
@@ -7049,7 +7076,7 @@ sub get_relationship_IsInvolvedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInvolvedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInvolvedIn: " . $self->{client}->status_line;
@@ -7085,7 +7112,7 @@ sub get_relationship_IsARequirementIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsARequirementIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsARequirementIn: " . $self->{client}->status_line;
@@ -7113,7 +7140,7 @@ sub get_relationship_IsARequirementOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsARequirementOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsARequirementOf: " . $self->{client}->status_line;
@@ -7164,7 +7191,7 @@ sub get_relationship_IsAlignedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsAlignedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsAlignedIn: " . $self->{client}->status_line;
@@ -7192,7 +7219,7 @@ sub get_relationship_IsAlignmentFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsAlignmentFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsAlignmentFor: " . $self->{client}->status_line;
@@ -7229,7 +7256,7 @@ sub get_relationship_IsAnnotatedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsAnnotatedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsAnnotatedBy: " . $self->{client}->status_line;
@@ -7257,7 +7284,7 @@ sub get_relationship_Annotates
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Annotates: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Annotates: " . $self->{client}->status_line;
@@ -7293,7 +7320,7 @@ sub get_relationship_IsBindingSiteFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsBindingSiteFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsBindingSiteFor: " . $self->{client}->status_line;
@@ -7321,7 +7348,7 @@ sub get_relationship_IsBoundBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsBoundBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsBoundBy: " . $self->{client}->status_line;
@@ -7359,7 +7386,7 @@ sub get_relationship_IsClassFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsClassFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsClassFor: " . $self->{client}->status_line;
@@ -7387,7 +7414,7 @@ sub get_relationship_IsInClass
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInClass: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInClass: " . $self->{client}->status_line;
@@ -7427,7 +7454,7 @@ sub get_relationship_IsCollectionOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsCollectionOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsCollectionOf: " . $self->{client}->status_line;
@@ -7455,7 +7482,7 @@ sub get_relationship_IsCollectedInto
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsCollectedInto: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsCollectedInto: " . $self->{client}->status_line;
@@ -7492,7 +7519,7 @@ sub get_relationship_IsComposedOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsComposedOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsComposedOf: " . $self->{client}->status_line;
@@ -7520,7 +7547,7 @@ sub get_relationship_IsComponentOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsComponentOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsComponentOf: " . $self->{client}->status_line;
@@ -7556,7 +7583,7 @@ sub get_relationship_IsComprisedOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsComprisedOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsComprisedOf: " . $self->{client}->status_line;
@@ -7584,7 +7611,7 @@ sub get_relationship_Comprises
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Comprises: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Comprises: " . $self->{client}->status_line;
@@ -7620,7 +7647,7 @@ sub get_relationship_IsConfiguredBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsConfiguredBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsConfiguredBy: " . $self->{client}->status_line;
@@ -7648,7 +7675,7 @@ sub get_relationship_ReflectsStateOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_ReflectsStateOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_ReflectsStateOf: " . $self->{client}->status_line;
@@ -7684,7 +7711,7 @@ sub get_relationship_IsConsistentWith
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsConsistentWith: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsConsistentWith: " . $self->{client}->status_line;
@@ -7712,7 +7739,7 @@ sub get_relationship_IsConsistentTo
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsConsistentTo: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsConsistentTo: " . $self->{client}->status_line;
@@ -7754,7 +7781,7 @@ sub get_relationship_IsControlledUsing
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsControlledUsing: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsControlledUsing: " . $self->{client}->status_line;
@@ -7782,7 +7809,7 @@ sub get_relationship_Controls
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Controls: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Controls: " . $self->{client}->status_line;
@@ -7824,7 +7851,7 @@ sub get_relationship_IsCoregulatedWith
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsCoregulatedWith: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsCoregulatedWith: " . $self->{client}->status_line;
@@ -7852,7 +7879,7 @@ sub get_relationship_HasCoregulationWith
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasCoregulationWith: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasCoregulationWith: " . $self->{client}->status_line;
@@ -7904,7 +7931,7 @@ sub get_relationship_IsCoupledTo
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsCoupledTo: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsCoupledTo: " . $self->{client}->status_line;
@@ -7932,7 +7959,7 @@ sub get_relationship_IsCoupledWith
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsCoupledWith: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsCoupledWith: " . $self->{client}->status_line;
@@ -7968,7 +7995,7 @@ sub get_relationship_IsDefaultFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDefaultFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDefaultFor: " . $self->{client}->status_line;
@@ -7996,7 +8023,7 @@ sub get_relationship_RunsByDefaultIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_RunsByDefaultIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_RunsByDefaultIn: " . $self->{client}->status_line;
@@ -8032,7 +8059,7 @@ sub get_relationship_IsDefaultLocationOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDefaultLocationOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDefaultLocationOf: " . $self->{client}->status_line;
@@ -8060,7 +8087,7 @@ sub get_relationship_HasDefaultLocation
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasDefaultLocation: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasDefaultLocation: " . $self->{client}->status_line;
@@ -8108,7 +8135,7 @@ sub get_relationship_IsDeterminedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDeterminedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDeterminedBy: " . $self->{client}->status_line;
@@ -8136,7 +8163,7 @@ sub get_relationship_Determines
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Determines: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Determines: " . $self->{client}->status_line;
@@ -8172,7 +8199,7 @@ sub get_relationship_IsDividedInto
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDividedInto: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDividedInto: " . $self->{client}->status_line;
@@ -8200,7 +8227,7 @@ sub get_relationship_IsDivisionOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsDivisionOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsDivisionOf: " . $self->{client}->status_line;
@@ -8236,7 +8263,7 @@ sub get_relationship_IsExemplarOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsExemplarOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsExemplarOf: " . $self->{client}->status_line;
@@ -8264,7 +8291,7 @@ sub get_relationship_HasAsExemplar
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasAsExemplar: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasAsExemplar: " . $self->{client}->status_line;
@@ -8300,7 +8327,7 @@ sub get_relationship_IsFamilyFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsFamilyFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsFamilyFor: " . $self->{client}->status_line;
@@ -8328,7 +8355,7 @@ sub get_relationship_DeterminesFunctionOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_DeterminesFunctionOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_DeterminesFunctionOf: " . $self->{client}->status_line;
@@ -8364,7 +8391,7 @@ sub get_relationship_IsFormedOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsFormedOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsFormedOf: " . $self->{client}->status_line;
@@ -8392,7 +8419,7 @@ sub get_relationship_IsFormedInto
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsFormedInto: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsFormedInto: " . $self->{client}->status_line;
@@ -8428,7 +8455,7 @@ sub get_relationship_IsFunctionalIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsFunctionalIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsFunctionalIn: " . $self->{client}->status_line;
@@ -8456,7 +8483,7 @@ sub get_relationship_HasFunctional
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasFunctional: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasFunctional: " . $self->{client}->status_line;
@@ -8493,7 +8520,7 @@ sub get_relationship_IsGroupFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsGroupFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsGroupFor: " . $self->{client}->status_line;
@@ -8521,7 +8548,7 @@ sub get_relationship_IsInGroup
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInGroup: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInGroup: " . $self->{client}->status_line;
@@ -8558,7 +8585,7 @@ sub get_relationship_IsImplementedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsImplementedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsImplementedBy: " . $self->{client}->status_line;
@@ -8586,7 +8613,7 @@ sub get_relationship_Implements
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Implements: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Implements: " . $self->{client}->status_line;
@@ -8624,7 +8651,7 @@ sub get_relationship_IsInPair
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInPair: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInPair: " . $self->{client}->status_line;
@@ -8652,7 +8679,7 @@ sub get_relationship_IsPairOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsPairOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsPairOf: " . $self->{client}->status_line;
@@ -8688,7 +8715,7 @@ sub get_relationship_IsInstantiatedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInstantiatedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInstantiatedBy: " . $self->{client}->status_line;
@@ -8716,7 +8743,7 @@ sub get_relationship_IsInstanceOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInstanceOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInstanceOf: " . $self->{client}->status_line;
@@ -8781,7 +8808,7 @@ sub get_relationship_IsLocatedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsLocatedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsLocatedIn: " . $self->{client}->status_line;
@@ -8809,7 +8836,7 @@ sub get_relationship_IsLocusFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsLocusFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsLocusFor: " . $self->{client}->status_line;
@@ -8845,7 +8872,7 @@ sub get_relationship_IsModeledBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsModeledBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsModeledBy: " . $self->{client}->status_line;
@@ -8873,7 +8900,7 @@ sub get_relationship_Models
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Models: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Models: " . $self->{client}->status_line;
@@ -8910,7 +8937,7 @@ sub get_relationship_IsNamedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsNamedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsNamedBy: " . $self->{client}->status_line;
@@ -8938,7 +8965,7 @@ sub get_relationship_Names
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Names: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Names: " . $self->{client}->status_line;
@@ -8977,7 +9004,7 @@ sub get_relationship_IsOwnerOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsOwnerOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsOwnerOf: " . $self->{client}->status_line;
@@ -9005,7 +9032,7 @@ sub get_relationship_IsOwnedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsOwnedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsOwnedBy: " . $self->{client}->status_line;
@@ -9051,7 +9078,7 @@ sub get_relationship_IsProposedLocationOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsProposedLocationOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsProposedLocationOf: " . $self->{client}->status_line;
@@ -9079,7 +9106,7 @@ sub get_relationship_HasProposedLocationIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasProposedLocationIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasProposedLocationIn: " . $self->{client}->status_line;
@@ -9117,7 +9144,7 @@ sub get_relationship_IsProteinFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsProteinFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsProteinFor: " . $self->{client}->status_line;
@@ -9145,7 +9172,7 @@ sub get_relationship_Produces
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Produces: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Produces: " . $self->{client}->status_line;
@@ -9190,7 +9217,7 @@ sub get_relationship_IsRealLocationOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRealLocationOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRealLocationOf: " . $self->{client}->status_line;
@@ -9218,7 +9245,7 @@ sub get_relationship_HasRealLocationIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasRealLocationIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasRealLocationIn: " . $self->{client}->status_line;
@@ -9253,7 +9280,7 @@ sub get_relationship_IsRegulatedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRegulatedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRegulatedIn: " . $self->{client}->status_line;
@@ -9281,7 +9308,7 @@ sub get_relationship_IsRegulatedSetOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRegulatedSetOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRegulatedSetOf: " . $self->{client}->status_line;
@@ -9318,7 +9345,7 @@ sub get_relationship_IsRelevantFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRelevantFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRelevantFor: " . $self->{client}->status_line;
@@ -9346,7 +9373,7 @@ sub get_relationship_IsRelevantTo
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRelevantTo: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRelevantTo: " . $self->{client}->status_line;
@@ -9381,7 +9408,7 @@ sub get_relationship_IsRequiredBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRequiredBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRequiredBy: " . $self->{client}->status_line;
@@ -9409,7 +9436,7 @@ sub get_relationship_Requires
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Requires: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Requires: " . $self->{client}->status_line;
@@ -9447,7 +9474,7 @@ sub get_relationship_IsRoleOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRoleOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRoleOf: " . $self->{client}->status_line;
@@ -9475,7 +9502,7 @@ sub get_relationship_HasRole
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasRole: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasRole: " . $self->{client}->status_line;
@@ -9511,7 +9538,7 @@ sub get_relationship_IsRowOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRowOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRowOf: " . $self->{client}->status_line;
@@ -9539,7 +9566,7 @@ sub get_relationship_IsRoleFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsRoleFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsRoleFor: " . $self->{client}->status_line;
@@ -9577,7 +9604,7 @@ sub get_relationship_IsSequenceOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsSequenceOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsSequenceOf: " . $self->{client}->status_line;
@@ -9605,7 +9632,7 @@ sub get_relationship_HasAsSequence
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasAsSequence: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasAsSequence: " . $self->{client}->status_line;
@@ -9642,7 +9669,7 @@ sub get_relationship_IsSubInstanceOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsSubInstanceOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsSubInstanceOf: " . $self->{client}->status_line;
@@ -9670,7 +9697,7 @@ sub get_relationship_Validates
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Validates: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Validates: " . $self->{client}->status_line;
@@ -9706,7 +9733,7 @@ sub get_relationship_IsSuperclassOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsSuperclassOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsSuperclassOf: " . $self->{client}->status_line;
@@ -9734,7 +9761,7 @@ sub get_relationship_IsSubclassOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsSubclassOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsSubclassOf: " . $self->{client}->status_line;
@@ -9770,7 +9797,7 @@ sub get_relationship_IsTargetOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsTargetOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsTargetOf: " . $self->{client}->status_line;
@@ -9798,7 +9825,7 @@ sub get_relationship_Targets
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Targets: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Targets: " . $self->{client}->status_line;
@@ -9836,7 +9863,7 @@ sub get_relationship_IsTaxonomyOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsTaxonomyOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsTaxonomyOf: " . $self->{client}->status_line;
@@ -9864,7 +9891,7 @@ sub get_relationship_IsInTaxa
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsInTaxa: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsInTaxa: " . $self->{client}->status_line;
@@ -9910,7 +9937,7 @@ sub get_relationship_IsTerminusFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsTerminusFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsTerminusFor: " . $self->{client}->status_line;
@@ -9938,7 +9965,7 @@ sub get_relationship_HasAsTerminus
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HasAsTerminus: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HasAsTerminus: " . $self->{client}->status_line;
@@ -9985,7 +10012,7 @@ sub get_relationship_IsTriggeredBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsTriggeredBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsTriggeredBy: " . $self->{client}->status_line;
@@ -10013,7 +10040,7 @@ sub get_relationship_Triggers
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Triggers: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Triggers: " . $self->{client}->status_line;
@@ -10049,7 +10076,7 @@ sub get_relationship_IsUsedAs
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsUsedAs: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsUsedAs: " . $self->{client}->status_line;
@@ -10077,7 +10104,7 @@ sub get_relationship_IsUseOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsUseOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsUseOf: " . $self->{client}->status_line;
@@ -10114,7 +10141,7 @@ sub get_relationship_Manages
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Manages: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Manages: " . $self->{client}->status_line;
@@ -10142,7 +10169,7 @@ sub get_relationship_IsManagedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsManagedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsManagedBy: " . $self->{client}->status_line;
@@ -10178,7 +10205,7 @@ sub get_relationship_OperatesIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_OperatesIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_OperatesIn: " . $self->{client}->status_line;
@@ -10206,7 +10233,7 @@ sub get_relationship_IsUtilizedIn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsUtilizedIn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsUtilizedIn: " . $self->{client}->status_line;
@@ -10244,7 +10271,7 @@ sub get_relationship_Overlaps
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Overlaps: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Overlaps: " . $self->{client}->status_line;
@@ -10272,7 +10299,7 @@ sub get_relationship_IncludesPartOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IncludesPartOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IncludesPartOf: " . $self->{client}->status_line;
@@ -10308,7 +10335,7 @@ sub get_relationship_ParticipatesAs
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_ParticipatesAs: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_ParticipatesAs: " . $self->{client}->status_line;
@@ -10336,7 +10363,7 @@ sub get_relationship_IsParticipationOf
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsParticipationOf: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsParticipationOf: " . $self->{client}->status_line;
@@ -10373,7 +10400,7 @@ sub get_relationship_ProducedResultsFor
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_ProducedResultsFor: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_ProducedResultsFor: " . $self->{client}->status_line;
@@ -10401,7 +10428,7 @@ sub get_relationship_HadResultsProducedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_HadResultsProducedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_HadResultsProducedBy: " . $self->{client}->status_line;
@@ -10457,7 +10484,7 @@ sub get_relationship_ProjectsOnto
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_ProjectsOnto: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_ProjectsOnto: " . $self->{client}->status_line;
@@ -10485,7 +10512,7 @@ sub get_relationship_IsProjectedOnto
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsProjectedOnto: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsProjectedOnto: " . $self->{client}->status_line;
@@ -10521,7 +10548,7 @@ sub get_relationship_Provided
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Provided: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Provided: " . $self->{client}->status_line;
@@ -10549,7 +10576,7 @@ sub get_relationship_WasProvidedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_WasProvidedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_WasProvidedBy: " . $self->{client}->status_line;
@@ -10591,7 +10618,7 @@ sub get_relationship_Shows
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Shows: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Shows: " . $self->{client}->status_line;
@@ -10619,7 +10646,7 @@ sub get_relationship_IsShownOn
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsShownOn: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsShownOn: " . $self->{client}->status_line;
@@ -10655,7 +10682,7 @@ sub get_relationship_Submitted
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Submitted: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Submitted: " . $self->{client}->status_line;
@@ -10683,7 +10710,7 @@ sub get_relationship_WasSubmittedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_WasSubmittedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_WasSubmittedBy: " . $self->{client}->status_line;
@@ -10720,7 +10747,7 @@ sub get_relationship_Uses
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_Uses: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_Uses: " . $self->{client}->status_line;
@@ -10748,7 +10775,7 @@ sub get_relationship_IsUsedBy
 	if ($result->is_error) {
 	    die "Error invoking get_relationship_IsUsedBy: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return @{$result->result};
 	}
     } else {
 	die "Error invoking get_relationship_IsUsedBy: " . $self->{client}->status_line;
