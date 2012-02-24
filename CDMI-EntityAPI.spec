@@ -188,7 +188,7 @@ funcdef all_entities_Attribute(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	string mod_date nullable;
-	string name nullable;
+	list<string> name nullable;
 } fields_Biomass ;
 
 /*
@@ -295,7 +295,7 @@ funcdef all_entities_Compartment(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
-	string name nullable;
+	list<string> name nullable;
 	string mod_date nullable;
 } fields_Complex ;
 
@@ -533,7 +533,7 @@ funcdef all_entities_CoregulatedSet(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	string name nullable;
-	string content nullable;
+	list<string> content nullable;
 } fields_Diagram ;
 
 /*
@@ -632,7 +632,7 @@ funcdef all_entities_Experiment(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	string type nullable;
-	string family_function nullable;
+	list<string> family_function nullable;
 } fields_Family ;
 
 /*
@@ -754,7 +754,7 @@ typedef structure {
 	string domain nullable;
 	int genetic_code nullable;
 	float gc_content nullable;
-	string phenotype nullable;
+	list<string> phenotype nullable;
 	string md5 nullable;
 	string source_id nullable;
 } fields_Genome ;
@@ -1011,7 +1011,7 @@ funcdef all_entities_Model(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	int compartment_index nullable;
-	string label nullable;
+	list<string> label nullable;
 	float pH nullable;
 	float potential nullable;
 } fields_ModelCompartment ;
@@ -1693,7 +1693,7 @@ typedef structure {
 	int domain nullable;
 	int hidden nullable;
 	string scientific_name nullable;
-	string alias nullable;
+	list<string> alias nullable;
 } fields_TaxonomicGrouping ;
 
 /*
@@ -1741,7 +1741,7 @@ funcdef all_entities_TaxonomicGrouping(int start, int count, list<string> fields
 
 typedef structure {
 	string id;
-	string role_rule nullable;
+	list<string> role_rule nullable;
 	string code nullable;
 	string type nullable;
 	string comment nullable;
@@ -1798,7 +1798,7 @@ funcdef all_entities_Variant(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
-	string notes nullable;
+	list<string> notes nullable;
 } fields_Variation ;
 
 /*

@@ -3,8 +3,7 @@
    will allow the user to extract data from the CS (Central Store).  We anticipate
    supporting numerous sparse CDMIs in the PS (Persistent Store).
 
-   Basic Themes:
-   ------------
+   =head2 Basic Themes
 
    There are several broad categories of routines supported in the CDMI-API.
 
@@ -41,8 +40,7 @@
    that the number of queries of this last class will grow (especially as new entities are
    added to the model).
 
-   Batching queries:
-   ----------------
+   =head2 Batching queries
 
    A majority of the CS-API routines take a list of ids as input.  Each id may be thought
    of as input to a query that produces an output result.  We support processing an input list,
@@ -71,7 +69,7 @@ module CDMI_API : CDMI_API {
     typedef int annotation_time;
     typedef string comment;
 
-        /* a fid is a "feature id".  A feature represents an ordered list of regions from
+        /* A fid is a "feature id".  A feature represents an ordered list of regions from
 	   the contigs of a genome.  Features all have types.  This allows you to speak
 	   of not only protein-encoding genes (PEGs) and RNAs, but also binding sites,
 	   large regions, etc.  The location of a fid is defined as a list of
@@ -152,6 +150,7 @@ module CDMI_API : CDMI_API {
 	/* a "location" refers to a sequence of regions
 	*/
     typedef list<region_of_dna> location;
+    typedef list<location>      locations;
 
 	/* we often need to represent regions or locations as
 	   strings.  We would use something like
@@ -197,8 +196,10 @@ module CDMI_API : CDMI_API {
     typedef list<annotation> annotations;
     typedef list<pubref> pubrefs;
     typedef list<role> roles;
+    typedef string optional;
+    typedef tuple<role,optional> role_with_flag;
+    typedef list<role_with_flag> roles_with_flags;
     typedef list<scored_fid> scored_fids;
-    typedef list<location> locations;
     typedef list<protein> proteins;
     typedef list<function> functions;
     typedef list<taxonomic_group> taxonomic_groups;
@@ -217,9 +218,8 @@ module CDMI_API : CDMI_API {
     typedef tuple<fid,function> fid_function_pair;
     typedef list<fid_function_pair> fid_function_pairs;
 
-	/* A functionally coupled protein family identifies a family and two scores
-	   that indicate the coupling strength: a co-expression score and a
-	   co-occurrence score.
+	/* A functionally coupled protein family identifies a family, a score, and a function
+           (of the related family)
         */
     typedef tuple<protein_family,score,function> fc_protein_family;
 
@@ -426,10 +426,9 @@ module CDMI_API : CDMI_API {
     funcdef protein_families_to_proteins(protein_families) returns (mapping<protein_family,proteins>);
 
 	/* protein_families_to_functions can be used to extract the set of functions assigned to the fids
-	   that make up the family.  Each input protein_family is mapped to a set of 2-tuples composed of
-	   a feature id (fid) and the function currently assigned to the fid.
+	   that make up the family.  Each input protein_family is mapped to a family function.
 	*/
-    funcdef protein_families_to_functions(protein_families) returns (mapping<protein_family,fid_function_pairs>);
+    funcdef protein_families_to_functions(protein_families) returns (mapping<protein_family,function>);
 
 	/* Since we accumulate data relating to the co-occurrence (i.e., chromosomal
 	   clustering) of genes in prokaryotic genomes,  we can note which pairs of genes tend to co-occur.
@@ -590,6 +589,8 @@ module CDMI_API : CDMI_API {
 
     typedef list<string> fields;
     typedef string complex;
+    typedef tuple<complex,optional> complex_with_flag;
+    typedef list<complex_with_flag> complexes_with_flags;
     typedef list<complex> complexes;
     typedef string name;
     typedef string reaction;
@@ -603,7 +604,7 @@ module CDMI_API : CDMI_API {
 	*/
     typedef structure {
 		name complex_name;
-		roles complex_roles;
+		roles_with_flags complex_roles;
 	        reactions complex_reactions;
 	} complex_data;
     funcdef complexes_to_complex_data(complexes) returns (mapping<complex,complex_data>);
@@ -623,12 +624,20 @@ module CDMI_API : CDMI_API {
     funcdef genomes_to_genome_data(genomes) returns (mapping<genome,genome_data>);
 
     typedef structure {
+	        string regulon_id;
+	 	fids regulon_set;
+		fids tfs;
+	} regulon_data;
+    typedef list<regulon_data> regulons_data;
+    funcdef fids_to_regulon_data(fids) returns (mapping<fid,regulons_data>);
+
+    typedef structure {
 		fid feature_id;
 		string genome_name;
 	        string feature_function;
 	        int feature_length;
 	        pubrefs feature_publications;
-	        locations feature_location;
+	        location feature_location;
 	} feature_data;
     funcdef fids_to_feature_data(fids) returns (mapping<fid,feature_data>);
 
@@ -651,15 +660,15 @@ module CDMI_API : CDMI_API {
     typedef list<regulon_size_pair> regulon_size_pairs;
     typedef list<regulon> regulons;
 
-	/*  The fids_to_regulons allows one to map fids into regulons that contain the fids.
+	/*  The fids_to_atomic_regulons allows one to map fids into regulons that contain the fids.
 	    Normally a fid will be in at most one regulon, but we support multiple regulons.
 	*/
-    funcdef fids_to_regulons(fids) returns (mapping<fid,regulon_size_pairs>);
+    funcdef fids_to_atomic_regulons(fids) returns (mapping<fid,regulon_size_pairs>);
 
-	/*  The regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
+	/*  The atomic_regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
 	    Regulons may arise from several sources; hence, fids can be in multiple regulons.
 	*/
-    funcdef regulons_to_fids(regulons) returns(mapping<regulon,fids>);
+    funcdef atomic_regulons_to_fids(regulons) returns(mapping<regulon,fids>);
     typedef string protein_sequence;
     typedef string dna_sequence;
 
@@ -694,7 +703,7 @@ module CDMI_API : CDMI_API {
 	    one or more Complexes.  Complexes connect to Roles.  Hence, the connection of fids
 	    or roles to reactions goes through Complexes.
 	*/
-    funcdef reactions_to_complexes(reactions) returns (mapping<reaction,complexes>);
+    funcdef reactions_to_complexes(reactions) returns (mapping<reaction,complexes_with_flags>);
 
 
     typedef string name_parameter;
