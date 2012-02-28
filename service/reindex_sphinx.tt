@@ -6,4 +6,4 @@ export PERL5LIB=$KB_TOP/lib
 export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_name %]
 export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
 
-exec $KB_RUNTIME/bin/indexer -c $KB_SERVICE_DIR/sphinx.conf --all
+exec $KB_RUNTIME/bin/indexer -c $KB_SERVICE_DIR/sphinx.conf --all --rotate

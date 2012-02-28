@@ -74,6 +74,10 @@ indexer
 
 searchd
 {
+[% IF kb_sphinx_port -%]
+	listen =  [% kb_sphinx_port %]
+[% END %]
+
 	log					= [% kb_service_dir %]/sphinx/sphinx.log
 
 	# query log file, all search queries are logged here
