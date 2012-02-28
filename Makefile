@@ -14,8 +14,7 @@ SERVICE_DIR = $(TARGET)/services/$(SERVICE)
 
 TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
 TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE) \
-	--define kb_service_port=$(SERVICE_PORT)
-
+	--define kb_service_port=$(SERVICE_PORT) --define kb_service_dir=$(SERVICE_DIR) 
 
 all: bin
 
@@ -25,12 +24,13 @@ $(BIN_DIR)/%: scripts/%.pl
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
 deploy: deploy-service
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-doc
+deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-doc deploy-sphinx
 deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
 	if [ ! -d $(SERVICE_DIR)/webroot ] ; then mkdir $(SERVICE_DIR)/webroot ; fi
+	if [ ! -d $(SERVICE_DIR)/sphinx ] ; then mkdir $(SERVICE_DIR)/sphinx ; fi
 
 deploy-scripts:
 	export KB_TOP=$(TARGET); \
@@ -46,6 +46,15 @@ deploy-scripts:
 
 deploy-libs:
 	rsync -arv lib/. $(TARGET)/lib/.
+
+deploy-sphinx:
+	$(TPAGE) $(TPAGE_ARGS) service/reindex_sphinx.tt > $(TARGET)/services/$(SERVICE)/reindex_sphinx
+	chmod +x $(TARGET)/services/$(SERVICE)/reindex_sphinx
+	$(TPAGE) $(TPAGE_ARGS) service/start_sphinx.tt > $(TARGET)/services/$(SERVICE)/start_sphinx
+	chmod +x $(TARGET)/services/$(SERVICE)/start_sphinx
+	$(TPAGE) $(TPAGE_ARGS) service/stop_sphinx.tt > $(TARGET)/services/$(SERVICE)/stop_sphinx
+	chmod +x $(TARGET)/services/$(SERVICE)/stop_sphinx
+	$(DEPLOY_RUNTIME)/bin/perl scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
 
 deploy-services:
 	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service

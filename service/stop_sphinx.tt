@@ -4,8 +4,14 @@ export KB_RUNTIME=[% kb_runtime %]
 export PATH=$KB_TOP/bin:$KB_RUNTIME/bin:$PATH
 export PERL5LIB=$KB_TOP/lib
 export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_name %]
-export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
 
-pid_file=$KB_SERVICE_DIR/service.pid
+pid_file=$KB_SERVICE_DIR/sphinx.pid
 
-exec $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/CDMI_API.psgi
+if [ ! -f $pid_file ] ; then
+	echo "No pid file $pid_file found for service sphinx" 1>&2
+	exit 1
+fi
+
+pid=`cat $pid_file`
+
+kill $pid

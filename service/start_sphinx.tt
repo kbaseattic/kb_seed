@@ -6,6 +6,6 @@ export PERL5LIB=$KB_TOP/lib
 export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_name %]
 export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
 
-pid_file=$KB_SERVICE_DIR/service.pid
+pid_file=$KB_SERVICE_DIR/sphinx.pid
 
-exec $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/CDMI_API.psgi
+exec $KB_RUNTIME/bin/searchd -c $KB_SERVICE_DIR/sphinx.conf 
