@@ -84,10 +84,10 @@ sub new_get_entity_for_script {
     # Get the parameters.
     my ($class, %options) = @_;
 
-    require CDMI_EntityAPIClient;
+    require CDMI_APIClient;
     require CDMI_EntityAPIImpl;
     
-    return new_for_script_with_type($class, 'CDMI_EntityAPIImpl', 'CDMI_EntityAPIClient', %options);
+    return new_for_script_with_type($class, 'CDMI_EntityAPIImpl', 'CDMI_APIClient', %options);
 }
 
 sub new_for_script_with_type

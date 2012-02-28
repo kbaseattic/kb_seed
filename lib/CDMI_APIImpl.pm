@@ -4852,8 +4852,10 @@ sub text_search
     my $ctx = $CDMI_APIServer::CallContext;
     my($return);
     #BEGIN text_search
-            my $sphinx = Sphinx::Search->new;
-    $sphinx->SetServer("bio-data-1.mcs.anl.gov", 9312);
+    my $sphinx = Sphinx::Search->new;
+    my $host = $ENV{KB_SPHINX_HOST} || "ash.mcs.anl.gov";
+    my $port = $ENV{KB_SPHINX_PORT} || 7038;
+    $sphinx->SetServer($host, $port);
     my @entities = @$entities;
     @entities = qw(Genome Feature Contig Subsystem Role) if @entities == 0;
 
