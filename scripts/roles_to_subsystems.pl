@@ -8,6 +8,12 @@ use Carp;
 
 =head1 roles_to_subsystems
 
+
+roles_to_subsystems can be used to access the set of subsystems that include
+specific roles. The input is a list of roles (i.e., role descriptions), and a mapping
+is returned as a hash with key role description and values composed of sets of susbsystem names.
+
+
 Example:
 
     roles_to_subsystems [arguments] < input > output
@@ -77,24 +83,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added. For each line of input there can be multiple lines of output, one per subsystem containing the role. The subsystem name is added to the output lines.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: roles_to_subsystems [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +113,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_subsystems(\@h);
     for my $tuple (@tuples) {

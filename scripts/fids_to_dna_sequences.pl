@@ -8,6 +8,11 @@ use Carp;
 
 =head1 fids_to_dna_sequences
 
+
+fids_to_dna_sequences allows the user to look up the DNA sequences
+corresponding to each of a set of fids.
+
+
 Example:
 
     fids_to_dna_sequences [arguments] < input > output
@@ -70,29 +75,35 @@ This is used only if the column containing the subsystem is not the last column.
 
 =item -i InputFile    [ use InputFile, rather than stdin ]
 
+=item -fasta
+
+This is used to request a fasta output file (dropping all of the other columns in the input lines).
+It defaults to outputing just a fasta entry.
+
 =back
 
 =head2 Output Format
 
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+The standard output is jsut a fasta file with the sequence.  You can also get
+a tab-delimited file by using -fasta=0.  The tab-delimited format consists of the input
+file with an extra column of sequence  added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_dna_sequences [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
-
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $fasta = 1;
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+				     'fasta=i' => \$fasta,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -106,7 +117,8 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+my %fasta_written;   # to remove any possible duplicates
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_dna_sequences(\@h);
     for my $tuple (@tuples) {
@@ -115,7 +127,6 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         #
         my ($id, $line) = @$tuple;
         my $v = $h->{$id};
-
         if (! defined($v))
         {
             print STDERR $line,"\n";
@@ -124,12 +135,34 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             foreach $_ (@$v)
             {
-                print "$line\t$_\n";
+		if ($fasta)
+		{
+		    if (! $fasta_written{$id})
+		    {
+			$fasta_written{$id} = 1;
+			print ">$id\n$_\n";
+		    }
+		}
+		else
+		{
+		    print "$line\t$_\n";
+		}
             }
         }
         else
         {
-            print "$line\t$v\n";
+	    if ($fasta)
+	    {
+		if (! $fasta_written{$id})
+		{
+		    $fasta_written{$id} = 1;
+		    print ">$id\n$v\n";
+		}
+	    }
+	    else
+	    {
+		print "$line\t$v\n";
+	    }
         }
     }
 }

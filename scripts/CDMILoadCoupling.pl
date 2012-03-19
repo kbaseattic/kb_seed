@@ -20,8 +20,8 @@
     use strict;
     use Stats;
     use SeedUtils;
-    use CDMI;
-    use CDMILoader;
+    use Bio::KBase::CDMI::CDMI;
+    use Bio::KBase::CDMI::CDMILoader;
 
 =head1 CDMI Coupling Loader
 
@@ -78,12 +78,12 @@ the corresponding relation with a suffix of C<.dtx>.
 $| = 1;
 # Connect to the database using the command-line options.
 my $loadOnly;
-my $cdmi = CDMI->new_for_script(loadOnly => \$loadOnly);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(loadOnly => \$loadOnly);
 if (! $cdmi) {
     print "usage: CDMILoadCoupling [options] dumpDirectory outDirectory\n";
 } else {
     # Create the loader object.
-    my $loader = CDMILoader->new($cdmi);
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
     # Extract the statistics object.
     my $stats = $loader->stats;
     # Get the directories.
@@ -101,8 +101,8 @@ if (! $cdmi) {
         # Do we need to create the load files?
         if (! $loadOnly) {
             # Yes. Get the list of SEED genomes in the CDMI. This will be our input filter.
-            my %genomes = map { $_ => 1 } $cdmi->GetFlat('Submitted Genome', 'Submitted(from-link) = ?',
-                    ['SEED'], 'Genome(source-id)');
+            my %genomes = map { $_ => 1 } $cdmi->GetFlat('Submitted Genome', 'Submitted(from_link) = ?',
+                    ['SEED'], 'Genome(source_id)');
             # Start with the pairings. We build the IsPairOf output file at the same
             # time.
             my ($ih, $oh, $ph);
@@ -110,23 +110,40 @@ if (! $cdmi) {
             open($oh, ">$outDirectory/Pairing.dtx") || die "Could not open Pairing output: $!\n";
             open($ph, ">$outDirectory/IsInPair.dtx") || die "Could not open IsPairOf output: $!\n";
             print "Reading Pairing file.\n";
+            # For performance reasons, we'll process the pairs in batches.
+            # This list contains the pairs.
+            my $pairs = [];
+            # This hash tracks feature IDs.
+            my $fidMap = {};
             # Loop through the pairings in the file.
             while (! eof $ih) {
                 my ($pairing) = $loader->GetLine($ih);
                 $stats->Add(pairingIn => 1);
-                # Compute the new pairing key.
-                my ($newKey, $inverted) = compute_pair_key($loader, $pairing, \%genomes);
-                # If we're keeping it, output it to the new file and create its
-                # IsInPair relationships.
-                if (defined $newKey) {
-                    print $oh "$newKey\n";
-                    $stats->Add(pairingOut => 1);
-                    my @newFids = split /:/, $newKey;
-                    for my $newFid (@newFids) {
-                        print $ph join("\t", $newFid, $newKey) . "\n";
-                        $stats->Add(isInPairOut => 1);
+                # Parse this pairing.
+                my ($fid1, $fid2) = parse_pair_key($pairing, \%genomes);
+                # Only proceed if the pairing is for genomes we have.
+                if (defined $fid1) {
+                    # Store the features in the hash.
+                    $fidMap->{$fid1} = 1;
+                    $fidMap->{$fid2} = 1;
+                    # Add the pairing to the current batch.
+                    push @$pairs, [$fid1, $fid2];
+                    # If the batch is full, process it.
+                    if (scalar @$pairs >= 5000) {
+                        ProcessPairingBatch($loader, $oh, $ph, $fidMap, $pairs);
+                        # Set up for the next batch.
+                        $fidMap = {};
+                        $pairs = [];
                     }
                 }
+            }
+            # If there's a residual batch, process it.
+            if (@$pairs) {
+                ProcessPairingBatch($loader, $oh, $ph, $fidMap, $pairs);
+                # Release the space used by the batching variables. We'll
+                # use them again.
+                $fidMap = {};
+                $pairs = [];
             }
             # Close all three files.
             close $ih; undef $ih;
@@ -141,9 +158,10 @@ if (! $cdmi) {
             while (! eof $ih) {
                 my ($set, $pairing, $inverted) = $loader->GetLine($ih);
                 $stats->Add(isDeterminedByIn => 1);
-                # Compute the new ID for the pairing.
-                my ($newPairing, $newInverted) = compute_pair_key($loader, $pairing, \%genomes);
-                if (defined $newPairing) {
+                # Parse this pairing.
+                my ($fid1, $fid2) = parse_pair_key($pairing, \%genomes);
+                # Only proceed if the pairing is for genomes we have.
+                if (defined $fid1) {
                     # Here we are keeping the pair. That means we also want to keep
                     # the pairset. Insure we have the set's key.
                     my $newSet = $pairSets{$set};
@@ -152,16 +170,26 @@ if (! $cdmi) {
                         $pairSets{$set} = $newSet;
                         $stats->Add(keptPairSet => 1);
                     }
-                    # If the pair key is inverted, flip the relationship's
-                    # inversion flag.
-                    if ($newInverted) {
-                        $inverted = ($inverted ? 0 : 1);
-                        $stats->Add(invertFlip => 1);
+                    # Store the features in the hash.
+                    $fidMap->{$fid1} = 1;
+                    $fidMap->{$fid2} = 1;
+                    # Add the pairing to the current batch.
+                    push @$pairs, [$newSet, $fid1, $fid2, $inverted];
+                    # If the batch is full, process it.
+                    if (scalar @$pairs >= 5000) {
+                        ProcessPairsetBatch($loader, $oh, $fidMap, $pairs);
+                        # Set up for the next batch.
+                        $fidMap = {};
+                        $pairs = [];
                     }
-                    # Output the relationship.
-                    print $oh join("\t", $newSet, $newPairing, $inverted) . "\n";
-                    $stats->Add(IsDeterminedByOut => 1);
                 }
+            }
+            # If there's a residual batch, process it.
+            if (@$pairs) {
+                ProcessPairsetBatch($loader, $oh, $fidMap, $pairs);
+                # Release the space used by the batching variables.
+                $fidMap = {};
+                $pairs = [];
             }
             # Close the files.
             close $oh; undef $oh;
@@ -197,65 +225,184 @@ if (! $cdmi) {
 
 =head2 Subroutines
 
-=head3 compute_pair_key
+=head3 parse_pair_key
 
-    my ($newKey, $inverted) = compute_pair_key($loader, $oldKey, \%genomes);
+    my ($fid1, $fid2) = parse_pair_key($pairing, \%genomes);
 
-Parse a pairing key and compute the equivalent KBase key. If one or
-both of the pair elements aren't in genomes from the incoming hash,
-an undefined result will be returned, indicating that the pairing key
-does not belong in the database. If the result pairing key is inverted
-from the original, that is indicated in the return.
+Split a pair key into its component feature IDs and figure out if both
+relevant genomes are in the database.
+
+=over 4
+
+=item pairing
+
+Incoming pairing key, consisting of two feature IDs separated by a semicolon.
+
+=item genomes
+
+Reference to a hash of the genome IDs for SEED genomes in the CDMI database.
+
+=item RETURN
+
+Returns a list consisting of the two feature IDs, in order, or returns
+two undefined values if one or the other of the features is not for a
+genome in the database.
+
+=cut
+
+sub parse_pair_key {
+    # Get the parameters.
+    my ($pairing, $genomes) = @_;
+    # The return values go in here.
+    my @retVal;
+    # Split the pairing into its two pieces.
+    my ($fid1, $fid2) = split /:/, $pairing;
+    # Get the relevant genomes.
+    my $genome1 = genome_of($fid1);
+    my $genome2 = genome_of($fid2);
+    # Are they both in the CDMI?
+    if ($genomes->{$genome1} && $genomes->{$genome2}) {
+        # Yes. Return them.
+        push @retVal, $fid1, $fid2;
+    } else {
+        # No. Return undefined values.
+        push @retVal, undef, undef;
+    }
+    # Return the result.
+    return @retVal;
+}
+
+=head3 ProcessPairingBatch
+
+    ProcessPairingBatch($loader, $oh, $ph, \%fidMap, \@pairs);
+
+Insert a list of pairings into the database. This method must find the
+KBase IDs for the specified features and construct a new pairing ID
+from them, then connect them to the features.
 
 =over 4
 
 =item loader
 
-L<CDMILoader> object for this load.
+L<CDMILoader> object for accessing the ID server.
 
-=item oldKey
+=item oh
 
-Key of the pairing in the Sapling. This is formed from the two FIG
-feature IDs concatenated with an intervening colon.
+Output file for the Pairing table.
 
-=item genomes
+=item ph
 
-Reference to a hash whose keys are the FIG IDs of the genomes in the
-KBase CDMI and whose values evaluate to TRUE.
+Output file for the IsInPair table.
 
-=item RETURN
+=item fidMap
 
-Returns a two-element list containing the appropriate KBase ID for the
-pairing followed by FALSE if the KBase ID is in the same order as the
-Sapling ID and TRUE if it is inverted. The first element will be
-C<undef> if either feature in the pairing does not belong in the CDMI.
+Reference to a hash whose keys are the features in the incoming pairs.
+
+=item pairs
+
+Reference to a list of 2-tuples, each containing the two features in a
+single pair.
 
 =back
 
 =cut
 
-sub compute_pair_key {
+sub ProcessPairingBatch {
     # Get the parameters.
-    my ($loader, $oldKey, $genomes) = @_;
-    # Declare the return variables.
-    my ($newKey, $inverted) = (undef, 0);
-    # Split the old key into the two features.
-    my ($fid1, $fid2) = split /:/, $oldKey;
-    # Get the relevant genomes.
-    my $genome1 = genome_of($fid1);
-    my $genome2 = genome_of($fid2);
-    # Only proceed if they're both in the CDMI.
-    if ($genomes->{$genome1} && $genomes->{$genome2}) {
-        # Get the KBase IDs of the features in the order they should
-        # appear in the output key.
-        my $fidHash = $loader->FindKBaseIDs('SEED', [$fid1, $fid2]);
-        my @newFids = sort values %$fidHash;
-        # Record whether or not they are flipped.
-        $inverted = ($newFids[0] ne $fidHash->{$fid1});
-        # Form the new key.
-        $newKey = join(":", @newFids);
+    my ($loader, $oh, $ph, $fidMap, $pairs) = @_;
+    # Get the statistics object.
+    my $stats = $loader->stats;
+    # Get the feature IDs from the ID server.
+    my $idMapping = $loader->FindKBaseIDs('SEED', 'Feature', [keys %$fidMap]);
+    # Loop through the pairs.
+    for my $pair (@$pairs) {
+        my ($fid1, $fid2) = @$pair;
+        # Find the KBase IDs for this pair.
+        my $kbid1 = $idMapping->{$fid1};
+        my $kbid2 = $idMapping->{$fid2};
+        # Insure we found both.
+        if (! $kbid1 || ! $kbid2) {
+            $stats->Add(kbidNotFound => 1);
+        } else {
+            # Compute the new pairing key.
+            my $newKey = join(":", sort ($kbid1, $kbid2));
+            # Output the three records we need.
+            print $oh "$newKey\n";
+            $stats->Add(pairingOut => 1);
+            print $ph "$kbid1\t$newKey\n";
+            print $ph "$kbid2\t$newKey\n";
+            $stats->Add(isInPairOut => 2);
+        }
     }
-    # Return the result.
-    return ($newKey, $inverted);
+    print "Pairing batch processed. " . $stats->Ask('pairingIn') . " pairings read.\n";
 }
 
+=head3 ProcessPairsetBatch
+
+    ProcessPairsetBatch($loader, $oh, $fidMap, $pairs);
+
+Output a batch of IsDeterminedBy records. We need to get the KBase IDs
+for all of the features of interest, and use those to form new pairing
+keys. This may change the inversion state of the pairing.
+
+=over 4
+
+=item loader
+
+L<CDMILoader> object for accessing the ID server.
+
+=item oh
+
+Output file for the Pairing table.
+
+=item ph
+
+Output file for the IsInPair table.
+
+=item fidMap
+
+Reference to a hash whose keys are the features in the incoming pairs.
+
+=item pairs
+
+Reference to a list of 4-tuples, each consisting of (0) a pairset ID,
+(1) the first feature in a pairing, (2) the second feature in a pairing,
+and (3) an inversion flag. The features must be assembled into a new
+pairing ID, which will be related to the pairset.
+
+=back
+
+=cut
+
+sub ProcessPairsetBatch {
+    # Get the parameters.
+    my ($loader, $oh, $fidMap, $pairs) = @_;
+    # Get the statistics object.
+    my $stats = $loader->stats;
+    # Get the feature IDs from the ID server.
+    my $idMapping = $loader->FindKBaseIDs('SEED', 'Feature', [keys %$fidMap]);
+    # Loop through the pairs.
+    for my $pair (@$pairs) {
+        my ($pairset, $fid1, $fid2, $inverted) = @$pair;
+        # Find the KBase IDs for this pair.
+        my $kbid1 = $idMapping->{$fid1};
+        my $kbid2 = $idMapping->{$fid2};
+        # Insure we found both.
+        if (! $kbid1 || ! $kbid2) {
+            $stats->Add(kbidNotFound => 1);
+        } else {
+            # Compute the new pairing key.
+            my @newOrder = sort ($kbid1, $kbid2);
+            my $newKey = join(":", @newOrder);
+            # If it's flipped, reverse the inversion flag.
+            if ($newOrder[0] ne $kbid1) {
+                $inverted = ($inverted ? 0 : 1);
+                $stats->Add(invertFlip => 1);
+            }
+            # Output the relationship.
+            print $oh join("\t", $pairset, $newKey, $inverted) . "\n";
+            $stats->Add(IsDeterminedByOut => 1);
+        }
+    }
+    print "Pairset batch processed. " . $stats->Ask('isDeterminedByIn') . " relationship instances read.\n";
+}

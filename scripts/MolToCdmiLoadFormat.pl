@@ -21,11 +21,11 @@ use strict;
 use Stats;
 use File::Copy;
 use BasicLocation;
-use CDMILoader;
+use Bio::KBase::CDMI::CDMILoader;
 
 =head1 MOL Genome Conversion Script for CDMI Load
 
-    MolToCdmiLoadFormat <outDirectory> <inDirectory> ...
+    MolToCdmiLoadFormat <outDirectory> <inDirectory>
 
 =head2 Introduction
 
@@ -117,7 +117,7 @@ Name of the directory containing the microbes online files.
     # Loop through the feature file.
     while (! eof $ih) {
         # Get the current feature record.
-        my ($contigID, $fid, $type, $location) = CDMILoader::GetLine($ih);
+        my ($contigID, $fid, $type, $location) = Bio::KBase::CDMI::CDMILoader::GetLine($ih);
         $stats->Add(featuresIn => 1);
         # Convert the type.
         my $realType;

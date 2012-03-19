@@ -9,6 +9,10 @@ use Carp;
 
 =head1 get_relationship_IsRealLocationOf
 
+This relationship connects a model's instance of a reaction
+to the compartments in which it takes place. Most instances
+take place in a single compartment. Transporters use two compartments.
+
 Example:
 
     get_relationship_IsRealLocationOf -a < ids > table.with.fields.added
@@ -35,6 +39,57 @@ output is to the standard output.
 
 This is used only if the column containing id is not the last.
 
+=item -from field-list
+
+Choose a set of fields from the ModelCompartment entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item compartment_index
+
+=item label
+
+=item pH
+
+=item potential
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=item type
+
+=back    
+
+=item -to field-list
+
+Choose a set of fields from the Requirement entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item direction
+
+=item transproton
+
+=item proton
+
+=back    
+
 =back
 
 =head2 Output Format
@@ -44,8 +99,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -64,7 +119,7 @@ my @from_fields;
 my @rel_fields;
 my @to_fields;
 
-my $usage = "usage: get_relationship_IsRealLocationOf [-c column] [-a | -from field list -rel field list -to field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_relationship_IsRealLocationOf [-c column] [-a | -from field list -rel field list -to field list] < ids > extended.by.a.column(s)\n";
 
 my $column;
 my $input_file;
@@ -75,19 +130,20 @@ my $t;
 my $h;
 my $i = "-";
 
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"h"	   => \$h,
-						"a"	   => \$a,
-						"from=s" => \$f,
-						"rel=s" => \$r,
-						"to=s" => \$t,
-						'i=s'	   => \$i);		      
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("c=i"		=> \$column,
+								  "h"	   	=> \$h,
+								  "show-fields"	=> \$h,
+								  "a"	   	=> \$a,
+								  "from=s" 	=> \$f,
+								  "rel=s" 	=> \$r,
+								  "to=s" 	=> \$t,
+								  'i=s'	   	=> \$i);
 
 if ($h) {
-	print "from: ", join(",", @all_from_fields), "\n";
-	print "relation: ", join(",", @all_rel_fields), "\n";
-	print "to: ", join(",", @all_to_fields), "\n";
-	exit;
+	print STDERR "from: ", join(",", @all_from_fields), "\n";
+	print STDERR "relation: ", join(",", @all_rel_fields), "\n";
+	print STDERR "to: ", join(",", @all_to_fields), "\n";
+	exit 0;
 }
 
 if ($a  && ($f || $r || $t)) {die $usage};
@@ -127,7 +183,7 @@ else
 
 
 my %lines;
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     for my $tuple (@tuples) {
 	my ($id, $line) = @$tuple;
 	$lines{$id} = $line;

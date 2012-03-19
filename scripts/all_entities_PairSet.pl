@@ -9,6 +9,15 @@ use Carp;
 
 =head1 all_entities_PairSet
 
+Return all instances of the PairSet entity.
+
+A PairSet is a precompute set of pairs or genes.  Each pair occurs close to
+one another of the chromosome.  We believe that all of the first members
+of the pairs correspond to one another (are quite similar), as do all of
+the second members of the pairs.  These pairs (from prokaryotic genomes)
+offer on of the most powerful clues relating to uncharacterized genes/peroteins.
+
+
 Example:
 
     all_entities_PairSet -a 
@@ -25,6 +34,21 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item score
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +58,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +73,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

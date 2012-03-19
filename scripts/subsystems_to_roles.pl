@@ -8,13 +8,20 @@ use Carp;
 
 =head1 subsystems_to_roles
 
+The command subsystem_to_roles takes as input a table with a column containing subsystem IDs.  The table is
+extended with an extra column set to roles that make up the subsystems.  For each
+input line (designating a subsystem), a line will be added to the output for each
+role that occurs in the subsystem.
+
+You can ask for auxiliary roles, but the default is to leave them out.  If you want
+them, use "-aux=1".
 Example:
 
     subsystems_to_roles [arguments] < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
+line would contain the subsystem name. If another column contains the subsystem,
 use
 
     -c N
@@ -81,24 +88,24 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with an extra column (Role) added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: subsystems_to_roles [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
-
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $aux;
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+				       'aux' => \$aux,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -112,9 +119,9 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->subsystems_to_roles(\@h);
+    my $h = $kbO->subsystems_to_roles(\@h, $aux);
     for my $tuple (@tuples) {
         #
         # Process output here and print.

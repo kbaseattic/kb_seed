@@ -296,6 +296,7 @@ funcdef all_entities_Compartment(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	list<string> name nullable;
+	string msid nullable;
 	string mod_date nullable;
 } fields_Complex ;
 
@@ -310,6 +311,11 @@ It has the following fields:
 =item name
 
 name of this complex. Not all complexes have names.
+
+
+=item msid
+
+common modeling ID of this complex.
 
 
 =item mod_date
@@ -331,6 +337,7 @@ typedef structure {
 	string id;
 	string label nullable;
 	string abbr nullable;
+	string msid nullable;
 	int ubiquitous nullable;
 	string mod_date nullable;
 	string uncharged_formula nullable;
@@ -355,6 +362,11 @@ reactions
 =item abbr
 
 shortened abbreviation for the compound name
+
+
+=item msid
+
+common modeling ID of this compound
 
 
 =item ubiquitous
@@ -499,7 +511,7 @@ funcdef all_entities_ContigSequence(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
-	string reason nullable;
+	string source_id nullable;
 } fields_CoregulatedSet ;
 
 /*
@@ -515,9 +527,10 @@ It has the following fields:
 =over 4
 
 
-=item reason
+=item source_id
 
-Description of how this coregulated set was derived.
+original ID of this coregulated set in the source (core)
+database
 
 
 
@@ -1200,7 +1213,9 @@ funcdef all_entities_ProteinSequence(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
-	string citation nullable;
+	string title nullable;
+	string link nullable;
+	string pubdate nullable;
 } fields_Publication ;
 
 /*
@@ -1208,7 +1223,7 @@ Annotators attach publications to ProteinSequences.  The criteria we have used
 to gather such connections is a bit nonstandard.  We have sought to attach publications
 to ProteinSequences when the publication includes an expert asserting a belief or estimate
 of function.  The paper may not be the original characterization.  Further, it may not
-even discuss a sequence protein (much of the lietarture is very valuable, but reports
+even discuss a sequence protein (much of the literature is very valuable, but reports
 work on proteins in strains that have not yet been sequenced).  On the other hand,
 reports of sequencing regions of a chromosome (with no specific assertion of a
 clear function) should not be attached.  The attached publications give an ID (usually a
@@ -1219,9 +1234,19 @@ It has the following fields:
 =over 4
 
 
-=item citation
+=item title
 
-Hyperlink of the article. The text is the article title.
+title of the article, or (unknown) if the title is not known
+
+
+=item link
+
+URL of the article
+
+
+=item pubdate
+
+publication date of the article
 
 
 
@@ -1238,6 +1263,7 @@ typedef structure {
 	string id;
 	string mod_date nullable;
 	string name nullable;
+	string msid nullable;
 	string abbr nullable;
 	string equation nullable;
 	string reversibility nullable;
@@ -1260,6 +1286,11 @@ definition
 =item name
 
 descriptive name of this reaction
+
+
+=item msid
+
+common modeling ID of this reaction
 
 
 =item abbr
@@ -1959,6 +1990,28 @@ funcdef get_relationship_IsContainedIn(list<string> ids, list<string> from_field
 
 typedef structure {
 	string id;
+} fields_Controls ;
+
+/*
+This relationship connects a coregulated set to the
+features that are used as its transcription factors.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Controls(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Feature, fields_Controls, fields_CoregulatedSet>>);
+funcdef get_relationship_IsControlledUsing(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_CoregulatedSet, fields_Controls, fields_Feature>>);
+
+typedef structure {
+	string id;
 } fields_Describes ;
 
 /*
@@ -2032,6 +2085,28 @@ funcdef get_relationship_Encompasses(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Feature, fields_Encompasses, fields_Feature>>);
 funcdef get_relationship_IsEncompassedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Feature, fields_Encompasses, fields_Feature>>);
+
+typedef structure {
+	string id;
+} fields_Formulated ;
+
+/*
+This relationship connects a coregulated set to the
+source organization that originally computed it.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Formulated(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Source, fields_Formulated, fields_CoregulatedSet>>);
+funcdef get_relationship_WasFormulatedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_CoregulatedSet, fields_Formulated, fields_Source>>);
 
 typedef structure {
 	string id;
@@ -2437,6 +2512,29 @@ funcdef get_relationship_HasValueIn(list<string> ids, list<string> from_fields, 
 
 typedef structure {
 	string id;
+} fields_Imported ;
+
+/*
+This relationship specifies the import source for
+identifiers. It is used when reloading identifiers to
+provide for rapid deletion of the previous load's results.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Imported(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Source, fields_Imported, fields_Identifier>>);
+funcdef get_relationship_WasImportedFrom(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Identifier, fields_Imported, fields_Source>>);
+
+typedef structure {
+	string id;
 	int sequence nullable;
 	string abbreviation nullable;
 	int auxiliary nullable;
@@ -2780,35 +2878,6 @@ funcdef get_relationship_IsConsistentWith(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_EcNumber, fields_IsConsistentWith, fields_Role>>);
 funcdef get_relationship_IsConsistentTo(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Role, fields_IsConsistentWith, fields_EcNumber>>);
-
-typedef structure {
-	string id;
-	int effector nullable;
-} fields_IsControlledUsing ;
-
-/*
-This relationship connects a coregulated set to the
-protein that is used as its transcription factor.
-It has the following fields:
-
-=over 4
-
-
-=item effector
-
-TRUE if this transcription factor is an effector
-(up-regulates), FALSE if it is a suppressor (down-regulates)
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsControlledUsing(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_CoregulatedSet, fields_IsControlledUsing, fields_Feature>>);
-funcdef get_relationship_Controls(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Feature, fields_IsControlledUsing, fields_CoregulatedSet>>);
 
 typedef structure {
 	string id;

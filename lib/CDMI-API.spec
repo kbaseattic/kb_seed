@@ -51,17 +51,17 @@
 
 		fids_to_literature
 
-    will take a list of feature ids as input.  The returned value will be a mapping from
-    feature ids (fids) to publication references.
+   will take a list of feature ids as input.  The returned value will be a mapping from
+   feature ids (fids) to publication references.
 
-    It is a little inconvenient to batch your requests by supplying a list of fids,
-    but the performance will be much better in most cases.  Please note that you are
-    controlling the granularity of each request, and in most cases the size of the input
-    list is not critical.  However, you should note that while batching up hundreds or thousands
-    of input ids at a time should work just fine, millions may well cause things to break (e.g.,
-    you may exhaust local memory in your machine as the output results are returned).  As
-    machines get larger, the appropriate size of the input lists may become largely irrelevant.
-    For now, we recommend that you experiment a bit and use common sense.
+   It is a little inconvenient to batch your requests by supplying a list of fids,
+   but the performance will be much better in most cases.  Please note that you are
+   controlling the granularity of each request, and in most cases the size of the input
+   list is not critical.  However, you should note that while batching up hundreds or thousands
+   of input ids at a time should work just fine, millions may well cause things to break (e.g.,
+   you may exhaust local memory in your machine as the output results are returned).  As
+   machines get larger, the appropriate size of the input lists may become largely irrelevant.
+   For now, we recommend that you experiment a bit and use common sense.
 
 */
 module CDMI_API : CDMI_API {
@@ -623,13 +623,16 @@ module CDMI_API : CDMI_API {
         } genome_data;
     funcdef genomes_to_genome_data(genomes) returns (mapping<genome,genome_data>);
 
+    typedef string regulon;
+    typedef list<regulon> regulons;
     typedef structure {
-	        string regulon_id;
+	        regulon regulon_id;
 	 	fids regulon_set;
 		fids tfs;
 	} regulon_data;
     typedef list<regulon_data> regulons_data;
     funcdef fids_to_regulon_data(fids) returns (mapping<fid,regulons_data>);
+    funcdef regulons_to_fids(regulons) returns (mapping<regulon,fids>);
 
     typedef structure {
 		fid feature_id;
@@ -654,21 +657,21 @@ module CDMI_API : CDMI_API {
 	    proteins having identical protein sequence.
 	*/
     funcdef equiv_sequence_assertions(proteins) returns (mapping<protein,function_assertions>);
-    typedef string regulon;
-    typedef int regulon_size;
-    typedef tuple<regulon,regulon_size> regulon_size_pair;
-    typedef list<regulon_size_pair> regulon_size_pairs;
-    typedef list<regulon> regulons;
+    typedef string atomic_regulon;
+    typedef int atomic_regulon_size;
+    typedef tuple<atomic_regulon,atomic_regulon_size> atomic_regulon_size_pair;
+    typedef list<atomic_regulon_size_pair> atomic_regulon_size_pairs;
+    typedef list<atomic_regulon> atomic_regulons;
 
 	/*  The fids_to_atomic_regulons allows one to map fids into regulons that contain the fids.
 	    Normally a fid will be in at most one regulon, but we support multiple regulons.
 	*/
-    funcdef fids_to_atomic_regulons(fids) returns (mapping<fid,regulon_size_pairs>);
+    funcdef fids_to_atomic_regulons(fids) returns (mapping<fid,atomic_regulon_size_pairs>);
 
 	/*  The atomic_regulons_to_fids routine allows the user to access the set of fids that make up a regulon.
 	    Regulons may arise from several sources; hence, fids can be in multiple regulons.
 	*/
-    funcdef atomic_regulons_to_fids(regulons) returns(mapping<regulon,fids>);
+    funcdef atomic_regulons_to_fids(atomic_regulons) returns(mapping<atomic_regulon,fids>);
     typedef string protein_sequence;
     typedef string dna_sequence;
 
@@ -724,7 +727,7 @@ module CDMI_API : CDMI_API {
 	    instead of the ID. If 0, only the ID will be included. The default is 0.
 	*/
     funcdef roles_to_complexes(roles) returns (mapping<role,complexes>);
-
+    funcdef complexes_to_roles(complexes) returns (mapping<complexes,roles>);
     typedef tuple<subsystem,variant,role> ss_var_role_tuple;
     typedef list<ss_var_role_tuple> ss_var_role_tuples;
     funcdef fids_to_subsystem_data(fids) returns (mapping<fid,ss_var_role_tuples>);

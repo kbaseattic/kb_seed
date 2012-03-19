@@ -8,6 +8,15 @@ use Carp;
 
 =head1 genomes_to_md5s
 
+
+The routine genomes_to_md5s can be used to look up the MD5 value associated with each of
+a set of genomes.  The MD5 values are computed when the genome is loaded, so this routine
+just retrieves the precomputed values.
+
+Note that the MD5 value of a genome is independent of the contig names and case of the
+DNA sequences that make up the genome.
+
+
 Example:
 
     genomes_to_md5s [arguments] < input > output
@@ -81,18 +90,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: genomes_to_md5s [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -106,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->genomes_to_md5s(\@h);
     for my $tuple (@tuples) {

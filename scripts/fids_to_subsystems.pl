@@ -8,6 +8,13 @@ use Carp;
 
 =head1 fids_to_subsystems
 
+
+fids in subsystems normally have somewhat more reliable assigned functions than
+those not in subsystems.  Hence, it is common to ask "Is this protein-encoding gene
+included in any subsystems?"   fids_to_subsystems can be used to see which subsystems
+contain a fid (or, you can submit as input a set of fids and get the subsystems for each).
+
+
 Example:
 
     fids_to_subsystems [arguments] < input > output
@@ -83,18 +90,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_subsystems [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_subsystems(\@h);
     for my $tuple (@tuples) {

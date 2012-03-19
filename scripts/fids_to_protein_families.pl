@@ -8,6 +8,15 @@ use Carp;
 
 =head1 fids_to_protein_families
 
+
+Kbase supports the creation and maintence of protein families.  Each family is intended to contain a set
+of isofunctional homologs.  Currently, the families are collections of translations
+of features, rather than of just protein sequences (represented by md5s, for example).
+fids_to_protein_families supports access to the features that have been grouped into a family.
+Ideally, each feature in a family would have the same assigned function.  This is not
+always true, but probably should be.
+
+
 Example:
 
     fids_to_protein_families [arguments] < input > output
@@ -83,18 +92,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_protein_families [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +116,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_protein_families(\@h);
     for my $tuple (@tuples) {

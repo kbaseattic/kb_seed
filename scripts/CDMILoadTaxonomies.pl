@@ -20,8 +20,8 @@
     use strict;
     use Stats;
     use SeedUtils;
-    use CDMILoader;
-    use CDMI;
+    use Bio::KBase::CDMI::CDMILoader;
+    use Bio::KBase::CDMI::CDMI;
 
 =head1 CDMI Taxonomy Loader
 
@@ -54,7 +54,7 @@ containing the NCBI taxonomy files.
 =cut
 
 # Connect to the database using the command-line options.
-my $cdmi = CDMI->new_for_script();
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMILoadTaxonomies [options] taxonomyDirectory\n";
 } else {
@@ -144,7 +144,7 @@ sub ReadTaxonomies {
     # Get the parameters.
     my ($cdmi, $directoryName) = @_;
     # Create the CDMI loader.
-    my $loader = CDMILoader->new($cdmi);
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
     # Get the statistics object.
     my $retVal = $loader->stats;
     # Initialize the relation loaders.
@@ -218,7 +218,7 @@ sub ReadTaxonomies {
         my ($oldID, $newID) = GetTaxData($ih, $retVal);
         # Look for genomes connected to the old ID.
         my (@genomes) = $cdmi->GetFlat('IsTaxonomyOf',
-                'IsTaxonomyOf(from-link) = ?', [$oldID]);
+                'IsTaxonomyOf(from_link) = ?', [$oldID]);
         # Did we find any?
         if (@genomes) {
             # Yes. Disconnect them.

@@ -8,6 +8,19 @@ use Carp;
 
 =head1 proteins_to_functions
 
+
+The routine proteins_to_functions allows users to access functions associated with
+specific protein sequences.  The input proteins are given as a list of MD5 values
+(these MD5 values each correspond to a specific protein sequence).  For each input
+MD5 value, a list of [feature-id,function] pairs is constructed and returned.
+Note that there are many cases in which a single protein sequence corresponds
+to the translation associated with multiple protein-encoding genes, and each may
+have distinct functions (an undesirable situation, we grant).
+
+This function allows you to access all of the functions assigned (by all annotation
+groups represented in Kbase) to each of a set of sequences.
+
+
 Example:
 
     proteins_to_functions [arguments] < input > output
@@ -22,7 +35,7 @@ use
 where N is the column (from 1) that contains the subsystem.
 
 This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+output is to the standard output. For each input line there are multiple output lines, one for each fid the protein maps to. Two columns are added to each output line, a fid and a function.
 
 =head2 Documentation for underlying call
 
@@ -91,18 +104,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: proteins_to_functions [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -116,7 +128,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->proteins_to_functions(\@h);
     for my $tuple (@tuples) {

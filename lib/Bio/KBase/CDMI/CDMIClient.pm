@@ -1,6 +1,16 @@
-package CDMIClient;
+package Bio::KBase::CDMI::CDMIClient;
 
-use CDMI;
+
+use Bio::KBase::CDMI::Client;
+
+our $have_local_cdmi;
+eval {
+    require Bio::KBase::CDMI::CDMI;
+    require Bio::KBase::CDMI::CDMI_APIImpl;
+    require Bio::KBase::CDMI::CDMI_EntityAPIImpl;
+    $have_local_cdmi = 1;
+};
+
 use strict;
 use Getopt::Long;
 
@@ -74,20 +84,19 @@ sub new_for_script {
     # Get the parameters.
     my ($class, %options) = @_;
 
-    require CDMI_APIClient;
-    require CDMI_APIImpl;
 
-    return new_for_script_with_type($class, 'CDMI_APIImpl', 'CDMI_APIClient', %options);
+    return new_for_script_with_type($class, 'Bio::KBase::CDMI::CDMI_APIImpl', 'Bio::KBase::CDMI::Client', %options);
 }
 
 sub new_get_entity_for_script {
     # Get the parameters.
     my ($class, %options) = @_;
 
-    require CDMI_APIClient;
-    require CDMI_EntityAPIImpl;
     
-    return new_for_script_with_type($class, 'CDMI_EntityAPIImpl', 'CDMI_APIClient', %options);
+    return new_for_script_with_type($class,
+				    'Bio::KBase::CDMI::CDMI_EntityAPIImpl',
+				    'Bio::KBase::CDMI::Client',
+				    %options);
 }
 
 sub new_for_script_with_type
@@ -119,9 +128,13 @@ sub new_for_script_with_type
     if ($rc) {
 	if ($local)
 	{
-	    my $cdmi = CDMI->new(loadDirectory => $loadDirectory, DBD => $dbd,
-				 dbName => $dbName, sock => $sock, userData => $userData,
-				 dbhost => $dbhost, port => $port, dbms => $dbms);
+	    if (!$have_local_cdmi)
+	    {
+		die "The appropriate modules are not available for using the -local flag";
+	    }
+	    my $cdmi = Bio::KBase::CDMI::CDMI->new(loadDirectory => $loadDirectory, DBD => $dbd,
+						   dbName => $dbName, sock => $sock, userData => $userData,
+						   dbhost => $dbhost, port => $port, dbms => $dbms);
 	    $retVal = $impl_class->new($cdmi);
 	    
 	}

@@ -8,13 +8,21 @@ use Carp;
 
 =head1 subsystems_to_fids
 
+This command gives to access to all of the rows in a subsystem.  It does not support
+selecting just rows for specific genomes (although the underlying API routine
+subsystems_to_fids does).  This command gives you all of the 
+
+    [genome,variant-code,fids]
+
+for an input subsystem.
+
 Example:
 
     subsystems_to_fids [arguments] < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
+line would contain a subssytem name. If another column contains the subsystem
 use
 
     -c N
@@ -89,24 +97,24 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added.  These will be [Genome,Variant,FIF]
+(i.e., three columns are appended).
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: subsystems_to_fids [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -120,9 +128,9 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->subsystems_to_fids(\@h);
+    my $h = $kbO->subsystems_to_fids(\@h, \@ARGV);
     for my $tuple (@tuples) {
         #
         # Process output here and print.

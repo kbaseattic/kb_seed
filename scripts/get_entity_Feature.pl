@@ -1,5 +1,6 @@
 use strict;
 use Data::Dumper;
+use Bio::KBase::Utilities::ScriptThing;
 use Carp;
 
 #
@@ -8,6 +9,17 @@ use Carp;
 
 
 =head1 get_entity_Feature
+
+A feature (sometimes also called a gene) is a part of a
+genome that is of special interest. Features may be spread across
+multiple DNA sequences (contigs) of a genome, but never across more
+than one genome. Each feature in the database has a unique
+ID that functions as its ID in this table.
+Normally a Feature is just a single contigous region on a contig.
+Features have types, and an appropriate choice of available types
+allows the support of protein-encoding genes, exons, RNA genes,
+binding sites, pathogenicity islands, or whatever.
+
 
 Example:
 
@@ -33,7 +45,28 @@ output is to the standard output.
 
 =item -c Column
 
-This is used only if the column containing id is not the last.
+Use the specified column to define the id of the entity to retrieve.
+
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item feature_type
+
+=item source_id
+
+=item sequence_length
+
+=item function
+
+=back    
 
 =back
 
@@ -44,8 +77,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -53,17 +86,25 @@ use Getopt::Long;
 my @all_fields = ( 'feature_type', 'source_id', 'sequence_length', 'function' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_Feature [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_entity_Feature [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
 
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"a"	   => \$a,
-						"fields=s" => \$f,
-						'i=s'	   => \$i);		      
+my $show_fields;
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
+								  "a"	   	=> \$a,
+								  "h"	   	=> \$show_fields,
+								  "show-fields"	=> \$show_fields,
+								  "fields=s" 	=> \$f,
+								  'i=s'	   	=> \$i);
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
 if ($a && $f) { print STDERR $usage; exit 1 }
 if ($a)
 {
@@ -93,7 +134,7 @@ elsif ($f) {
 }
 
 open my $ih, "<$i";
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_Feature(\@h, \@fields);
     for my $tuple (@tuples) {

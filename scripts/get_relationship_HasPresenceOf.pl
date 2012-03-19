@@ -9,6 +9,10 @@ use Carp;
 
 =head1 get_relationship_HasPresenceOf
 
+This relationship connects a media to the compounds that
+occur in it. The intersection data describes how much of each
+compound can be found.
+
 Example:
 
     get_relationship_HasPresenceOf -a < ids > table.with.fields.added
@@ -35,6 +39,69 @@ output is to the standard output.
 
 This is used only if the column containing id is not the last.
 
+=item -from field-list
+
+Choose a set of fields from the Media entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item mod_date
+
+=item name
+
+=item type
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=item concentration
+
+=item minimum_flux
+
+=item maximum_flux
+
+=back    
+
+=item -to field-list
+
+Choose a set of fields from the Compound entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item label
+
+=item abbr
+
+=item msid
+
+=item ubiquitous
+
+=item mod_date
+
+=item uncharged_formula
+
+=item formula
+
+=item mass
+
+=back    
+
 =back
 
 =head2 Output Format
@@ -44,15 +111,15 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
  
 my @all_from_fields = ( 'id', 'mod_date', 'name', 'type' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'minimum_flux', 'maximum_flux' );
-my @all_to_fields = ( 'id', 'label', 'abbr', 'ubiquitous', 'mod_date', 'uncharged_formula', 'formula', 'mass' );
+my @all_to_fields = ( 'id', 'label', 'abbr', 'msid', 'ubiquitous', 'mod_date', 'uncharged_formula', 'formula', 'mass' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -64,7 +131,7 @@ my @from_fields;
 my @rel_fields;
 my @to_fields;
 
-my $usage = "usage: get_relationship_HasPresenceOf [-c column] [-a | -from field list -rel field list -to field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_relationship_HasPresenceOf [-c column] [-a | -from field list -rel field list -to field list] < ids > extended.by.a.column(s)\n";
 
 my $column;
 my $input_file;
@@ -75,19 +142,20 @@ my $t;
 my $h;
 my $i = "-";
 
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"h"	   => \$h,
-						"a"	   => \$a,
-						"from=s" => \$f,
-						"rel=s" => \$r,
-						"to=s" => \$t,
-						'i=s'	   => \$i);		      
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("c=i"		=> \$column,
+								  "h"	   	=> \$h,
+								  "show-fields"	=> \$h,
+								  "a"	   	=> \$a,
+								  "from=s" 	=> \$f,
+								  "rel=s" 	=> \$r,
+								  "to=s" 	=> \$t,
+								  'i=s'	   	=> \$i);
 
 if ($h) {
-	print "from: ", join(",", @all_from_fields), "\n";
-	print "relation: ", join(",", @all_rel_fields), "\n";
-	print "to: ", join(",", @all_to_fields), "\n";
-	exit;
+	print STDERR "from: ", join(",", @all_from_fields), "\n";
+	print STDERR "relation: ", join(",", @all_rel_fields), "\n";
+	print STDERR "to: ", join(",", @all_to_fields), "\n";
+	exit 0;
 }
 
 if ($a  && ($f || $r || $t)) {die $usage};
@@ -127,7 +195,7 @@ else
 
 
 my %lines;
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     for my $tuple (@tuples) {
 	my ($id, $line) = @$tuple;
 	$lines{$id} = $line;

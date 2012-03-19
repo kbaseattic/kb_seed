@@ -8,18 +8,25 @@ use Carp;
 
 =head1 co_occurrence_evidence
 
-Example:
 
-    co_occurrence_evidence [arguments] < input > output
+co-occurence_evidence is used to retrieve the detailed pairs of genes that go into the
+computation of co-occurence scores.  The scores reflect an estimate of the number of distinct OTUs that
+contain an instance of a co-occuring pair.  This routine returns as evidence a list of all the pairs that
+went into the computation.
 
-The standard input should be a tab-separated table (i.e., each line
-is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
-use
+The input to the computation is table in which one of the columns contains 
+co-occurring pairs.  For example,
 
-    -c N
+     echo 'kb|g.0.peg.101:kb|g.0.peg.263' | co_occurrence_evidence 
 
-where N is the column (from 1) that contains the subsystem.
+takes in a table with 1 column and one row.  The input row is a single pair
+of related fids joined using a ':'.
+
+The output is a table with an added (usually huge) column containing the evidence that
+the pair of fids are,in fact, related.  The evidence is a comma-separated list of pairs
+(each pair being two fids joined with ':').  Thus the command above produces
+
+           kb|g.0.peg.101:kb|g.0.peg.263	kb|g.0.peg.101:kb|g.0.peg.263,kb|g.10.peg.3334:kb|g.10.peg.3978,...
 
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
@@ -85,24 +92,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with an extra column (containing large evidence strings)  added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: co_occurrence_evidence [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -116,14 +122,14 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h;
     my %lines;
     foreach my $tuple (@tuples) {
 	my ($id, $line) = @$tuple;
         my ($a, $b) =  split(":", $id);
 	push (@h, [$a, $b]);
-	#make a hash so I can look up the line;	
+	#make a hash so I can look up the line;
 	$lines{$id} = $line;
     }
     my $h = $kbO->co_occurrence_evidence(\@h);

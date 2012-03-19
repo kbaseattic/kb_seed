@@ -8,6 +8,16 @@ use Carp;
 
 =head1 proteins_to_protein_families
 
+
+Protein families contain a set of isofunctional homologs.  proteins_to_protein_families
+can be used to look up is used to get the set of protein_families containing a specified protein.
+For performance reasons, you can submit a batch of proteins (i.e., a list of proteins),
+and for each input protein, you get back a set (possibly empty) of protein_families.
+Specific collections of families (e.g., FIGfams) usually require that a protein be in
+at most one family.  However, we will be integrating protein families from a number of
+sources, and so a protein can be in multiple families.
+
+
 Example:
 
     proteins_to_protein_families [arguments] < input > output
@@ -19,10 +29,10 @@ use
 
     -c N
 
-where N is the column (from 1) that contains the subsystem.
+where N is the column (from 1) that contains the protein.
 
 This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+output is to the standard output. For each protein, the family it belongs to is added at the end of the input line.
 
 =head2 Documentation for underlying call
 
@@ -83,18 +93,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: proteins_to_protein_families [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +117,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->proteins_to_protein_families(\@h);
     for my $tuple (@tuples) {

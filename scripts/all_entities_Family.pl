@@ -9,6 +9,28 @@ use Carp;
 
 =head1 all_entities_Family
 
+Return all instances of the Family entity.
+
+The Kbase will support the maintenance of protein families (as sets of Features
+with associated translations).  We are initially only supporting the notion of a family
+as composed of a set of isofunctional homologs.  That is, the families we
+initially support should be thought of as containing protein-encoding genes whose
+associated sequences all implement the same function
+(we do understand that the notion of "function" is somewhat ambiguous, so let
+us sweep this under the rug by calling a functional role a "primitive concept").
+We currently support families in which the members are
+translations of features, and we think of Features as
+having an associated function. Identical protein sequences
+as products of translating distinct genes may or may not
+have identical functions, and we allow multiple members of
+the same Family to share identical protein sequences.  This
+may be justified, since in a very, very, very few cases
+identical proteins do, in fact, have distinct functions.
+We would prefer to reach the point where our Families are
+sets of protein sequence, rather than sets of
+protein-encoding Features.
+
+
 Example:
 
     all_entities_Family -a 
@@ -25,6 +47,23 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item type
+
+=item family_function
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +73,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +88,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

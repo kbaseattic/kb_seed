@@ -18,8 +18,8 @@
 #
 
 use strict;
-use CDMILoader;
-use CDMI;
+use Bio::KBase::CDMI::CDMILoader;
+use Bio::KBase::CDMI::CDMI;
 
 =head1 Model Chemistry Data Load Script for CDMI
 
@@ -44,29 +44,29 @@ files with a heading line.
 
 =item compartment.dtx
 
-This file produces B<Compartment> and has four input columns--
-C<abbr>, C<id>, C<mod-date>, and C<name>. The C<mod-date> column
+This file produces B<Compartment> and has five input columns--
+C<abbr>, C<id>, C<mod-date>, C<msid>, and C<name>. The C<mod-date> column
 must be translated.
 
 =item complex.dtx
 
-This file produces B<Complex> and has two input columns-- C<id> and
-C<mod-date>. The C<mod-date> column must be translated.
+This file produces B<Complex> and has three input columns-- C<id>,
+C<msid>, and C<mod-date>. The C<mod-date> column must be translated.
 
 =item complexName.dtx
 
-This file produces the C<name> field of B<Complex> and has two input
-columns-- C<id> and C<name>.  If the C<name> column is empty
+This file produces the C<name> field of B<Complex> and three two input
+columns-- C<id>, C<msid> and C<name>.  If the C<name> column is empty
 (indicating that the complex does not have a name), the record will
-not produce output.
+not produce output. The C<msid> column is not used.
 
 =item compound.dtx
 
-This file produces B<Compound> and has seven input columns-- C<abbr>,
-C<formula>, C<id>, C<label>, C<mass>, C<mod-date>, and C<uncharged-formula>.
-An eighth field-- C<ubiquitous>-- is computed from data in the
-B<Reagent.dtx> file. This means the latter file must be processed
-first. The C<mod-date> column must be translated. If the
+This file produces B<Compound> and has eight input columns-- C<abbr>,
+C<formula>, C<id>, C<label>, C<mass>, C<mod-date>, C<msid>, and
+C<uncharged-formula>. An ninth field-- C<ubiquitous>-- is computed
+from data in the B<Reagent.dtx> file. This means the latter file must
+be processed first. The C<mod-date> column must be translated. If the
 C<uncharged-formula> column is empty it will be stored as an empty string.
 
 =item hasCompoundAliasFrom.dtx
@@ -94,8 +94,9 @@ C<to-link>.
 
 =item isTriggeredBy.dtx
 
-This file produces B<IsTriggeredBy> and has four input columns-- C<from-link>,
-C<optional>, C<to-link>, and C<type>.
+This file produces B<IsTriggeredBy> and has five input columns--
+C<from-link>, C<msid>, C<optional>, C<to-link>, and C<type>.
+The C<msid> column is not used.
 
 =item isUsedAs.dtx
 
@@ -115,9 +116,9 @@ and C<to-link>.
 
 =item reaction.dtx
 
-This file produces B<Reaction> and has six columns-- C<abbr>, C<equation>,
-C<id>, C<mod-date>, C<name>, and C<reversibility>. C<mod-date> must be
-translated.
+This file produces B<Reaction> and has seven columns-- C<abbr>, C<equation>,
+C<id>, C<mod-date>, C<msid>, C<name>, and C<reversibility>. C<mod-date>
+must be translated.
 
 =item reactionComplex.dtx
 
@@ -170,8 +171,8 @@ Name of the directory containing the model data files.
         die "Invalid input directory $inDirectory.";
     }
     # Connect to the CDMI and create the loader object.
-    my $cdmi = CDMI->new_for_script();
-    my $loader = CDMILoader->new($cdmi);
+    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
     # Get the statistics object.
     my $stats = $loader->stats;
     # Alias sources will be cached in here.
@@ -230,7 +231,8 @@ Name of the directory containing the model data files.
         $loader->ConvertFileRecord('Reaction', 'SEED', \@fields,
                 { abbr => [0, 'copy'], equation => [1, 'copy'],
                   id => [2, 'copy'], mod_date => [3, 'timeStamp'],
-                  name => [4, 'copy'], reversibility => [5, 'copy']
+                  msid => [4, 'copy'], name => [5, 'copy'],
+                  reversibility => [6, 'copy']
                    });
         $stats->Add(ReactionOut => 1);
     }
@@ -265,7 +267,7 @@ Name of the directory containing the model data files.
         $stats->Add(compartmentIn => 1);
         $loader->ConvertFileRecord('Compartment', 'SEED', \@fields,
                 { id => [1, 'copy'], mod_date => [2, 'timeStamp'],
-                  name => [3, 'copy'], abbr => [0, 'copy'] });
+                  name => [4, 'copy'], abbr => [0, 'copy'] });
         $stats->Add(CompartmnetOut => 1);
     }
     close $ih; undef $ih;
@@ -279,7 +281,8 @@ Name of the directory containing the model data files.
         my @fields = $loader->GetLine($ih);
         $stats->Add(complexIn => 1);
         $loader->ConvertFileRecord('Complex', 'SEED', \@fields,
-                { id => [0, 'copy'], mod_date => [1, 'timeStamp'] });
+                { id => [0, 'copy'], mod_date => [2, 'timeStamp'],
+                  msid => [1, 'copy'] });
         $stats->Add(ComplexOut => 1);
     }
     close $ih; undef $ih;
@@ -292,9 +295,9 @@ Name of the directory containing the model data files.
     while (! eof $ih) {
         my @fields = $loader->GetLine($ih);
         $stats->Add(complexNameIn => 1);
-        if ($fields[1]) {
+        if ($fields[2]) {
             $loader->ConvertFileRecord('ComplexName', 'SEED', \@fields,
-                    { id => [0, 'copy'], name => [1, 'copy'] });
+                    { id => [0, 'copy'], name => [2, 'copy'] });
             $stats->Add(ComplexNameOut => 1);
         }
     }
@@ -346,7 +349,8 @@ Name of the directory containing the model data files.
                 { id => [2, 'copy'], abbr => [0, 'copy'],
                   label => [3, 'copy'], mass => [4, 'copy', 0],
                   mod_date => [5, 'timeStamp'], formula => [1, 'copy', ''],
-                  uncharged_formula => [6, 'copy', ''],
+                  uncharged_formula => [7, 'copy', ''],
+                  msid => [6, 'copy'],
                   ubiquitous => [undef, 'copy', $ubiquitous] });
             $stats->Add(CompoundOut => 1);
     }
@@ -427,8 +431,8 @@ Name of the directory containing the model data files.
         my @fields = $loader->GetLine($ih);
         $stats->Add(isTriggeredByIn => 1);
         $loader->ConvertFileRecord('IsTriggeredBy', 'SEED', \@fields,
-                { from_link => [0, 'copy'], optional => [1, 'copy', 0],
-                  to_link => [2, 'copy'], type => [3, 'copy'] });
+                { from_link => [0, 'copy'], optional => [2, 'copy', 0],
+                  to_link => [3, 'copy'], type => [4, 'copy'] });
         $stats->Add(IsTriggeredByOut => 1);
     }
     close $ih; undef $ih;

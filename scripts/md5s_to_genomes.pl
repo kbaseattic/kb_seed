@@ -8,6 +8,16 @@ use Carp;
 
 =head1 md5s_to_genomes
 
+
+md5s to genomes is used to get the genomes associated with each of a list of input md5 values.
+
+           The routine takes as input a list of MD5 values.  It constructs a mapping from each input
+           MD5 value to a list of genomes that share the same MD5 value.
+
+           The MD5 value for a genome is independent of the names of contigs and the case of the DNA sequence
+           data.
+
+
 Example:
 
     md5s_to_genomes [arguments] < input > output
@@ -83,18 +93,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: md5s_to_genomes [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +117,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->md5s_to_genomes(\@h);
     for my $tuple (@tuples) {

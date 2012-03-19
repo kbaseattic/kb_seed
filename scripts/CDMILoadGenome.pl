@@ -19,8 +19,8 @@
 
 use strict;
 use SeedUtils;
-use CDMI;
-use CDMILoader;
+use Bio::KBase::CDMI::CDMI;
+use Bio::KBase::CDMI::CDMILoader;
 use IDServerAPIClient;
 use MD5Computer;
 use BasicLocation;
@@ -192,6 +192,12 @@ before loading.
 URL to use for the ID server. The default uses the standard KBase ID
 server.
 
+=item typed
+
+If specified, then the incoming IDs are only unique within a particular
+datatype. When the IDs are passed to the ID server, the source type
+will have the data type included.
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -200,16 +206,19 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url);
+my ($recursive, $newOnly, $clear, $id_server_url, $typed);
+# Turn off buffering for progress messages.
+$| = 1;
 
 # Connect to the database.
-my $cdmi = CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
+        "clear" => \$clear, "idserver=s" => \$id_server_url,
+        "typed" => \$typed);
 if (! $cdmi) {
     print "usage: CDMILoadGenome [options] source genomeDirectory\n";
     exit;
 }
-
+print "Connected to CDMI.\n";
 # Get the source and genome directory.
     my ($source, $genomeDirectory) = @ARGV;
     if (! $source) {
@@ -221,12 +230,15 @@ if (! $cdmi) {
     } else {
 
         # Connect to the KBID server and create the loader utility object.
-	my $id_server;
-	if ($id_server_url) {
-	    $id_server = IDServerAPIClient->new($id_server_url);
-	}
-        my $loader = CDMILoader->new($cdmi, $id_server);
-
+        my $id_server;
+        if ($id_server_url) {
+            $id_server = IDServerAPIClient->new($id_server_url);
+        }
+        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
+        # Insure the loader knows if we are using typed ID services.
+        if ($typed) {
+            $loader->SetTyped(1);
+        }
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the genome tables.
@@ -298,8 +310,7 @@ sub LoadGenome {
     open(my $ih, "<$genomeDirectory/name.tab") || die "Could not open name file: $!\n";
     my ($genomeOriginalID, $scientificName) = $loader->GetLine($ih);
     # Get the KBID for this genome.
-    my $idH = $loader->idserver->register_ids('kb|g', $source, [$genomeOriginalID]);
-    my $genomeID = $idH->{$genomeOriginalID};
+    my $genomeID = $loader->GetKBaseID('kb|g', $source, 'Genome', $genomeOriginalID);
     # If this genome exists and we are only loading new genomes, skip it.
     if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
         $loader->stats->Add(genomeSkipped => 1);
@@ -370,7 +381,7 @@ sub DeleteGenome {
     # Delete the features.
     $loader->DeleteRelatedRecords($genomeID, 'IsOwnerOf', 'Feature');
     # Check for a taxonomy connection.
-    my ($taxon) = $cdmi->GetFlat("IsTaxonomyOf", 'IsTaxonomyOf(to-link) = ?',
+    my ($taxon) = $cdmi->GetFlat("IsTaxonomyOf", 'IsTaxonomyOf(to_link) = ?',
             [$genomeID], 'from-link');
     if ($taxon) {
         # We found one, so disconnect it.
@@ -378,7 +389,7 @@ sub DeleteGenome {
         $stats->Add(IsTaxonomyOf => 1);
     }
     # Check for a submit connection.
-    my ($source) = $cdmi->GetFlat("Submitted", 'Submitted(to-link) = ?',
+    my ($source) = $cdmi->GetFlat("Submitted", 'Submitted(to_link) = ?',
             [$genomeID], 'from-link');
     if ($source) {
         # We found one, so disconnect it.
@@ -482,7 +493,8 @@ sub LoadContigs {
             undef $sequence;
             # Compute the contig's MD5.
             my $contigMD5 = $md5Object->ProcessContig($foreignID, \@chunks);
-            my $contigKBID = $loader->GetKBaseID("$genomeID.c", $source, $foreignID);
+            my $contigKBID = $loader->GetKBaseID("$genomeID.c", $source, 'Contig',
+                    $foreignID);
             $contigMap->{$foreignID} = $contigKBID;
             # We now have all the information we need to load the contig
             # into the database. First, check to see if the sequence is
@@ -761,12 +773,13 @@ sub ProcessFeatureBatch {
     #
     my %typemap;
     for my $fid (@fids) {
-	my($type) = $fidBatch->{$fid}->[0];
-	push(@{$typemap{$type}}, $fid);
+        my($type) = $fidBatch->{$fid}->[0];
+        push(@{$typemap{$type}}, $fid);
     }
     for my $type (keys %typemap) {
-	my $h = $loader->GetKBaseIDs("$genomeID.$type", $source, $typemap{$type});
-	$id_mapping->{$_} = $h->{$_} foreach keys %$h;
+        my $h = $loader->GetKBaseIDs("$genomeID.$type", $source, 'Feature',
+               $typemap{$type});
+        $id_mapping->{$_} = $h->{$_} foreach keys %$h;
     }
     # Now we have all the KBase IDs we need. Loop through the batch.
     for my $fid (@fids) {
@@ -915,43 +928,49 @@ sub LoadProteins {
                 # Insure the protein sequence is in the database and get its
                 # ID.
                 my $protID = $loader->CheckProtein($sequence);
-                # Connect it to the feature.
+                # Look for the feature.
                 my $kbid = $id_mapping->{$fid};
-                $kbid or die "Faulty assumption: no mapped id for $fid";
-                $loader->InsertObject('IsProteinFor', from_link => $protID,
-                        to_link => $kbid);
-                $stats->Add(featureProtein => 1);
-                # Is there a gene name for this feature?
-                if ($aliasMap->{$fid}) {
-                    # Yes. We must add it as an identifier.
-                    my $naturalID = $aliasMap->{$fid};
-                    my $prefixed = "$source|$naturalID";
-                    # Insure the identifier is in the database.
-                    my $created = $loader->InsureEntity(Identifier => $prefixed,
-                        natural_form => $naturalID, source => $source);
-                    $stats->Add(aliasFound => 1);
-                    # If the identifier previously existed, see if it's
-                    # already connected to this protein.
-                    if ($created) {
-                        $stats->Add(newIdentifier => 1);
-                    } else {
-                        $stats->Add(oldIdentifier => 1);
-                        my ($test) = $cdmi->GetFlat("IsNamedBy",
-                                'IsNamedBy(from-link) = ? AND IsNamedBy(to-link) = ?',
-                                [$protID, $prefixed], 'to-link');
-                        if (! defined $test) {
-                            # It's not, so denote that this is a new connection.
-                            $created = 1;
-                            $stats->Add(oldIdentifierNewIdConnection => 1);
+                if (! $kbid) {
+                    # Not found, so we have an error.
+                    print STDERR "Feature $fid for protein sequence not found.\n";
+                    $stats->Add(proteinFeatureNotFound => 1);
+                } else {
+                    # Found, so we can connect the protein to the feature.
+                    $loader->InsertObject('IsProteinFor', from_link => $protID,
+                            to_link => $kbid);
+                    $stats->Add(featureProtein => 1);
+                    # Is there a gene name for this feature?
+                    if ($aliasMap->{$fid}) {
+                        # Yes. We must add it as an identifier.
+                        my $naturalID = $aliasMap->{$fid};
+                        my $prefixed = "$source|$naturalID";
+                        # Insure the identifier is in the database.
+                        my $created = $loader->InsureEntity(Identifier => $prefixed,
+                            natural_form => $naturalID, source => $source);
+                        $stats->Add(aliasFound => 1);
+                        # If the identifier previously existed, see if it's
+                        # already connected to this protein.
+                        if ($created) {
+                            $stats->Add(newIdentifier => 1);
                         } else {
-                            $stats->Add(oldIdConnection => 1);
+                            $stats->Add(oldIdentifier => 1);
+                            my ($test) = $cdmi->GetFlat("IsNamedBy",
+                                    'IsNamedBy(from_link) = ? AND IsNamedBy(to_link) = ?',
+                                    [$protID, $prefixed], 'to-link');
+                            if (! defined $test) {
+                                # It's not, so denote that this is a new connection.
+                                $created = 1;
+                                $stats->Add(oldIdentifierNewIdConnection => 1);
+                            } else {
+                                $stats->Add(oldIdConnection => 1);
+                            }
                         }
-                    }
-                    if ($created) {
-                        # Connect the identifier to the protein.
-                        $cdmi->InsertObject('IsNamedBy', from_link => $protID,
-                                to_link => $prefixed);
-                        $stats->Add(newIdConnection => 1);
+                        if ($created) {
+                            # Connect the identifier to the protein.
+                            $cdmi->InsertObject('IsNamedBy', from_link => $protID,
+                                    to_link => $prefixed);
+                            $stats->Add(newIdConnection => 1);
+                        }
                     }
                 }
                 # Set up for the next feature.
@@ -1064,8 +1083,8 @@ sub CreateGenome {
         my $currentTaxID = $taxID;
         while ($currentTaxID && ! $domain) {
             my ($taxTuple) = $cdmi->GetAll('IsInGroup TaxonomicGrouping',
-                    "IsInGroup(from-link) = ?", [$currentTaxID],
-                    "TaxonomicGrouping(id) TaxonomicGrouping(domain) TaxonomicGrouping(scientific-name)");
+                    "IsInGroup(from_link) = ?", [$currentTaxID],
+                    "TaxonomicGrouping(id) TaxonomicGrouping(domain) TaxonomicGrouping(scientific_name)");
             if (! $taxTuple) {
                 # We've run off the end, so we stop the loop without a
                 # domain.

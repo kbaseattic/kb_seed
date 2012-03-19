@@ -8,6 +8,13 @@ use Carp;
 
 =head1 roles_to_complexes
 
+
+roles_to_complexes allows a user to connect Roles to Complexes,
+from there, the connection exists to Reactions (although in the
+actual ER-model model, the connection from Complex to Reaction goes through
+ReactionComplex).  Since Roles also connect to fids, the connection between
+fids and Reactions is induced.
+
 Example:
 
     roles_to_complexes [arguments] < input > output
@@ -22,7 +29,7 @@ use
 where N is the column (from 1) that contains the subsystem.
 
 This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+output is to the standard output. For each line of input there may be multiple lines of output, one per complex associated with the role. Two columns are appended to the input line, the optional flag, and the complex id.
 
 =head2 Documentation for underlying call
 
@@ -83,18 +90,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: roles_to_complexes [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_complexes(\@h);
     for my $tuple (@tuples) {
@@ -117,21 +123,17 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         #
         my ($id, $line) = @$tuple;
         my $v = $h->{$id};
-
         if (! defined($v))
         {
             print STDERR $line,"\n";
         }
-        elsif (ref($v) eq 'ARRAY')
+        else
         {
             foreach $_ (@$v)
             {
-                print "$line\t$_\n";
+		my($complex,$optional) = @$_;
+                print "$line\t$optional\t$complex\n";
             }
-        }
-        else
-        {
-            print "$line\t$v\n";
         }
     }
 }

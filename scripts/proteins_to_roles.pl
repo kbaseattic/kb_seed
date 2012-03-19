@@ -8,6 +8,26 @@ use Carp;
 
 =head1 proteins_to_roles
 
+
+The routine proteins_to_roles allows a user to gather the set of functional
+roles that are associated with specifc protein sequences.  A single protein
+sequence (designated by an MD5 value) may have numerous associated functions,
+since functions are treated as an attribute of the feature, and multiple
+features may have precisely the same translation.  In our experience,
+it is not uncommon, even for the best annotation teams, to assign
+distinct functions (and, hence, functional roles) to identical
+protein sequences.
+
+For each input MD5 value, this routine gathers the set of features (fids)
+that share the same sequence, collects the associated functions, expands
+these into functional roles (for multi-functional proteins), and returns
+the set of roles that results.
+
+Note that, if the user wishes to see the specific features that have the
+assigned functional roles, they should use proteins_to_functions instead (it
+returns the fids associated with each assigned function).
+
+
 Example:
 
     proteins_to_roles [arguments] < input > output
@@ -22,7 +42,7 @@ use
 where N is the column (from 1) that contains the subsystem.
 
 This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+output is to the standard output. For each input line, there can be multiple output lines, one for each role the protein can map to. The role is added to the end of each line.
 
 =head2 Documentation for underlying call
 
@@ -83,18 +103,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: proteins_to_roles [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +127,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->proteins_to_roles(\@h);
     for my $tuple (@tuples) {

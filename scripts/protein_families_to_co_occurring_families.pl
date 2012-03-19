@@ -8,6 +8,14 @@ use Carp;
 
 =head1 protein_families_to_co_occurring_families
 
+
+Since we accumulate data relating to the co-occurrence (i.e., chromosomal
+clustering) of genes in prokaryotic genomes,  we can note which pairs of genes tend to co-occur.
+From this data, one can compute the protein families that tend to co-occur (i.e., tend to
+cluster on the chromosome).  This allows one to formulate conjectures for unclustered pairs, based
+on clustered pairs from the same protein_families.
+
+
 Example:
 
     protein_families_to_co_occurring_families [arguments] < input > output
@@ -93,18 +101,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: protein_families_to_co_occurring_families [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -118,7 +125,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->protein_families_to_co_occurring_families(\@h);
     for my $tuple (@tuples) {
@@ -136,7 +143,8 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             foreach $_ (@$v)
             {
-                print "$line\t$_\n";
+		my $a = join("\t", @$_);
+                print "$line\t$a\n";
             }
         }
         else

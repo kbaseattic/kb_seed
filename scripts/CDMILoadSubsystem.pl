@@ -19,8 +19,8 @@
 
     use strict;
     use SeedUtils;
-    use CDMI;
-    use CDMILoader;
+    use Bio::KBase::CDMI::CDMI;
+    use Bio::KBase::CDMI::CDMILoader;
     use Digest::MD5;
     use IDServerAPIClient;
 
@@ -67,7 +67,7 @@ my ($recursive, $clear, $id_server_url);
 $id_server_url = "http://bio-data-1.mcs.anl.gov:8080/services/idserver";
 
 # Connect to the database.
-my $cdmi = CDMI->new_for_script("recursive" => \$recursive, "clear" => \$clear, "idserver=s" => \$id_server_url);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "clear" => \$clear, "idserver=s" => \$id_server_url);
 if (! $cdmi) {
     print "usage: CDMILoadSubsystem [options] source subsystemDirectory\n";
 } else {
@@ -82,7 +82,7 @@ if (! $cdmi) {
     } else {
         # Connect to the KBID server and create the loader utility object.
         my $id_server = IDServerAPIClient->new($id_server_url);
-        my $loader = CDMILoader->new($cdmi, $id_server);
+        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the subsystem tables.
@@ -493,8 +493,8 @@ sub ParseSpreadsheet {
                 my ($genomeID, $regionString) = split /:/, $genome;
                 # Insure this genome exists in the database.
                 my ($genomeKBID) = $cdmi->GetFlat("Submitted Genome",
-                    'Submitted(from-link) = ? AND Genome(source-id) = ?',
-                    [$source, $genome], 'Submitted(to-link)');
+                    'Submitted(from_link) = ? AND Genome(source_id) = ?',
+                    [$source, $genome], 'Submitted(to_link)');
                 if (! $genomeKBID) {
                     $stats->Add(genomeNotFound => 1);
                 } else {
@@ -554,7 +554,7 @@ sub ParseSpreadsheet {
                                         push @pegs, "fig|$genomeID.peg.$pegNum";
                                     }
                                 }
-                                my $pegMap = $loader->FindKBaseIDs($source, \@pegs);
+                                my $pegMap = $loader->FindKBaseIDs($source, 'Feature', \@pegs);
                                 for my $peg (@pegs) {
                                     my $kbPeg = $pegMap->{$peg};
                                     if (! $kbPeg) {
@@ -578,7 +578,7 @@ sub ParseSpreadsheet {
         for my $variantID (keys %varRoleRules) {
             my $ruleHash = $varRoleRules{$variantID};
             for my $roleRule (sort keys %$ruleHash) {
-                $cdmi->InsertValue($variantID, 'Variant(role-rule)', $roleRule);
+                $cdmi->InsertValue($variantID, 'Variant(role_rule)', $roleRule);
             }
         }
     }

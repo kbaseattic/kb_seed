@@ -9,6 +9,13 @@ use Carp;
 
 =head1 all_entities_Reagent
 
+Return all instances of the Reagent entity.
+
+This entity represents a compound as it is used by
+a specific reaction. A reaction involves many compounds, and a
+compound can be involved in many reactions. The reagent
+describes the use of the compound by a specific reaction.
+
 Example:
 
     all_entities_Reagent -a 
@@ -25,6 +32,27 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item stoichiometry
+
+=item cofactor
+
+=item compartment_index
+
+=item transport_coefficient
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +62,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +77,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

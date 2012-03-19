@@ -1,4 +1,4 @@
-package CDMI_APIImpl;
+package Bio::KBase::CDMI::CDMI_APIImpl;
 use strict;
 
 =head1 NAME
@@ -60,26 +60,26 @@ input ids to the output results.  Thus, a routine like
 
              fids_to_literature
 
- will take a list of feature ids as input.  The returned value will be a mapping from
- feature ids (fids) to publication references.
+will take a list of feature ids as input.  The returned value will be a mapping from
+feature ids (fids) to publication references.
 
- It is a little inconvenient to batch your requests by supplying a list of fids,
- but the performance will be much better in most cases.  Please note that you are
- controlling the granularity of each request, and in most cases the size of the input
- list is not critical.  However, you should note that while batching up hundreds or thousands
- of input ids at a time should work just fine, millions may well cause things to break (e.g.,
- you may exhaust local memory in your machine as the output results are returned).  As
- machines get larger, the appropriate size of the input lists may become largely irrelevant.
- For now, we recommend that you experiment a bit and use common sense.
+It is a little inconvenient to batch your requests by supplying a list of fids,
+but the performance will be much better in most cases.  Please note that you are
+controlling the granularity of each request, and in most cases the size of the input
+list is not critical.  However, you should note that while batching up hundreds or thousands
+of input ids at a time should work just fine, millions may well cause things to break (e.g.,
+you may exhaust local memory in your machine as the output results are returned).  As
+machines get larger, the appropriate size of the input lists may become largely irrelevant.
+For now, we recommend that you experiment a bit and use common sense.
 
 =cut
 
 #BEGIN_HEADER
 
 use strict;
-use CDMI;
+use Bio::KBase::CDMI::CDMI;
 use Data::Dumper;
-use CDMI_EntityAPIImpl;
+use Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 use Sphinx::Search;
 
 our $AUTOLOAD;
@@ -108,11 +108,11 @@ sub new
 
     my($cdmi) = @args;
     if (! $cdmi) {
-        $cdmi = CDMI->new();
+        $cdmi = Bio::KBase::CDMI::CDMI->new();
     }
     $self->{db} = $cdmi;
 
-    my $e = CDMI_EntityAPIImpl->new($cdmi);
+    my $e = Bio::KBase::CDMI::CDMI_EntityAPIImpl->new($cdmi);
     $self->{get_entity} = $e;
 
     #END_CONSTRUCTOR
@@ -189,7 +189,7 @@ made the annotation and when (as seconds from the epoch).
 sub fids_to_annotations
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_annotations
                     my $kb = $self->{db};
@@ -197,10 +197,10 @@ sub fids_to_annotations
 
     for my $id (@$fids) {
         my @resultRows = $kb->GetAll("IsAnnotatedBy Annotation",
-                                      "IsAnnotatedBy(from-link) = ?", [$id],
+                                      "IsAnnotatedBy(from_link) = ?", [$id],
                                       [qw(Annotation(comment)
                                           Annotation(annotator)
-                                          Annotation(annotation-time))]);
+                                          Annotation(annotation_time))]);
 	if (@resultRows != 0) {
 		$return->{$id} = \@resultRows;
 	}
@@ -258,7 +258,7 @@ from the fids to their assigned functions.
 sub fids_to_functions
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_functions
                                         my $kb = $self->{db};
@@ -339,19 +339,19 @@ connections, we hope that they will help record the associations.
 sub fids_to_literature
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_literature
                                         my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
-        my @resultRows = $kb->GetAll("Produces ProteinSequence IsATopicOf Publication",
-                                      "Produces(from-link) = ?", [$id],
+        my @resultRows = $kb->GetAll("Produces IsATopicOf Publication",
+                                      "Produces(from_link) = ?", [$id],
                                       [qw(Publication(id)
-                                          Publication(citation))]);
+                                          Publication(link)
+                                          Publication(title))]);
         if (@resultRows != 0) {
-		my @pubrefs = map { [$_->[0], $_->[1]->link(), $_->[1]->text() ] } @resultRows;
-		$return->{$id} = \@pubrefs;
+		$return->{$id} = \@resultRows;
 	}
 
     }
@@ -414,15 +414,15 @@ always true, but probably should be.
 sub fids_to_protein_families
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_protein_families
                                         my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("IsMemberOf",
-                                      "IsMemberOf(from-link) = ?", [$id],
-				     'IsMemberOf(to-link)');
+                                      "IsMemberOf(from_link) = ?", [$id],
+				     'IsMemberOf(to_link)');
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
         }
@@ -484,15 +484,15 @@ This can occur due to fusions or to broad specificity of substrate.
 sub fids_to_roles
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_roles
                                         my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("HasFunctional",
-                                      "HasFunctional(from-link) = ?", [$id],
-				     'HasFunctional(to-link)');
+                                      "HasFunctional(from_link) = ?", [$id],
+				     'HasFunctional(to_link)');
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
         }
@@ -555,15 +555,15 @@ contain a fid (or, you can submit as input a set of fids and get the subsystems 
 sub fids_to_subsystems
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_subsystems
                 my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("IsContainedIn HasRole IsIncludedIn",
-                                      "IsContainedIn(from-link) = ?", [$id],
-				     'IsIncludedIn(to-link)');
+                                      "IsContainedIn(from_link) = ?", [$id],
+				     'IsIncludedIn(to_link)');
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
         }
@@ -641,15 +641,15 @@ approximately what percentage appear to be actually related for a few cutoff val
 sub fids_to_co_occurring_fids
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_co_occurring_fids
-                                        my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetAll("IsInPair Pairing Determines PairSet",
-                                      "IsInPair(from-link) = ?", [$id],
-				     [qw(IsInPair(to-link) PairSet(score))]);
+                                      "IsInPair(from_link) = ?", [$id],
+				     [qw(IsInPair(to_link) PairSet(score))]);
 
 
 	if (@resultRows != 0) {
@@ -746,7 +746,7 @@ not achieve).
 sub fids_to_locations
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_locations
                     my $kb = $self->{db};
@@ -812,7 +812,7 @@ as "occuring" in a region if the location of the gene overlaps the designated re
 sub locations_to_fids
 {
     my($self, $region_of_dna_strings) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN locations_to_fids
                     my $kb = $self->{db};
@@ -901,7 +901,7 @@ regions that make up the location.
 sub locations_to_dna_sequences
 {
     my($self, $locations) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($dna_seqs);
     #BEGIN locations_to_dna_sequences
                     my $kb = $self->{db};
@@ -971,15 +971,15 @@ be the entire set (within Kbase) that have the sequence as a translation.
 sub proteins_to_fids
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_fids
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my @resultRows = $kb->GetFlat("IsProteinFor",
-                                      "IsProteinFor(from-link) = ?", [$id],
-				     'IsProteinFor(to-link)');
+                                      "IsProteinFor(from_link) = ?", [$id],
+				     'IsProteinFor(to_link)');
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
         }
@@ -1044,15 +1044,15 @@ sources, and so a protein can be in multiple families.
 sub proteins_to_protein_families
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_protein_families
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my %famH = map { $_ => 1 } $kb->GetFlat("IsProteinFor IsMemberOf",
-                                      "IsProteinFor(from-link) = ?", [$id],
-				     'IsMemberOf(to-link)');
+                                      "IsProteinFor(from_link) = ?", [$id],
+				     'IsMemberOf(to_link)');
         $return->{$id} = [sort keys %famH];
     }
     #END proteins_to_protein_families
@@ -1123,20 +1123,18 @@ and we will attempt to do so.
 sub proteins_to_literature
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_literature
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my @resultRows = $kb->GetAll("IsATopicOf Publication",
-                                      "IsATopicOf(from-link) = ?", [$id],
+                                      "IsATopicOf(from_link) = ?", [$id],
                                       [qw(Publication(id)
-                                          Publication(citation))]);
+                                          Publication(link) Publication(title))]);
 	if (@resultRows != 0) {
-		my @pubrefs = map { [$_->[0], $_->[1]->link(), $_->[1]->text() ] }
-			      @resultRows;
-		$return->{$id} = \@pubrefs;
+		$return->{$id} = \@resultRows;
         }
     }
 
@@ -1211,14 +1209,14 @@ groups represented in Kbase) to each of a set of sequences.
 sub proteins_to_functions
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_functions
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my @resultRows = $kb->GetAll("IsProteinFor Feature",
-                                      "IsProteinFor(from-link) = ?", [$id],
+                                      "IsProteinFor(from_link) = ?", [$id],
 				     [qw(Feature(id) Feature(function))]);
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
@@ -1294,15 +1292,15 @@ returns the fids associated with each assigned function).
 sub proteins_to_roles
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_roles
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my %roleH = map { $_ => 1 } $kb->GetFlat("IsProteinFor HasFunctional",
-                                      "IsProteinFor(from-link) = ?", [$id],
-				     'HasFunctional(to-link)');
+                                      "IsProteinFor(from_link) = ?", [$id],
+				     'HasFunctional(to_link)');
         $return->{$id} = [sort keys %roleH];
     }
     #END proteins_to_roles
@@ -1361,7 +1359,7 @@ may be multifunctional, meaning that they may be implementing other roles, as we
 sub roles_to_proteins
 {
     my($self, $roles) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_proteins
             my $kb = $self->{db};
@@ -1369,8 +1367,8 @@ sub roles_to_proteins
     if ((! $roles) || (@$roles == 0)) { return $return }
     for my $role (@$roles) {
         my %roleH = map { $_ => 1 } $kb->GetFlat("IsFunctionalIn Produces",
-                                      "IsFunctionalIn(from-link) = ?", [$role],
-				     'Produces(to-link)');
+                                      "IsFunctionalIn(from_link) = ?", [$role],
+				     'Produces(to_link)');
         $return->{$role} = [sort keys %roleH];
     }
     #END roles_to_proteins
@@ -1429,7 +1427,7 @@ is returned as a hash with key role description and values composed of sets of s
 sub roles_to_subsystems
 {
     my($self, $roles) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_subsystems
             my $kb = $self->{db};
@@ -1438,8 +1436,8 @@ sub roles_to_subsystems
 
     for my $role (@$roles) {
         my @resultRows = $kb->GetFlat("IsIncludedIn",
-                                      "IsIncludedIn(from-link) = ?", [$role],
-				     'IsIncludedIn(to-link)');
+                                      "IsIncludedIn(from_link) = ?", [$role],
+				     'IsIncludedIn(to_link)');
 	if (@resultRows != 0) {
                 $return->{$role} = \@resultRows;
         }
@@ -1502,7 +1500,7 @@ of distinct protein_families returned.
 sub roles_to_protein_families
 {
     my($self, $roles) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_protein_families
             my $kb = $self->{db};
@@ -1510,8 +1508,8 @@ sub roles_to_protein_families
     if ((! $roles) || (@$roles == 0)) { return $return }
     for my $role (@$roles) {
         my @resultRows = $kb->GetFlat("DeterminesFunctionOf",
-                                      "DeterminesFunctionOf(from-link) = ?", [$role],
-				     'DeterminesFunctionOf(to-link)');
+                                      "DeterminesFunctionOf(from_link) = ?", [$role],
+				     'DeterminesFunctionOf(to_link)');
 	if (@resultRows != 0) {
                 $return->{$role} = \@resultRows;
         }
@@ -1579,7 +1577,7 @@ greater than 0.5 or less than -0.5.
 sub fids_to_coexpressed_fids
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_coexpressed_fids
             $return = {};
@@ -1589,16 +1587,17 @@ sub fids_to_coexpressed_fids
 
     my $n = @$fids;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $fid_constraint = "IsCoregulatedWith(from-link) IN $targets";
+    my $fid_constraint = "IsCoregulatedWith(from_link) IN $targets";
 
     my @res = $kb->GetAll('IsCoregulatedWith',
 			  $fid_constraint,
 			  $fids,
-			  'IsCoregulatedWith(from-link) IsCoregulatedWith(to-link) IsCoregulatedWith(coefficient)');
+			  'IsCoregulatedWith(from_link) IsCoregulatedWith(to_link) IsCoregulatedWith(coefficient)');
 
     foreach my $tuple (@res)
     {
 	my($fid1,$fid2,$pcc) = @$tuple;
+	$pcc = sprintf("%0.3f",$pcc);
 	push(@{$return->{$fid1}},[$fid2,$pcc]);
     }
 
@@ -1658,15 +1657,15 @@ of MD5s.  This may, or may not, be a mistake.
 sub protein_families_to_fids
 {
     my($self, $protein_families) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_fids
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$protein_families) {
         my @resultRows = $kb->GetFlat("HasMember",
-                                      "HasMember(from-link) = ?", [$id],
-				     'HasMember(to-link)');
+                                      "HasMember(from_link) = ?", [$id],
+				     'HasMember(to_link)');
 	if (@resultRows != 0) {
                 $return->{$id} = \@resultRows;
         }
@@ -1727,15 +1726,15 @@ represented by each of a set of protein_families.  We define protein_families as
 sub protein_families_to_proteins
 {
     my($self, $protein_families) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_proteins
                     my $kb = $self->{db};
     $return = {};
     for my $id (@$protein_families) {
         my %protH = map { $_ => 1 } $kb->GetFlat("HasMember Produces",
-                                      "HasMember(from-link) = ?", [$id],
-				     'Produces(to-link)');
+                                      "HasMember(from_link) = ?", [$id],
+				     'Produces(to_link)');
         $return->{$id} = [sort keys %protH];
     }
     #END protein_families_to_proteins
@@ -1791,7 +1790,7 @@ that make up the family.  Each input protein_family is mapped to a family functi
 sub protein_families_to_functions
 {
     my($self, $protein_families) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_functions
                     my $kb = $self->{db};
@@ -1878,7 +1877,7 @@ on clustered pairs from the same protein_families.
 sub protein_families_to_co_occurring_families
 {
     my($self, $protein_families) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_co_occurring_families
     my $kb = $self->{db};
@@ -1971,7 +1970,7 @@ fids that are believed to correspond to the input pair.
 sub co_occurrence_evidence
 {
     my($self, $pairs_of_fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN co_occurrence_evidence
                     my $kb = $self->{db};
@@ -1980,8 +1979,8 @@ sub co_occurrence_evidence
 	my $flipped = ($fid1 gt $fid2) ? 1 : 0;
 	my $pair_key = join(":",sort @$pair);
         my @resultRows = $kb->GetAll("Determines PairSet IsDeterminedBy",
-				     'Determines(from-link) = ?',[$pair_key],
-				     [qw(Determines(inverted) IsDeterminedBy(inverted) IsDeterminedBy(to-link))]);
+				     'Determines(from_link) = ?',[$pair_key],
+				     [qw(Determines(inverted) IsDeterminedBy(inverted) IsDeterminedBy(to_link))]);
 
 	if (@resultRows != 0) {
 		my @ev;
@@ -2050,14 +2049,14 @@ produces a mapping from the input IDs to the returned DNA sequence in each case.
 sub contigs_to_sequences
 {
     my($self, $contigs) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_sequences
                     my $kb = $self->{db};
     $return = {};
     for my $contig ( @$contigs ) {
         my @dna = $kb->GetFlat("HasAsSequence HasSection ContigChunk",
-            'HasAsSequence(from-link) = ?', [$contig], 'ContigChunk(sequence)');
+            'HasAsSequence(from_link) = ?', [$contig], 'ContigChunk(sequence)');
         $return->{$contig} = join("", @dna);
     }
     #END contigs_to_sequences
@@ -2116,14 +2115,14 @@ The routine returns a mapping from contig IDs to lengths
 sub contigs_to_lengths
 {
     my($self, $contigs) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_lengths
                     my $kb = $self->{db};
     $return = {};
     for my $contig ( @$contigs ) {
         my ($len) = $kb->GetFlat("HasAsSequence ContigSequence",
-            'HasAsSequence(from-link) = ?', [$contig], 'ContigSequence(length)');
+            'HasAsSequence(from_link) = ?', [$contig], 'ContigSequence(length)');
         $return->{$contig} = $len;
     }
     #END contigs_to_lengths
@@ -2183,13 +2182,13 @@ from contig ID to MD5 value.
 sub contigs_to_md5s
 {
     my($self, $contigs) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_md5s
                     my $kb = $self->{db};
     $return = {};
     for my $contig (@$contigs) {
-        my ($md5) = $kb->GetFlat("HasAsSequence", 'HasAsSequence(from-link) = ?',
+        my ($md5) = $kb->GetFlat("HasAsSequence", 'HasAsSequence(from_link) = ?',
             [$contig], 'to-link');
         $return->{$contig} = $md5;
     }
@@ -2253,7 +2252,7 @@ md5s to genomes is used to get the genomes associated with each of a list of inp
 sub md5s_to_genomes
 {
     my($self, $md5s) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN md5s_to_genomes
                     $return = {};
@@ -2320,7 +2319,7 @@ DNA sequences that make up the genome.
 sub genomes_to_md5s
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_md5s
                     $return = {};
@@ -2386,13 +2385,13 @@ from genome ID to the list of contigs included in the genome.
 sub genomes_to_contigs
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_contigs
                     $return = {};
     my $kb = $self->{db};
     for my $genome (@$genomes) {
-        my @contigs = $kb->GetFlat('IsComposedOf', 'IsComposedOf(from-link) = ?', [$genome],
+        my @contigs = $kb->GetFlat('IsComposedOf', 'IsComposedOf(from_link) = ?', [$genome],
             'to-link');
         $return->{$genome} = \@contigs;
     }
@@ -2458,7 +2457,7 @@ types_of_fids argument.
 sub genomes_to_fids
 {
     my($self, $genomes, $types_of_fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_fids
                     $return = {};
@@ -2469,13 +2468,13 @@ sub genomes_to_fids
     }
     my $filter;
     if (! @marks) {
-        $filter = "IsOwnerOf(from-link) = ?";
+        $filter = "IsOwnerOf(from_link) = ?";
     } elsif (@marks == 1) {
-        $filter = "Feature(feature-type) = ? AND IsOwnerOf(from-link) = ?";
+        $filter = "Feature(feature_type) = ? AND IsOwnerOf(from_link) = ?";
         push @parms, $types_of_fids->[0];
     } else {
-        $filter = "Feature(feature-type) IN (" . join(", ", @marks) .
-                ") AND IsOwnerOf(from-link) = ?";
+        $filter = "Feature(feature_type) IN (" . join(", ", @marks) .
+                ") AND IsOwnerOf(from_link) = ?";
         push @parms, @$types_of_fids;
     }
     for my $genome (@$genomes) {
@@ -2568,19 +2567,19 @@ The output is a mapping from genome IDs to lists of the form shown above.
 sub genomes_to_taxonomies
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_taxonomies
                     my $kb = $self->{db};
     $return = {};
-    my $fields = 'TaxonomicGrouping(scientific-name) TaxonomicGrouping(id) TaxonomicGrouping(hidden) TaxonomicGrouping(domain)';
+    my $fields = 'TaxonomicGrouping(scientific_name) TaxonomicGrouping(id) TaxonomicGrouping(hidden) TaxonomicGrouping(domain)';
     for my $genome (@$genomes) {
-        my ($taxa) = $kb->GetAll('IsInTaxa TaxonomicGrouping', 'IsInTaxa(from-link) = ?',
+        my ($taxa) = $kb->GetAll('IsInTaxa TaxonomicGrouping', 'IsInTaxa(from_link) = ?',
                 [$genome], $fields);
         if (defined $taxa) {
             my @taxonomy = ($taxa->[0]);
             while (! $taxa->[3]) {
-                ($taxa) = $kb->GetAll('IsInGroup TaxonomicGrouping', 'IsInGroup(from-link) = ?',
+                ($taxa) = $kb->GetAll('IsInGroup TaxonomicGrouping', 'IsInGroup(from_link) = ?',
                         [$taxa->[1]], $fields);
                 if (! $taxa->[2]) {
                     unshift @taxonomy, $taxa->[0];
@@ -2656,14 +2655,14 @@ and presence or absence of the subsystem in the genome should be undetermined.
 sub genomes_to_subsystems
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_subsystems
                     $return = {};
     my $kb = $self->{db};
     for my $genome (@$genomes) {
-        my @subs = $kb->GetAll('Uses Implements Variant IsDescribedBy', 'Uses(from-link) = ?', [$genome],
-            ['Variant(code)', 'IsDescribedBy(to-link)']);
+        my @subs = $kb->GetAll('Uses Implements Variant IsDescribedBy', 'Uses(from_link) = ?', [$genome],
+            ['Variant(code)', 'IsDescribedBy(to_link)']);
         $return->{$genome} = \@subs;
     }
     #END genomes_to_subsystems
@@ -2727,14 +2726,14 @@ a [variant-code,genome ID] pair.
 sub subsystems_to_genomes
 {
     my($self, $subsystems) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_genomes
                     $return = {};
     my $kb = $self->{db};
     for my $subsystem (@$subsystems) {
-        my @genomes = $kb->GetAll('Describes Variant IsImplementedBy IsUsedBy', 'Describes(from-link) = ?', [$subsystem],
-            ['Variant(code)', 'IsUsedBy(to-link)']);
+        my @genomes = $kb->GetAll('Describes Variant IsImplementedBy IsUsedBy', 'Describes(from_link) = ?', [$subsystem],
+            ['Variant(code)', 'IsUsedBy(to_link)']);
         $return->{$subsystem} = \@genomes;
     }
     #END subsystems_to_genomes
@@ -2807,10 +2806,10 @@ the genome that are included in the subsystem.
 sub subsystems_to_fids
 {
     my($self, $subsystems, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_fids
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     my @filters;
     my @parms;
@@ -2818,18 +2817,18 @@ sub subsystems_to_fids
         $genomes = [];
     }
     if (@$genomes == 1) {
-        push @filters, "IsOwnedBy(to-link) = ?";
+        push @filters, "IsOwnedBy(to_link) = ?";
         push @parms, $genomes->[0];
     } elsif (@$genomes > 1) {
-        push @filters, "IsOwnedBy(to-link) IN (" . join(", ", ('?') x scalar(@$genomes)) . ")";
+        push @filters, "IsOwnedBy(to_link) IN (" . join(", ", ('?') x scalar(@$genomes)) . ")";
         push @parms, @$genomes;
     }
-    push @filters, 'Describes(from-link) = ?';
+    push @filters, 'Describes(from_link) = ?';
     my $filter = join(" AND ", @filters);
     for my $subsystem (@$subsystems) {
         my @fidData = $kb->GetAll('Describes Variant IsImplementedBy IsRowOf Contains IsOwnedBy',
-                $filter, [@parms, $subsystem], ['IsImplementedBy(to-link)',
-                'IsOwnedBy(to-link)', 'Variant(code)', 'Contains(to-link)']);
+                $filter, [@parms, $subsystem], ['IsImplementedBy(to_link)',
+                'IsOwnedBy(to_link)', 'Variant(code)', 'Contains(to_link)']);
         my %rowSpecs;
         my %rowFids;
 #print STDERR Dumper @fidData, "FIDDATA\n";
@@ -2908,7 +2907,7 @@ are not returned.  If it is 1, they are returned.
 sub subsystems_to_roles
 {
     my($self, $subsystems, $aux) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_roles
             $return = {};
@@ -2917,7 +2916,7 @@ sub subsystems_to_roles
 
 	my @filter;
 	my @params;
-	push(@filter, 'Includes(from-link) = ?');
+	push(@filter, 'Includes(from_link) = ?');
 	push(@params, $subsystem);
 	if (!$aux)
 	{
@@ -2928,7 +2927,7 @@ sub subsystems_to_roles
         my @roles = $kb->GetFlat('Includes',
 				 join(' AND ', @filter),
 				 \@params,
-				 'Includes(to-link)');
+				 'Includes(to_link)');
         $return->{$subsystem} = \@roles;
     }
     #END subsystems_to_roles
@@ -3007,7 +3006,7 @@ sure that it all makes sense.
 sub subsystems_to_spreadsheets
 {
     my($self, $subsystems, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_spreadsheets
                     $return = {};
@@ -3016,10 +3015,10 @@ sub subsystems_to_spreadsheets
     }
     my $filter;
     if (@$genomes) {
-        $filter = "Describes(from-link) = ? AND IsUsedBy(to-link) IN (" .
+        $filter = "Describes(from_link) = ? AND IsUsedBy(to_link) IN (" .
             join(", ", ('?') x scalar(@$genomes)) . ")";
     } else {
-        $filter = "Describes(from-link) = ?";
+        $filter = "Describes(from_link) = ?";
     }
     my $kb = $self->{db};
     for my $subsystem (@$subsystems) {
@@ -3027,13 +3026,13 @@ sub subsystems_to_spreadsheets
         my $rowQ = $kb->Get('Describes Variant IsImplementedBy SSRow IsUsedBy',
             $filter, [$subsystem, @$genomes]);
         while (my $rowData = $rowQ->Fetch()) {
-            my $rowID = $rowData->PrimaryValue('IsUsedBy(from-link)');
+            my $rowID = $rowData->PrimaryValue('IsUsedBy(from_link)');
             my $variantCode = $rowData->PrimaryValue('Variant(code)');
-            my $genome = $rowData->PrimaryValue('IsUsedBy(to-link)');
+            my $genome = $rowData->PrimaryValue('IsUsedBy(to_link)');
             my %row;
             my @cellData = $kb->GetAll('IsRowOf SSCell HasRole AND SSCell Contains',
-                'IsRowOf(from-link) = ?', [$rowID],
-                ['HasRole(to-link)', 'Contains(to-link)']);
+                'IsRowOf(from_link) = ?', [$rowID],
+                ['HasRole(to_link)', 'Contains(to_link)']);
             for my $cellItem (@cellData) {
                 my ($role, $fid) = @$cellItem;
                 push @{$row{$role}}, $fid;
@@ -3092,7 +3091,7 @@ the minimal set we need to clean up in order to properly support modeling.
 sub all_roles_used_in_models
 {
     my($self) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN all_roles_used_in_models
                     my $kb = $self->{db};
@@ -3100,7 +3099,7 @@ sub all_roles_used_in_models
     my @res = $kb->GetAll('IsTriggeredBy',
 			  '',
 			  [],
-			  'IsTriggeredBy(to-link)');
+			  'IsTriggeredBy(to_link)');
 
     my %roles;
     foreach my $tuple (@res)
@@ -3185,7 +3184,7 @@ reaction is a string
 sub complexes_to_complex_data
 {
     my($self, $complexes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN complexes_to_complex_data
             $return = {};
@@ -3209,7 +3208,7 @@ sub complexes_to_complex_data
     @res    = $kb->GetAll('Complex HasStep ReactionRule IsUseOf',
 			  $complex_constraint,
 			  $complexes,
-			  'Complex(id) IsUseOf(to-link)');
+			  'Complex(id) IsUseOf(to_link)');
 
     foreach my $tuple (@res)
     {
@@ -3229,7 +3228,7 @@ sub complexes_to_complex_data
     foreach my $cid (@$complexes)
     {
 	my $complex_name      = $to_name{$cid} || '';
-	my $complex_roles     = defined($to_roles{$cid}) ?     
+	my $complex_roles     = defined($to_roles{$cid}) ?
 	                        [map { [$_,$to_roles{$cid}->{$_}] } sort keys(%{$to_roles{$cid}})] : [];
 	my $complex_reactions = $to_reactions{$cid} ? [sort keys(%{$to_reactions{$cid}})] : [];
 	$return->{$cid} = { complex_name      => $complex_name,
@@ -3310,7 +3309,7 @@ genome_data is a reference to a hash where the following keys are defined:
 sub genomes_to_genome_data
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_genome_data
     $return = {};
@@ -3324,7 +3323,7 @@ sub genomes_to_genome_data
 			  $genomes,
 			  'Genome(id) Genome(complete) Genome(contigs) Genome(dna_size)
                            Genome(gc_content) Genome(genetic_code) Genome(pegs) Genome(rnas)
-                           Genome(scientific-name) Genome(md5)'
+                           Genome(scientific_name) Genome(md5)'
 			  );
 
     foreach my $tuple (@res)
@@ -3376,9 +3375,10 @@ fids is a reference to a list where each element is a fid
 fid is a string
 regulons_data is a reference to a list where each element is a regulon_data
 regulon_data is a reference to a hash where the following keys are defined:
-	regulon_id has a value which is a string
+	regulon_id has a value which is a regulon
 	regulon_set has a value which is a fids
 	tfs has a value which is a fids
+regulon is a string
 
 </pre>
 
@@ -3392,9 +3392,10 @@ fids is a reference to a list where each element is a fid
 fid is a string
 regulons_data is a reference to a list where each element is a regulon_data
 regulon_data is a reference to a hash where the following keys are defined:
-	regulon_id has a value which is a string
+	regulon_id has a value which is a regulon
 	regulon_set has a value which is a fids
 	tfs has a value which is a fids
+regulon is a string
 
 
 =end text
@@ -3412,7 +3413,7 @@ regulon_data is a reference to a hash where the following keys are defined:
 sub fids_to_regulon_data
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_regulon_data
     $return = {};
@@ -3480,6 +3481,81 @@ sub fids_to_regulon_data
 	$return->{$fid} = $regulons_data;
     }
     #END fids_to_regulon_data
+    return($return);
+}
+
+
+
+
+=head2 regulons_to_fids
+
+  $return = $obj->regulons_to_fids($regulons)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$regulons is a regulons
+$return is a reference to a hash where the key is a regulon and the value is a fids
+regulons is a reference to a list where each element is a regulon
+regulon is a string
+fids is a reference to a list where each element is a fid
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$regulons is a regulons
+$return is a reference to a hash where the key is a regulon and the value is a fids
+regulons is a reference to a list where each element is a regulon
+regulon is a string
+fids is a reference to a list where each element is a fid
+fid is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub regulons_to_fids
+{
+    my($self, $regulons) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN regulons_to_fids
+    $return = {};
+    if (@$regulons < 1) { return $return }
+
+    my $kb = $self->{db};
+    my $n = @$regulons;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $regulon_constraint = "IsRegulatedSetOf(from_link) IN $targets";
+
+    my @res = $kb->GetAll('IsRegulatedSetOf',
+			  $regulon_constraint,
+			  $regulons,
+			  'IsRegulatedSetOf(from_link) IsRegulatedSetOf(to_link)');
+
+    foreach my $tuple (@res)
+    {
+	my($regulon,$fid) = @$tuple;
+	push(@{$return->{$regulon}},$fid);
+    }
+    #END regulons_to_fids
     return($return);
 }
 
@@ -3573,7 +3649,7 @@ length is an int
 sub fids_to_feature_data
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_feature_data
     $return = {};
@@ -3603,7 +3679,7 @@ sub fids_to_feature_data
     my @res = $kb->GetAll('Feature IsOwnedBy Genome',
 			  $fid_constraint,
 			  $fids,
-			  'Feature(id) Genome(scientific-name) Feature(function) Feature(sequence-length)'
+			  'Feature(id) Genome(scientific_name) Feature(function) Feature(sequence_length)'
 			  );
 
     foreach my $tuple (@res)
@@ -3614,10 +3690,10 @@ sub fids_to_feature_data
 	$len{$fid}         = $length;
     }
 
-    my @res = $kb->GetAll('Feature Produces ProteinSequence IsATopicOf Publication',
+    @res = $kb->GetAll('Feature Produces ProteinSequence IsATopicOf Publication',
 			  $produces_constraint,
 			  $fids,
-			  'Feature(id) IsATopicOf(to-link) Publication(citation)'
+			  'Feature(id) IsATopicOf(to_link) Publication(citation)'
 			  );
     foreach my $tuple (@res)
     {
@@ -3713,7 +3789,7 @@ proteins having identical protein sequence.
 sub equiv_sequence_assertions
 {
     my($self, $proteins) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN equiv_sequence_assertions
     $return = {};
@@ -3722,17 +3798,30 @@ sub equiv_sequence_assertions
 
     my $n = @$proteins;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $protein_constraint = "IsNamedBy(from-link) IN $targets";
-    my @res = $kb->GetAll('IsNamedBy Identifier HasAssertionFrom',
-			  $protein_constraint,
+    my $protein_constraint1 = "IsNamedBy(from_link) IN $targets";
+    my $protein_constraint2 = "IsProteinFor(from_link) IN $targets";
+    my @res = $kb->GetAll('IsProteinFor Feature IsOwnedBy Genome WasSubmittedBy',
+			  $protein_constraint2,
 			  $proteins,
-			  'IsNamedBy(from-link) HasAssertion(from-link) HasAssertion(function) HasAssertion(to-link) HasAssertion(expert)');
+			  'IsProteinFor(from_link) Feature(source_id) Feature(function) WasSubmittedBy(to_link)');
+
+    foreach my $tuple (@res)
+    {
+	my($md5,$id,$function,$source) = @$tuple;
+	push(@{$return->{$md5}},[$id,$function,$source,0]);
+    }
+
+    @res = $kb->GetAll('IsNamedBy Identifier HasAssertionFrom',
+			  $protein_constraint1,
+			  $proteins,
+			  'IsNamedBy(from_link) HasAssertionFrom(from_link) HasAssertionFrom(function) HasAssertionFrom(to_link) HasAssertionFrom(expert)');
 
     foreach my $tuple (@res)
     {
 	my($md5,$id,$function,$source,$expert) = @$tuple;
 	push(@{$return->{$md5}},[$id,$function,$source,$expert]);
     }
+
     #END equiv_sequence_assertions
     return($return);
 }
@@ -3752,15 +3841,15 @@ sub equiv_sequence_assertions
 
 <pre>
 $fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a regulon_size_pairs
+$return is a reference to a hash where the key is a fid and the value is an atomic_regulon_size_pairs
 fids is a reference to a list where each element is a fid
 fid is a string
-regulon_size_pairs is a reference to a list where each element is a regulon_size_pair
-regulon_size_pair is a reference to a list containing 2 items:
-	0: a regulon
-	1: a regulon_size
-regulon is a string
-regulon_size is an int
+atomic_regulon_size_pairs is a reference to a list where each element is an atomic_regulon_size_pair
+atomic_regulon_size_pair is a reference to a list containing 2 items:
+	0: an atomic_regulon
+	1: an atomic_regulon_size
+atomic_regulon is a string
+atomic_regulon_size is an int
 
 </pre>
 
@@ -3769,15 +3858,15 @@ regulon_size is an int
 =begin text
 
 $fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a regulon_size_pairs
+$return is a reference to a hash where the key is a fid and the value is an atomic_regulon_size_pairs
 fids is a reference to a list where each element is a fid
 fid is a string
-regulon_size_pairs is a reference to a list where each element is a regulon_size_pair
-regulon_size_pair is a reference to a list containing 2 items:
-	0: a regulon
-	1: a regulon_size
-regulon is a string
-regulon_size is an int
+atomic_regulon_size_pairs is a reference to a list where each element is an atomic_regulon_size_pair
+atomic_regulon_size_pair is a reference to a list containing 2 items:
+	0: an atomic_regulon
+	1: an atomic_regulon_size
+atomic_regulon is a string
+atomic_regulon_size is an int
 
 
 =end text
@@ -3796,7 +3885,7 @@ Normally a fid will be in at most one regulon, but we support multiple regulons.
 sub fids_to_atomic_regulons
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_atomic_regulons
                     $return = {};
@@ -3804,9 +3893,9 @@ sub fids_to_atomic_regulons
     for my $fid (@$fids)
     {
 	my @res = $kb->GetAll('IsFormedInto AtomicRegulon IsFormedOf2',
-			       'IsFormedInto(from-link) = ?',
+			       'IsFormedInto(from_link) = ?',
 			       [$fid],
-			       'AtomicRegulon(id) IsFormedOf2(to-link)');
+			       'AtomicRegulon(id) IsFormedOf2(to_link)');
 
         if (@res != 0) {
 		my %counts;
@@ -3823,7 +3912,7 @@ sub fids_to_atomic_regulons
 
 =head2 atomic_regulons_to_fids
 
-  $return = $obj->atomic_regulons_to_fids($regulons)
+  $return = $obj->atomic_regulons_to_fids($atomic_regulons)
 
 =over 4
 
@@ -3832,10 +3921,10 @@ sub fids_to_atomic_regulons
 =begin html
 
 <pre>
-$regulons is a regulons
-$return is a reference to a hash where the key is a regulon and the value is a fids
-regulons is a reference to a list where each element is a regulon
-regulon is a string
+$atomic_regulons is an atomic_regulons
+$return is a reference to a hash where the key is an atomic_regulon and the value is a fids
+atomic_regulons is a reference to a list where each element is an atomic_regulon
+atomic_regulon is a string
 fids is a reference to a list where each element is a fid
 fid is a string
 
@@ -3845,10 +3934,10 @@ fid is a string
 
 =begin text
 
-$regulons is a regulons
-$return is a reference to a hash where the key is a regulon and the value is a fids
-regulons is a reference to a list where each element is a regulon
-regulon is a string
+$atomic_regulons is an atomic_regulons
+$return is a reference to a hash where the key is an atomic_regulon and the value is a fids
+atomic_regulons is a reference to a list where each element is an atomic_regulon
+atomic_regulon is a string
 fids is a reference to a list where each element is a fid
 fid is a string
 
@@ -3868,21 +3957,21 @@ Regulons may arise from several sources; hence, fids can be in multiple regulons
 
 sub atomic_regulons_to_fids
 {
-    my($self, $regulons) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my($self, $atomic_regulons) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN atomic_regulons_to_fids
     $return = {};
-    if (@$regulons < 1) { return $return }
+    if (@$atomic_regulons < 1) { return $return }
     my $kb = $self->{db};
-    my $n = @$regulons;
+    my $n = @$atomic_regulons;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
     my $ar_constraint = "IsFormedOf(from-link) IN $targets";
 
     my @res = $kb->GetAll('IsFormedOf',
 			  $ar_constraint,
-			  $regulons,
-			  'IsFormedOf(from-link) IsFormedOf(to-link)');
+			  $atomic_regulons,
+			  'IsFormedOf(from_link) IsFormedOf(to_link)');
 
     foreach my $tuple (@res)
     {
@@ -3945,7 +4034,7 @@ the protein string in a separate call.
 sub fids_to_protein_sequences
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_protein_sequences
             $return = {};
@@ -3954,12 +4043,12 @@ sub fids_to_protein_sequences
     my $kb = $self->{db};
     my $n = @$fids;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $fid_constraint = "Produces(from-link) IN $targets";
+    my $fid_constraint = "Produces(from_link) IN $targets";
 
     my @res = $kb->GetAll('Produces ProteinSequence',
 			  $fid_constraint,
 			  $fids,
-			  'Produces(from-link) ProteinSequence(sequence)');
+			  'Produces(from_link) ProteinSequence(sequence)');
 
     foreach my $tuple (@res)
     {
@@ -4018,21 +4107,21 @@ md5 is a string
 sub fids_to_proteins
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_proteins
-                $return = {};
+    $return = {};
     if (@$fids < 1) { return $return }
 
     my $kb = $self->{db};
     my $n = @$fids;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $fid_constraint = "Produces(from-link) IN $targets";
+    my $fid_constraint = "Produces(from_link) IN $targets";
 
     my @res = $kb->GetAll('Produces ProteinSequence',
 			  $fid_constraint,
 			  $fids,
-			  'Produces(from-link) Produces(to-link)');
+			  'Produces(from_link) Produces(to_link)');
 
     foreach my $tuple (@res)
     {
@@ -4092,7 +4181,7 @@ corresponding to each of a set of fids.
 sub fids_to_dna_sequences
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_dna_sequences
             $return = {};
@@ -4172,30 +4261,30 @@ A "function" is a set of "roles" (often called "functional roles");
 sub roles_to_fids
 {
     my($self, $roles, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_fids
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if ((! $roles) || (@$roles == 0)) { return $return }
     my @parms;
 
     my $n = @$roles;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $role_constraint = "IsFunctionalIn(from-link) IN $targets";
+    my $role_constraint = "IsFunctionalIn(from_link) IN $targets";
     push @parms, @$roles;
     my $genome_constraint = "";
     if (@$genomes > 0)
     {
 	$n = @$genomes;
 	$targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-	$genome_constraint = "AND IsOwnedBy(to-link) IN $targets";
+	$genome_constraint = "AND IsOwnedBy(to_link) IN $targets";
 	push @parms, @$genomes;
     }
     my @resultRows = $kb->GetAll("IsFunctionalIn Feature IsOwnedBy",
 				  "$role_constraint $genome_constraint",
 				  \@parms,
-				  'IsFunctionalIn(from-link) IsFunctionalIn(to-link)');
+				  'IsFunctionalIn(from_link) IsFunctionalIn(to_link)');
     foreach $_ (@resultRows)
     {
 	my($role,$fid) = @$_;
@@ -4265,7 +4354,7 @@ or roles to reactions goes through Complexes.
 sub reactions_to_complexes
 {
     my($self, $reactions) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN reactions_to_complexes
     my $kb = $self->{db};
@@ -4274,9 +4363,9 @@ sub reactions_to_complexes
     for my $reaction (@$reactions)
     {
 	my @comp = $kb->GetFlat('IsUsedAs ReactionRule IsStepOf',
-				'IsUsedAs(from-link) = ?',
+				'IsUsedAs(from_link) = ?',
 				[$reaction],
-				'IsStepOf(to-link)');
+				'IsStepOf(to_link)');
 	if (@comp)
 	{
 	    my %tmp = map { $_ => 1 } @comp;
@@ -4340,7 +4429,7 @@ the details of Reactions.
 sub reaction_strings
 {
     my($self, $reactions, $name_parameter) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN reaction_strings
             $return = {};
@@ -4351,9 +4440,9 @@ sub reaction_strings
 	    	Reagent(id)
 	    	Compound(label)
 	        Reagent(cofactor)
-	        Reagent(compartment-index)
+	        Reagent(compartment_index)
 	        Reagent(stoichiometry)
-	        Reagent(transport-coefficient)
+	        Reagent(transport_coefficient)
 	    )]);
 		#Assembling data on reaction reagents
 		my $reactantHash;
@@ -4470,8 +4559,8 @@ actual ER-model model, the connection from Complex to Reaction goes through
 ReactionComplex).  Since Roles also connect to fids, the connection between
 fids and Reactions is induced.
 
-The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will 
-be included with the ID in the output. If only, the compound name will be included 
+The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will
+be included with the ID in the output. If only, the compound name will be included
 instead of the ID. If 0, only the ID will be included. The default is 0.
 
 =back
@@ -4481,7 +4570,7 @@ instead of the ID. If 0, only the ID will be included. The default is 0.
 sub roles_to_complexes
 {
     my($self, $roles) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_complexes
     my $kb = $self->{db};
@@ -4490,7 +4579,7 @@ sub roles_to_complexes
 
     my $n = @$roles;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $role_constraint = "Triggers(from-link) IN $targets";
+    my $role_constraint = "Triggers(from_link) IN $targets";
 
     my @res = $kb->GetAll('Triggers Complex',
 			  $role_constraint,
@@ -4504,6 +4593,82 @@ sub roles_to_complexes
     }
 
     #END roles_to_complexes
+    return($return);
+}
+
+
+
+
+=head2 complexes_to_roles
+
+  $return = $obj->complexes_to_roles($complexes)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$complexes is a complexes
+$return is a reference to a hash where the key is a complexes and the value is a roles
+complexes is a reference to a list where each element is a complex
+complex is a string
+roles is a reference to a list where each element is a role
+role is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$complexes is a complexes
+$return is a reference to a hash where the key is a complexes and the value is a roles
+complexes is a reference to a list where each element is a complex
+complex is a string
+roles is a reference to a list where each element is a role
+role is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub complexes_to_roles
+{
+    my($self, $complexes) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN complexes_to_roles
+    my $kb = $self->{db};
+    $return = {};
+    if (@$complexes < 1) { return $return }
+
+    my $n = @$complexes;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $complex_constraint = "IsTriggeredBy(from_link) IN $targets";
+
+    my @res = $kb->GetAll('IsTriggeredBy',
+			  $complex_constraint,
+			  $complexes,
+			  'IsTriggeredBy(from_link) IsTriggeredBy(to_link)');
+
+    foreach my $tuple (@res)
+    {
+	my($complex,$role) = @$tuple;
+	push(@{$return->{$complex}},$role);
+    }
+
+    #END complexes_to_roles
     return($return);
 }
 
@@ -4569,15 +4734,15 @@ role is a string
 sub fids_to_subsystem_data
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_subsystem_data
             my $kb = $self->{db};
     $return = {};
     for my $fid (@$fids) {
         my @subTuples = $kb->GetAll("IsContainedIn SSCell HasRole AND SSCell IsRoleFor Implements Variant IsDescribedBy",
-                                    "IsContainedIn(from-link) = ?", [$fid],
-                                    'IsDescribedBy(to-link) Variant(code) HasRole(to-link)');
+                                    "IsContainedIn(from_link) = ?", [$fid],
+                                    'IsDescribedBy(to_link) Variant(code) HasRole(to_link)');
         $return->{$fid} = \@subTuples if @subTuples;
     }
     #END fids_to_subsystem_data
@@ -4630,7 +4795,7 @@ genome is a string
 sub representative
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN representative
     my $kb = $self->{db};
@@ -4639,12 +4804,12 @@ sub representative
 
     my $n = @$genomes;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $genome_constraint = "IsCollectedInto(from-link) IN $targets";
+    my $genome_constraint = "IsCollectedInto(from_link) IN $targets";
 
     my @res = $kb->GetAll('IsCollectedInto OTU IsCollectionOf',
 			  "$genome_constraint AND IsCollectionOf(representative) = 1",
 			  $genomes,
-			  'IsCollectedInto(from-link) IsCollectionOf(to-link)');
+			  'IsCollectedInto(from_link) IsCollectionOf(to_link)');
 
     foreach my $tuple (@res)
     {
@@ -4704,7 +4869,7 @@ genome_name is a string
 sub otu_members
 {
     my($self, $genomes) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN otu_members
             my $kb = $self->{db};
@@ -4713,12 +4878,12 @@ sub otu_members
 
     my $n = @$genomes;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $genome_constraint = "IsCollectedInto(from-link) IN $targets";
+    my $genome_constraint = "IsCollectedInto(from_link) IN $targets";
 
     my @res = $kb->GetAll('IsCollectedInto OTU IsCollectionOf',
 			  $genome_constraint,
 			  $genomes,
-			  'IsCollectedInto(from-link) IsCollectionOf(to-link)');
+			  'IsCollectedInto(from_link) IsCollectionOf(to_link)');
 
     foreach my $tuple (@res)
     {
@@ -4778,7 +4943,7 @@ genome is a string
 sub fids_to_genomes
 {
     my($self, $fids) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_genomes
     #END fids_to_genomes
@@ -4836,7 +5001,7 @@ field_name is a string
 
 =item Description
 
-text_search performs a search against a full-text index maintained 
+text_search performs a search against a full-text index maintained
 for the CDMI. The parameter "input" is the text string to be searched for.
 The parameter "entities" defines the entities to be searched. If the list
 is empty, all indexed entities will be searched. The "start" and "count"
@@ -4849,7 +5014,7 @@ parameters limit the results to "count" hits starting at "start".
 sub text_search
 {
     my($self, $input, $start, $count, $entities) = @_;
-    my $ctx = $CDMI_APIServer::CallContext;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN text_search
     my $sphinx = Sphinx::Search->new;
@@ -6880,6 +7045,58 @@ genome_md5 has a value which is a string
 
 
 
+=head2 regulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 regulons
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a regulon
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a regulon
+
+=end text
+
+=back
+
+
+
 =head2 regulon_data
 
 =over 4
@@ -6892,7 +7109,7 @@ genome_md5 has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-regulon_id has a value which is a string
+regulon_id has a value which is a regulon
 regulon_set has a value which is a fids
 tfs has a value which is a fids
 
@@ -6903,7 +7120,7 @@ tfs has a value which is a fids
 =begin text
 
 a reference to a hash where the following keys are defined:
-regulon_id has a value which is a string
+regulon_id has a value which is a regulon
 regulon_set has a value which is a fids
 tfs has a value which is a fids
 
@@ -7120,7 +7337,7 @@ a reference to a list where each element is a function_assertion
 
 
 
-=head2 regulon
+=head2 atomic_regulon
 
 =over 4
 
@@ -7146,7 +7363,7 @@ a string
 
 
 
-=head2 regulon_size
+=head2 atomic_regulon_size
 
 =over 4
 
@@ -7172,7 +7389,7 @@ an int
 
 
 
-=head2 regulon_size_pair
+=head2 atomic_regulon_size_pair
 
 =over 4
 
@@ -7184,8 +7401,8 @@ an int
 
 <pre>
 a reference to a list containing 2 items:
-0: a regulon
-1: a regulon_size
+0: an atomic_regulon
+1: an atomic_regulon_size
 
 </pre>
 
@@ -7194,8 +7411,8 @@ a reference to a list containing 2 items:
 =begin text
 
 a reference to a list containing 2 items:
-0: a regulon
-1: a regulon_size
+0: an atomic_regulon
+1: an atomic_regulon_size
 
 
 =end text
@@ -7204,7 +7421,7 @@ a reference to a list containing 2 items:
 
 
 
-=head2 regulon_size_pairs
+=head2 atomic_regulon_size_pairs
 
 =over 4
 
@@ -7215,14 +7432,14 @@ a reference to a list containing 2 items:
 =begin html
 
 <pre>
-a reference to a list where each element is a regulon_size_pair
+a reference to a list where each element is an atomic_regulon_size_pair
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a regulon_size_pair
+a reference to a list where each element is an atomic_regulon_size_pair
 
 =end text
 
@@ -7230,7 +7447,7 @@ a reference to a list where each element is a regulon_size_pair
 
 
 
-=head2 regulons
+=head2 atomic_regulons
 
 =over 4
 
@@ -7241,14 +7458,14 @@ a reference to a list where each element is a regulon_size_pair
 =begin html
 
 <pre>
-a reference to a list where each element is a regulon
+a reference to a list where each element is an atomic_regulon
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a regulon
+a reference to a list where each element is an atomic_regulon
 
 =end text
 

@@ -20,14 +20,14 @@
     use strict;
     use Stats;
     use SeedUtils;
-    use CDMI;
-    use CDMILoader;
+    use Bio::KBase::CDMI::CDMI;
     use CustomAttributes;
-    use HyperLink;
+    use Dlits;
+    use Date::Parse;
 
 =head1 CDMI Publication Loader
 
-    CDMILoadPublications [options] titleFile
+    CDMILoadPublications [options]
 
 This script loads the publication data from the SEED attribute database.
 The publication data is stored as dlit evidence code attributes of proteins.
@@ -56,12 +56,13 @@ following.
 
 =item attrHost
 
-Name of the host server containing the attribute database. The default is
-taken from B<FIG_Config> parameters.
+Name of the host server containing the global and attribute databases.
+The default is taken from B<FIG_Config> parameters.
 
 =item attrPort
 
-Port to use for connecting to the attribute database. The default is C<3306>.
+Port to use for connecting to the global and attribute databases. The
+default is C<3306>.
 
 =item attrDBD
 
@@ -70,53 +71,41 @@ is taken from the B<FIG_Config> parameters.
 
 =back
 
-There is a single positional parameter: the name of a tab-delimited file
-containing PUBMED IDs in the first column and publication titles in the
-second column.
-
 =cut
 
+# Prevent buffering on STDOUT.
+$| = 1;
 # Connect to the database using the command-line options.
 my $attrHost = $FIG_Config::attrHost;
 my $attrPort = 3306;
 my $attrDBD = $FIG_Config::attrDBD;
-my $cdmi = CDMI->new_for_script('attrHost=s' => \$attrHost,
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script('attrHost=s' => \$attrHost,
         'attrPort=i' => \$attrPort, 'attrDBD=s' => \$attrDBD);
+
 if (! $cdmi) {
-    print "usage: CDMILoadPublications [options] titleFile\n";
+    print "usage: CDMILoadPublications [options]\n";
 } else {
     # Create the statistics object.
     my $stats = Stats->new();
     # Recreate the two tables.
     print "Recreating tables.\n";
-    $cdmi->CreateTable('Publication');
-    $cdmi->CreateTable('Concerns');
+    $cdmi->CreateTable('Publication', 1);
+    $cdmi->CreateTable('Concerns', 1);
     # Get the attribute database.
     print "Connecting to attribute database.\n";
     my $ca = CustomAttributes->new(dbport => $attrPort, dbhost => $attrHost,
             DBD => $attrDBD, dbuser => 'seed');
-    # This hash will track the publications already stored. We prime it
-    # with the data in the publications file.
+    # Get the seed global database. We set the default host and port here.
+    print "Connecting to SEED global databaase.\n";
+    my $sgdb = DBKernel->new('mysql', 'seed_global', 'seed', undef, $attrPort,
+                             $attrHost);
+    # This hash will track the publications already stored.
     my %pubs;
-    my $ih;
-    my $titleFile = $ARGV[0];
-    if (! $titleFile) {
-        print "No publication title file specified.\n";
-    } elsif (! -s $titleFile) {
-        print "Publication title file $titleFile not found or empty.\n";
-    } else {
-        open $ih, "<$titleFile" || die "Could not open title file: $!\n";
-        print "Reading titles from $titleFile.\n";
-        while (! eof $ih) {
-            my ($pubmed, $title) = CDMILoader::GetLine($ih);
-            my $link = HyperLink->new($title, "http://www.ncbi.nlm.nih.gov/pubmed/$pubmed");
-            $pubs{$pubmed} = $link;
-            $stats->Add(titles => 1);
-        }
-    }
-    print "Looking for evidence.\n";
+    # We'll use this counter to show our progress.
+    my $count = 0;
     # Loop through the dlit evidence codes.
-    my $query = $ca->Get('IsEvidencedBy', "IsEvidencedBy(to-link) LIKE ? AND IsEvidencedBy(value) LIKE ?",
+    print "Looking for evidence.\n";
+    my $query = $ca->Get('IsEvidencedBy', "IsEvidencedBy(to_link) LIKE ? AND IsEvidencedBy(value) LIKE ?",
             ['Protein:%', 'dlit%']);
     while (my $evidence = $query->Fetch()) {
         $stats->Add(evidenceFound => 1);
@@ -133,9 +122,30 @@ if (! $cdmi) {
             $stats->Add(dlits => 1);
             # Does this publication already exist?
             if (! $pubs{$pubmed}) {
-                # No. We need to add it to the hash with a made-up title.
-                $pubs{$pubmed} = HyperLink->new("<unknown>", "http://www.ncbi.nlm.nih.gov/pubmed/$pubmed");
-                $stats->Add(newPubmed => 1);
+                # No. We need to get its data from Pubmed.
+                my $articleH = Dlits::get_pubmed_document_details($sgdb, $pubmed);
+                if (! $articleH) {
+                    # We couldn't find it. Store it as unknown.
+                    $stats->Add(unknownPubmed => 1);
+                    $pubs{$pubmed} = { title => "(unknown)",
+                            'link' => "http://www.ncbi.nlm.nih.gov/pubmed/$pubmed",
+                            pubdate => 0,
+                            id => $pubmed };
+                } else {
+                    # Here we found the title. Convert the date. Note we must
+                    # deal with the possibility the date is missing or invalid.
+                    my $pubdate = str2time($articleH->{pubdate});
+                    if (! defined $pubdate) {
+                        $pubdate = 0;
+                        $stats->Add(badPubdate => 1);
+                    }
+                    # Store the new publication in the hash.
+                    $stats->Add(newPubmed => 1);
+                    $pubs{$pubmed} = { title => $articleH->{title},
+                            'link' => "http://www.ncbi.nlm.nih.gov/pubmed/$pubmed",
+                            pubdate => $pubdate,
+                            id => $pubmed };
+                }
             }
             # Look for the protein sequence in the CDMI.
             if (! $cdmi->Exists(ProteinSequence => $protID)) {
@@ -145,12 +155,19 @@ if (! $cdmi) {
                 $cdmi->InsertObject('Concerns', from_link => $pubmed, to_link => $protID);
                 $stats->Add(publicationLinked => 1);
             }
+            # Display our progress.
+            $count++;
+            if ($count % 1000 == 0) {
+                print "$count evidence records processed.\n";
+            }
         }
     }
     # Now output the publications.
-    print "Writing publications.\n";
-    for my $pubmed (keys %pubs) {
-        $cdmi->InsertObject('Publication', id => $pubmed, citation => $pubs{$pubmed});
+    my $pubCount = scalar(keys %pubs);
+    print "Writing $pubCount publications.\n";
+    for my $pubmed (sort keys %pubs) {
+        my $pubData = $pubs{$pubmed};
+        $cdmi->InsertObject('Publication', $pubData);
         $stats->Add(publicationOut => 1);
     }
     print "All done:\n" . $stats->Show();

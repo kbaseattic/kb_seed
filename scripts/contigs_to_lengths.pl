@@ -8,6 +8,14 @@ use Carp;
 
 =head1 contigs_to_lengths
 
+
+In some cases, one wishes to know just the lengths of the contigs, rather than their
+actual DNA sequence (e.g., suppose that you wished to know if a gene boundary occured within
+100 bp of the end of the contig).  To avoid requiring a user to access the entire DNA sequence,
+we offer the ability to retrieve just the contig lengths.  Input to the routine is a list of contig IDs.
+The routine returns a mapping from contig IDs to lengths
+
+
 Example:
 
     contigs_to_lengths [arguments] < input > output
@@ -75,24 +83,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with an extra column (the contig length) added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: contigs_to_lengths [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -106,7 +113,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->contigs_to_lengths(\@h);
     for my $tuple (@tuples) {

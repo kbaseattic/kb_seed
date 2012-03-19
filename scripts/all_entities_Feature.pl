@@ -9,6 +9,19 @@ use Carp;
 
 =head1 all_entities_Feature
 
+Return all instances of the Feature entity.
+
+A feature (sometimes also called a gene) is a part of a
+genome that is of special interest. Features may be spread across
+multiple DNA sequences (contigs) of a genome, but never across more
+than one genome. Each feature in the database has a unique
+ID that functions as its ID in this table.
+Normally a Feature is just a single contigous region on a contig.
+Features have types, and an appropriate choice of available types
+allows the support of protein-encoding genes, exons, RNA genes,
+binding sites, pathogenicity islands, or whatever.
+
+
 Example:
 
     all_entities_Feature -a 
@@ -25,6 +38,27 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item feature_type
+
+=item source_id
+
+=item sequence_length
+
+=item function
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +68,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +83,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

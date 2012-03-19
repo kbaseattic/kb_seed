@@ -11,9 +11,7 @@ IDServerAPIClient
 
 =head1 DESCRIPTION
 
-The KBase ID provides access to the mappings between KBase identifiers and
-external identifiers, the original identifiers for data that was migrated from
-other databases into the KBase.
+
 
 =cut
 
@@ -25,9 +23,9 @@ sub new
 	client => JSON::RPC::Client->new,
 	url => $url,
     };
-    $self->{client}->ua->timeout(60);
     return bless $self, $class;
 }
+
 
 
 
@@ -51,13 +49,12 @@ sub kbase_ids_to_external_ids
 	if ($result->is_error) {
 	    die "Error invoking kbase_ids_to_external_ids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
 	die "Error invoking kbase_ids_to_external_ids: " . $self->{client}->status_line;
     }
 }
-
 
 
 
@@ -81,7 +78,7 @@ sub external_ids_to_kbase_ids
 	if ($result->is_error) {
 	    die "Error invoking external_ids_to_kbase_ids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
 	die "Error invoking external_ids_to_kbase_ids: " . $self->{client}->status_line;
@@ -90,11 +87,13 @@ sub external_ids_to_kbase_ids
 
 
 
-
 =head2 $result = register_ids(prefix, db_name, ids)
 
 Register a set of identifiers. All will be assigned identifiers with the given
 prefix.
+
+If an external ID has already been registered, the existing registration will be returned instead 
+of a new ID being allocated.
 
 =cut
 
@@ -111,13 +110,12 @@ sub register_ids
 	if ($result->is_error) {
 	    die "Error invoking register_ids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
 	die "Error invoking register_ids: " . $self->{client}->status_line;
     }
 }
-
 
 
 
@@ -143,13 +141,12 @@ sub allocate_id_range
 	if ($result->is_error) {
 	    die "Error invoking allocate_id_range: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
 	die "Error invoking allocate_id_range: " . $self->{client}->status_line;
     }
 }
-
 
 
 
@@ -175,7 +172,7 @@ sub register_allocated_ids
 	if ($result->is_error) {
 	    die "Error invoking register_allocated_ids: " . $result->error_message;
 	} else {
-	    return $result->result;
+	    return;
 	}
     } else {
 	die "Error invoking register_allocated_ids: " . $self->{client}->status_line;

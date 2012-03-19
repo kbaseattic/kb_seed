@@ -19,11 +19,11 @@
 
 use strict;
 use SeedEnv;
-use CDMI;
-use CDMILoader;
+use Bio::KBase::CDMI::CDMI;
+use Bio::KBase::CDMI::CDMILoader;
 
 my $sapO = SAPserver->new;
-my $cdmi = CDMI->new_for_script();
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 
 my  $IsFormedOf = "/home/disz/IsFormedOf";
 

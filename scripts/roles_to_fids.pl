@@ -8,6 +8,12 @@ use Carp;
 
 =head1 roles_to_fids
 
+
+            You often wish to find the fids in one or more genomes that
+            implement specific functional roles.  To do this, you can use
+            roles_to_fids.
+
+
 Example:
 
     roles_to_fids [arguments] < input > output
@@ -76,6 +82,8 @@ This is used only if the column containing the subsystem is not the last column.
 
 =item -i InputFile    [ use InputFile, rather than stdin ]
 
+=item genomes - A list of genomes to restricty the output
+
 =back
 
 =head2 Output Format
@@ -87,18 +95,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
-my $usage = "usage: roles_to_fids [-c column] < input > output";
+my $usage = "usage: roles_to_fids [-c column genomes] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -112,7 +119,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, 1, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_fids(\@h, \@ARGV);
     for my $tuple (@tuples) {

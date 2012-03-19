@@ -8,6 +8,11 @@ use Carp;
 
 =head1 fids_to_atomic_regulons
 
+
+The fids_to_atomic_regulons allows one to map fids into regulons that contain the fids.
+Normally a fid will be in at most one regulon, but we support multiple regulons.
+
+
 Example:
 
     fids_to_atomic_regulons [arguments] < input > output
@@ -91,18 +96,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_atomic_regulons [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -116,7 +120,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_atomic_regulons(\@h);
     for my $tuple (@tuples) {

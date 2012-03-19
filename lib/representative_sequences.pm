@@ -813,7 +813,7 @@ sub representative_sequences {
     my $blast_opt = [ -e => $max_e_val,
                       -v => $max,
                       -b => $max,
-                      -F => 'F',
+                      -F => 'f',
                       -a =>  2
                     ];
 
@@ -1000,7 +1000,6 @@ sub self_bpp
     my $prog = $protein ? 'blastp' : 'blastn';
     my $blast_opt = [ -v =>  1,
                       -b =>  1,
-                      -F => 'F',
                       -a =>  2
                      ];
     push @$blast_opt, ( -r => 1, -q => -1 ) if ! $protein;
@@ -1107,7 +1106,12 @@ sub top_blast_per_subject
     gjoseqlib::print_alignment_as_fasta( $query_file, [ $query ] );
 
     $blast_opt ||= [];
-    my @blast_cmd = ( $blastall, '-p', $prog, '-d', $db, '-i', $query_file, @$blast_opt );
+    my @blast_cmd = ( $blastall,
+                      -p => $prog,
+                      -d => $db,
+                      -i => $query_file,
+                      @$blast_opt
+                    );
 
     open( BPIPE, '-|', @blast_cmd ) or die "Could not open blast pipe\n";
     my $sims = integrate_blast_segments( \*BPIPE, $sort, $no_merge, $self );
@@ -1163,6 +1167,7 @@ sub top_blast_per_subject_2
                 -p => $prog,
                 -d => $db,
                 -i => $query_file,
+                -F => 'f',
                 @$blast_opt
               );
 

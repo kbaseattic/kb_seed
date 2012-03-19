@@ -1,5 +1,6 @@
 use strict;
 use Data::Dumper;
+use Bio::KBase::Utilities::ScriptThing;
 use Carp;
 
 #
@@ -8,6 +9,25 @@ use Carp;
 
 
 =head1 get_entity_AtomicRegulon
+
+An atomic regulon is an indivisible group of coregulated features
+on a single genome. Atomic regulons are constructed so that a given feature
+can only belong to one. Because of this, the expression levels for
+atomic regulons represent in some sense the state of a cell.
+An atomicRegulon is a set of protein-encoding genes that
+are believed to have identical expression profiles (i.e.,
+they will all be expressed or none will be expressed in the
+vast majority of conditions).  These are sometimes referred
+to as "atomic regulons".  Note that there are more common
+notions of "coregulated set of genes" based on the notion
+that a single regulatory mechanism impacts an entire set of
+genes. Since multiple other mechanisms may impact
+overlapping sets, the genes impacted by a regulatory
+mechanism need not all share the same expression profile.
+We use a distinct notion (CoregulatedSet) to reference sets
+of genes impacted by a single regulatory mechanism (i.e.,
+by a single transcription regulator).
+
 
 Example:
 
@@ -33,7 +53,20 @@ output is to the standard output.
 
 =item -c Column
 
-This is used only if the column containing id is not the last.
+Use the specified column to define the id of the entity to retrieve.
+
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=back    
 
 =back
 
@@ -44,8 +77,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -53,17 +86,25 @@ use Getopt::Long;
 my @all_fields = (  );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_AtomicRegulon [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_entity_AtomicRegulon [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
 
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"a"	   => \$a,
-						"fields=s" => \$f,
-						'i=s'	   => \$i);		      
+my $show_fields;
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
+								  "a"	   	=> \$a,
+								  "h"	   	=> \$show_fields,
+								  "show-fields"	=> \$show_fields,
+								  "fields=s" 	=> \$f,
+								  'i=s'	   	=> \$i);
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
 if ($a && $f) { print STDERR $usage; exit 1 }
 if ($a)
 {
@@ -93,7 +134,7 @@ elsif ($f) {
 }
 
 open my $ih, "<$i";
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_AtomicRegulon(\@h, \@fields);
     for my $tuple (@tuples) {

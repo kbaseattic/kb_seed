@@ -9,6 +9,14 @@ use Carp;
 
 =head1 all_entities_Subsystem
 
+Return all instances of the Subsystem entity.
+
+A subsystem is a set of functional roles that have been annotated simultaneously (e.g.,
+the roles present in a specific pathway), with an associated subsystem spreadsheet
+which encodes the fids in each genome that implement the functional roles in the
+subsystem.
+
+
 Example:
 
     all_entities_Subsystem -a 
@@ -25,6 +33,35 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item version
+
+=item curator
+
+=item notes
+
+=item description
+
+=item usable
+
+=item private
+
+=item cluster_based
+
+=item experimental
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +71,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +86,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

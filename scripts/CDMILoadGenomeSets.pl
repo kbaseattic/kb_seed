@@ -18,8 +18,8 @@
 #
 
     use strict;
-    use CDMILoader;
-    use CDMI;
+    use Bio::KBase::CDMI::CDMILoader;
+    use Bio::KBase::CDMI::CDMI;
 
 =head1 CDMI Genome Set Loader
 
@@ -63,12 +63,12 @@ is presumed to be the representative genome.
 # The source database name will be stored in here.
 my $source = 'SEED';
 # Connect to the database using the command-line options.
-my $cdmi = CDMI->new_for_script('source=s' => \$source);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script('source=s' => \$source);
 if (! $cdmi) {
     print "usage: CDMILoadGenomeSets [options] genomeSetFile\n";
 } else {
     # Create the loader utility object.
-    my $loader = CDMILoader->new($cdmi);
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
     # Get the statistics object inside it.
     my $stats = $loader->stats;
     # Get the genome set file name.
@@ -99,7 +99,7 @@ if (! $cdmi) {
             $stats->Add(setLineIn => 1);
             # Try to find the genome in the database.
             my ($genomeData) = $cdmi->GetAll("Submitted Genome",
-                'Submitted(from-link) = ? AND Genome(source-id) = ?',
+                'Submitted(from_link) = ? AND Genome(source_id) = ?',
                 [$source, $genomeID], 'Genome(id) Genome(md5)');
             # Only proceed if we found it.
             if (defined $genomeData) {

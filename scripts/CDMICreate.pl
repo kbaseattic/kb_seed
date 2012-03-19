@@ -20,7 +20,7 @@
     use strict;
     use Stats;
     use SeedUtils;
-    use CDMI;
+    use Bio::KBase::CDMI::CDMI;
 
 =head1 CDMI Database Creator
 
@@ -36,7 +36,7 @@ no positional parameters.
 =cut
 
 # Connect to the database.
-my $cdmi = CDMI->new_for_script();
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMICreate [options]\n";
 } else {

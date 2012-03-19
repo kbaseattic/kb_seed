@@ -8,13 +8,17 @@ use Carp;
 
 =head1 subsystems_to_genomes
 
+This command takes as input a table with a column containing subsystem names. 
+An extra column is appended to the table containing genome IDs (for those genomes
+included in the subsystem with an active variant code (not matching /\*?(o|-1)/).
+
 Example:
 
     subsystems_to_genomes [arguments] < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
+line would contain the subsystem name. If another column contains the subsystem name
 use
 
     -c N
@@ -81,24 +85,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with two extra columns added (the variant code and the genome).
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: subsystems_to_genomes [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -112,7 +115,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->subsystems_to_genomes(\@h);
     for my $tuple (@tuples) {
@@ -130,7 +133,10 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
             foreach $_ (@$v)
             {
                 my($variant,$genome) = @$_;
-                print join("\t",($line,$variant,$genome)),"\n";
+		if ($variant !~ /^\*?(0|-1)/)
+		{
+		    print join("\t",($line,$variant,$genome)),"\n";
+		}
             }
         }
     }

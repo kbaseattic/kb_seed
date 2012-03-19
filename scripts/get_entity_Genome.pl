@@ -1,5 +1,6 @@
 use strict;
 use Data::Dumper;
+use Bio::KBase::Utilities::ScriptThing;
 use Carp;
 
 #
@@ -8,6 +9,17 @@ use Carp;
 
 
 =head1 get_entity_Genome
+
+The Kbase houses a large and growing set of genomes.  We often have multiple
+genomes that have identical DNA.  These usually have distinct gene calls and
+annotations, but not always.  We consider the Kbase to be a framework for
+managing hundreds of thousands of genomes and offering the tools needed to
+support compartive analysis on large sets of genomes, some of which are
+virtually identical.
+Each genome has an MD5 value computed from the DNA that is associated with the genome.
+Hence, it is easy to recognize when you have identical genomes, perhaps annotated
+by distinct groups.
+
 
 Example:
 
@@ -33,7 +45,46 @@ output is to the standard output.
 
 =item -c Column
 
-This is used only if the column containing id is not the last.
+Use the specified column to define the id of the entity to retrieve.
+
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item pegs
+
+=item rnas
+
+=item scientific_name
+
+=item complete
+
+=item prokaryotic
+
+=item dna_size
+
+=item contigs
+
+=item domain
+
+=item genetic_code
+
+=item gc_content
+
+=item phenotype
+
+=item md5
+
+=item source_id
+
+=back    
 
 =back
 
@@ -44,8 +95,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -53,17 +104,25 @@ use Getopt::Long;
 my @all_fields = ( 'pegs', 'rnas', 'scientific_name', 'complete', 'prokaryotic', 'dna_size', 'contigs', 'domain', 'genetic_code', 'gc_content', 'phenotype', 'md5', 'source_id' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_Genome [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_entity_Genome [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
 
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"a"	   => \$a,
-						"fields=s" => \$f,
-						'i=s'	   => \$i);		      
+my $show_fields;
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
+								  "a"	   	=> \$a,
+								  "h"	   	=> \$show_fields,
+								  "show-fields"	=> \$show_fields,
+								  "fields=s" 	=> \$f,
+								  'i=s'	   	=> \$i);
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
 if ($a && $f) { print STDERR $usage; exit 1 }
 if ($a)
 {
@@ -93,7 +152,7 @@ elsif ($f) {
 }
 
 open my $ih, "<$i";
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_Genome(\@h, \@fields);
     for my $tuple (@tuples) {

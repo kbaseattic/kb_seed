@@ -9,6 +9,13 @@ use Carp;
 
 =head1 all_entities_Biomass
 
+Return all instances of the Biomass entity.
+
+A biomass is a collection of compounds in a specific
+ratio and in specific compartments that are necessary for a
+cell to function properly. The prediction of biomasses is key
+to the functioning of the model.
+
 Example:
 
     all_entities_Biomass -a 
@@ -25,6 +32,23 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item mod_date
+
+=item name
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +58,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +73,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

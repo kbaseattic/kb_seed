@@ -1,4 +1,4 @@
-package CDMILoader;
+package Bio::KBase::CDMI::CDMILoader;
 
     use strict;
     use Stats;
@@ -49,6 +49,14 @@ all of the relations will be loaded from the files created.
 
 List of relation names in the order they should be loaded
 by L</LoadRelations>.
+
+=item typed
+
+TRUE if ID requests are typed, that is, if the object type is
+part of the source specification in the ID request. FALSE if
+ID requests are untyped. This option should be turned on if
+the current source's IDs are unique within type but not
+globally unique within the source.
 
 =back
 
@@ -275,7 +283,7 @@ sub ReadAttribute {
 Convert a time from ModelSEED format to an ERDB time value. The ModelSEED
 format is
 
-B<YYYY>C<->B<MM>C<->M<DD>C<T>B<HH>C<:>B<MM>C<:>B<SS>
+B<YYYY>C<->B<MM>C<->B<DD>C<T>B<HH>C<:>B<MM>C<:>B<SS>
 
 =over 4
 
@@ -348,6 +356,8 @@ sub new {
     }
     # Attach the ID server.
     $retVal->{idserver} = $idserver;
+    # Default to untyped ID requests.
+    $retVal->{typed} = 0;
     # Create the relation loader stuff.
     $retVal->{relations} = {};
     $retVal->{reltionList} = [];
@@ -555,6 +565,8 @@ Text of the role.
 
 Returns the ID of the role in the database.
 
+=back
+
 =cut
 
 sub CheckRole {
@@ -683,16 +695,12 @@ sub InsureEntity {
 
 =head3 DeleteRelatedRecords
 
-    $loader->DeleteRelatedRecords($kbdi, $relName, $entityName);
+    $loader->DeleteRelatedRecords($kbid, $relName, $entityName);
 
 Delete all the records in the named entity and relationship relating to the
 specified KBase ID and roll up the statistics.
 
 =over 4
-
-=item sap
-
-L<Sapling> object for accessing the database.
 
 =item kbid
 
@@ -718,7 +726,7 @@ sub DeleteRelatedRecords {
     # Get the statistics object.
     my $stats = $self->stats;
     # Get all the relationship records.
-    my (@targets) = $cdmi->GetFlat($relName, "$relName(from-link) = ?", [$kbid],
+    my (@targets) = $cdmi->GetFlat($relName, "$relName(from_link) = ?", [$kbid],
                                   "to-link");
     print scalar(@targets) . " entries found for delete of $entityName via $relName.\n" if @targets;
     # Loop through the relationship records, deleting them and the target entity
@@ -819,7 +827,7 @@ sub ConvertFileRecord {
             } elsif ($rule eq 'timeStamp') {
                 $outputValue = ConvertTime($inputValue);
             } elsif ($rule eq 'kbid') {
-                my $hash = $self->FindKBaseIDs($source, [$inputValue]);
+                my $hash = $self->FindKBaseIDs($source, '', [$inputValue]);
                 $outputValue = $hash->{$inputValue};
             } elsif ($rule eq 'copy1') {
                 $outputValue = substr($inputValue, 0, length($inputValue)/2);
@@ -836,9 +844,34 @@ sub ConvertFileRecord {
     $self->InsertObject($objectName, %fields);
 }
 
+=head2 KBase ID Services
+
+=head3 SetTyped
+
+    $loader->SetTyped($typingFlag);
+
+Indicate whether or not ID requests are typed.
+
+=over 4
+
+=item typingFlag
+
+TRUE if ID requests are typed, else FALSE.
+
+=back
+
+=cut
+
+sub SetTyped {
+    # Get the parameters.
+    my ($self, $typingFlag) = @_;
+    # Update the typed flag.
+    $self->{typed} = $typingFlag;
+}
+
 =head3 FindKBaseIDs
 
-    my $idMapping = $loader->FindKBaseIDs($source, \@ids);
+    my $idMapping = $loader->FindKBaseIDs($source, $type, \@ids);
 
 
 Find the KBase IDs for the specified identifiers from the given external
@@ -849,6 +882,10 @@ source database. No new IDs will be created or registered.
 =item source
 
 Name of the source database.
+
+=item type
+
+Type of object to which the IDs apply.
 
 =item ids
 
@@ -866,16 +903,18 @@ will not appear in the hash.
 
 sub FindKBaseIDs {
     # Get the parameters.
-    my ($self, $source, $ids) = @_;
+    my ($self, $source, $type, $ids) = @_;
+    # Compute the real source using the type.
+    my $realSource = $source . ($self->{typed} ? ":$type" : "");
     # Call through to the ID server.
-    my $retVal = $self->idserver->external_ids_to_kbase_ids($source, $ids);
+    my $retVal = $self->idserver->external_ids_to_kbase_ids($realSource, $ids);
     # Return the result.
     return $retVal;
 }
 
 =head3 GetKBaseIDs
 
-    my $idHash = $loader->GetKBaseIDs($prefix, $source, \@ids);
+    my $idHash = $loader->GetKBaseIDs($prefix, $source, $type, \@ids);
 
 Compute KBase IDs for all the specified foreign IDs from the specified
 source. The KBase IDs will all have the indicated prefix, which must
@@ -892,6 +931,10 @@ C<kb|>.
 
 Source (core) database for the IDs.
 
+=item type
+
+Type of object to which the IDs apply.
+
 =item ids
 
 Reference to a list of foreign IDs whose KBase IDs are desired. If
@@ -907,13 +950,15 @@ Returns a reference to a hash mapping the foreign IDs to KBase IDs.
 
 sub GetKBaseIDs {
     # Get the parameters.
-    my ($self, $prefix, $source, $ids) = @_;
+    my ($self, $prefix, $source, $type, $ids) = @_;
     # Insure the IDs are a list reference.
     if (ref $ids ne 'ARRAY') {
         $ids = [$ids];
     }
+    # Compute the real source using the type.
+    my $realSource = $source . ($self->{typed} ? ":$type" : "");
     # Call the ID server.
-    my $retVal = $self->idserver->register_ids($prefix, $source, $ids);
+    my $retVal = $self->idserver->register_ids($prefix, $realSource, $ids);
     # Return the result.
     return $retVal;
 }
@@ -938,6 +983,10 @@ C<kb|>.
 
 Source (core) database for the IDs.
 
+=item type
+
+Type of object to which the IDs apply.
+
 =item id
 
 Foreign ID whose KBase ID is desired.
@@ -953,9 +1002,9 @@ exist, it will have been created.
 
 sub GetKBaseID {
     # Get the parameters.
-    my ($self, $prefix, $source, $id) = @_;
+    my ($self, $prefix, $source, $type, $id) = @_;
     # Ask the ID server for the ID.
-    my $idHash = $self->GetKBaseIDs($prefix, $source, [$id]);
+    my $idHash = $self->GetKBaseIDs($prefix, $source, $type, [$id]);
     # Return the result.
     return $idHash->{$id};
 }

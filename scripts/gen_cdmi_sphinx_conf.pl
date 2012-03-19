@@ -41,6 +41,6 @@ print STDERR "@$entities\n";
 $params{entities} = $entities;
 
 print STDERR Dumper(\%params);
-	
+
 my $templ = Template->new;
 $templ->process($template_file, \%params) || die Template->error;

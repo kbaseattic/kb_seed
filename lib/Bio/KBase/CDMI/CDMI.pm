@@ -17,7 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
-package CDMI;
+package Bio::KBase::CDMI::CDMI;
 
     use strict;
     use Tracer;
@@ -29,6 +29,7 @@ package CDMI;
     use XML::Simple;
     use Digest::MD5;
     use Getopt::Long;
+    use Data::UUID;
 
 =head1 CDMI Package
 
@@ -143,6 +144,11 @@ MYSQL port number to use (MySQL only). The default is C<3306>.
 Database management system to use (e.g. C<postgres>). The default is
 C<mysql>.
 
+=item uuid
+
+L<Data::UUID> object for generating annotation IDs. Will not exist
+unless it's needed.
+
 =back
 
 =cut
@@ -248,7 +254,7 @@ sub new_for_script {
             "port=i" => \$port, "dbms=s" => \$dbms);
     # If the parse worked, create the CDMI object.
     if ($rc) {
-        $retVal = CDMI::new($class, loadDirectory => $loadDirectory, DBD => $dbd,
+        $retVal = Bio::KBase::CDMI::CDMI::new($class, loadDirectory => $loadDirectory, DBD => $dbd,
                 dbName => $dbName, sock => $sock, userData => $userData,
                 dbhost => $dbhost, port => $port, dbms => $dbms);
     }
@@ -331,7 +337,7 @@ sub GetLocations {
     my $lastLoc;
     # Get this feature's locations.
     my $qh = $self->Get("IsLocatedIn",
-                       'IsLocatedIn(from-link) = ? ORDER BY IsLocatedIn(ordinal)',
+                       'IsLocatedIn(from_link) = ? ORDER BY IsLocatedIn(ordinal)',
                        [$fid]);
     while (my $resultRow = $qh->Fetch()) {
         # Compute the contig ID and other information.
@@ -452,7 +458,7 @@ sub ComputeDNA {
         $left = 0;
     }
     # Get the contig sequence key.
-    my ($contigKey) = $self->GetFlat("HasAsSequence", "HasAsSequence(from-link) = ?",
+    my ($contigKey) = $self->GetFlat("HasAsSequence", "HasAsSequence(from_link) = ?",
             [$contig], 'to-link');
     # Get the DNA segment length.
     my $maxSequenceLength = $self->TuningParameter("maxSequenceLength");
@@ -506,7 +512,7 @@ sub Taxonomy {
     # Get the parameters.
     my ($self, $genomeID, $format) = @_;
     # Get the genome's taxonomic group.
-    my ($taxon) = $self->GetFlat('IsInTaxa', 'IsInTaxa(from-link) = ?',
+    my ($taxon) = $self->GetFlat('IsInTaxa', 'IsInTaxa(from_link) = ?',
             [$genomeID], 'to-link');
     # We'll put the return data in here.
     my @retVal;
@@ -518,7 +524,7 @@ sub Taxonomy {
             # Get the data we need for this taxonomic group.
             my ($taxonData) = $self->GetAll('TaxonomicGrouping IsInGroup',
                                             'TaxonomicGrouping(id) = ?', [$taxon],
-                                            'domain scientific-name IsInGroup(to-link)');
+                                            'domain scientific-name IsInGroup(to_link)');
             # If we didn't find what we're looking for, then we have a problem. This
             # would indicate a node below the domain level that doesn't have a parent
             # or (more likely) an invalid input string.
@@ -549,6 +555,55 @@ sub Taxonomy {
     }
     # Return the result.
     return @retVal;
+}
+
+=head3 ComputeNewAnnotationID
+
+    my $annotationID = $cdmi->ComputeNewAnnotationID($fid, $timeStamp);
+
+Return a valid annotation ID for the specified feature and time stamp.
+The ID is formed from the feature ID and a complemented version of the
+time stamp followed by a UUID. The complemented time stamp causes the
+annotations to present in reverse chronological order and the
+feature ID causes annotations for the same feature to cluster together.
+This provides for efficient retrieval, though the keys are gigantic.
+
+=over 4
+
+=item fid
+
+ID of the target feature for the annotation.
+
+=item timeStamp
+
+time at which the annotation occurred
+
+=item RETURN
+
+Returns a unique ID to give to the annotation.
+
+=back
+
+=cut
+
+sub ComputeNewAnnotationID {
+    # Get the parameters.
+    my ($self, $fid, $timeStamp) = @_;
+    # Complement the time stamp.
+    my $inverted = 9999999999 - $timeStamp;
+    my $padLen = 10 - length($inverted);
+    if ($padLen > 0) {
+        $inverted = ("0" x $padLen) . $inverted;
+    }
+    # Get a UUID.
+    if (! defined $self->{uuid}) {
+        $self->{uuid} = Data::UUID->new();
+    }
+    my $suffix = $self->{uuid}->create_b64();
+    # Forge the full key.
+    my $retVal = "$fid.$inverted.$suffix";
+    # Return the result.
+    return $retVal;
 }
 
 =head2 Configuration-Related Methods

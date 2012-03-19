@@ -8,6 +8,41 @@ use Carp;
 
 =head1 genomes_to_taxonomies
 
+
+The routine genomes_to_taxonomies can be used to retrieve taxonomic information for
+each of a list of input genomes.  For each genome in the input list of genomes, a list of
+taxonomic groups is returned.  Kbase will use the groups maintained by NCBI.  For an NCBI
+taxonomic string like
+
+     cellular organisms;
+     Bacteria;
+     Proteobacteria;
+     Gammaproteobacteria;
+     Enterobacteriales;
+     Enterobacteriaceae;
+     Escherichia;
+     Escherichia coli
+
+associated with the strain 'Escherichia coli 1412', this routine would return a list of these
+taxonomic groups:
+
+
+     ['Bacteria',
+      'Proteobacteria',
+      'Gammaproteobacteria',
+      'Enterobacteriales',
+      'Enterobacteriaceae',
+      'Escherichia',
+      'Escherichia coli',
+      'Escherichia coli 1412'
+     ]
+
+That is, the initial "cellular organisms" has been deleted, and the strain ID has
+been added as the last "grouping".
+
+The output is a mapping from genome IDs to lists of the form shown above.
+
+
 Example:
 
     genomes_to_taxonomies [arguments] < input > output
@@ -77,24 +112,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added. One extra column is added, consisting of the taxonomy list presented as a single string with items separated by a ":".
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: genomes_to_taxonomies [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +142,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->genomes_to_taxonomies(\@h);
     for my $tuple (@tuples) {

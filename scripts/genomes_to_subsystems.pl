@@ -8,6 +8,15 @@ use Carp;
 
 =head1 genomes_to_subsystems
 
+
+A user can invoke genomes_to_subsystems to rerieve the names of the subsystems
+relevant to each genome.  The input is a list of genomes.  The output is a mapping
+from genome to a list of 2-tuples, where each 2-tuple give a variant code and a
+subsystem name.  Variant codes of -1 (or *-1) amount to assertions that the
+genome contains no active variant.  A variant code of 0 means "work in progress",
+and presence or absence of the subsystem in the genome should be undetermined.
+
+
 Example:
 
     genomes_to_subsystems [arguments] < input > output
@@ -85,24 +94,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
+file with extra columns added. For each line of the input file there can be many output files, one per subsystem. A single field of variant,subsystem is added to the end of each line.
+ 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: genomes_to_subsystems [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -116,7 +124,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->genomes_to_subsystems(\@h);
     for my $tuple (@tuples) {

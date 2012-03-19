@@ -1,5 +1,6 @@
 use strict;
 use Data::Dumper;
+use Bio::KBase::Utilities::ScriptThing;
 use Carp;
 
 #
@@ -8,6 +9,10 @@ use Carp;
 
 
 =head1 get_entity_ModelCompartment
+
+The Model Compartment represents a section of a cell
+(e.g. cell wall, cytoplasm) as it appears in a specific
+model.
 
 Example:
 
@@ -33,7 +38,28 @@ output is to the standard output.
 
 =item -c Column
 
-This is used only if the column containing id is not the last.
+Use the specified column to define the id of the entity to retrieve.
+
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item compartment_index
+
+=item label
+
+=item pH
+
+=item potential
+
+=back    
 
 =back
 
@@ -44,8 +70,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -53,17 +79,25 @@ use Getopt::Long;
 my @all_fields = ( 'compartment_index', 'label', 'pH', 'potential' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_ModelCompartment [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_entity_ModelCompartment [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
 
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"a"	   => \$a,
-						"fields=s" => \$f,
-						'i=s'	   => \$i);		      
+my $show_fields;
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
+								  "a"	   	=> \$a,
+								  "h"	   	=> \$show_fields,
+								  "show-fields"	=> \$show_fields,
+								  "fields=s" 	=> \$f,
+								  'i=s'	   	=> \$i);
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
 if ($a && $f) { print STDERR $usage; exit 1 }
 if ($a)
 {
@@ -93,7 +127,7 @@ elsif ($f) {
 }
 
 open my $ih, "<$i";
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_ModelCompartment(\@h, \@fields);
     for my $tuple (@tuples) {

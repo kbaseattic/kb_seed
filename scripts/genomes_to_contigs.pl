@@ -8,6 +8,12 @@ use Carp;
 
 =head1 genomes_to_contigs
 
+
+The routine genomes_to_contigs can be used to retrieve the IDs of the contigs
+associated with each of a list of input genomes.  The routine constructs a mapping
+from genome ID to the list of contigs included in the genome.
+
+
 Example:
 
     genomes_to_contigs [arguments] < input > output
@@ -22,7 +28,7 @@ use
 where N is the column (from 1) that contains the subsystem.
 
 This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+output is to the standard output. For each line of input, there can be multiple output lines, one per contig. The contig id is added to the end of each line.
 
 =head2 Documentation for underlying call
 
@@ -83,18 +89,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: genomes_to_contigs [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +113,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->genomes_to_contigs(\@h);
     for my $tuple (@tuples) {

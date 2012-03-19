@@ -8,6 +8,14 @@ use Carp;
 
 =head1 fids_to_coexpressed_fids
 
+
+The routine fids_to_coexpressed_fids returns (for each input fid) a
+list of features that appear to be coexpressed.  That is,
+for an input fid, we determine the set of fids from the same genome that
+have Pearson Correlation Coefficients (based on normalized expression data)
+greater than 0.5 or less than -0.5.
+
+
 Example:
 
     fids_to_coexpressed_fids [arguments] < input > output
@@ -87,18 +95,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_coexpressed_fids [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -112,7 +119,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_coexpressed_fids(\@h);
     for my $tuple (@tuples) {
@@ -130,12 +137,9 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             foreach $_ (@$v)
             {
-                print "$line\t$_\n";
+		my($fid,$pcc) = @$_;
+                print "$line\t$pcc\t$fid\n";
             }
-        }
-        else
-        {
-            print "$line\t$v\n";
         }
     }
 }

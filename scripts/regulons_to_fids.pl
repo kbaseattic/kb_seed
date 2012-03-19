@@ -8,18 +8,32 @@ use Carp;
 
 =head1 regulons_to_fids
 
+The CS contains two similar notions:
+
+    1. atomic regulons, which are sets of fids thought to have exactly the
+       same expression profiles (derived from operons, subsystems, and expression data)
+
+    2. regulons which are thought of as a set of genes impacted by a transcription factor.
+       This second notion is built up looking for binding-site/transcription-factor pairs 
+       and reconciling the insights with operons and subsystems.
+
+Clearly the two notions are closely related.  
+
+This command takes as input a table in which one column is composed of regulon ids,
+and it adds a column corresponding to the fids that make up the regulon.
+
 Example:
 
     regulons_to_fids [arguments] < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
+line would contain the regulon identifer. If another column contains the identifier
 use
 
     -c N
 
-where N is the column (from 1) that contains the subsystem.
+where N is the column (from 1) that contains the regulon ID.
 
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
@@ -77,24 +91,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with an extra column (fids in the regulon) added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: regulons_to_fids [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +121,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->regulons_to_fids(\@h);
     for my $tuple (@tuples) {

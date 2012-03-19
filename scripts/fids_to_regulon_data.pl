@@ -6,11 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 fids_to_regulons
+=head1 fids_to_regulon_data
+
+
+
+
 
 Example:
 
-    fids_to_regulons [arguments] < input > output
+    fids_to_regulon_data [arguments] < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -26,9 +30,9 @@ output is to the standard output.
 
 =head2 Documentation for underlying call
 
-This script is a wrapper for the CDMI-API call fids_to_regulons. It is documented as follows:
+This script is a wrapper for the CDMI-API call fids_to_regulon_data. It is documented as follows:
 
-  $return = $obj->fids_to_regulons($fids)
+  $return = $obj->fids_to_regulon_data($fids)
 
 =over 4
 
@@ -38,15 +42,15 @@ This script is a wrapper for the CDMI-API call fids_to_regulons. It is documente
 
 <pre>
 $fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a regulon_size_pairs
+$return is a reference to a hash where the key is a fid and the value is a regulons_data
 fids is a reference to a list where each element is a fid
 fid is a string
-regulon_size_pairs is a reference to a list where each element is a regulon_size_pair
-regulon_size_pair is a reference to a list containing 2 items:
-	0: a regulon
-	1: a regulon_size
+regulons_data is a reference to a list where each element is a regulon_data
+regulon_data is a reference to a hash where the following keys are defined:
+	regulon_id has a value which is a regulon
+	regulon_set has a value which is a fids
+	tfs has a value which is a fids
 regulon is a string
-regulon_size is an int
 
 </pre>
 
@@ -55,15 +59,15 @@ regulon_size is an int
 =begin text
 
 $fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a regulon_size_pairs
+$return is a reference to a hash where the key is a fid and the value is a regulons_data
 fids is a reference to a list where each element is a fid
 fid is a string
-regulon_size_pairs is a reference to a list where each element is a regulon_size_pair
-regulon_size_pair is a reference to a list containing 2 items:
-	0: a regulon
-	1: a regulon_size
+regulons_data is a reference to a list where each element is a regulon_data
+regulon_data is a reference to a hash where the following keys are defined:
+	regulon_id has a value which is a regulon
+	regulon_set has a value which is a fids
+	tfs has a value which is a fids
 regulon is a string
-regulon_size is an int
 
 
 =end text
@@ -91,18 +95,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
-my $usage = "usage: fids_to_regulons [-c column] < input > output";
+my $usage = "usage: fids_to_regulon_data [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -116,9 +119,10 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->fids_to_regulons(\@h);
+
+    my $h = $kbO->fids_to_regulon_data(\@h);
     for my $tuple (@tuples) {
         #
         # Process output here and print.
@@ -132,11 +136,17 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         }
         elsif (ref($v) eq 'ARRAY')
         {
-	     print "$line\t$v->[1]\t$v->[0]\n";
+            foreach $_ (@$v)
+            {
+		    my $id = $_->{regulon_id};
+		    my $set = join (",",@{$_->{regulon_set}});
+		    my $tfs = join (",",@{$_->{tfs}});
+		    print "$line\t$id\t$set\t$tfs\n";
+            }
         }
         else
         {
-            print "$line\t$v\n";
+            print "$line\n";
         }
     }
 }

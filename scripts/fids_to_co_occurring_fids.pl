@@ -8,6 +8,25 @@ use Carp;
 
 =head1 fids_to_co_occurring_fids
 
+
+One of the most powerful clues to function relates to conserved clusters of genes on
+the chromosome (in prokaryotic genomes).  We have attempted to record pairs of genes
+that tend to occur close to one another on the chromosome.  To meaningfully do this,
+we need to construct similarity-based mappings between genes in distinct genomes.
+We have constructed such mappings for many (but not all) genomes maintained in the
+Kbase CS.  The prokaryotic geneomes in the CS are grouped into OTUs by ribosomal
+RNA (genomes within a single OTU have SSU rRNA that is greater than 97% identical).
+If two genes occur close to one another (i.e., corresponding genes occur close
+to one another), then we assign a score, which is the number of distinct OTUs
+in which such clustering is detected.  This allows one to normalize for situations
+in which hundreds of corresponding genes are detected, but they all come from
+very closely related genomes.
+
+The significance of the score relates to the number of genomes in the database.
+We recommend that you take the time to look at a set of scored pairs and determine
+approximately what percentage appear to be actually related for a few cutoff values.
+
+
 Example:
 
     fids_to_co_occurring_fids [arguments] < input > output
@@ -81,24 +100,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added. For each line of input there may be multiple lines of output, one for each co_occuring fid. Two columns are added, the score and the co_occurring fid.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_co_occurring_fids [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -112,7 +130,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_co_occurring_fids(\@h);
     for my $tuple (@tuples) {
@@ -121,7 +139,6 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         #
         my ($id, $line) = @$tuple;
         my $v = $h->{$id};
-
         if (! defined($v))
         {
             print STDERR $line,"\n";
@@ -130,11 +147,11 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             foreach $_ (@$v)
             {
-		if (ref($_) eq 'ARRAY') 
+		if (ref($_) eq 'ARRAY')
 		{
-			my $b = $_->[1]."\t$id".":".$_->[0];
+			my $b = $_->[1]."\t".$_->[0];
 			print "$line\t$b\n";
-		} else 
+		} else
 		{
 			print "$line\t$_\n";
 		}

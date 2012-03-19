@@ -2,15 +2,15 @@
 
 use strict;
 use SeedUtils;
-use CDMI_APIImpl;
-use CDMI;
+use Bio::KBase::CDMI::CDMI;
+require Bio::KBase::CDMI::CDMI_APIImpl;
 
-    my $cdmi = CDMI->new_for_script();
-    my $kbO = CDMI_APIImpl->new($cdmi);
-    my @fids = qw(kb|SEED|fig|83333.1.peg.4 kb|SEED|fig|360108.4.peg.1041 kb|MOL|3235849 kb|SEED|196627.4.peg.101);
+    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
+    my $kbO = Bio::KBase::CDMI::CDMI_APIImpl->new($cdmi);
+    my @fids = qw(kb|g.237.peg.1 kb|g.1068.peg.914 kb|g.0.peg.4288);
     my @fidTypes = qw(crispr rna);
-    my @fidPairs = (['kb|SEED|fig|83333.1.peg.2', 'kb|SEED|fig|83333.1.peg.4'],
-                    ['kb|SEED|fig|360108.4.peg.1041', 'kb|SEED|fig|360108.4.peg.1039']);
+    my @fidPairs = (['kb|g.0.peg.2173', 'kb|g.0.peg.4288'],
+                    ['kb|g.1068.peg.914', 'kb|g.1068.peg.529']);
     my @regions = qw(kb|MOL|103782:52814_0+4000 kb|SEED|83333.1:NC_000913_3000+2000 kb|SEED|360108.4:NZ_AANK01000003_185000-1000);
     my @locs = ([['kb|MOL|103782:52814',10,'+',100],['kb|MOL|103782:52814',110,'+',50]],
                 [['kb|SEED|83333.1:NC_000913', 2020, '-', 110]]);
@@ -28,7 +28,7 @@ use CDMI;
     my @contigs = qw(kb|MOL|103782:52814 kb|SEED|553973.6:NZ_GG657770);
     my @genomeMD5s = qw(415d0675326bf70a88be20d84c6a415c
                         b4ff0a0fea9686b26b4e2a3cf7b6adbf);
-    my @genomes = qw(kb|SEED|83333.1 kb|MOL|101510 kb|SEED|196627.4 kb|SEED|100226.15);
+    my @genomes = qw(kb|g.0 kb|g.237 kb|g.1068 kb|g.3899);
     my @subs = ('Ribosome LSU bacterial', 'tRNA nucleotidyltransferase');
 
     my $result;

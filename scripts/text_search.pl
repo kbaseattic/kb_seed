@@ -8,6 +8,14 @@ use Carp;
 
 =head1 text_search
 
+
+text_search performs a search against a full-text index maintained 
+for the CDMI. The parameter "input" is the text string to be searched for.
+The parameter "entities" defines the entities to be searched. If the list
+is empty, all indexed entities will be searched. The "start" and "count"
+parameters limit the results to "count" hits starting at "start".
+
+
 Example:
 
     text_search [arguments] < input > output
@@ -95,17 +103,16 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: text_search [-start N] [-count N] [-entity name -entity name ..] search-string\n";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $start = 0;
 my $count = 100;
 my @entities;
-my $kbO = CDMIClient->new_for_script('start=s' => \$start,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('start=s' => \$start,
 				     'count=s' => \$count,
 				     'entity=s' => \@entities);
 
@@ -126,6 +133,6 @@ for my $entity (keys %$res)
 	    print join("\t", "#", @hdr), "\n";
 	}
 	print join("\t", $entity, @$data{@hdr}), "\n";
-		       
+
     }
 }

@@ -8,6 +8,16 @@ use Carp;
 
 =head1 locations_to_dna_sequences
 
+
+locations_to_dna_sequences takes as input a list of locations (each in the form of
+a list of regions).  The routine constructs 2-tuples composed of
+
+     [the input location,the dna string]
+
+The returned DNA string is formed by concatenating the DNA for each of the
+regions that make up the location.
+
+
 Example:
 
     locations_to_dna_sequences [arguments] < input > output
@@ -103,18 +113,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: locations_to_dna_sequences [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -128,30 +137,25 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
-    my @h = map { $_->[0] } @tuples;
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
+    my @h = map { my @regions = map { $_ =~ /^(\S+)_(\d+)([+-])(\d+)$/;
+				      [$1,$2,$3,$4] } split(",",$_->[0]);
+		  \@regions } @tuples;
     my $h = $kbO->locations_to_dna_sequences(\@h);
     for my $tuple (@tuples) {
         #
         # Process output here and print.
         #
         my ($id, $line) = @$tuple;
-        my $v = $h->{$id};
+        my $v = shift @$h;
 
-        if (! defined($v))
+        if (! defined($v->[1]))
         {
             print STDERR $line,"\n";
         }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
-            }
-        }
         else
         {
-            print "$line\t$v\n";
+            print "$line\t$v->[1]\n";
         }
     }
 }

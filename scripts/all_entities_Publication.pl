@@ -9,6 +9,19 @@ use Carp;
 
 =head1 all_entities_Publication
 
+Return all instances of the Publication entity.
+
+Annotators attach publications to ProteinSequences.  The criteria we have used
+to gather such connections is a bit nonstandard.  We have sought to attach publications
+to ProteinSequences when the publication includes an expert asserting a belief or estimate
+of function.  The paper may not be the original characterization.  Further, it may not
+even discuss a sequence protein (much of the literature is very valuable, but reports
+work on proteins in strains that have not yet been sequenced).  On the other hand,
+reports of sequencing regions of a chromosome (with no specific assertion of a
+clear function) should not be attached.  The attached publications give an ID (usually a
+Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it).
+
+
 Example:
 
     all_entities_Publication -a 
@@ -25,6 +38,25 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item title
+
+=item link
+
+=item pubdate
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,13 +66,13 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'citation' );
+my @all_fields = ( 'title', 'link', 'pubdate' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_Publication [-show-fields] [-a | -f field list] > entity.data";
@@ -49,9 +81,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

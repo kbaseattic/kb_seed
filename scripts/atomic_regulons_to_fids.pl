@@ -6,11 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 regulons_to_fids
+=head1 atomic_regulons_to_fids
 
 Example:
 
     atomic_regulons_to_fids [arguments] < input > output
+
+Atomic_regulons are sets of fids that are believed to have identical
+expression profiles.  The estmates were made using expression data,
+operon estimates, and subsystems.
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -83,18 +87,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: atomic_regulons_to_fids [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +111,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->atomic_regulons_to_fids(\@h);
     for my $tuple (@tuples) {

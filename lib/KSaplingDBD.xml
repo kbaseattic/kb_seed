@@ -2,27 +2,6 @@
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://bio-macpro-1.mcs.anl.gov/~parrello/FIG/Html/ERDB_DBD.xsd">
   <Title>Knowledge Base Bioinformatics Database</Title>
-  <Notes>
-    [p]The diagram colors indicate the way the data is loaded: each color indicates
-    a different load group.[/p]
-    [list]
-    [b]Red[/b] Genome group: includes all taxonomy and sequence data.[*]
-    [b]Blue[/b] Subsystem group: includes the subsystems themselves
-    and all the subsystem spreadsheets.[*]
-    [b]Green[/b] Feature group: includes features, feature identifiers,
-    protein sequences, and related publications.[*]
-    [b]Yellow[/b] Scenario includes KEGG diagrams, scenarios,
-    and connections to the related chemical reactions.[*]
-    [b]Purple[/b] Alignment group: includes protein alignments and trees.[*]
-    [b]Navy[/b] Model group: includes compounds, reactions,
-    structural cues, and models for the cell chemistry.[*]
-    [b]Brown[/b] Family group: includes protein families and functional coupling data.[*]
-    [b]Black[/b] Protein group: includes annotation history and data from the Annotation
-    Clearinghouse.[*]
-    [b]Cyan[/b] Expression group: includes data relating to gene expression and
-    cell regulation.
-    [/list]
-    </Notes>
   <Regions>
     <Region name="Chemistry">
       <Notes>The Chemistry region contains data about reactions and subsystem
@@ -253,6 +232,9 @@
         <Field name="name" type="string">
           <Notes>common name for the compartment</Notes>
         </Field>
+        <Field name="msid" type="string">
+          <Notes>common modeling ID of this compartment</Notes>
+        </Field>
       </Fields>
     </Entity>
     <Entity name="Compound" keyType="string">
@@ -269,6 +251,9 @@
         </Field>
         <Field name="abbr" type="string">
           <Notes>shortened abbreviation for the compound name</Notes>
+        </Field>
+        <Field name="msid" type="string">
+          <Notes>common modeling ID of this compound</Notes>
         </Field>
         <Field name="ubiquitous" type="boolean">
           <Notes>TRUE if this compound is found in most reactions, else FALSE</Notes>
@@ -294,6 +279,13 @@
             <IndexField name="label" order="ascending"/>
           </IndexFields>
         </Index>
+        <Index>
+          <Notes>This index allows retrieval by the common
+          modeling ID.</Notes>
+          <IndexFields>
+            <IndexField name="msid" order="ascending" />
+          </IndexFields>
+        </Index>
       </Indexes>
     </Entity>
     <Entity name="Reaction" keyType="string">
@@ -311,6 +303,9 @@
         <Field name="name" type="string">
           <Notes>descriptive name of this reaction</Notes>
         </Field>
+        <Field name="msid" type="string">
+          <Notes>common modeling ID of this reaction</Notes>
+        </Field>
         <Field name="abbr" type="string">
           <Notes>abbreviated name of this reaction</Notes>
         </Field>
@@ -322,6 +317,15 @@
           &lt; for backward-only, = for bidirectional)</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index>
+          <Notes>This index allows retrieval by the common
+          modeling ID.</Notes>
+          <IndexFields>
+            <IndexField name="msid" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Complex" keyType="string">
       <DisplayInfo theme="navy" col="3" row="3">
@@ -334,10 +338,22 @@
         <Field name="name" type="string" relation="ComplexName">
           <Notes>name of this complex. Not all complexes have names.</Notes>
         </Field>
+        <Field name="msid" type="string">
+          <Notes>common modeling ID of this complex.</Notes>
+        </Field>
         <Field name="mod-date" type="date">
           <Notes>date and time of the last change to this complex's definition</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index>
+          <Notes>This index allows retrieval by the common
+          modeling ID.</Notes>
+          <IndexFields>
+            <IndexField name="msid" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Diagram" keyType="string">
       <DisplayInfo theme="ivory" col="5" row="3">
@@ -431,7 +447,7 @@ Annotators attach publications to ProteinSequences.  The criteria we have used
 to gather such connections is a bit nonstandard.  We have sought to attach publications
 to ProteinSequences when the publication includes an expert asserting a belief or estimate
 of function.  The paper may not be the original characterization.  Further, it may not
-even discuss a sequence protein (much of the lietarture is very valuable, but reports
+even discuss a sequence protein (much of the literature is very valuable, but reports
 work on proteins in strains that have not yet been sequenced).  On the other hand,
 reports of sequencing regions of a chromosome (with no specific assertion of a
 clear function) should not be attached.  The attached publications give an ID (usually a
@@ -439,8 +455,14 @@ Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it)
 
       </Notes>
       <Fields>
-        <Field name="citation" type="link">
-          <Notes>Hyperlink of the article. The text is the article title.</Notes>
+        <Field name="title" type="string">
+          <Notes>title of the article, or (unknown) if the title is not known</Notes>
+        </Field>
+        <Field name="link" type="string">
+          <Notes>URL of the article</Notes>
+        </Field>
+        <Field name="pubdate" type="date">
+           <Notes>publication date of the article</Notes>
         </Field>
       </Fields>
       <Indexes>
@@ -449,7 +471,7 @@ Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it)
           title. It should only be used for LIKE-style searches, since
           the article titles are encoded together with the URLs.</Notes>
           <IndexFields>
-            <IndexField name="citation" order="ascending"/>
+            <IndexField name="title" order="ascending"/>
           </IndexFields>
         </Index>
       </Indexes>
@@ -1113,8 +1135,9 @@ an atomic regulon) using CoregulatedSet.
 
       </Notes>
       <Fields>
-        <Field name="reason" type="text">
-          <Notes>Description of how this coregulated set was derived.</Notes>
+        <Field name="source-id" type="string">
+          <Notes>original ID of this coregulated set in the source (core)
+          database</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -1240,6 +1263,17 @@ tools will be supported.
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="Imported" from="Source" to="Identifier"
+                  arity="1M" converse="WasImportedFrom">
+      <Notes>This relationship specifies the import source for
+      identifiers. It is used when reloading identifiers to
+      provide for rapid deletion of the previous load's results.</Notes>
+    </Relationship>
+    <Relationship name="Formulated" from="Source" to="CoregulatedSet"
+                  arity="1M" converse="WasFormulatedBy">
+      <Notes>This relationship connects a coregulated set to the
+      source organization that originally computed it.</Notes>
+    </Relationship>
     <Relationship name="Involves" from="Reaction" to="Reagent"
                   arity="1M" converse="IsInvolvedIn">
       <Notes>This relationship connects a reaction to the
@@ -1263,21 +1297,14 @@ tools will be supported.
       <Notes>This relationship connects a reaction to the compartment
       in which it runs by default.</Notes>
     </Relationship>
-    <Relationship name="IsControlledUsing" from="CoregulatedSet"
-                  to="Feature" arity="MM"
-                  converse="Controls">
+    <Relationship name="Controls" from="Feature" to="CoregulatedSet"
+                  arity="MM" converse="IsControlledUsing">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Controls"
                     fixed="1" row="3" col="3" />
       </DisplayInfo>
       <Notes>This relationship connects a coregulated set to the
-      protein that is used as its transcription factor.</Notes>
-      <Fields>
-        <Field name="effector" type="boolean">
-          <Notes>TRUE if this transcription factor is an effector
-          (up-regulates), FALSE if it is a suppressor (down-regulates)</Notes>
-        </Field>
-      </Fields>
+      features that are used as its transcription factors.</Notes>
     </Relationship>
     <Relationship name="IsBindingSiteFor" from="Feature" to="CoregulatedSet"
                   converse="IsBoundBy" arity="1M">

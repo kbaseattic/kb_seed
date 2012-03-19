@@ -9,6 +9,14 @@ use Carp;
 
 =head1 all_entities_Role
 
+Return all instances of the Role entity.
+
+A role describes a biological function that may be fulfilled
+by a feature. One of the main goals of the database is to assign
+features to roles. Most roles are effected by the construction of
+proteins. Some, however, deal with functional regulation and message
+transmission.
+
 Example:
 
     all_entities_Role -a 
@@ -25,6 +33,21 @@ in the entities in the output.
 
 Return all fields.
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item hypothetical
+
+=back    
+   
 =back
 
 =head2 Output Format
@@ -34,8 +57,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -49,9 +72,10 @@ my $a;
 my $f;
 my @fields;
 my $show_fields;
-my $geO = CDMIClient->new_get_entity_for_script("a"	      => \$a,
-						"show-fields" => \$show_fields,
-						"fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
+								  "show-fields" => \$show_fields,
+								  "h" 		=> \$show_fields,
+								  "fields=s"    => \$f);
 
 if ($show_fields)
 {

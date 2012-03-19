@@ -19,8 +19,8 @@
 
 use strict;
 use SeedUtils;
-use CDMI;
-use CDMILoader;
+use Bio::KBase::CDMI::CDMI;
+use Bio::KBase::CDMI::CDMILoader;
 use IDServerAPIClient;
 
 =head1 CDMI Expression Data Loader
@@ -135,7 +135,7 @@ use constant TABLES => [qw(ProbeSet IndicatedLevelsFor ProducedResultsFor
 my ($recursive, $newOnly, $clear, $id_server_url);
 
 # Connect to the database.
-my $cdmi = CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
         "clear" => \$clear, "idserver=s" => \$id_server_url);
 if (! $cdmi) {
     print "usage: CDMILoadExpression [options] source genomeDirectory\n";
@@ -157,7 +157,7 @@ if (! $cdmi) {
 	if ($id_server_url) {
 	    $id_server = IDServerAPIClient->new($id_server_url);
 	}
-        my $loader = CDMILoader->new($cdmi, $id_server);
+        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
 
         # Are we clearing?
         if($clear) {
@@ -230,7 +230,7 @@ sub LoadExpressionData {
     # Convert it to KBase. If it's not in the database, we won't find it
     # and we'll skip it.
     my ($genome) = $cdmi->GetFlat("Submitted Genome",
-            'Submitted(from-link) = ? AND Genome(source-id) = ?',
+            'Submitted(from_link) = ? AND Genome(source_id) = ?',
             [$source, $genomeID], 'Genome(id)');
     if (! defined $genome) {
         print "Genome $genomeID not found.\n";
@@ -254,7 +254,7 @@ sub LoadExpressionData {
             $stats->Add(customChipID => 1);
         } else {
             # Generate a default chip ID.
-            $chipID = $loader->GetKBaseID('kb|chip', $source, "Chip:$genomeID");
+            $chipID = $loader->GetKBaseID('kb|chip', $source, 'Chip', "Chip:$genomeID");
         }
         # Create the chip record.
         $loader->InsertObject('ProbeSet', id => $chipID);
@@ -264,8 +264,8 @@ sub LoadExpressionData {
         # already in the database.
         print "Generating feature map.\n";
         my %fidMap = map { $_->[0] => $_->[1] }
-                $cdmi->GetAll("IsOwnerOf Feature", 'IsOwnerOf(from-link) = ?',
-                [$genome], 'Feature(source-id) Feature(id)');
+                $cdmi->GetAll("IsOwnerOf Feature", 'IsOwnerOf(from_link) = ?',
+                [$genome], 'Feature(source_id) Feature(id)');
         # Do we have experiments?
         my @experiments = ReadExperiments($expDataDirectory);
         if (! @experiments) {

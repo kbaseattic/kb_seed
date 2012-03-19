@@ -19,7 +19,7 @@
 
 use strict;
 use Tracer;
-use CDMI;
+use Bio::KBase::CDMI::CDMI;
 use Stats;
 use Time::HiRes;
 use File::Copy;

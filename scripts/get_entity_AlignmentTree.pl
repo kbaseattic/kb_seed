@@ -1,5 +1,6 @@
 use strict;
 use Data::Dumper;
+use Bio::KBase::Utilities::ScriptThing;
 use Carp;
 
 #
@@ -8,6 +9,21 @@ use Carp;
 
 
 =head1 get_entity_AlignmentTree
+
+An alignment arranges a group of protein sequences so that they
+match. Each alignment is associated with a phylogenetic tree that
+describes how the sequences developed and their evolutionary distance.
+The actual tree and alignment FASTA are stored in separate flat files.
+The Kbase will maintain a set of alignments and associated
+trees.  The majority
+of these will be based on protein sequences.  We will not have a comprehensive set
+but we will have tens of thousands of such alignments, and we view them as an
+imporant resource to support annotation.
+The alignments/trees will include the tools and parameters used to construct
+them.
+Access to the underlying sequences and trees in a form convenient to existing
+tools will be supported.
+
 
 Example:
 
@@ -33,7 +49,32 @@ output is to the standard output.
 
 =item -c Column
 
-This is used only if the column containing id is not the last.
+Use the specified column to define the id of the entity to retrieve.
+
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item alignment_method
+
+=item alignment_parameters
+
+=item alignment_properties
+
+=item tree_method
+
+=item tree_parameters
+
+=item tree_properties
+
+=back    
 
 =back
 
@@ -44,8 +85,8 @@ file with an extra column added for each requested field.  Input lines that cann
 be extended are written to stderr.  
 
 =cut
-use ScriptThing;
-use CDMIClient;
+
+use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
 
 #Default fields
@@ -53,17 +94,25 @@ use Getopt::Long;
 my @all_fields = ( 'alignment_method', 'alignment_parameters', 'alignment_properties', 'tree_method', 'tree_parameters', 'tree_properties' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_AlignmentTree [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
+my $usage = "usage: get_entity_AlignmentTree [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
 
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
-my $geO = CDMIClient->new_get_entity_for_script('c=i'	   => \$column,
-						"a"	   => \$a,
-						"fields=s" => \$f,
-						'i=s'	   => \$i);		      
+my $show_fields;
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
+								  "a"	   	=> \$a,
+								  "h"	   	=> \$show_fields,
+								  "show-fields"	=> \$show_fields,
+								  "fields=s" 	=> \$f,
+								  'i=s'	   	=> \$i);
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
 if ($a && $f) { print STDERR $usage; exit 1 }
 if ($a)
 {
@@ -93,7 +142,7 @@ elsif ($f) {
 }
 
 open my $ih, "<$i";
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_AlignmentTree(\@h, \@fields);
     for my $tuple (@tuples) {

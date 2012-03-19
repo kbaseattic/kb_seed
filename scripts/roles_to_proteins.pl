@@ -8,6 +8,12 @@ use Carp;
 
 =head1 roles_to_proteins
 
+
+roles_to_proteins can be used to extract the set of proteins (designated by MD5 values)
+that currently are believed to implement a given role.  Note that the proteins
+may be multifunctional, meaning that they may be implementing other roles, as well.
+
+
 Example:
 
     roles_to_proteins [arguments] < input > output
@@ -77,24 +83,24 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added. For each input line there can be multiple output lines, one per protein associated with the role.
+Two extra columns are added to the output, function and protein.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: roles_to_proteins [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_proteins(\@h);
     for my $tuple (@tuples) {

@@ -8,6 +8,12 @@ use Carp;
 
 =head1 protein_families_to_proteins
 
+
+protein_families_to_proteins can be used to access the set of proteins (i.e., the set of MD5 values)
+represented by each of a set of protein_families.  We define protein_families as sets of fids (rather than sets
+           of MD5s.  This may, or may not, be a mistake.
+
+
 Example:
 
     protein_families_to_proteins [arguments] < input > output
@@ -76,25 +82,23 @@ This is used only if the column containing the subsystem is not the last column.
 
 =head2 Output Format
 
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+The standard output is a tab-delimited file. For each input line, there are multiple output lines, one for each protein in the family. The protein is added to the end of each line.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: protein_families_to_proteins [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +112,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->protein_families_to_proteins(\@h);
     for my $tuple (@tuples) {

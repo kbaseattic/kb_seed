@@ -8,6 +8,13 @@ use Carp;
 
 =head1 roles_to_protein_families
 
+
+roles_to_protein_families can be used to locate the protein families containing
+features that have assigned functions implying that they implement designated roles.
+Note that for any input role (given as a role description), you may have a set
+of distinct protein_families returned.
+
+
 Example:
 
     roles_to_protein_families [arguments] < input > output
@@ -83,18 +90,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: roles_to_protein_families [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -108,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_protein_families(\@h);
     for my $tuple (@tuples) {

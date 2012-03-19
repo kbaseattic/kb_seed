@@ -26,11 +26,19 @@ package NCBI_genetic_code;
 #  Access to the numbered genetic codes used by NCBI.  A code is returned
 #  as a reference to a hash that has both uppercase and lowercase translations.
 #
-#  There are two access methods: by hash element and by subroutine:
+#  There are two access methods: by hash lookup and by function:
 #
-#   \%genetic_code_n = $NCBI_genetic_code::genetic_code{ $n };
+#   \%genetic_code = $NCBI_genetic_code::genetic_code{ $n };
+#   \%genetic_code =  NCBI_genetic_code::genetic_code( $n );
 #
-#   \%genetic_code_n =  NCBI_genetic_code::genetic_code( $n );
+#   \%genetic_code_name = $NCBI_genetic_code::genetic_code_name{ $n };
+#   \%genetic_code_name =  NCBI_genetic_code::genetic_code_name( $n );
+#
+#   \%is_start_codon = $NCBI_genetic_code::is_start_codon{ $n };
+#   \%is_start_codon =  NCBI_genetic_code::is_start_codon( $n );
+#
+#   \%is_stop_codon = $NCBI_genetic_code::is_stop_codon{ $n };
+#   \%is_stop_codon =  NCBI_genetic_code::is_stop_codon( $n );
 #
 #  The only difference in behaviour is that the subroutine defaults to code
 #  number 1 when no parameter is supplied:
@@ -51,18 +59,60 @@ my @triplets = map { $nt1 = $_;
                          } @nt
                    } @nt;
 
-my $code_num;
+our %genetic_code;
+our %genetic_code_name;
+our %is_start_codon;
+our %is_stop_codon;
 
-our %genetic_code = map { my @aas = split //, $_->[1];
-                          $_->[0] => { map { @$_, map { lc } @$_ }   # uc and lc
-                                       map { [ $_ => shift @aas ] }  # assignment
-                                       @triplets                     # codons
-                                     }
-                        }
-                    map { if ( /transl_table=(\d+)/ ) { $code_num = $1 };
-                          /AAs\s+=\s+(\S+)/ ? [ $code_num, $1 ] : ()
-                        }
-                    split /\n/, <<'End_of_Codes';
+my $code_num;
+while ( <DATA> )
+{
+    chomp;
+    if ( /\d+\.\s+(.*)\s+\(transl_table=(\d+)/ )
+    {
+        $code_num = $2;
+        $genetic_code_name{ $code_num } = $1;
+    }
+
+    if ( /AAs\s+=\s+(\S+)/ )
+    {
+        my @aas = split //, $1;
+        my %code;
+        my %stops;
+        foreach my $codon ( @triplets )
+        {
+            my $aa = shift( @aas );
+            $code{    $codon } =    $aa;
+            $code{ lc $codon } = lc $aa;
+            if ( $aa eq '*' ) { $stops{ $codon } = $stops{ lc $codon } = 1 }
+        }
+        $genetic_code{ $code_num } = \%code;
+        $is_stop_codon{ $code_num } = \%stops;
+    }
+
+    if ( /Starts\s+=\s+(\S+)/ )
+    {
+        my @data = split //, $1;
+        my %starts;
+        foreach my $codon ( @triplets )
+        {
+            if ( shift( @data ) eq 'M' )
+            {
+                $starts{ $codon } = $starts{ lc $codon } = 1;
+            }
+        }
+        $is_start_codon{ $code_num } = \%starts;
+    }
+}
+
+sub genetic_code      { $genetic_code{ $_[0]      || '1' } }
+sub genetic_code_name { $genetic_code_name{ $_[0] || '1' } }
+sub is_start_codon    { $is_start_codon{ $_[0]    || '1' } }
+sub is_stop_codon     { $is_stop_codon{ $_[0]     || '1' } }
+
+1;
+
+__DATA__
 
 1. The Standard Code (transl_table=1)
 
@@ -199,9 +249,3 @@ our %genetic_code = map { my @aas = split //, $_->[1];
   Base1  = TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   Base2  = TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   Base3  = TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
-
-End_of_Codes
-
-sub genetic_code { $genetic_code{ $_[0] || '1' } }
-
-1;

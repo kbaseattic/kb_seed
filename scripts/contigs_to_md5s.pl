@@ -8,6 +8,15 @@ use Carp;
 
 =head1 contigs_to_md5s
 
+
+contigs_to_md5s can be used to acquire MD5 values for each of a list of contigs.
+The quickest way to determine whether two contigs are identical is to compare their
+associated MD5 values, eliminating the need to retrieve the sequence of each and compare them.
+
+The routine takes as input a list of contig IDs.  The output is a mapping
+from contig ID to MD5 value.
+
+
 Example:
 
     contigs_to_md5s [arguments] < input > output
@@ -75,24 +84,23 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with an extra column (the contig md5) added.
 
 Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: contigs_to_md5s [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -106,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->contigs_to_md5s(\@h);
     for my $tuple (@tuples) {

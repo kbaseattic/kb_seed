@@ -28,7 +28,7 @@ $(BIN_DIR)/%: scripts/%.pl
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
 deploy: deploy-service
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-doc deploy-sphinx
+deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-sphinx
 deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
 
 deploy-dir:

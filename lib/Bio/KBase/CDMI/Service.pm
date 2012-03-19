@@ -1,8 +1,7 @@
-package CDMI_APIServer;
+package Bio::KBase::CDMI::Service;
 
 use Data::Dumper;
 use Moose;
-use KBRpcContext;
 
 extends 'RPC::Any::Server::JSONRPC::PSGI';
 
@@ -55,6 +54,7 @@ our %return_counts = (
         'complexes_to_complex_data' => 1,
         'genomes_to_genome_data' => 1,
         'fids_to_regulon_data' => 1,
+        'regulons_to_fids' => 1,
         'fids_to_feature_data' => 1,
         'equiv_sequence_assertions' => 1,
         'fids_to_atomic_regulons' => 1,
@@ -66,6 +66,7 @@ our %return_counts = (
         'reactions_to_complexes' => 1,
         'reaction_strings' => 1,
         'roles_to_complexes' => 1,
+        'complexes_to_roles' => 1,
         'fids_to_subsystem_data' => 1,
         'representative' => 1,
         'otu_members' => 1,
@@ -165,12 +166,16 @@ our %return_counts = (
         'get_relationship_IsATopicOf' => 1,
         'get_relationship_Contains' => 1,
         'get_relationship_IsContainedIn' => 1,
+        'get_relationship_Controls' => 1,
+        'get_relationship_IsControlledUsing' => 1,
         'get_relationship_Describes' => 1,
         'get_relationship_IsDescribedBy' => 1,
         'get_relationship_Displays' => 1,
         'get_relationship_IsDisplayedOn' => 1,
         'get_relationship_Encompasses' => 1,
         'get_relationship_IsEncompassedIn' => 1,
+        'get_relationship_Formulated' => 1,
+        'get_relationship_WasFormulatedBy' => 1,
         'get_relationship_GeneratedLevelsFor' => 1,
         'get_relationship_WasGeneratedFrom' => 1,
         'get_relationship_HasAssertionFrom' => 1,
@@ -199,6 +204,8 @@ our %return_counts = (
         'get_relationship_IsUsageOf' => 1,
         'get_relationship_HasValueFor' => 1,
         'get_relationship_HasValueIn' => 1,
+        'get_relationship_Imported' => 1,
+        'get_relationship_WasImportedFrom' => 1,
         'get_relationship_Includes' => 1,
         'get_relationship_IsIncludedIn' => 1,
         'get_relationship_IndicatedLevelsFor' => 1,
@@ -225,8 +232,6 @@ our %return_counts = (
         'get_relationship_ReflectsStateOf' => 1,
         'get_relationship_IsConsistentWith' => 1,
         'get_relationship_IsConsistentTo' => 1,
-        'get_relationship_IsControlledUsing' => 1,
-        'get_relationship_Controls' => 1,
         'get_relationship_IsCoregulatedWith' => 1,
         'get_relationship_HasCoregulationWith' => 1,
         'get_relationship_IsCoupledTo' => 1,
@@ -362,6 +367,7 @@ sub _build_valid_methods
         'complexes_to_complex_data' => 1,
         'genomes_to_genome_data' => 1,
         'fids_to_regulon_data' => 1,
+        'regulons_to_fids' => 1,
         'fids_to_feature_data' => 1,
         'equiv_sequence_assertions' => 1,
         'fids_to_atomic_regulons' => 1,
@@ -373,6 +379,7 @@ sub _build_valid_methods
         'reactions_to_complexes' => 1,
         'reaction_strings' => 1,
         'roles_to_complexes' => 1,
+        'complexes_to_roles' => 1,
         'fids_to_subsystem_data' => 1,
         'representative' => 1,
         'otu_members' => 1,
@@ -472,12 +479,16 @@ sub _build_valid_methods
         'get_relationship_IsATopicOf' => 1,
         'get_relationship_Contains' => 1,
         'get_relationship_IsContainedIn' => 1,
+        'get_relationship_Controls' => 1,
+        'get_relationship_IsControlledUsing' => 1,
         'get_relationship_Describes' => 1,
         'get_relationship_IsDescribedBy' => 1,
         'get_relationship_Displays' => 1,
         'get_relationship_IsDisplayedOn' => 1,
         'get_relationship_Encompasses' => 1,
         'get_relationship_IsEncompassedIn' => 1,
+        'get_relationship_Formulated' => 1,
+        'get_relationship_WasFormulatedBy' => 1,
         'get_relationship_GeneratedLevelsFor' => 1,
         'get_relationship_WasGeneratedFrom' => 1,
         'get_relationship_HasAssertionFrom' => 1,
@@ -506,6 +517,8 @@ sub _build_valid_methods
         'get_relationship_IsUsageOf' => 1,
         'get_relationship_HasValueFor' => 1,
         'get_relationship_HasValueIn' => 1,
+        'get_relationship_Imported' => 1,
+        'get_relationship_WasImportedFrom' => 1,
         'get_relationship_Includes' => 1,
         'get_relationship_IsIncludedIn' => 1,
         'get_relationship_IndicatedLevelsFor' => 1,
@@ -532,8 +545,6 @@ sub _build_valid_methods
         'get_relationship_ReflectsStateOf' => 1,
         'get_relationship_IsConsistentWith' => 1,
         'get_relationship_IsConsistentTo' => 1,
-        'get_relationship_IsControlledUsing' => 1,
-        'get_relationship_Controls' => 1,
         'get_relationship_IsCoregulatedWith' => 1,
         'get_relationship_HasCoregulationWith' => 1,
         'get_relationship_IsCoupledTo' => 1,
@@ -630,7 +641,7 @@ sub call_method {
     my ($self, $data, $method_info) = @_;
     my ($module, $method) = @$method_info{qw(module method)};
     
-    my $ctx = KBRpcContext->new(client_ip => $self->_plack_req->address);
+    my $ctx = Bio::KBase::CDMI::ServiceContext->new(client_ip => $self->_plack_req->address);
     
     my $args = $data->{arguments};
     if (@$args == 1 && ref($args->[0]) eq 'HASH')
@@ -708,6 +719,37 @@ sub get_method
     }
     
     return { module => $module, method => $method };
+}
+
+package Bio::KBase::CDMI::ServiceContext;
+
+use strict;
+
+=head1 NAME
+
+Bio::KBase::CDMI::ServiceContext
+
+head1 DESCRIPTION
+
+A KB RPC context contains information about the invoker of this
+service. If it is an authenticated service the authenticated user
+record is available via $context->user. The client IP address
+is available via $context->client_ip.
+
+=cut
+
+use base 'Class::Accessor';
+
+__PACKAGE__->mk_accessors(qw(user client_ip));
+
+sub new
+{
+    my($class, %opts) = @_;
+    
+    my $self = {
+	%opts,
+    };
+    return bless $self, $class;
 }
 
 1;

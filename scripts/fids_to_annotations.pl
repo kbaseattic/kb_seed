@@ -8,6 +8,12 @@ use Carp;
 
 =head1 fids_to_annotations
 
+
+This routine takes as input a list of fids.  It retrieves the existing
+annotations for each fid, including the text of the annotation, who
+made the annotation and when (as seconds from the epoch).
+
+
 Example:
 
     fids_to_annotations [arguments] < input > output
@@ -95,18 +101,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: fids_to_annotations [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -120,7 +125,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->fids_to_annotations(\@h);
     for my $tuple (@tuples) {
@@ -134,16 +139,14 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             print STDERR $line,"\n";
         }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
-            }
-        }
         else
-        {
-            print "$line\t$v\n";
-        }
+	{
+	    foreach my $ann (sort { $b->[2] <=> $a->[2] } @$v)
+	    {
+		my($txt,$who,$when) = @$ann;
+		my $whenL = localtime($when);
+		print join("\n",($whenL,$who,$txt)),"\n//\n";
+	    }
+	}
     }
 }

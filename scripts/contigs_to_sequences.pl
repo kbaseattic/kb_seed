@@ -8,6 +8,16 @@ use Carp;
 
 =head1 contigs_to_sequences
 
+
+contigs_to_sequences is used to access the DNA sequence associated with each of a set
+of input contigs.  It takes as input a set of contig IDs (from which the genome can be determined) and
+produces a mapping from the input IDs to the returned DNA sequence in each case.
+
+Normally, people want to get back a fasta file, so that is the default (the input table
+is essentially discarded, keeping only the fasta file).  The alternative to to add a column
+to the table (containing the contig sequence).  The "-fasta=0" argument should be used, if you
+do not want fasta output. 
+
 Example:
 
     contigs_to_sequences [arguments] < input > output
@@ -66,9 +76,14 @@ dna is a string
 
 =item -c Column
 
-This is used only if the column containing the subsystem is not the last column.
+This is used only if the column containing the contig IDs is not the last column.
 
 =item -i InputFile    [ use InputFile, rather than stdin ]
+
+=item -fasta
+
+This is used to request a fasta output file (dropping all of the other columns in the input lines).
+It defaults to outputing just a fasta entry.
 
 =back
 
@@ -81,19 +96,20 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: contigs_to_sequences [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
-
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $fasta = 1;
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+				     'fasta=i' => \$fasta,
 				      'i=s' => \$input_file);
+
 if (! $kbO) { print STDERR $usage; exit }
 
 my $ih;
@@ -106,9 +122,11 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+my %fasta_written;   # to remove any possible duplicates
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->contigs_to_sequences(\@h);
+
     for my $tuple (@tuples) {
         #
         # Process output here and print.
@@ -124,12 +142,34 @@ while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
         {
             foreach $_ (@$v)
             {
-                print "$line\t$_\n";
+		if ($fasta)
+		{
+		    if (! $fasta_written{$id})
+		    {
+			$fasta_written{$id} = 1;
+			print ">$id\n$_\n";
+		    }
+		}
+		else
+		{
+		    print "$line\t$_\n";
+		}
             }
         }
         else
         {
-            print "$line\t$v\n";
+	    if ($fasta)
+	    {
+		if (! $fasta_written{$id})
+		{
+		    $fasta_written{$id} = 1;
+		    print ">$id\n$v\n";
+		}
+	    }
+	    else
+	    {
+		print "$line\t$v\n";
+	    }
         }
     }
 }

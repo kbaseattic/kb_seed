@@ -21,7 +21,7 @@ use strict;
 use Stats;
 use File::Copy;
 use BasicLocation;
-use CDMILoader;
+use Bio::KBase::CDMI::CDMILoader;
 
 =head1 EnsemblPlant Genome Conversion Script for CDMI Load
 
@@ -178,12 +178,15 @@ Name of the directory containing the plant genome files.
     # Next comes the features file. This requires the most changes.
     # In addition to prefixing feature IDs, we have to fix the
     # contig IDs in the locations, and move the parent and gene IDs
-    # to the end columns.
+    # to the end columns. We also need to keep track of the CDS for
+    # each mRNA, because the mRNA's protein really belongs to the CDS.
+    # A hash will map mRNA IDs to CDS IDs.
+    my %mRnaHash;
     print "Translating features file.\n";
     open($ih, "<$inDirectory/features.$genomeID.tsv") || die "Could not open $genomeID features file: $!\n";
     open($oh, ">$outDirectory/features.tab") || die "Could not create $genomeID features output file: $!\n";
     while (! eof $ih) {
-        my ($fid, $type, $parent, $name, $location) = CDMILoader::GetLine($ih);
+        my ($fid, $type, $parent, $name, $location) = Bio::KBase::CDMI::CDMILoader::GetLine($ih);
         $stats->Add(featureLineIn => 1);
         # Delete the parent ID if it's a period. Otherwise, fix it.
         if ($parent eq '.') {
@@ -195,6 +198,11 @@ Name of the directory containing the plant genome files.
         }
         # Fix the main feature ID.
         $fid = "$genomeID:$fid";
+        # If this is a CDS, add it to the mRNA map.
+        if ($type eq 'CDS' && $parent) {
+            $mRnaHash{$parent} = $fid;
+            $stats->Add(mRnaParentFound => 1);
+        }
         # Split up the location.
         my @locs = split /\s*,\s*/, $location;
         # This remembers the previous contig ID for the location.
@@ -221,6 +229,12 @@ Name of the directory containing the plant genome files.
                 $stats->Add(badLocation => 1);
             }
         }
+        # Is this location on the minus strand?
+        if ($oLocs[0] =~ /\d+\-\d+/) {
+            # Yes. The pieces were given to us in reverse order, so we
+            # have to reverse the list.
+            @oLocs = reverse @oLocs;
+        }
         # Re-assemble the location.
         $location = join(",", @oLocs);
         # Output the fixed line.
@@ -238,8 +252,18 @@ Name of the directory containing the plant genome files.
     while (! eof $ih) {
         my $line = <$ih>;
         $stats->Add(protLineIn => 1);
-        if (substr($line,0,1) eq '>') {
-            $line = ">$genomeID:" . substr($line,1);
+        if ($line =~ /^>(\S+)(.*)/) {
+            # Here we have a header line. Compute the real feature ID and
+            # save the residual part of the line.
+            my $fid = "$genomeID:$1";
+            my $suffix = $2;
+            # Check to see if this is an mRNA. If it is, we map it to the
+            # CDS.
+            if ($mRnaHash{$fid}) {
+                $fid = $mRnaHash{$fid};
+                $stats->Add(mRnaProteinMapped => 1);
+            }
+            $line = ">$fid$suffix\n";
             $stats->Add(protLineFixed => 1);
         }
         print $oh $line;

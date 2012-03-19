@@ -8,6 +8,18 @@ use Carp;
 
 =head1 proteins_to_literature
 
+
+The routine proteins_to_literature can be used to extract the list of papers
+we have associated with specific protein sequences.  The user should note that
+in many cases the association of a paper with a protein sequence is not precise.
+That is, the paper may actually describe a closely-related protein (that may
+not yet even be in a sequenced genome).  Annotators attempt to use best
+judgement when associating literature and proteins.  Publication references
+include [pubmed ID,URL for the paper, title of the paper].  In some cases,
+the URL and title are omitted.  In theory, we can extract them from PubMed
+and we will attempt to do so.
+
+
 Example:
 
     proteins_to_literature [arguments] < input > output
@@ -89,18 +101,17 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: proteins_to_literature [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
 
 my $input_file;
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -114,7 +125,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->proteins_to_literature(\@h);
     for my $tuple (@tuples) {

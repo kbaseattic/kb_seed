@@ -1,9 +1,9 @@
-use CDMI;
+use Bio::KBase::CDMI::CDMI;
 use strict;
 use Data::Dumper;
 use Encode;
 
-my $cdmi = CDMI->new_for_script();
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 my $q = $cdmi->{_dbh}->quote;
 
 @ARGV == 1 or die "Usage: $0 entity-to-index\n";
@@ -46,7 +46,7 @@ if ($entity->{FulltextIndexes})
 	elsif ($ix->{type} eq 'related_field')
 	{
 	    my $jidx = scalar(@join) + 1;
-	    
+
 	    if ($ix->{path} =~ /^(\S+)\s+(\S+)\s+(\S+)$/)
 	    {
 		my($rel, $targ, $rel2) = ($1, $2, $3);

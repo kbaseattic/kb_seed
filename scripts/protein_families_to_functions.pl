@@ -8,6 +8,11 @@ use Carp;
 
 =head1 protein_families_to_functions
 
+
+protein_families_to_functions can be used to extract the set of functions assigned to the fids
+that make up the family.  Each input protein_family is mapped to a family function.
+
+
 Example:
 
     protein_families_to_functions [arguments] < input > output
@@ -91,19 +96,20 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
 
 my $usage = "usage: protein_families_to_functions [-c column] < input > output";
 
-use CDMIClient;
-use ScriptThing;
-
-my $column;
-
+       
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+            
+my $column;     
+            
 my $input_file;
+        
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+                                      'i=s' => \$input_file);
 
-my $kbO = CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
 my $ih;
@@ -116,7 +122,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->protein_families_to_functions(\@h);
     for my $tuple (@tuples) {
