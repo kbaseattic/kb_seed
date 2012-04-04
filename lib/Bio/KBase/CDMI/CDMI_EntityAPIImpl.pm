@@ -58,6 +58,7 @@ our $entity_field_defs = {
 		    'abbr' => 1,
 		    'mod_date' => 1,
 		    'name' => 1,
+		    'msid' => 1,
 	
     },
     'Complex' => {
@@ -1737,6 +1738,86 @@ sub _validate_fields_for_relationship
     return(\@sfields, \@qfields);
 }
 
+sub _query_entity
+{
+    my($self, $ctx, $tbl, $qry, $fields) = @_;
+
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+    
+    my @filter;
+    my @filter_params;
+
+    my $valid_fields = $entity_field_defs->{$tbl};
+    my $field_rels = $entity_field_rels->{$tbl};
+    my %valid_ops = map { $_ => 1 } ('LIKE', '<', '>', '=', '>=', '<=');
+    my @bad_q;
+    for my $q (@$qry)
+    {
+	my($field, $op, $value) = @$q;
+	if (!$valid_fields->{$field})
+	{
+	    push(@bad_q, "Field $field does not exist in $tbl");
+	    next;
+	}
+	if ($field_rels->{$field})
+	{
+	    push(@bad_q, "Field $field is stored in a secondary relation; this is not yet supported for queries.");
+	    next;
+	}
+	if (!$valid_ops{uc($op)})
+	{
+	    push(@bad_q, "Operator $op is not allowed");
+	    next;
+	}
+	push(@filter, "$field $op ?");
+	push(@filter_params, $value);
+    }
+
+    if (@bad_q)
+    {
+	die "Errors found in query:\n" . join("\n", @bad_q);
+    }
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my $qstr = join(", ", @$qfields);
+
+    my $filter = join(" AND ", map { "(" . $_ . ")" } @filter);
+    my $qry = "SELECT $qstr FROM $q$tbl$q WHERE $filter";
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+    }
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute(@filter_params);
+    my $out = $sth->fetchall_hashref('id');
+
+    my @ids = keys %$out;
+    
+    #
+    # Now query for the fields that are in separate relations.
+    #
+    for my $ent (@$rel_fields)
+    {
+	my($field, $rel) = @$ent;
+	my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	$sth->execute(@ids);
+	while (my $row = $sth->fetchrow_arrayref())
+	{
+	    my($id, $val) = @$row;
+	    push(@{$out->{$id}->{$field}}, $val);
+	}
+    }
+    return $out;
+}    
+
 sub _get_entity
 {
     my($self, $ctx, $tbl, $ids, $fields) = @_;
@@ -2151,6 +2232,82 @@ sub get_entity_AlignmentTree
 
 
 
+=head2 query_entity_AlignmentTree
+
+  $return = $obj->query_entity_AlignmentTree($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AlignmentTree
+fields_AlignmentTree is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	alignment_method has a value which is a string
+	alignment_parameters has a value which is a string
+	alignment_properties has a value which is a string
+	tree_method has a value which is a string
+	tree_parameters has a value which is a string
+	tree_properties has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AlignmentTree
+fields_AlignmentTree is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	alignment_method has a value which is a string
+	alignment_parameters has a value which is a string
+	alignment_properties has a value which is a string
+	tree_method has a value which is a string
+	tree_parameters has a value which is a string
+	tree_properties has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_AlignmentTree
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_AlignmentTree
+
+    $return = $self->_query_entity($ctx, 'AlignmentTree', $qry, $fields);
+
+    #END query_entity_AlignmentTree
+    return($return);
+}
+
+
+
+
 =head2 all_entities_AlignmentTree
 
   $return = $obj->all_entities_AlignmentTree($start, $count, $fields)
@@ -2313,6 +2470,76 @@ sub get_entity_Annotation
 
 
 
+=head2 query_entity_Annotation
+
+  $return = $obj->query_entity_Annotation($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Annotation
+fields_Annotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotator has a value which is a string
+	comment has a value which is a string
+	annotation_time has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Annotation
+fields_Annotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotator has a value which is a string
+	comment has a value which is a string
+	annotation_time has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Annotation
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Annotation
+
+    $return = $self->_query_entity($ctx, 'Annotation', $qry, $fields);
+
+    #END query_entity_Annotation
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Annotation
 
   $return = $obj->all_entities_Annotation($start, $count, $fields)
@@ -2461,6 +2688,70 @@ sub get_entity_AtomicRegulon
 
 
 
+=head2 query_entity_AtomicRegulon
+
+  $return = $obj->query_entity_AtomicRegulon($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AtomicRegulon
+fields_AtomicRegulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AtomicRegulon
+fields_AtomicRegulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_AtomicRegulon
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_AtomicRegulon
+
+    $return = $self->_query_entity($ctx, 'AtomicRegulon', $qry, $fields);
+
+    #END query_entity_AtomicRegulon
+    return($return);
+}
+
+
+
+
 =head2 all_entities_AtomicRegulon
 
   $return = $obj->all_entities_AtomicRegulon($start, $count, $fields)
@@ -2589,6 +2880,72 @@ sub get_entity_Attribute
     $return = $self->_get_entity($ctx, 'Attribute', $ids, $fields);
 
     #END get_entity_Attribute
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Attribute
+
+  $return = $obj->query_entity_Attribute($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Attribute
+fields_Attribute is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Attribute
+fields_Attribute is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Attribute
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Attribute
+
+    $return = $self->_query_entity($ctx, 'Attribute', $qry, $fields);
+
+    #END query_entity_Attribute
     return($return);
 }
 
@@ -2739,6 +3096,74 @@ sub get_entity_Biomass
 
 
 
+=head2 query_entity_Biomass
+
+  $return = $obj->query_entity_Biomass($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Biomass
+fields_Biomass is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Biomass
+fields_Biomass is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Biomass
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Biomass
+
+    $return = $self->_query_entity($ctx, 'Biomass', $qry, $fields);
+
+    #END query_entity_Biomass
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Biomass
 
   $return = $obj->all_entities_Biomass($start, $count, $fields)
@@ -2877,6 +3302,72 @@ sub get_entity_BiomassCompound
 
 
 
+=head2 query_entity_BiomassCompound
+
+  $return = $obj->query_entity_BiomassCompound($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_BiomassCompound
+fields_BiomassCompound is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	coefficient has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_BiomassCompound
+fields_BiomassCompound is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	coefficient has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_BiomassCompound
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_BiomassCompound
+
+    $return = $self->_query_entity($ctx, 'BiomassCompound', $qry, $fields);
+
+    #END query_entity_BiomassCompound
+    return($return);
+}
+
+
+
+
 =head2 all_entities_BiomassCompound
 
   $return = $obj->all_entities_BiomassCompound($start, $count, $fields)
@@ -2958,6 +3449,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -2973,6 +3465,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -3006,6 +3499,11 @@ compartment's definition
 common name for the compartment
 
 
+=item msid
+
+common modeling ID of this compartment
+
+
 
 =back
 
@@ -3023,6 +3521,78 @@ sub get_entity_Compartment
     $return = $self->_get_entity($ctx, 'Compartment', $ids, $fields);
 
     #END get_entity_Compartment
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Compartment
+
+  $return = $obj->query_entity_Compartment($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Compartment
+fields_Compartment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	abbr has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	msid has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Compartment
+fields_Compartment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	abbr has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	msid has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Compartment
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Compartment
+
+    $return = $self->_query_entity($ctx, 'Compartment', $qry, $fields);
+
+    #END query_entity_Compartment
     return($return);
 }
 
@@ -3049,6 +3619,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -3065,6 +3636,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -3176,6 +3748,76 @@ sub get_entity_Complex
     $return = $self->_get_entity($ctx, 'Complex', $ids, $fields);
 
     #END get_entity_Complex
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Complex
+
+  $return = $obj->query_entity_Complex($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Complex
+fields_Complex is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a reference to a list where each element is a string
+	msid has a value which is a string
+	mod_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Complex
+fields_Complex is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a reference to a list where each element is a string
+	msid has a value which is a string
+	mod_date has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Complex
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Complex
+
+    $return = $self->_query_entity($ctx, 'Complex', $qry, $fields);
+
+    #END query_entity_Complex
     return($return);
 }
 
@@ -3372,6 +4014,86 @@ sub get_entity_Compound
 
 
 
+=head2 query_entity_Compound
+
+  $return = $obj->query_entity_Compound($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Compound
+fields_Compound is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	label has a value which is a string
+	abbr has a value which is a string
+	msid has a value which is a string
+	ubiquitous has a value which is an int
+	mod_date has a value which is a string
+	uncharged_formula has a value which is a string
+	formula has a value which is a string
+	mass has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Compound
+fields_Compound is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	label has a value which is a string
+	abbr has a value which is a string
+	msid has a value which is a string
+	ubiquitous has a value which is an int
+	mod_date has a value which is a string
+	uncharged_formula has a value which is a string
+	formula has a value which is a string
+	mass has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Compound
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Compound
+
+    $return = $self->_query_entity($ctx, 'Compound', $qry, $fields);
+
+    #END query_entity_Compound
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Compound
 
   $return = $obj->all_entities_Compound($start, $count, $fields)
@@ -3527,6 +4249,72 @@ sub get_entity_Contig
 
 
 
+=head2 query_entity_Contig
+
+  $return = $obj->query_entity_Contig($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Contig
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Contig
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Contig
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Contig
+
+    $return = $self->_query_entity($ctx, 'Contig', $qry, $fields);
+
+    #END query_entity_Contig
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Contig
 
   $return = $obj->all_entities_Contig($start, $count, $fields)
@@ -3671,6 +4459,72 @@ sub get_entity_ContigChunk
 
 
 
+=head2 query_entity_ContigChunk
+
+  $return = $obj->query_entity_ContigChunk($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ContigChunk
+fields_ContigChunk is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ContigChunk
+fields_ContigChunk is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ContigChunk
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ContigChunk
+
+    $return = $self->_query_entity($ctx, 'ContigChunk', $qry, $fields);
+
+    #END query_entity_ContigChunk
+    return($return);
+}
+
+
+
+
 =head2 all_entities_ContigChunk
 
   $return = $obj->all_entities_ContigChunk($start, $count, $fields)
@@ -3805,6 +4659,72 @@ sub get_entity_ContigSequence
     $return = $self->_get_entity($ctx, 'ContigSequence', $ids, $fields);
 
     #END get_entity_ContigSequence
+    return($return);
+}
+
+
+
+
+=head2 query_entity_ContigSequence
+
+  $return = $obj->query_entity_ContigSequence($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ContigSequence
+fields_ContigSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	length has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ContigSequence
+fields_ContigSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	length has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ContigSequence
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ContigSequence
+
+    $return = $self->_query_entity($ctx, 'ContigSequence', $qry, $fields);
+
+    #END query_entity_ContigSequence
     return($return);
 }
 
@@ -3952,6 +4872,72 @@ sub get_entity_CoregulatedSet
 
 
 
+=head2 query_entity_CoregulatedSet
+
+  $return = $obj->query_entity_CoregulatedSet($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_CoregulatedSet
+fields_CoregulatedSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_CoregulatedSet
+fields_CoregulatedSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_CoregulatedSet
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_CoregulatedSet
+
+    $return = $self->_query_entity($ctx, 'CoregulatedSet', $qry, $fields);
+
+    #END query_entity_CoregulatedSet
+    return($return);
+}
+
+
+
+
 =head2 all_entities_CoregulatedSet
 
   $return = $obj->all_entities_CoregulatedSet($start, $count, $fields)
@@ -4088,6 +5074,74 @@ sub get_entity_Diagram
     $return = $self->_get_entity($ctx, 'Diagram', $ids, $fields);
 
     #END get_entity_Diagram
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Diagram
+
+  $return = $obj->query_entity_Diagram($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Diagram
+fields_Diagram is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	content has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Diagram
+fields_Diagram is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	content has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Diagram
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Diagram
+
+    $return = $self->_query_entity($ctx, 'Diagram', $qry, $fields);
+
+    #END query_entity_Diagram
     return($return);
 }
 
@@ -4240,6 +5294,74 @@ sub get_entity_EcNumber
 
 
 
+=head2 query_entity_EcNumber
+
+  $return = $obj->query_entity_EcNumber($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_EcNumber
+fields_EcNumber is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	obsolete has a value which is an int
+	replacedby has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_EcNumber
+fields_EcNumber is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	obsolete has a value which is an int
+	replacedby has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_EcNumber
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_EcNumber
+
+    $return = $self->_query_entity($ctx, 'EcNumber', $qry, $fields);
+
+    #END query_entity_EcNumber
+    return($return);
+}
+
+
+
+
 =head2 all_entities_EcNumber
 
   $return = $obj->all_entities_EcNumber($start, $count, $fields)
@@ -4372,6 +5494,72 @@ sub get_entity_Experiment
     $return = $self->_get_entity($ctx, 'Experiment', $ids, $fields);
 
     #END get_entity_Experiment
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Experiment
+
+  $return = $obj->query_entity_Experiment($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Experiment
+fields_Experiment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Experiment
+fields_Experiment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Experiment
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Experiment
+
+    $return = $self->_query_entity($ctx, 'Experiment', $qry, $fields);
+
+    #END query_entity_Experiment
     return($return);
 }
 
@@ -4533,6 +5721,74 @@ sub get_entity_Family
     $return = $self->_get_entity($ctx, 'Family', $ids, $fields);
 
     #END get_entity_Family
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Family
+
+  $return = $obj->query_entity_Family($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Family
+fields_Family is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	type has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Family
+fields_Family is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	type has a value which is a string
+	family_function has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Family
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Family
+
+    $return = $self->_query_entity($ctx, 'Family', $qry, $fields);
+
+    #END query_entity_Family
     return($return);
 }
 
@@ -4705,6 +5961,78 @@ sub get_entity_Feature
     $return = $self->_get_entity($ctx, 'Feature', $ids, $fields);
 
     #END get_entity_Feature
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Feature
+
+  $return = $obj->query_entity_Feature($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Feature
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Feature
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Feature
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Feature
+
+    $return = $self->_query_entity($ctx, 'Feature', $qry, $fields);
+
+    #END query_entity_Feature
     return($return);
 }
 
@@ -4949,6 +6277,96 @@ sub get_entity_Genome
 
 
 
+=head2 query_entity_Genome
+
+  $return = $obj->query_entity_Genome($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Genome
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Genome
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Genome
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Genome
+
+    $return = $self->_query_entity($ctx, 'Genome', $qry, $fields);
+
+    #END query_entity_Genome
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Genome
 
   $return = $obj->all_entities_Genome($start, $count, $fields)
@@ -5119,6 +6537,74 @@ sub get_entity_Identifier
 
 
 
+=head2 query_entity_Identifier
+
+  $return = $obj->query_entity_Identifier($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Identifier
+fields_Identifier is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source has a value which is a string
+	natural_form has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Identifier
+fields_Identifier is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source has a value which is a string
+	natural_form has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Identifier
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Identifier
+
+    $return = $self->_query_entity($ctx, 'Identifier', $qry, $fields);
+
+    #END query_entity_Identifier
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Identifier
 
   $return = $obj->all_entities_Identifier($start, $count, $fields)
@@ -5267,6 +6753,76 @@ sub get_entity_Media
     $return = $self->_get_entity($ctx, 'Media', $ids, $fields);
 
     #END get_entity_Media
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Media
+
+  $return = $obj->query_entity_Media($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Media
+fields_Media is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Media
+fields_Media is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	type has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Media
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Media
+
+    $return = $self->_query_entity($ctx, 'Media', $qry, $fields);
+
+    #END query_entity_Media
     return($return);
 }
 
@@ -5463,6 +7019,86 @@ sub get_entity_Model
 
 
 
+=head2 query_entity_Model
+
+  $return = $obj->query_entity_Model($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Model
+fields_Model is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	version has a value which is an int
+	type has a value which is a string
+	status has a value which is a string
+	reaction_count has a value which is an int
+	compound_count has a value which is an int
+	annotation_count has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Model
+fields_Model is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	version has a value which is an int
+	type has a value which is a string
+	status has a value which is a string
+	reaction_count has a value which is an int
+	compound_count has a value which is an int
+	annotation_count has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Model
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Model
+
+    $return = $self->_query_entity($ctx, 'Model', $qry, $fields);
+
+    #END query_entity_Model
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Model
 
   $return = $obj->all_entities_Model($start, $count, $fields)
@@ -5640,6 +7276,78 @@ sub get_entity_ModelCompartment
 
 
 
+=head2 query_entity_ModelCompartment
+
+  $return = $obj->query_entity_ModelCompartment($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ModelCompartment
+fields_ModelCompartment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	compartment_index has a value which is an int
+	label has a value which is a reference to a list where each element is a string
+	pH has a value which is a float
+	potential has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ModelCompartment
+fields_ModelCompartment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	compartment_index has a value which is an int
+	label has a value which is a reference to a list where each element is a string
+	pH has a value which is a float
+	potential has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ModelCompartment
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ModelCompartment
+
+    $return = $self->_query_entity($ctx, 'ModelCompartment', $qry, $fields);
+
+    #END query_entity_ModelCompartment
+    return($return);
+}
+
+
+
+
 =head2 all_entities_ModelCompartment
 
   $return = $obj->all_entities_ModelCompartment($start, $count, $fields)
@@ -5768,6 +7476,70 @@ sub get_entity_OTU
     $return = $self->_get_entity($ctx, 'OTU', $ids, $fields);
 
     #END get_entity_OTU
+    return($return);
+}
+
+
+
+
+=head2 query_entity_OTU
+
+  $return = $obj->query_entity_OTU($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_OTU
+fields_OTU is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_OTU
+fields_OTU is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_OTU
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_OTU
+
+    $return = $self->_query_entity($ctx, 'OTU', $qry, $fields);
+
+    #END query_entity_OTU
     return($return);
 }
 
@@ -5913,6 +7685,72 @@ sub get_entity_PairSet
 
 
 
+=head2 query_entity_PairSet
+
+  $return = $obj->query_entity_PairSet($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_PairSet
+fields_PairSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	score has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_PairSet
+fields_PairSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	score has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_PairSet
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_PairSet
+
+    $return = $self->_query_entity($ctx, 'PairSet', $qry, $fields);
+
+    #END query_entity_PairSet
+    return($return);
+}
+
+
+
+
 =head2 all_entities_PairSet
 
   $return = $obj->all_entities_PairSet($start, $count, $fields)
@@ -6045,6 +7883,70 @@ sub get_entity_Pairing
 
 
 
+=head2 query_entity_Pairing
+
+  $return = $obj->query_entity_Pairing($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Pairing
+fields_Pairing is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Pairing
+fields_Pairing is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Pairing
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Pairing
+
+    $return = $self->_query_entity($ctx, 'Pairing', $qry, $fields);
+
+    #END query_entity_Pairing
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Pairing
 
   $return = $obj->all_entities_Pairing($start, $count, $fields)
@@ -6165,6 +8067,70 @@ sub get_entity_ProbeSet
     $return = $self->_get_entity($ctx, 'ProbeSet', $ids, $fields);
 
     #END get_entity_ProbeSet
+    return($return);
+}
+
+
+
+
+=head2 query_entity_ProbeSet
+
+  $return = $obj->query_entity_ProbeSet($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ProbeSet
+fields_ProbeSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ProbeSet
+fields_ProbeSet is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ProbeSet
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ProbeSet
+
+    $return = $self->_query_entity($ctx, 'ProbeSet', $qry, $fields);
+
+    #END query_entity_ProbeSet
     return($return);
 }
 
@@ -6303,6 +8269,72 @@ sub get_entity_ProteinSequence
     $return = $self->_get_entity($ctx, 'ProteinSequence', $ids, $fields);
 
     #END get_entity_ProteinSequence
+    return($return);
+}
+
+
+
+
+=head2 query_entity_ProteinSequence
+
+  $return = $obj->query_entity_ProteinSequence($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ProteinSequence
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ProteinSequence
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ProteinSequence
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ProteinSequence
+
+    $return = $self->_query_entity($ctx, 'ProteinSequence', $qry, $fields);
+
+    #END query_entity_ProteinSequence
     return($return);
 }
 
@@ -6460,6 +8492,76 @@ sub get_entity_Publication
     $return = $self->_get_entity($ctx, 'Publication', $ids, $fields);
 
     #END get_entity_Publication
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Publication
+
+  $return = $obj->query_entity_Publication($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Publication
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Publication
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Publication
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Publication
+
+    $return = $self->_query_entity($ctx, 'Publication', $qry, $fields);
+
+    #END query_entity_Publication
     return($return);
 }
 
@@ -6642,6 +8744,82 @@ sub get_entity_Reaction
 
 
 
+=head2 query_entity_Reaction
+
+  $return = $obj->query_entity_Reaction($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Reaction
+fields_Reaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	msid has a value which is a string
+	abbr has a value which is a string
+	equation has a value which is a string
+	reversibility has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Reaction
+fields_Reaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	mod_date has a value which is a string
+	name has a value which is a string
+	msid has a value which is a string
+	abbr has a value which is a string
+	equation has a value which is a string
+	reversibility has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Reaction
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Reaction
+
+    $return = $self->_query_entity($ctx, 'Reaction', $qry, $fields);
+
+    #END query_entity_Reaction
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Reaction
 
   $return = $obj->all_entities_Reaction($start, $count, $fields)
@@ -6789,6 +8967,74 @@ sub get_entity_ReactionRule
     $return = $self->_get_entity($ctx, 'ReactionRule', $ids, $fields);
 
     #END get_entity_ReactionRule
+    return($return);
+}
+
+
+
+
+=head2 query_entity_ReactionRule
+
+  $return = $obj->query_entity_ReactionRule($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReactionRule
+fields_ReactionRule is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	transproton has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReactionRule
+fields_ReactionRule is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	transproton has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ReactionRule
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_ReactionRule
+
+    $return = $self->_query_entity($ctx, 'ReactionRule', $qry, $fields);
+
+    #END query_entity_ReactionRule
     return($return);
 }
 
@@ -6968,6 +9214,78 @@ sub get_entity_Reagent
 
 
 
+=head2 query_entity_Reagent
+
+  $return = $obj->query_entity_Reagent($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Reagent
+fields_Reagent is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	stoichiometry has a value which is a float
+	cofactor has a value which is an int
+	compartment_index has a value which is an int
+	transport_coefficient has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Reagent
+fields_Reagent is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	stoichiometry has a value which is a float
+	cofactor has a value which is an int
+	compartment_index has a value which is an int
+	transport_coefficient has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Reagent
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Reagent
+
+    $return = $self->_query_entity($ctx, 'Reagent', $qry, $fields);
+
+    #END query_entity_Reagent
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Reagent
 
   $return = $obj->all_entities_Reagent($start, $count, $fields)
@@ -7124,6 +9442,76 @@ sub get_entity_Requirement
 
 
 
+=head2 query_entity_Requirement
+
+  $return = $obj->query_entity_Requirement($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Requirement
+fields_Requirement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	transproton has a value which is a float
+	proton has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Requirement
+fields_Requirement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	transproton has a value which is a float
+	proton has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Requirement
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Requirement
+
+    $return = $self->_query_entity($ctx, 'Requirement', $qry, $fields);
+
+    #END query_entity_Requirement
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Requirement
 
   $return = $obj->all_entities_Requirement($start, $count, $fields)
@@ -7266,6 +9654,72 @@ sub get_entity_Role
 
 
 
+=head2 query_entity_Role
+
+  $return = $obj->query_entity_Role($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Role
+fields_Role is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	hypothetical has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Role
+fields_Role is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	hypothetical has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Role
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Role
+
+    $return = $self->_query_entity($ctx, 'Role', $qry, $fields);
+
+    #END query_entity_Role
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Role
 
   $return = $obj->all_entities_Role($start, $count, $fields)
@@ -7390,6 +9844,70 @@ sub get_entity_SSCell
     $return = $self->_get_entity($ctx, 'SSCell', $ids, $fields);
 
     #END get_entity_SSCell
+    return($return);
+}
+
+
+
+
+=head2 query_entity_SSCell
+
+  $return = $obj->query_entity_SSCell($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SSCell
+fields_SSCell is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SSCell
+fields_SSCell is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_SSCell
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_SSCell
+
+    $return = $self->_query_entity($ctx, 'SSCell', $qry, $fields);
+
+    #END query_entity_SSCell
     return($return);
 }
 
@@ -7546,6 +10064,74 @@ sub get_entity_SSRow
 
 
 
+=head2 query_entity_SSRow
+
+  $return = $obj->query_entity_SSRow($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SSRow
+fields_SSRow is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	curated has a value which is an int
+	region has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SSRow
+fields_SSRow is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	curated has a value which is an int
+	region has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_SSRow
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_SSRow
+
+    $return = $self->_query_entity($ctx, 'SSRow', $qry, $fields);
+
+    #END query_entity_SSRow
+    return($return);
+}
+
+
+
+
 =head2 all_entities_SSRow
 
   $return = $obj->all_entities_SSRow($start, $count, $fields)
@@ -7688,6 +10274,72 @@ sub get_entity_Scenario
 
 
 
+=head2 query_entity_Scenario
+
+  $return = $obj->query_entity_Scenario($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Scenario
+fields_Scenario is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	common_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Scenario
+fields_Scenario is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	common_name has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Scenario
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Scenario
+
+    $return = $self->_query_entity($ctx, 'Scenario', $qry, $fields);
+
+    #END query_entity_Scenario
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Scenario
 
   $return = $obj->all_entities_Scenario($start, $count, $fields)
@@ -7811,6 +10463,70 @@ sub get_entity_Source
     $return = $self->_get_entity($ctx, 'Source', $ids, $fields);
 
     #END get_entity_Source
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Source
+
+  $return = $obj->query_entity_Source($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Source
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Source
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Source
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Source
+
+    $return = $self->_query_entity($ctx, 'Source', $qry, $fields);
+
+    #END query_entity_Source
     return($return);
 }
 
@@ -8015,6 +10731,86 @@ sub get_entity_Subsystem
 
 
 
+=head2 query_entity_Subsystem
+
+  $return = $obj->query_entity_Subsystem($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Subsystem
+fields_Subsystem is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	version has a value which is an int
+	curator has a value which is a string
+	notes has a value which is a string
+	description has a value which is a string
+	usable has a value which is an int
+	private has a value which is an int
+	cluster_based has a value which is an int
+	experimental has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Subsystem
+fields_Subsystem is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	version has a value which is an int
+	curator has a value which is a string
+	notes has a value which is a string
+	description has a value which is a string
+	usable has a value which is an int
+	private has a value which is an int
+	cluster_based has a value which is an int
+	experimental has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Subsystem
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Subsystem
+
+    $return = $self->_query_entity($ctx, 'Subsystem', $qry, $fields);
+
+    #END query_entity_Subsystem
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Subsystem
 
   $return = $obj->all_entities_Subsystem($start, $count, $fields)
@@ -8151,6 +10947,70 @@ sub get_entity_SubsystemClass
     $return = $self->_get_entity($ctx, 'SubsystemClass', $ids, $fields);
 
     #END get_entity_SubsystemClass
+    return($return);
+}
+
+
+
+
+=head2 query_entity_SubsystemClass
+
+  $return = $obj->query_entity_SubsystemClass($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SubsystemClass
+fields_SubsystemClass is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SubsystemClass
+fields_SubsystemClass is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_SubsystemClass
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_SubsystemClass
+
+    $return = $self->_query_entity($ctx, 'SubsystemClass', $qry, $fields);
+
+    #END query_entity_SubsystemClass
     return($return);
 }
 
@@ -8310,6 +11170,78 @@ sub get_entity_TaxonomicGrouping
     $return = $self->_get_entity($ctx, 'TaxonomicGrouping', $ids, $fields);
 
     #END get_entity_TaxonomicGrouping
+    return($return);
+}
+
+
+
+
+=head2 query_entity_TaxonomicGrouping
+
+  $return = $obj->query_entity_TaxonomicGrouping($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
+fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	domain has a value which is an int
+	hidden has a value which is an int
+	scientific_name has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
+fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	domain has a value which is an int
+	hidden has a value which is an int
+	scientific_name has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_TaxonomicGrouping
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_TaxonomicGrouping
+
+    $return = $self->_query_entity($ctx, 'TaxonomicGrouping', $qry, $fields);
+
+    #END query_entity_TaxonomicGrouping
     return($return);
 }
 
@@ -8489,6 +11421,78 @@ sub get_entity_Variant
 
 
 
+=head2 query_entity_Variant
+
+  $return = $obj->query_entity_Variant($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Variant
+fields_Variant is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
+	code has a value which is a string
+	type has a value which is a string
+	comment has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Variant
+fields_Variant is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	role_rule has a value which is a reference to a list where each element is a string
+	code has a value which is a string
+	type has a value which is a string
+	comment has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Variant
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Variant
+
+    $return = $self->_query_entity($ctx, 'Variant', $qry, $fields);
+
+    #END query_entity_Variant
+    return($return);
+}
+
+
+
+
 =head2 all_entities_Variant
 
   $return = $obj->all_entities_Variant($start, $count, $fields)
@@ -8625,6 +11629,72 @@ sub get_entity_Variation
     $return = $self->_get_entity($ctx, 'Variation', $ids, $fields);
 
     #END get_entity_Variation
+    return($return);
+}
+
+
+
+
+=head2 query_entity_Variation
+
+  $return = $obj->query_entity_Variation($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Variation
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Variation
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Variation
+{
+    my($self, $qry, $fields) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN query_entity_Variation
+
+    $return = $self->_query_entity($ctx, 'Variation', $qry, $fields);
+
+    #END query_entity_Variation
     return($return);
 }
 
@@ -16212,6 +19282,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsDefaultFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -16242,6 +19313,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsDefaultFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -16324,6 +19396,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -16354,6 +19427,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -16408,6 +19482,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsDefaultLocationOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Reagent is a reference to a hash where the following keys are defined:
@@ -16436,6 +19511,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsDefaultLocationOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Reagent is a reference to a hash where the following keys are defined:
@@ -16514,6 +19590,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -16542,6 +19619,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -18224,6 +21302,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
@@ -18252,6 +21331,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ModelCompartment is a reference to a hash where the following keys are defined:
@@ -18330,6 +21410,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -18358,6 +21439,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -19285,6 +22367,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsProposedLocationOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -19312,6 +22395,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 fields_IsProposedLocationOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -19398,6 +22482,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 </pre>
 
@@ -19425,6 +22510,7 @@ fields_Compartment is a reference to a hash where the following keys are defined
 	abbr has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
+	msid has a value which is a string
 
 
 =end text
@@ -27257,6 +30343,7 @@ id has a value which is a string
 abbr has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
+msid has a value which is a string
 
 </pre>
 
@@ -27269,6 +30356,7 @@ id has a value which is a string
 abbr has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
+msid has a value which is a string
 
 
 =end text

@@ -2012,6 +2012,34 @@ sub get_entity_AlignmentTree
 
 
 
+=head2 $result = query_entity_AlignmentTree(qry, fields)
+
+
+
+=cut
+
+sub query_entity_AlignmentTree
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_AlignmentTree",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_AlignmentTree: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_AlignmentTree: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_AlignmentTree(start, count, fields)
 
 
@@ -2089,6 +2117,34 @@ sub get_entity_Annotation
 	}
     } else {
 	die "Error invoking get_entity_Annotation: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Annotation(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Annotation
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Annotation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Annotation: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Annotation: " . $self->{client}->status_line;
     }
 }
 
@@ -2174,6 +2230,34 @@ sub get_entity_AtomicRegulon
 
 
 
+=head2 $result = query_entity_AtomicRegulon(qry, fields)
+
+
+
+=cut
+
+sub query_entity_AtomicRegulon
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_AtomicRegulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_AtomicRegulon: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_AtomicRegulon: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_AtomicRegulon(start, count, fields)
 
 
@@ -2239,6 +2323,34 @@ sub get_entity_Attribute
 	}
     } else {
 	die "Error invoking get_entity_Attribute: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Attribute(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Attribute
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Attribute",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Attribute: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Attribute: " . $self->{client}->status_line;
     }
 }
 
@@ -2320,6 +2432,34 @@ sub get_entity_Biomass
 
 
 
+=head2 $result = query_entity_Biomass(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Biomass
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Biomass",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Biomass: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Biomass: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Biomass(start, count, fields)
 
 
@@ -2390,6 +2530,34 @@ sub get_entity_BiomassCompound
 
 
 
+=head2 $result = query_entity_BiomassCompound(qry, fields)
+
+
+
+=cut
+
+sub query_entity_BiomassCompound
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_BiomassCompound",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_BiomassCompound: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_BiomassCompound: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_BiomassCompound(start, count, fields)
 
 
@@ -2445,6 +2613,11 @@ compartment's definition
 common name for the compartment
 
 
+=item msid
+
+common modeling ID of this compartment
+
+
 
 =back
 
@@ -2467,6 +2640,34 @@ sub get_entity_Compartment
 	}
     } else {
 	die "Error invoking get_entity_Compartment: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Compartment(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Compartment
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Compartment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Compartment: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Compartment: " . $self->{client}->status_line;
     }
 }
 
@@ -2546,6 +2747,34 @@ sub get_entity_Complex
 	}
     } else {
 	die "Error invoking get_entity_Complex: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Complex(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Complex
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Complex",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Complex: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Complex: " . $self->{client}->status_line;
     }
 }
 
@@ -2657,6 +2886,34 @@ sub get_entity_Compound
 
 
 
+=head2 $result = query_entity_Compound(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Compound
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Compound",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Compound: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Compound: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Compound(start, count, fields)
 
 
@@ -2727,6 +2984,34 @@ sub get_entity_Contig
 	}
     } else {
 	die "Error invoking get_entity_Contig: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Contig(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Contig
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Contig",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Contig: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Contig: " . $self->{client}->status_line;
     }
 }
 
@@ -2810,6 +3095,34 @@ sub get_entity_ContigChunk
 
 
 
+=head2 $result = query_entity_ContigChunk(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ContigChunk
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ContigChunk",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ContigChunk: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ContigChunk: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_ContigChunk(start, count, fields)
 
 
@@ -2879,6 +3192,34 @@ sub get_entity_ContigSequence
 	}
     } else {
 	die "Error invoking get_entity_ContigSequence: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_ContigSequence(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ContigSequence
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ContigSequence",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ContigSequence: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ContigSequence: " . $self->{client}->status_line;
     }
 }
 
@@ -2959,6 +3300,34 @@ sub get_entity_CoregulatedSet
 
 
 
+=head2 $result = query_entity_CoregulatedSet(qry, fields)
+
+
+
+=cut
+
+sub query_entity_CoregulatedSet
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_CoregulatedSet",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_CoregulatedSet: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_CoregulatedSet: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_CoregulatedSet(start, count, fields)
 
 
@@ -3028,6 +3397,34 @@ sub get_entity_Diagram
 	}
     } else {
 	die "Error invoking get_entity_Diagram: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Diagram(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Diagram
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Diagram",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Diagram: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Diagram: " . $self->{client}->status_line;
     }
 }
 
@@ -3109,6 +3506,34 @@ sub get_entity_EcNumber
 
 
 
+=head2 $result = query_entity_EcNumber(qry, fields)
+
+
+
+=cut
+
+sub query_entity_EcNumber
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_EcNumber",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_EcNumber: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_EcNumber: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_EcNumber(start, count, fields)
 
 
@@ -3174,6 +3599,34 @@ sub get_entity_Experiment
 	}
     } else {
 	die "Error invoking get_entity_Experiment: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Experiment(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Experiment
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Experiment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Experiment: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Experiment: " . $self->{client}->status_line;
     }
 }
 
@@ -3272,6 +3725,34 @@ sub get_entity_Family
 
 
 
+=head2 $result = query_entity_Family(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Family
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Family",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Family: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Family: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Family(start, count, fields)
 
 
@@ -3365,6 +3846,34 @@ sub get_entity_Feature
 	}
     } else {
 	die "Error invoking get_entity_Feature: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Feature(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Feature
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Feature",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Feature: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Feature: " . $self->{client}->status_line;
     }
 }
 
@@ -3512,6 +4021,34 @@ sub get_entity_Genome
 
 
 
+=head2 $result = query_entity_Genome(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Genome
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Genome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Genome: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Genome: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Genome(start, count, fields)
 
 
@@ -3585,6 +4122,34 @@ sub get_entity_Identifier
 	}
     } else {
 	die "Error invoking get_entity_Identifier: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Identifier(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Identifier
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Identifier",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Identifier: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Identifier: " . $self->{client}->status_line;
     }
 }
 
@@ -3667,6 +4232,34 @@ sub get_entity_Media
 	}
     } else {
 	die "Error invoking get_entity_Media: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Media(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Media
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Media",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Media: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Media: " . $self->{client}->status_line;
     }
 }
 
@@ -3778,6 +4371,34 @@ sub get_entity_Model
 
 
 
+=head2 $result = query_entity_Model(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Model
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Model",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Model: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Model: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Model(start, count, fields)
 
 
@@ -3869,6 +4490,34 @@ sub get_entity_ModelCompartment
 
 
 
+=head2 $result = query_entity_ModelCompartment(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ModelCompartment
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ModelCompartment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ModelCompartment: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ModelCompartment: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_ModelCompartment(start, count, fields)
 
 
@@ -3928,6 +4577,34 @@ sub get_entity_OTU
 	}
     } else {
 	die "Error invoking get_entity_OTU: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_OTU(qry, fields)
+
+
+
+=cut
+
+sub query_entity_OTU
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_OTU",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_OTU: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_OTU: " . $self->{client}->status_line;
     }
 }
 
@@ -4008,6 +4685,34 @@ sub get_entity_PairSet
 
 
 
+=head2 $result = query_entity_PairSet(qry, fields)
+
+
+
+=cut
+
+sub query_entity_PairSet
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_PairSet",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_PairSet: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_PairSet: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_PairSet(start, count, fields)
 
 
@@ -4076,6 +4781,34 @@ sub get_entity_Pairing
 
 
 
+=head2 $result = query_entity_Pairing(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Pairing
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Pairing",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Pairing: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Pairing: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Pairing(start, count, fields)
 
 
@@ -4135,6 +4868,34 @@ sub get_entity_ProbeSet
 	}
     } else {
 	die "Error invoking get_entity_ProbeSet: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_ProbeSet(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ProbeSet
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ProbeSet",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ProbeSet: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ProbeSet: " . $self->{client}->status_line;
     }
 }
 
@@ -4209,6 +4970,34 @@ sub get_entity_ProteinSequence
 	}
     } else {
 	die "Error invoking get_entity_ProteinSequence: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_ProteinSequence(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ProteinSequence
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ProteinSequence",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ProteinSequence: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ProteinSequence: " . $self->{client}->status_line;
     }
 }
 
@@ -4296,6 +5085,34 @@ sub get_entity_Publication
 	}
     } else {
 	die "Error invoking get_entity_Publication: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Publication(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Publication
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Publication",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Publication: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Publication: " . $self->{client}->status_line;
     }
 }
 
@@ -4397,6 +5214,34 @@ sub get_entity_Reaction
 
 
 
+=head2 $result = query_entity_Reaction(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Reaction
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Reaction",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Reaction: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Reaction: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Reaction(start, count, fields)
 
 
@@ -4467,6 +5312,34 @@ sub get_entity_ReactionRule
 	}
     } else {
 	die "Error invoking get_entity_ReactionRule: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_ReactionRule(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ReactionRule
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ReactionRule",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_ReactionRule: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_ReactionRule: " . $self->{client}->status_line;
     }
 }
 
@@ -4571,6 +5444,34 @@ sub get_entity_Reagent
 
 
 
+=head2 $result = query_entity_Reagent(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Reagent
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Reagent",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Reagent: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Reagent: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Reagent(start, count, fields)
 
 
@@ -4651,6 +5552,34 @@ sub get_entity_Requirement
 
 
 
+=head2 $result = query_entity_Requirement(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Requirement
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Requirement",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Requirement: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Requirement: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Requirement(start, count, fields)
 
 
@@ -4723,6 +5652,34 @@ sub get_entity_Role
 
 
 
+=head2 $result = query_entity_Role(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Role
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Role",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Role: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Role: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Role(start, count, fields)
 
 
@@ -4784,6 +5741,34 @@ sub get_entity_SSCell
 	}
     } else {
 	die "Error invoking get_entity_SSCell: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_SSCell(qry, fields)
+
+
+
+=cut
+
+sub query_entity_SSCell
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_SSCell",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_SSCell: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_SSCell: " . $self->{client}->status_line;
     }
 }
 
@@ -4873,6 +5858,34 @@ sub get_entity_SSRow
 
 
 
+=head2 $result = query_entity_SSRow(qry, fields)
+
+
+
+=cut
+
+sub query_entity_SSRow
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_SSRow",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_SSRow: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_SSRow: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_SSRow(start, count, fields)
 
 
@@ -4947,6 +5960,34 @@ sub get_entity_Scenario
 
 
 
+=head2 $result = query_entity_Scenario(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Scenario
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Scenario",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Scenario: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Scenario: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Scenario(start, count, fields)
 
 
@@ -5007,6 +6048,34 @@ sub get_entity_Source
 	}
     } else {
 	die "Error invoking get_entity_Source: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Source(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Source
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Source",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Source: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Source: " . $self->{client}->status_line;
     }
 }
 
@@ -5132,6 +6201,34 @@ sub get_entity_Subsystem
 
 
 
+=head2 $result = query_entity_Subsystem(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Subsystem
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Subsystem",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Subsystem: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Subsystem: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Subsystem(start, count, fields)
 
 
@@ -5191,6 +6288,34 @@ sub get_entity_SubsystemClass
 	}
     } else {
 	die "Error invoking get_entity_SubsystemClass: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_SubsystemClass(qry, fields)
+
+
+
+=cut
+
+sub query_entity_SubsystemClass
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_SubsystemClass",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_SubsystemClass: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_SubsystemClass: " . $self->{client}->status_line;
     }
 }
 
@@ -5280,6 +6405,34 @@ sub get_entity_TaxonomicGrouping
 	}
     } else {
 	die "Error invoking get_entity_TaxonomicGrouping: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_TaxonomicGrouping(qry, fields)
+
+
+
+=cut
+
+sub query_entity_TaxonomicGrouping
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_TaxonomicGrouping",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_TaxonomicGrouping: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_TaxonomicGrouping: " . $self->{client}->status_line;
     }
 }
 
@@ -5380,6 +6533,34 @@ sub get_entity_Variant
 
 
 
+=head2 $result = query_entity_Variant(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Variant
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Variant",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Variant: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Variant: " . $self->{client}->status_line;
+    }
+}
+
+
+
 =head2 $result = all_entities_Variant(start, count, fields)
 
 
@@ -5445,6 +6626,34 @@ sub get_entity_Variation
 	}
     } else {
 	die "Error invoking get_entity_Variation: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = query_entity_Variation(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Variation
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Variation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking query_entity_Variation: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking query_entity_Variation: " . $self->{client}->status_line;
     }
 }
 

@@ -114,7 +114,7 @@ else
     $ih = \*STDIN;
 }
 
-while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, 1, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $kbO->roles_to_proteins(\@h);
     for my $tuple (@tuples) {

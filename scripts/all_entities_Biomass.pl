@@ -23,6 +23,19 @@ Example:
 would retrieve all entities of type Biomass and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Biomass entity has the following relationship links:
+
+=over 4
+    
+=item IsComprisedOf BiomassCompound
+
+=item IsManagedBy Model
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -115,7 +128,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Biomass($start, $count, \@fields );
 

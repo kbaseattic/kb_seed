@@ -22,6 +22,29 @@ Example:
 would retrieve all entities of type Source and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Source entity has the following relationship links:
+
+=over 4
+    
+=item Asserts Identifier
+
+=item Formulated CoregulatedSet
+
+=item HasCompoundAliasFrom Compound
+
+=item HasReactionAliasFrom Reaction
+
+=item Imported Identifier
+
+=item Provided Subsystem
+
+=item Submitted Genome
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -110,7 +133,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Source($start, $count, \@fields );
 

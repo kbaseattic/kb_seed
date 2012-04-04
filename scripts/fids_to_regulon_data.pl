@@ -84,6 +84,16 @@ This is used only if the column containing the subsystem is not the last column.
 
 =item -i InputFile    [ use InputFile, rather than stdin ]
 
+=item -h
+
+Display a list of the fields available for use.
+
+=item -fields field-list
+
+Choose a set of fields to return. Field-list is a comma-separated list of
+strings. The following fields are available: regulon_id, regulon_set, tfs.
+
+
 =back
 
 =head2 Output Format
@@ -95,19 +105,64 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
+my @all_fields = ( 'regulon_id', 'regulon_set', 'tfs' );
+my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: fids_to_regulon_data [-c column] < input > output";
+
+my $usage = "usage: fids_to_regulon_data [-h] [-c column] [-a | -f field list] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
 
 my $column;
+my @fields;
+my $a;
+my $f;
+my $show_fields;
 
 my $input_file;
 
 my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
+						"a"   => \$a,
+						"h"   => \$show_fields,
+						"show-fields" => \$show_fields,
+						"fields=s"    => \$f,
+					        'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
+
+if ($show_fields)
+{
+    print STDERR "Available fields: @all_fields\n";
+    exit 0;
+}
+if ($a && $f) { print STDERR $usage; exit 1 }
+
+if ($a)
+{   
+    @fields = @all_fields;
+}
+elsif ($f) {
+    my @err;
+    for my $field (split(",", $f))
+    {   
+        if (!$all_fields{$field})
+        {   
+            push(@err, $field);
+        }
+        else
+        {   
+            push(@fields, $field);
+        }
+    }
+    if (@err)
+    {   
+        print STDERR "fids_to_regulon_data: unknown fields @err. Valid fields are: @all_fields\n";
+        exit 1;
+    }
+} else {
+    print STDERR $usage;
+    exit 1;
+}
 
 my $ih;
 if ($input_file)
@@ -136,12 +191,18 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
         elsif (ref($v) eq 'ARRAY')
         {
-            foreach $_ (@$v)
+            foreach my $row (@$v)
             {
-		    my $id = $_->{regulon_id};
-		    my $set = join (",",@{$_->{regulon_set}});
-		    my $tfs = join (",",@{$_->{tfs}});
-		    print "$line\t$id\t$set\t$tfs\n";
+		my @ret;
+		foreach my $field (@fields) {
+		    if (ref($row->{$field}) eq 'ARRAY') {
+			    push (@ret, join (",", @{$row->{$field}}));
+		     } else {
+			    push(@ret, $row->{$field}); 
+		     }
+		}
+	 	    my $out = join("\t", @ret);
+		    print "$line\t$out\n";
             }
         }
         else

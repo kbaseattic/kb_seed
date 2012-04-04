@@ -39,6 +39,35 @@ where N is the column (from 1) that contains the id.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
+=head2 Related entities
+
+The Genome entity has the following relationship links:
+
+=over 4
+    
+=item HadResultsProducedBy ProbeSet
+
+=item HasRepresentativeOf Family
+
+=item IsCollectedInto OTU
+
+=item IsComposedOf Contig
+
+=item IsConfiguredBy AtomicRegulon
+
+=item IsInTaxa TaxonomicGrouping
+
+=item IsModeledBy Model
+
+=item IsOwnerOf Feature
+
+=item Uses SSRow
+
+=item WasSubmittedBy Source
+
+
+=back
+
 =head2 Command-Line Options
 
 =over 4

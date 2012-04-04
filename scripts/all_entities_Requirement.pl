@@ -21,6 +21,21 @@ Example:
 would retrieve all entities of type Requirement and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Requirement entity has the following relationship links:
+
+=over 4
+    
+=item HasRealLocationIn ModelCompartment
+
+=item IsARequirementOf Model
+
+=item Requires Reaction
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -115,7 +130,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Requirement($start, $count, \@fields );
 

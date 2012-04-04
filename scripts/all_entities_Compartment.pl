@@ -22,6 +22,23 @@ Example:
 would retrieve all entities of type Compartment and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Compartment entity has the following relationship links:
+
+=over 4
+    
+=item IsDefaultFor Reaction
+
+=item IsDefaultLocationOf Reagent
+
+=item IsInstantiatedBy ModelCompartment
+
+=item IsProposedLocationOf ReactionRule
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -48,6 +65,8 @@ strings. The following fields are available:
 
 =item name
 
+=item msid
+
 =back    
    
 =back
@@ -65,7 +84,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'abbr', 'mod_date', 'name' );
+my @all_fields = ( 'abbr', 'mod_date', 'name', 'msid' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_Compartment [-show-fields] [-a | -f field list] > entity.data";
@@ -116,7 +135,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Compartment($start, $count, \@fields );
 

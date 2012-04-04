@@ -465,6 +465,9 @@ Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it)
            <Notes>publication date of the article</Notes>
         </Field>
       </Fields>
+      <FulltextIndexes>
+	<FulltextIndex type="field" name="title" in_result="1"/>
+      </FulltextIndexes>
       <Indexes>
         <Index>
           <Notes>This index provides the ability to search by article

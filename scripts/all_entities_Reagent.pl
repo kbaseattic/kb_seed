@@ -23,6 +23,21 @@ Example:
 would retrieve all entities of type Reagent and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Reagent entity has the following relationship links:
+
+=over 4
+    
+=item HasDefaultLocation Compartment
+
+=item IsInvolvedIn Reaction
+
+=item IsParticipationOf Compound
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -119,7 +134,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Reagent($start, $count, \@fields );
 

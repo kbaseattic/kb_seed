@@ -32,6 +32,23 @@ where N is the column (from 1) that contains the id.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
+=head2 Related entities
+
+The Compartment entity has the following relationship links:
+
+=over 4
+    
+=item IsDefaultFor Reaction
+
+=item IsDefaultLocationOf Reagent
+
+=item IsInstantiatedBy ModelCompartment
+
+=item IsProposedLocationOf ReactionRule
+
+
+=back
+
 =head2 Command-Line Options
 
 =over 4
@@ -57,6 +74,8 @@ strings. The following fields are available:
 
 =item name
 
+=item msid
+
 =back    
 
 =back
@@ -74,7 +93,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'abbr', 'mod_date', 'name' );
+my @all_fields = ( 'abbr', 'mod_date', 'name', 'msid' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Compartment [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

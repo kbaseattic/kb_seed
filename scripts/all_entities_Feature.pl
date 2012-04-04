@@ -29,6 +29,53 @@ Example:
 would retrieve all entities of type Feature and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Feature entity has the following relationship links:
+
+=over 4
+    
+=item Controls CoregulatedSet
+
+=item Encompasses Feature
+
+=item HasCoregulationWith Feature
+
+=item HasFunctional Role
+
+=item HasIndicatedSignalFrom Experiment
+
+=item HasLevelsFrom ProbeSet
+
+=item IsAnnotatedBy Annotation
+
+=item IsBindingSiteFor CoregulatedSet
+
+=item IsContainedIn SSCell
+
+=item IsCoregulatedWith Feature
+
+=item IsEncompassedIn Feature
+
+=item IsExemplarOf Role
+
+=item IsFormedInto AtomicRegulon
+
+=item IsInPair Pairing
+
+=item IsLocatedIn Contig
+
+=item IsMemberOf Family
+
+=item IsOwnedBy Genome
+
+=item IsRegulatedIn CoregulatedSet
+
+=item Produces ProteinSequence
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -125,7 +172,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Feature($start, $count, \@fields );
 

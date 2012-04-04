@@ -29,6 +29,35 @@ Example:
 would retrieve all entities of type Genome and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Genome entity has the following relationship links:
+
+=over 4
+    
+=item HadResultsProducedBy ProbeSet
+
+=item HasRepresentativeOf Family
+
+=item IsCollectedInto OTU
+
+=item IsComposedOf Contig
+
+=item IsConfiguredBy AtomicRegulon
+
+=item IsInTaxa TaxonomicGrouping
+
+=item IsModeledBy Model
+
+=item IsOwnerOf Feature
+
+=item Uses SSRow
+
+=item WasSubmittedBy Source
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -143,7 +172,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Genome($start, $count, \@fields );
 

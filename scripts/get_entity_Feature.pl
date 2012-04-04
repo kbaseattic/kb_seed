@@ -39,6 +39,53 @@ where N is the column (from 1) that contains the id.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
+=head2 Related entities
+
+The Feature entity has the following relationship links:
+
+=over 4
+    
+=item Controls CoregulatedSet
+
+=item Encompasses Feature
+
+=item HasCoregulationWith Feature
+
+=item HasFunctional Role
+
+=item HasIndicatedSignalFrom Experiment
+
+=item HasLevelsFrom ProbeSet
+
+=item IsAnnotatedBy Annotation
+
+=item IsBindingSiteFor CoregulatedSet
+
+=item IsContainedIn SSCell
+
+=item IsCoregulatedWith Feature
+
+=item IsEncompassedIn Feature
+
+=item IsExemplarOf Role
+
+=item IsFormedInto AtomicRegulon
+
+=item IsInPair Pairing
+
+=item IsLocatedIn Contig
+
+=item IsMemberOf Family
+
+=item IsOwnedBy Genome
+
+=item IsRegulatedIn CoregulatedSet
+
+=item Produces ProteinSequence
+
+
+=back
+
 =head2 Command-Line Options
 
 =over 4

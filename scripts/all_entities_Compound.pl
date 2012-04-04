@@ -21,6 +21,27 @@ Example:
 would retrieve all entities of type Compound and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Compound entity has the following relationship links:
+
+=over 4
+    
+=item HasUsage BiomassCompound
+
+=item IsPresentIn Media
+
+=item IsShownOn Diagram
+
+=item IsTerminusFor Scenario
+
+=item ParticipatesAs Reagent
+
+=item UsesAliasForCompound Source
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -125,7 +146,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Compound($start, $count, \@fields );
 

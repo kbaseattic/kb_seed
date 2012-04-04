@@ -26,6 +26,19 @@ Example:
 would retrieve all entities of type ContigSequence and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The ContigSequence entity has the following relationship links:
+
+=over 4
+    
+=item HasSection ContigChunk
+
+=item IsSequenceOf Contig
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -116,7 +129,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_ContigSequence($start, $count, \@fields );
 

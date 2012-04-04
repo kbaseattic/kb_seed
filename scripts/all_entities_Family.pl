@@ -38,6 +38,25 @@ Example:
 would retrieve all entities of type Family and include all fields
 in the entities in the output.
 
+=head2 Related entities
+
+The Family entity has the following relationship links:
+
+=over 4
+    
+=item HasMember Feature
+
+=item IsCoupledTo Family
+
+=item IsCoupledWith Family
+
+=item IsFamilyFor Role
+
+=item IsRepresentedIn Genome
+
+
+=back
+
 
 =head2 Command-Line Options
 
@@ -130,7 +149,7 @@ elsif ($f) {
 }
 
 my $start = 0;
-my $count = 1000;
+my $count = 1_000_000;
 
 my $h = $geO->all_entities_Family($start, $count, \@fields );
 

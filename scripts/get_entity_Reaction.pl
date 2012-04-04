@@ -31,6 +31,29 @@ where N is the column (from 1) that contains the id.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
+=head2 Related entities
+
+The Reaction entity has the following relationship links:
+
+=over 4
+    
+=item Involves Reagent
+
+=item IsDisplayedOn Diagram
+
+=item IsRequiredBy Requirement
+
+=item IsUsedAs ReactionRule
+
+=item ParticipatesIn Scenario
+
+=item RunsByDefaultIn Compartment
+
+=item UsesAliasForReaction Source
+
+
+=back
+
 =head2 Command-Line Options
 
 =over 4

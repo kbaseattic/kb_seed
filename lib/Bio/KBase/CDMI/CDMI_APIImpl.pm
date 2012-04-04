@@ -4559,8 +4559,8 @@ actual ER-model model, the connection from Complex to Reaction goes through
 ReactionComplex).  Since Roles also connect to fids, the connection between
 fids and Reactions is induced.
 
-The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will
-be included with the ID in the output. If only, the compound name will be included
+The "name_parameter" can be 0, 1 or 'only'. If 1, then the compound name will 
+be included with the ID in the output. If only, the compound name will be included 
 instead of the ID. If 0, only the ID will be included. The default is 0.
 
 =back
@@ -5001,7 +5001,7 @@ field_name is a string
 
 =item Description
 
-text_search performs a search against a full-text index maintained
+text_search performs a search against a full-text index maintained 
 for the CDMI. The parameter "input" is the text string to be searched for.
 The parameter "entities" defines the entities to be searched. If the list
 is empty, all indexed entities will be searched. The "start" and "count"

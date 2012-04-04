@@ -72,6 +72,8 @@ properties of the tree.
 */
 funcdef get_entity_AlignmentTree(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_AlignmentTree>);
+funcdef query_entity_AlignmentTree(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AlignmentTree>);
 funcdef all_entities_AlignmentTree(int start, int count, list<string> fields)
 	returns(mapping<string, fields_AlignmentTree>);
 
@@ -115,6 +117,8 @@ date and time at which the annotation was made
 */
 funcdef get_entity_Annotation(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Annotation>);
+funcdef query_entity_Annotation(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Annotation>);
 funcdef all_entities_Annotation(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Annotation>);
 
@@ -153,6 +157,8 @@ It has the following fields:
 */
 funcdef get_entity_AtomicRegulon(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_AtomicRegulon>);
+funcdef query_entity_AtomicRegulon(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AtomicRegulon>);
 funcdef all_entities_AtomicRegulon(int start, int count, list<string> fields)
 	returns(mapping<string, fields_AtomicRegulon>);
 
@@ -181,6 +187,8 @@ Descriptive text indicating the nature and use of this attribute.
 
 */
 funcdef get_entity_Attribute(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Attribute>);
+funcdef query_entity_Attribute(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Attribute>);
 funcdef all_entities_Attribute(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Attribute>);
@@ -218,6 +226,8 @@ descriptive name for this biomass
 */
 funcdef get_entity_Biomass(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Biomass>);
+funcdef query_entity_Biomass(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Biomass>);
 funcdef all_entities_Biomass(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Biomass>);
 
@@ -247,6 +257,8 @@ contains this compound
 */
 funcdef get_entity_BiomassCompound(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_BiomassCompound>);
+funcdef query_entity_BiomassCompound(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_BiomassCompound>);
 funcdef all_entities_BiomassCompound(int start, int count, list<string> fields)
 	returns(mapping<string, fields_BiomassCompound>);
 
@@ -255,6 +267,7 @@ typedef structure {
 	string abbr nullable;
 	string mod_date nullable;
 	string name nullable;
+	string msid nullable;
 } fields_Compartment ;
 
 /*
@@ -283,12 +296,19 @@ compartment's definition
 common name for the compartment
 
 
+=item msid
+
+common modeling ID of this compartment
+
+
 
 =back
 
 
 */
 funcdef get_entity_Compartment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Compartment>);
+funcdef query_entity_Compartment(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Compartment>);
 funcdef all_entities_Compartment(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Compartment>);
@@ -329,6 +349,8 @@ date and time of the last change to this complex's definition
 
 */
 funcdef get_entity_Complex(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Complex>);
+funcdef query_entity_Complex(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Complex>);
 funcdef all_entities_Complex(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Complex>);
@@ -402,6 +424,8 @@ atomic mass of the compound
 */
 funcdef get_entity_Compound(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Compound>);
+funcdef query_entity_Compound(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Compound>);
 funcdef all_entities_Compound(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Compound>);
 
@@ -435,6 +459,8 @@ ID of this contig from the core (source) database
 
 */
 funcdef get_entity_Contig(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Contig>);
+funcdef query_entity_Contig(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Contig>);
 funcdef all_entities_Contig(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Contig>);
@@ -473,6 +499,8 @@ base pairs that make up this sequence
 */
 funcdef get_entity_ContigChunk(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_ContigChunk>);
+funcdef query_entity_ContigChunk(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ContigChunk>);
 funcdef all_entities_ContigChunk(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ContigChunk>);
 
@@ -505,6 +533,8 @@ number of base pairs in the contig
 
 */
 funcdef get_entity_ContigSequence(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ContigSequence>);
+funcdef query_entity_ContigSequence(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_ContigSequence>);
 funcdef all_entities_ContigSequence(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ContigSequence>);
@@ -540,6 +570,8 @@ database
 */
 funcdef get_entity_CoregulatedSet(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_CoregulatedSet>);
+funcdef query_entity_CoregulatedSet(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_CoregulatedSet>);
 funcdef all_entities_CoregulatedSet(int start, int count, list<string> fields)
 	returns(mapping<string, fields_CoregulatedSet>);
 
@@ -573,6 +605,8 @@ content of the diagram, in PNG format
 
 */
 funcdef get_entity_Diagram(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Diagram>);
+funcdef query_entity_Diagram(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Diagram>);
 funcdef all_entities_Diagram(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Diagram>);
@@ -610,6 +644,8 @@ hold the name of the replacement EC number.
 */
 funcdef get_entity_EcNumber(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_EcNumber>);
+funcdef query_entity_EcNumber(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_EcNumber>);
 funcdef all_entities_EcNumber(int start, int count, list<string> fields)
 	returns(mapping<string, fields_EcNumber>);
 
@@ -638,6 +674,8 @@ Publication or lab relevant to this experiment.
 
 */
 funcdef get_entity_Experiment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Experiment>);
+funcdef query_entity_Experiment(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Experiment>);
 funcdef all_entities_Experiment(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Experiment>);
@@ -691,6 +729,8 @@ members.
 
 */
 funcdef get_entity_Family(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Family>);
+funcdef query_entity_Family(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Family>);
 funcdef all_entities_Family(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Family>);
@@ -751,6 +791,8 @@ may also have comments.
 
 */
 funcdef get_entity_Feature(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Feature>);
+funcdef query_entity_Feature(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Feature>);
 funcdef all_entities_Feature(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Feature>);
@@ -865,6 +907,8 @@ source
 */
 funcdef get_entity_Genome(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Genome>);
+funcdef query_entity_Genome(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Genome>);
 funcdef all_entities_Genome(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Genome>);
 
@@ -902,6 +946,8 @@ without the identifying prefix (if one is present).
 
 */
 funcdef get_entity_Identifier(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Identifier>);
+funcdef query_entity_Identifier(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Identifier>);
 funcdef all_entities_Identifier(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Identifier>);
@@ -945,6 +991,8 @@ type of the medium (aerobic or anaerobic)
 
 */
 funcdef get_entity_Media(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Media>);
+funcdef query_entity_Media(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Media>);
 funcdef all_entities_Media(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Media>);
@@ -1018,6 +1066,8 @@ number of annotations used to build the model
 */
 funcdef get_entity_Model(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Model>);
+funcdef query_entity_Model(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Model>);
 funcdef all_entities_Model(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Model>);
 
@@ -1071,6 +1121,8 @@ ask Chris
 */
 funcdef get_entity_ModelCompartment(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_ModelCompartment>);
+funcdef query_entity_ModelCompartment(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ModelCompartment>);
 funcdef all_entities_ModelCompartment(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ModelCompartment>);
 
@@ -1092,6 +1144,8 @@ It has the following fields:
 
 */
 funcdef get_entity_OTU(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_OTU>);
+funcdef query_entity_OTU(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_OTU>);
 funcdef all_entities_OTU(int start, int count, list<string> fields)
 	returns(mapping<string, fields_OTU>);
@@ -1127,6 +1181,8 @@ pairings.
 */
 funcdef get_entity_PairSet(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_PairSet>);
+funcdef query_entity_PairSet(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_PairSet>);
 funcdef all_entities_PairSet(int start, int count, list<string> fields)
 	returns(mapping<string, fields_PairSet>);
 
@@ -1153,6 +1209,8 @@ It has the following fields:
 */
 funcdef get_entity_Pairing(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Pairing>);
+funcdef query_entity_Pairing(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Pairing>);
 funcdef all_entities_Pairing(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Pairing>);
 
@@ -1174,6 +1232,8 @@ It has the following fields:
 
 */
 funcdef get_entity_ProbeSet(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ProbeSet>);
+funcdef query_entity_ProbeSet(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_ProbeSet>);
 funcdef all_entities_ProbeSet(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ProbeSet>);
@@ -1207,6 +1267,8 @@ the protein's amino acids.
 
 */
 funcdef get_entity_ProteinSequence(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ProteinSequence>);
+funcdef query_entity_ProteinSequence(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_ProteinSequence>);
 funcdef all_entities_ProteinSequence(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ProteinSequence>);
@@ -1255,6 +1317,8 @@ publication date of the article
 
 */
 funcdef get_entity_Publication(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Publication>);
+funcdef query_entity_Publication(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Publication>);
 funcdef all_entities_Publication(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Publication>);
@@ -1316,6 +1380,8 @@ direction of this reaction (> for forward-only,
 */
 funcdef get_entity_Reaction(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Reaction>);
+funcdef query_entity_Reaction(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Reaction>);
 funcdef all_entities_Reaction(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Reaction>);
 
@@ -1350,6 +1416,8 @@ ask Chris
 
 */
 funcdef get_entity_ReactionRule(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ReactionRule>);
+funcdef query_entity_ReactionRule(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_ReactionRule>);
 funcdef all_entities_ReactionRule(int start, int count, list<string> fields)
 	returns(mapping<string, fields_ReactionRule>);
@@ -1412,6 +1480,8 @@ to the reagent's specified compartment.
 */
 funcdef get_entity_Reagent(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Reagent>);
+funcdef query_entity_Reagent(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Reagent>);
 funcdef all_entities_Reagent(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Reagent>);
 
@@ -1453,6 +1523,8 @@ ask Chris
 */
 funcdef get_entity_Requirement(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Requirement>);
+funcdef query_entity_Requirement(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Requirement>);
 funcdef all_entities_Requirement(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Requirement>);
 
@@ -1484,6 +1556,8 @@ TRUE if a role is hypothetical, else FALSE
 */
 funcdef get_entity_Role(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Role>);
+funcdef query_entity_Role(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Role>);
 funcdef all_entities_Role(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Role>);
 
@@ -1507,6 +1581,8 @@ It has the following fields:
 
 */
 funcdef get_entity_SSCell(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_SSCell>);
+funcdef query_entity_SSCell(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_SSCell>);
 funcdef all_entities_SSCell(int start, int count, list<string> fields)
 	returns(mapping<string, fields_SSCell>);
@@ -1552,6 +1628,8 @@ region occupied by this particular machine.
 */
 funcdef get_entity_SSRow(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_SSRow>);
+funcdef query_entity_SSRow(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_SSRow>);
 funcdef all_entities_SSRow(int start, int count, list<string> fields)
 	returns(mapping<string, fields_SSRow>);
 
@@ -1585,6 +1663,8 @@ number, is usually displayed everywhere.
 */
 funcdef get_entity_Scenario(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Scenario>);
+funcdef query_entity_Scenario(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Scenario>);
 funcdef all_entities_Scenario(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Scenario>);
 
@@ -1607,6 +1687,8 @@ It has the following fields:
 
 */
 funcdef get_entity_Source(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Source>);
+funcdef query_entity_Source(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Source>);
 funcdef all_entities_Source(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Source>);
@@ -1694,6 +1776,8 @@ annotation.
 */
 funcdef get_entity_Subsystem(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Subsystem>);
+funcdef query_entity_Subsystem(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Subsystem>);
 funcdef all_entities_Subsystem(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Subsystem>);
 
@@ -1715,6 +1799,8 @@ It has the following fields:
 
 */
 funcdef get_entity_SubsystemClass(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_SubsystemClass>);
+funcdef query_entity_SubsystemClass(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_SubsystemClass>);
 funcdef all_entities_SubsystemClass(int start, int count, list<string> fields)
 	returns(mapping<string, fields_SubsystemClass>);
@@ -1766,6 +1852,8 @@ be in this list.
 
 */
 funcdef get_entity_TaxonomicGrouping(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_TaxonomicGrouping>);
+funcdef query_entity_TaxonomicGrouping(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_TaxonomicGrouping>);
 funcdef all_entities_TaxonomicGrouping(int start, int count, list<string> fields)
 	returns(mapping<string, fields_TaxonomicGrouping>);
@@ -1824,6 +1912,8 @@ commentary text about the variant
 */
 funcdef get_entity_Variant(list<string> ids, list<string> fields)
 	returns(mapping<string, fields_Variant>);
+funcdef query_entity_Variant(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Variant>);
 funcdef all_entities_Variant(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Variant>);
 
@@ -1852,6 +1942,8 @@ means
 
 */
 funcdef get_entity_Variation(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Variation>);
+funcdef query_entity_Variation(list<tuple<string, string, string>> qry, list<string> fields)
 	returns(mapping<string, fields_Variation>);
 funcdef all_entities_Variation(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Variation>);

@@ -29,9 +29,9 @@ If the command-line parse fails, an undefined value will be returned
 rather than a CDMI object.
 
 The CDMIClient object can create either a CDMI_APIClient object for accessing
-the CDMI over the network, or a CDMI_APIImpl object for accessing 
+the CDMI over the network, or a CDMI_APIImpl object for accessing
 a local database. The latter will most likely only be used by
-developers of the CDMI. The C<--local> option must be passed to 
+developers of the CDMI. The C<--local> option must be passed to
 create the local database version.
 
 =over 4
@@ -92,7 +92,7 @@ sub new_get_entity_for_script {
     # Get the parameters.
     my ($class, %options) = @_;
 
-    
+
     return new_for_script_with_type($class,
 				    'Bio::KBase::CDMI::CDMI_EntityAPIImpl',
 				    'Bio::KBase::CDMI::Client',
@@ -102,7 +102,7 @@ sub new_get_entity_for_script {
 sub new_for_script_with_type
 {
     my($class, $impl_class, $client_class, %options) = @_;
-    
+
 
     # We'll put the return value in here if the command-line parse fails.
     my $retVal;
@@ -136,12 +136,60 @@ sub new_for_script_with_type
 						   dbName => $dbName, sock => $sock, userData => $userData,
 						   dbhost => $dbhost, port => $port, dbms => $dbms);
 	    $retVal = $impl_class->new($cdmi);
-	    
+
 	}
 	else
 	{
 	    $retVal = $client_class->new($url);
 	}
+    }
+    # Return the result.
+    return $retVal;
+}
+
+sub new {
+    # Get the parameters.
+    my ($class, $local) = @_;
+
+
+    return new_with_type($class, 'Bio::KBase::CDMI::CDMI_APIImpl', 'Bio::KBase::CDMI::Client', $local);
+}
+
+sub new_get_entity {
+    # Get the parameters.
+    my ($class, $local) = @_;
+
+
+    return new_with_type($class,
+                                    'Bio::KBase::CDMI::CDMI_EntityAPIImpl',
+                                    'Bio::KBase::CDMI::Client',
+                                    $local);
+}
+
+sub new_with_type
+{
+    my($class, $impl_class, $client_class, $local) = @_;
+
+
+    # We'll put the return value in here.
+    my $retVal;
+    my ($url);
+
+    $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
+
+    if ($local)
+    {
+        if (!$have_local_cdmi)
+        {
+            die "The appropriate modules are not available for using the -local flag";
+        }
+        my $cdmi = Bio::KBase::CDMI::CDMI->new();
+        $retVal = $impl_class->new($cdmi);
+
+    }
+    else
+    {
+        $retVal = $client_class->new($url);
     }
     # Return the result.
     return $retVal;

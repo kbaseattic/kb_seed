@@ -12,11 +12,11 @@ Bio::KBase - DOE Systems Biology Knowledgebase
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 our %DefaultURL = (central_store => 'http://bio-data-1.mcs.anl.gov/services/cdmi_api',
 		   id_server => 'http://bio-data-1.mcs.anl.gov/services/idserver');

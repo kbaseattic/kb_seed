@@ -53,6 +53,8 @@ strings. The following fields are available:
 
 =item name
 
+=item msid
+
 =back    
 
 =item -rel field-list
@@ -104,7 +106,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'stoichiometry', 'cofactor', 'compartment_index', 'transport_coefficient' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'abbr', 'mod_date', 'name' );
+my @all_to_fields = ( 'id', 'abbr', 'mod_date', 'name', 'msid' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -179,15 +181,11 @@ else
 }
 
 
-my %lines;
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-    for my $tuple (@tuples) {
-	my ($id, $line) = @$tuple;
-	$lines{$id} = $line;
-    }
 	
     my @h = map { $_->[0] } @tuples;
-    my $h = $geO->get_relationship_HasDefaultLocation(\@h, \@from_fields, \@rel_fields, \@to_fields); 
+    my $h = $geO->get_relationship_HasDefaultLocation(\@h, \@from_fields, \@rel_fields, \@to_fields);
+    my %results;
     for my $result (@$h) {
         my @from;
         my @rel;
@@ -197,18 +195,28 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	for my $key (@from_fields) {
 		push (@from,$res->{$key});
 	}
-        my $res = $result->[1];
+        $res = $result->[1];
 	$from_id = $res->{'from_link'};
 	for my $key (@rel_fields) {
 		push (@rel,$res->{$key});
 	}
-	my $res = $result->[2];
+	$res = $result->[2];
 	for my $key (@to_fields) {
 		push (@to,$res->{$key});
 	}
         if ($from_id) {
-		print join("\t", $lines{$from_id}, @from, @rel, @to), "\n";
+	    push @{$results{$from_id}}, [@from, @rel, @to];
         }
+    }
+    for my $tuple (@tuples)
+    {
+	my($id, $line) = @$tuple;
+	my $resultsForId = $results{$id};
+	if ($resultsForId) {
+	    for my $result (@$resultsForId) {
+		print join("\t", $line, @$result) . "\n";
+	    }
+	}
     }
 }
 

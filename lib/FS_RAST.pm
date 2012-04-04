@@ -479,6 +479,7 @@ sub ok_seq1 {
     if ((abs($e1-$b1) < 99) || (abs($e2-$b2) < 99)) { return 0 } # do not patch short fragments
     if ($strand eq '+')
     {
+	if ($b1 >= $b2)        { return 0 }
 	if ($b2 > $e2)         { return 0 }
 	if ($b2 > ($e1 + 250)) { return 0 }
 #	print STDERR "ok_seq1\n";
@@ -486,6 +487,7 @@ sub ok_seq1 {
     }
     else
     {
+	if ($b1 <= $b2)        { return 0 }
 	if ($b2 < $e2)         { return 0 }
 	if ($b2 < ($e1 - 250)) { return 0 }
 #	print STDERR "ok_seq1\n";
