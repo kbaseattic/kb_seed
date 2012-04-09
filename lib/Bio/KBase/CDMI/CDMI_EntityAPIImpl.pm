@@ -1800,19 +1800,24 @@ sub _query_entity
     my $out = $sth->fetchall_hashref('id');
 
     my @ids = keys %$out;
-    
-    #
-    # Now query for the fields that are in separate relations.
-    #
-    for my $ent (@$rel_fields)
+
+    if (@ids)
     {
-	my($field, $rel) = @$ent;
-	my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
-	$sth->execute(@ids);
-	while (my $row = $sth->fetchrow_arrayref())
+	my $rel_filter = "id IN (" . join(", ", map { "?" } @ids) . ")";
+	#
+	# Now query for the fields that are in separate relations.
+	#
+	for my $ent (@$rel_fields)
 	{
-	    my($id, $val) = @$row;
-	    push(@{$out->{$id}->{$field}}, $val);
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $rel_filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+		push(@{$out->{$id}->{$field}}, $val);
+	    }
 	}
     }
     return $out;
@@ -30036,6 +30041,105 @@ a reference to a list containing 2 items:
 0: a weight
 1: a reference to a hash where the key is a field_name and the value is a string
 
+
+=end text
+
+=back
+
+
+
+=head2 correspondence
+
+=over 4
+
+
+
+=item Description
+
+A correspondence is generated as a mapping of fids to fids.  The mapping
+attempts to map a fid to another that performs the same function.  The
+correspondence describes the regions that are similar, the strength of
+the similarity, the number of genes in the chromosomal context that appear
+to "correspond" and a score from 0 to 1 that loosely corresponds to 
+confidence in the correspondence.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+to has a value which is a fid
+iden has a value which is a float
+ncontext has a value which is an int
+b1 has a value which is an int
+e1 has a value which is an int
+ln1 has a value which is an int
+b2 has a value which is an int
+e2 has a value which is an int
+ln2 has a value which is an int
+score has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+to has a value which is a fid
+iden has a value which is a float
+ncontext has a value which is an int
+b1 has a value which is an int
+e1 has a value which is an int
+ln1 has a value which is an int
+b2 has a value which is an int
+e2 has a value which is an int
+ln2 has a value which is an int
+score has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 how
+
+=over 4
+
+
+
+=item Description
+
+A close_genomes is used to get a set of relatively close genomes (for
+each input genome, a set of close genomes is calculated, but the
+result should be viewed as quite approximate.  "how" is a suggestion
+of which algorithm to use:
+ 
+     0 - default (same genus)
+     1 - find genomes with the same genus name
+     2 - use the SSU rRNA, if possible
+     3 - use a set of "universal proteins", if you can
+         
+Up to n genomes will be returned for each input genome.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
 
 =end text
 

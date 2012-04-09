@@ -59,7 +59,7 @@ Limit the results to entities where the given field is LIKE (in the sql sense) t
 
 Limit the results to entities where the given field is related to the given value based on the given operator.
 
-The operators supported are as follows. We provide text base alternatives to the comparison
+The operators supported are as follows. We provide text based alternatives to the comparison
 operators so that extra quoting is not required to keep the command-line shell from 
 confusing them with shell I/O redirection operators.
 
@@ -223,6 +223,6 @@ my $h = $geO->query_entity_Source(\@qry, \@fields );
 
 while (my($k, $v) = each %$h)
 {
-    print join("\t", $k, @$v{@fields}), "\n";
+    print join("\t", $k, map { ref($_) eq 'ARRAY' ? join(",", @$_) : $_ } @$v{@fields}), "\n";
 }
 

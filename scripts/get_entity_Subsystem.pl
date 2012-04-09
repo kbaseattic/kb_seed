@@ -157,7 +157,16 @@ elsif ($f) {
     exit 1;
 }
 
-open my $ih, "<$i";
+my $ih;
+if ($i eq '-')
+{
+    $ih = \*STDIN;
+}
+else
+{
+    open($ih, "<", $i) or die "Cannot open input file $i: $!\n";
+}
+
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
     my $h = $geO->get_entity_Subsystem(\@h, \@fields);
@@ -171,7 +180,8 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    print STDERR $line,"\n";
      	} else {
 	    foreach $_ (@fields) {
-		push (@values, $v->{$_});
+		my $val = $v->{$_};
+		push (@values, ref($val) eq 'ARRAY' ? join(",", @$val) : $val);
 	    }
 	    my $tail = join("\t", @values);
 	    print "$line\t$tail\n";

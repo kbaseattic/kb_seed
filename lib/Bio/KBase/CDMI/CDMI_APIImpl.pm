@@ -79,6 +79,7 @@ For now, we recommend that you experiment a bit and use common sense.
 use strict;
 use Bio::KBase::CDMI::CDMI;
 use Data::Dumper;
+use Carp;
 use Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 use Sphinx::Search;
 
@@ -261,7 +262,7 @@ sub fids_to_functions
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_functions
-                                        my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
 
     for my $id (@$fids) {
@@ -342,7 +343,7 @@ sub fids_to_literature
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_literature
-                                        my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetAll("Produces IsATopicOf Publication",
@@ -417,7 +418,7 @@ sub fids_to_protein_families
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_protein_families
-                                        my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("IsMemberOf",
@@ -487,7 +488,7 @@ sub fids_to_roles
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_roles
-                                        my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("HasFunctional",
@@ -558,7 +559,7 @@ sub fids_to_subsystems
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_subsystems
-                my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$fids) {
         my @resultRows = $kb->GetFlat("IsContainedIn HasRole IsIncludedIn",
@@ -749,7 +750,7 @@ sub fids_to_locations
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_locations
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $fid (@$fids) {
         my @locs = map { [$_->Contig, $_->Begin, $_->Dir, $_->Length] } $kb->GetLocations($fid);
@@ -815,7 +816,7 @@ sub locations_to_fids
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN locations_to_fids
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $region (@$region_of_dna_strings) {
         my @fids = $kb->GenesInRegion($region);
@@ -904,7 +905,7 @@ sub locations_to_dna_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($dna_seqs);
     #BEGIN locations_to_dna_sequences
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $dna_seqs = [];
     for my $location (@$locations) {
         my @dnas;
@@ -1047,7 +1048,7 @@ sub proteins_to_protein_families
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_protein_families
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my %famH = map { $_ => 1 } $kb->GetFlat("IsProteinFor IsMemberOf",
@@ -1126,7 +1127,7 @@ sub proteins_to_literature
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_literature
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my @resultRows = $kb->GetAll("IsATopicOf Publication",
@@ -1212,7 +1213,7 @@ sub proteins_to_functions
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_functions
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my @resultRows = $kb->GetAll("IsProteinFor Feature",
@@ -1295,7 +1296,7 @@ sub proteins_to_roles
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN proteins_to_roles
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$proteins) {
         my %roleH = map { $_ => 1 } $kb->GetFlat("IsProteinFor HasFunctional",
@@ -1362,7 +1363,7 @@ sub roles_to_proteins
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_proteins
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if ((! $roles) || (@$roles == 0)) { return $return }
     for my $role (@$roles) {
@@ -1430,7 +1431,7 @@ sub roles_to_subsystems
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_subsystems
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if ((! $roles) || (@$roles == 0)) { return $return }
 
@@ -1503,7 +1504,7 @@ sub roles_to_protein_families
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN roles_to_protein_families
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if ((! $roles) || (@$roles == 0)) { return $return }
     for my $role (@$roles) {
@@ -1580,7 +1581,7 @@ sub fids_to_coexpressed_fids
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_coexpressed_fids
-            $return = {};
+    $return = {};
     if (@$fids < 1)  { return $return }
 
     my $kb = $self->{db};
@@ -1660,7 +1661,7 @@ sub protein_families_to_fids
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_fids
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$protein_families) {
         my @resultRows = $kb->GetFlat("HasMember",
@@ -1729,7 +1730,7 @@ sub protein_families_to_proteins
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_proteins
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $id (@$protein_families) {
         my %protH = map { $_ => 1 } $kb->GetFlat("HasMember Produces",
@@ -1793,7 +1794,7 @@ sub protein_families_to_functions
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN protein_families_to_functions
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     my $n = @$protein_families;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
@@ -1973,7 +1974,7 @@ sub co_occurrence_evidence
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN co_occurrence_evidence
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     for my $pair (@$pairs_of_fids) {
 	my($fid1,$fid2) = @$pair;
 	my $flipped = ($fid1 gt $fid2) ? 1 : 0;
@@ -2052,7 +2053,7 @@ sub contigs_to_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_sequences
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $contig ( @$contigs ) {
         my @dna = $kb->GetFlat("HasAsSequence HasSection ContigChunk",
@@ -2118,7 +2119,7 @@ sub contigs_to_lengths
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_lengths
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $contig ( @$contigs ) {
         my ($len) = $kb->GetFlat("HasAsSequence ContigSequence",
@@ -2185,7 +2186,7 @@ sub contigs_to_md5s
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN contigs_to_md5s
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $contig (@$contigs) {
         my ($md5) = $kb->GetFlat("HasAsSequence", 'HasAsSequence(from_link) = ?',
@@ -2255,7 +2256,7 @@ sub md5s_to_genomes
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN md5s_to_genomes
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $md5 (@$md5s) {
         my @genomes = $kb->GetFlat('Genome', 'Genome(md5) = ?', [$md5],
@@ -2322,7 +2323,7 @@ sub genomes_to_md5s
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_md5s
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $genome (@$genomes) {
         my ($md5) = $kb->GetFlat('Genome', 'Genome(id) = ?', [$genome],
@@ -2388,7 +2389,7 @@ sub genomes_to_contigs
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_contigs
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $genome (@$genomes) {
         my @contigs = $kb->GetFlat('IsComposedOf', 'IsComposedOf(from_link) = ?', [$genome],
@@ -2460,7 +2461,7 @@ sub genomes_to_fids
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_fids
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     my (@marks, @parms);
     for my $type (@$types_of_fids) {
@@ -2478,7 +2479,7 @@ sub genomes_to_fids
         push @parms, @$types_of_fids;
     }
     for my $genome (@$genomes) {
-        my @fids = $kb->GetFlat('IsOwnerOf Feature', $filter,
+         my @fids = $kb->GetFlat('IsOwnerOf Feature', $filter,
                 [@parms, $genome], 'Feature(id)');
         $return->{$genome} = \@fids;
     }
@@ -2570,7 +2571,7 @@ sub genomes_to_taxonomies
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_taxonomies
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     my $fields = 'TaxonomicGrouping(scientific_name) TaxonomicGrouping(id) TaxonomicGrouping(hidden) TaxonomicGrouping(domain)';
     for my $genome (@$genomes) {
@@ -2658,7 +2659,7 @@ sub genomes_to_subsystems
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN genomes_to_subsystems
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $genome (@$genomes) {
         my @subs = $kb->GetAll('Uses Implements Variant IsDescribedBy', 'Uses(from_link) = ?', [$genome],
@@ -2729,7 +2730,7 @@ sub subsystems_to_genomes
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_genomes
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $subsystem (@$subsystems) {
         my @genomes = $kb->GetAll('Describes Variant IsImplementedBy IsUsedBy', 'Describes(from_link) = ?', [$subsystem],
@@ -2910,7 +2911,7 @@ sub subsystems_to_roles
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_roles
-            $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $subsystem (@$subsystems) {
 
@@ -3009,7 +3010,7 @@ sub subsystems_to_spreadsheets
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN subsystems_to_spreadsheets
-                    $return = {};
+    $return = {};
     if (! $genomes) {
         $genomes = [];
     }
@@ -3094,7 +3095,7 @@ sub all_roles_used_in_models
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN all_roles_used_in_models
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = [];
     my @res = $kb->GetAll('IsTriggeredBy',
 			  '',
@@ -3187,7 +3188,7 @@ sub complexes_to_complex_data
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN complexes_to_complex_data
-            $return = {};
+    $return = {};
     if (@$complexes < 1)  { return $return }
 
     my $kb = $self->{db};
@@ -3888,7 +3889,7 @@ sub fids_to_atomic_regulons
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_atomic_regulons
-                    $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $fid (@$fids)
     {
@@ -4037,7 +4038,7 @@ sub fids_to_protein_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_protein_sequences
-            $return = {};
+    $return = {};
     if (@$fids < 1) { return $return }
 
     my $kb = $self->{db};
@@ -4184,7 +4185,7 @@ sub fids_to_dna_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_dna_sequences
-            $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $fid (@$fids) {
         my @locs = $kb->GetLocations($fid);
@@ -4432,7 +4433,7 @@ sub reaction_strings
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN reaction_strings
-            $return = {};
+    $return = {};
     my $kb = $self->{db};
     for my $reaction (@$reactions)
     {
@@ -4737,7 +4738,7 @@ sub fids_to_subsystem_data
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_subsystem_data
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     for my $fid (@$fids) {
         my @subTuples = $kb->GetAll("IsContainedIn SSCell HasRole AND SSCell IsRoleFor Implements Variant IsDescribedBy",
@@ -4872,7 +4873,7 @@ sub otu_members
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN otu_members
-            my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
     if (@$genomes < 1) {return $return }
 
@@ -4946,6 +4947,14 @@ sub fids_to_genomes
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_genomes
+    $return = {};
+    foreach my $fid (@$fids)
+    {
+	if ($fid =~ /^(kb\|g\.\d+)/)
+	{
+	    $return->{$fid} = $1;
+	}
+    }
     #END fids_to_genomes
     return($return);
 }
@@ -5056,6 +5065,248 @@ sub text_search
 
 
     #END text_search
+    return($return);
+}
+
+
+
+
+=head2 corresponds
+
+  $return = $obj->corresponds($fids, $genome)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$fids is a fids
+$genome is a genome
+$return is a reference to a hash where the key is a fid and the value is a correspondence
+fids is a reference to a list where each element is a fid
+fid is a string
+genome is a string
+correspondence is a reference to a hash where the following keys are defined:
+	to has a value which is a fid
+	iden has a value which is a float
+	ncontext has a value which is an int
+	b1 has a value which is an int
+	e1 has a value which is an int
+	ln1 has a value which is an int
+	b2 has a value which is an int
+	e2 has a value which is an int
+	ln2 has a value which is an int
+	score has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$fids is a fids
+$genome is a genome
+$return is a reference to a hash where the key is a fid and the value is a correspondence
+fids is a reference to a list where each element is a fid
+fid is a string
+genome is a string
+correspondence is a reference to a hash where the following keys are defined:
+	to has a value which is a fid
+	iden has a value which is a float
+	ncontext has a value which is an int
+	b1 has a value which is an int
+	e1 has a value which is an int
+	ln1 has a value which is an int
+	b2 has a value which is an int
+	e2 has a value which is an int
+	ln2 has a value which is an int
+	score has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub corresponds
+{
+    my($self, $fids, $genome) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN corresponds
+    use Corresponds;
+    $return = {};
+    my $gH      = $self->genomes_to_fids([$genome],['peg','CDS']);
+    my $fids_to = $gH->{$genome};
+    my $loc2H   = $self->fids_to_locations($fids_to);
+    my $seq2H   = $self->fids_to_protein_sequences($fids_to);
+    my @seqs2   = map { my $loc2 = $loc2H->{$_}; 
+			my $seq2 = $seq2H->{$_};
+			($seq2 && $loc2) ? [$_,'',$seq2] : () } @$fids_to;
+    my @locs2   = map { my $loc2 = $loc2H->{$_}; 
+			my $seq2 = $seq2H->{$_};
+			($seq2 && $loc2) ? [$_,$loc2] : () } @$fids_to;
+    my %genomes_to_fids;
+    foreach $_ (@$fids)
+    {
+	if ($_ =~ /^(kb\|g\.\d+)/)
+	{
+	    push(@{$genomes_to_fids{$1}},$_);
+	}
+    }
+    foreach my $g (keys(%genomes_to_fids))
+    {
+	my $gH            = $self->genomes_to_fids([$g],['peg','CDS']);
+	my $fids_from_all = $gH->{$g};
+	my %fids_from     = map { $_ => 1 } @{$genomes_to_fids{$g}};
+
+	my $loc1H     = $self->fids_to_locations($fids_from_all);
+	my $seq1H     = $self->fids_to_protein_sequences($fids_from_all);
+	my @seqs1     = map { my $loc1 = $loc1H->{$_}; 
+			      my $seq1 = $seq1H->{$_};
+			      ($seq1 && $loc1) ? [$_,'',$seq1] : () } @$fids_from_all;
+	my @locs1     = map { my $loc1 = $loc1H->{$_}; 
+			      my $seq1 = $seq1H->{$_};
+			      ($seq1 && $loc1) ? [$_,$loc1] : () } @$fids_from_all;
+	my($corr,$reps2,$reps1) = &Corresponds::correspondence_of_reps(\@seqs1,
+								       \@locs1,
+								       \@seqs2,
+								       \@locs2,
+								       5,
+								       200);
+	foreach my $x (@$corr)
+	{
+	    my($id1,$iden,$ncontext,$b1,$e1,$ln1,$b2,$e2,$ln2,$score,$to) = @$x;
+	    if ($fids_from{$id1})
+	    {
+		$return->{$id1} = { to       => $to,
+				    iden     => $iden,
+				    ncontext => $ncontext,
+				    b1       => $b1,
+				    e1       => $e1,
+				    ln1      => $ln1,
+				    b2       => $b2,
+				    e2       => $e2,
+				    ln2      => $ln2,
+				    score    => $score
+				  };
+	    }
+	}
+
+#	foreach my $group (@$reps2)    ### filling in all members in a locus
+#	{
+#	    if (@{$group->[1]} > 1)
+#	    {
+#		my $rep  = $group->[0]->[0];
+#		my $same = $group->[1];
+#		foreach my $x (@$same)
+#		{
+#		    $return->{$x->[0]} = $return->{$rep};
+#		}
+#	    }
+#	}
+    }
+    #END corresponds
+    return($return);
+}
+
+
+
+
+=head2 close_genomes
+
+  $return = $obj->close_genomes($genomes, $how, $n)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomes is a genomes
+$how is a how
+$n is an int
+$return is a reference to a hash where the key is a genome and the value is a genomes
+genomes is a reference to a list where each element is a genome
+genome is a string
+how is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomes is a genomes
+$how is a how
+$n is an int
+$return is a reference to a hash where the key is a genome and the value is a genomes
+genomes is a reference to a list where each element is a genome
+genome is a string
+how is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub close_genomes
+{
+    my($self, $genomes, $how, $n) = @_;
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN close_genomes
+    $return = {};
+    if ($how > 1)
+    {
+	print STDERR "how=$how is not yet supported.  Using default of matching names\n";
+	$how = 0;
+    }
+
+    if (($how == 0) || ($how == 1))
+    {
+	open(ALL,"all_entities_Genome -fields scientific_name|") || die "could nopen open pipe";
+	my @tuples    = map { ($_ =~ /^(\S+)\t(\S.*\S)/) ? [$1,[split(/\s+/,$2)]] : () } <ALL>;
+	my %to_seek   = map { $_ => 1 } @$genomes;
+	my %to_name   = map { ($_->[0] => $_->[1]) } grep { $to_seek{$_->[0]} } @tuples;
+	close(ALL);
+	foreach my $g (@$genomes)
+	{
+	    my $name = $to_name{$g};
+	    if ($name)
+	    {
+		my @poss = map  { ($_->[1] > 0) ? $_->[0] : () }
+		           sort { ($b->[1] <=> $a->[1]) or ($a->[0] cmp $b->[0]) }
+		           map  { my $i; 
+                                  for ($i=0; 
+                                       ($i < @$name) && ($i < @{$_->[1]}) && ((lc $name->[$i]) eq (lc $_->[1]->[$i])); 
+                                       $i++) {}
+			          [$_->[0],$i] } 
+                           @tuples;
+		if (@poss > $n) { $#poss = $n-1 }
+		$return->{$g} = \@poss;
+	    }
+	}
+    }
+    #END close_genomes
     return($return);
 }
 
@@ -7740,6 +7991,105 @@ a reference to a list containing 2 items:
 0: a weight
 1: a reference to a hash where the key is a field_name and the value is a string
 
+
+=end text
+
+=back
+
+
+
+=head2 correspondence
+
+=over 4
+
+
+
+=item Description
+
+A correspondence is generated as a mapping of fids to fids.  The mapping
+attempts to map a fid to another that performs the same function.  The
+correspondence describes the regions that are similar, the strength of
+the similarity, the number of genes in the chromosomal context that appear
+to "correspond" and a score from 0 to 1 that loosely corresponds to 
+confidence in the correspondence.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+to has a value which is a fid
+iden has a value which is a float
+ncontext has a value which is an int
+b1 has a value which is an int
+e1 has a value which is an int
+ln1 has a value which is an int
+b2 has a value which is an int
+e2 has a value which is an int
+ln2 has a value which is an int
+score has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+to has a value which is a fid
+iden has a value which is a float
+ncontext has a value which is an int
+b1 has a value which is an int
+e1 has a value which is an int
+ln1 has a value which is an int
+b2 has a value which is an int
+e2 has a value which is an int
+ln2 has a value which is an int
+score has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 how
+
+=over 4
+
+
+
+=item Description
+
+A close_genomes is used to get a set of relatively close genomes (for
+each input genome, a set of close genomes is calculated, but the
+result should be viewed as quite approximate.  "how" is a suggestion
+of which algorithm to use:
+ 
+     0 - default (same genus)
+     1 - find genomes with the same genus name
+     2 - use the SSU rRNA, if possible
+     3 - use a set of "universal proteins", if you can
+         
+Up to n genomes will be returned for each input genome.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
 
 =end text
 

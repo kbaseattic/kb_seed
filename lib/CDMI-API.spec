@@ -750,4 +750,41 @@ module CDMI_API : CDMI_API {
 	 */
     funcdef text_search(string input, int start, int count, list<string> entities) returns (mapping<entity_name, list<search_hit>>);
 
+	/* A correspondence is generated as a mapping of fids to fids.  The mapping
+	   attempts to map a fid to another that performs the same function.  The
+	   correspondence describes the regions that are similar, the strength of
+	   the similarity, the number of genes in the chromosomal context that appear
+	   to "correspond" and a score from 0 to 1 that loosely corresponds to 
+	   confidence in the correspondence.
+	*/
+	    typedef structure {
+	        fid to;
+	        float iden;
+		int ncontext;   
+	        int b1;
+                int e1;
+	        int ln1;
+	        int b2;
+                int e2;
+	        int ln2;
+	        int score;
+	} correspondence;
+
+     funcdef corresponds(fids,genome) returns (mapping<fid,correspondence>);
+
+	/* A close_genomes is used to get a set of relatively close genomes (for
+	   each input genome, a set of close genomes is calculated, but the
+           result should be viewed as quite approximate.  "how" is a suggestion
+	   of which algorithm to use:
+ 
+		0 - default (same genus)
+		1 - find genomes with the same genus name
+		2 - use the SSU rRNA, if possible
+		3 - use a set of "universal proteins", if you can
+         
+           Up to n genomes will be returned for each input genome.
+	*/
+
+     typedef int how;
+     funcdef close_genomes(genomes,how,int n) returns (mapping<genome,genomes>);
 };

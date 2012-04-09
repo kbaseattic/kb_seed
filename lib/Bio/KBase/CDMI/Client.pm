@@ -1930,6 +1930,62 @@ sub text_search
 
 
 
+=head2 $result = corresponds(fids, genome)
+
+
+
+=cut
+
+sub corresponds
+{
+    my($self, @args) = @_;
+
+    @args == 2 or die "Invalid argument count (expecting 2)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.corresponds",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking corresponds: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking corresponds: " . $self->{client}->status_line;
+    }
+}
+
+
+
+=head2 $result = close_genomes(genomes, how, n)
+
+
+
+=cut
+
+sub close_genomes
+{
+    my($self, @args) = @_;
+
+    @args == 3 or die "Invalid argument count (expecting 3)";
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.close_genomes",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    die "Error invoking close_genomes: " . $result->error_message;
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+	die "Error invoking close_genomes: " . $self->{client}->status_line;
+    }
+}
+
+
+
 
 
 =head2 $result = get_entity_AlignmentTree(ids, fields)

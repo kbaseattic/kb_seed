@@ -82,6 +82,10 @@ This is used only if the column containing the subsystem is not the last column.
 This is used to request a fasta output file (dropping all of the other columns in the input lines).
 It defaults to outputing just a fasta entry.
 
+=item -fc Columns  [ construct comment for fasta from these columns ]
+
+This is used to ask for "fasta comments" formed from one or more columns (comma-separated)
+
 =back
 
 =head2 Output Format
@@ -104,9 +108,11 @@ my $column;
 
 my $input_file;
 my $fasta = 1;
+my $fasta_comment;
 
 my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				     'fasta=i' => \$fasta,
+				     'fc=s'    => \$fasta_comment,
 				      'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
@@ -136,19 +142,25 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
         elsif (ref($v) eq 'ARRAY')
         {
-            foreach $_ (@$v)
+            foreach my $seq (@$v)
             {
 		if ($fasta)
 		{
 		    if (! $fasta_written{$id})
 		    {
 			$fasta_written{$id} = 1;
-			print ">$id\n$_\n";
+			my $hdr = "";
+			if ($fasta_comment)
+			{
+			    my @fields = split(/\t/,$line);
+			    $hdr = join("; ",map { $fields[$_-1] } split(/,/,$fasta_comment));
+			}
+			print ">$id $hdr\n$_\n";
 		    }
 		}
 		else
 		{
-		    print "$line\t$_\n";
+		    print "$line\t$seq\n";
 		}
             }
         }
@@ -159,7 +171,13 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 		if (! $fasta_written{$id})
 		{
 		    $fasta_written{$id} = 1;
-		    print ">$id\n$v\n";
+		    my $hdr = "";
+		    if ($fasta_comment)
+		    {
+			my @fields = split(/\t/,$line);
+			$hdr = join("; ",map { $fields[$_-1] } split(/,/,$fasta_comment));
+		    }
+		    print ">$id $hdr\n$v\n";
 		}
 	    }
 	    else

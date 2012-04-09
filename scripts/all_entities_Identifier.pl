@@ -137,7 +137,7 @@ while (%$h)
 {
     while (my($k, $v) = each %$h)
     {
-	print join("\t", $k, @$v{@fields}), "\n";
+	print join("\t", $k, map { ref($_) eq 'ARRAY' ? join(",", @$_) : $_ } @$v{@fields}), "\n";
     }
     $start += $count;
     $h = $geO->all_entities_Identifier($start, $count, \@fields);
