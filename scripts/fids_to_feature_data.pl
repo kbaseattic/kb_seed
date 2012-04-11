@@ -175,7 +175,7 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         {
 	    my $id = $v->{feature_id};
 	    my $len = $v->{feature_length};
-	    my $pub = join (",",@{$v->{feature_publications}});
+	    my $pub = join (",",map { $_->[0] } @{$v->{feature_publications}});
 
 	    my $locs = $v->{feature_location};
 	    my @locStrings = map { join("", $_->[0], "_", $_->[1], $_->[2], $_->[3]) } @$locs;

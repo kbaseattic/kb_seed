@@ -56,7 +56,7 @@ sub id_server
 
     use Bio::KBase;
 
-    my $kb = Bio::Kbase->new();
+    my $kb = Bio::KBase->new();
     my $store = $kb->central_store();
     my $id_server = $kb->id_server();
 
