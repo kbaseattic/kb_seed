@@ -3694,12 +3694,11 @@ sub fids_to_feature_data
     @res = $kb->GetAll('Feature Produces ProteinSequence IsATopicOf Publication',
 			  $produces_constraint,
 			  $fids,
-			  'Feature(id) IsATopicOf(to_link) Publication(citation)'
+			  'Feature(id) IsATopicOf(to_link) Publication(link) Publication(title)'
 			  );
     foreach my $tuple (@res)
     {
-	my($fid,$pubid,$url) = @$tuple;
-	my($link,$title)     = ($url->link(),$url->text());
+	my($fid,$pubid,$link,$title) = @$tuple;
 	push(@{$publications{$fid}},[$pubid,$link,$title]);
     }
     foreach my $fid (@$fids)
