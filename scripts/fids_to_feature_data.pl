@@ -121,7 +121,35 @@ This is used only if the column containing the subsystem is not the last column.
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added in this order:  feature_id feature_publications genome_name feature_location feature_length feature_function.
+file with extra columns added in this order:
+
+=over 4
+    
+=item feature_id
+
+Feature identifier
+
+=item feature_publications 
+
+List of Pubmed identifiers for publications associated with this feature.
+
+=item genome_name 
+
+Name of the genome this feature is present in.
+
+=item feature_location 
+
+Location string describing the location of this feature in its genome.
+
+=item feature_length 
+
+Length of the DNA sequence of this feature.
+
+=item feature_function
+
+The function currently assigned to this feature.
+
+=back
 
 Input lines that cannot be extended are written to stderr.
 

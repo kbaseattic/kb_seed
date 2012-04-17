@@ -734,22 +734,32 @@ sub call_method {
     my $ctx = Bio::KBase::CDMI::ServiceContext->new(client_ip => $self->_plack_req->address);
     
     my $args = $data->{arguments};
-    if (@$args == 1 && ref($args->[0]) eq 'HASH')
-    {
-	my $actual_args = $args->[0]->{args};
-	my $token = $args->[0]->{auth_token};
-	$data->{arguments} = $actual_args;
-	
-	
+
         # Service CDMI_API does not require authentication.
-	
-    }
-    
+        
     my $new_isa = $self->get_package_isa($module);
     no strict 'refs';
     local @{"${module}::ISA"} = @$new_isa;
     local $CallContext = $ctx;
-    my @result = $module->$method(@{ $data->{arguments} });
+    my @result;
+    {
+	my $err;
+	eval {
+	    @result = $module->$method(@{ $data->{arguments} });
+	};
+	if ($@)
+	{
+	    #
+	    # Reraise the string version of the exception because
+	    # the RPC lib can't handle exception objects (yet).
+	    #
+	    my $err = $@;
+	    my $str = "$err";
+	    $str =~ s/Bio::KBase::CDMI::Service::call_method.*//s;
+	    $str =~ s/^/>\t/mg;
+	    die "The JSONRPC server invocation of the method \"$method\" failed with the following error:\n" . $str;
+	}
+    }
     my $result;
     if ($return_counts{$method} == 1)
     {
