@@ -2203,6 +2203,17 @@ sub genomes_to_genome_data
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
 							       "Invalid argument count for function genomes_to_genome_data (received $n, expecting 1)");
     }
+    {
+	my($genomes) = @args;
+
+	my @_bad_arguments;
+        (ref($genomes) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"genomes\" (value was \"$genomes\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to genomes_to_genome_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'genomes_to_genome_data');
+	}
+    }
 
     my $result = $self->{client}->call($self->{url}, {
 	method => "CDMI_API.genomes_to_genome_data",

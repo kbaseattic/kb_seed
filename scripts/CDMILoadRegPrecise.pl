@@ -30,20 +30,26 @@
 This script loads the RegPrecise data into the CDMI. RegPrecise data
 uses Microbes Online feature IDs, and relates these features to
 regulons, which are stored as CoregulatedSet objects in the CDMI.
-The data is stored in two tab-delimited files: in both files the
-first column is a regulon ID and the second is a feature ID.
+The data is stored in a series of tab-delimited files-- three for
+each RegPrecise genome. Each file contains two fields, the first of
+which is aways a RegPrecise regulon ID. The second field in each file
+is given below.
 
 =over 4
 
-=item kbasegene.tsv
+=item regulons.###.tab
 
-This file relates regulons to the features they contain. It builds the
-B<IsRegulatedIn> relationship.
+Contains the Microbes Online gene ID of each gene in the regulon.
 
-=item kbaseregulator.tsv
+=item binding_sites.###.tab
 
-This file relates regulons to the features used as their transcription
-factors. It builds the B<Controls> relationship.
+Contains the offset locations of the binding sites for the transcription
+factors. There will generally be more than one such location.
+
+=item transcription_factors.###.tab
+
+Contains the Microbes Online gene ID of the regulon's transcription
+factor.
 
 =back
 
@@ -77,8 +83,8 @@ if (! $cdmi) {
 } else {
     # Create the loader object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    # Denote that IDs are typed: this is Microbes Online.
-    $loader->SetTyped(1);
+    # Denote that IDs are from Microbes Online.
+    $loader->SetSource('MOL');
     # Extract the statistics object.
     my $stats = $loader->stats;
     # Get the input directory
@@ -88,15 +94,11 @@ if (! $cdmi) {
         die "Missing input directory.\n";
     } elsif (! -d $inDirectory) {
         die "Invalid input directory $inDirectory.\n";
-    } elsif (! -f "$inDirectory/kbasegene.tsv") {
-        die "Missing kbasegene.tsv file in $inDirectory.\n";
-    } elsif (! -f "$inDirectory/kbaseregulator.tsv") {
-        die "Missing kbaseregulator.tsv file in $inDirectory.\n";
     } else {
         # Insure we have a RegPrecise source record.
         $loader->InsureEntity(Source => 'RegPrecise');
         # Get the list of tables we are loading.
-        my @tables = qw(Formulated CoregulatedSet Controls IsRegulatedIn);
+        my @tables = qw(Formulated CoregulatedSet CoregulatedSetBinding Controls IsRegulatedIn);
         # Are we clearing?
         if ($clear) {
             # Yes. Rebuild all the tables.
@@ -112,139 +114,107 @@ if (! $cdmi) {
         }
         # Initialize the relation loaders.
         $loader->SetRelations(@tables);
-        # This will cache the coregulated set IDs. It maps each to its
-        # KBase ID.
-        my %coregs;
-        # Both files are processed more or less the same way. The only
-        # difference is the relation being loaded.
-        my %relName = ('kbasegene.tsv' => 'IsRegulatedIn',
-                'kbaseregulator.tsv' => 'Controls');
-        for my $fileName (keys %relName) {
-            # Open the input file.
-            print "Reading $fileName.\n";
-            open(my $ih, "<$inDirectory/$fileName") || die "Could not open $fileName file: $!\n";
-            # We need to batch the incoming IDs for the requests to the ID
-            # server. The first hash tracks the feature IDs found, and the
-            # second maps each regulon to its related features.
-            my (%fids, %regulons);
-            # This tracks the number of features in this batch.
-            my $batch = 0;
-            # Loop through the input file.
-            while (! eof $ih) {
-                my ($regulon, $fid) = $loader->GetLine($ih);
-                # Add this feature to the batch.
-                $fids{$fid} = 1;
-                push @{$regulons{$regulon}}, $fid;
-                $stats->Add(lineIn => 1);
-                $batch++;
-                # Is the batch full?
-                if ($batch >= 5000) {
-                    ProcessBatch($loader, \%fids, \%regulons, \%coregs, $relName{$fileName});
-                    $batch = 0;
-                    %fids = ();
-                    %regulons = ();
+        # Get the regulon files.
+        opendir(TMP, $inDirectory) || die "Could not open $inDirectory.\n";
+        my @regFiles = sort grep { $_ =~ /^regulons\.\d+\.tab$/ } readdir(TMP);
+        print scalar(@regFiles) . " regulon files found in $inDirectory.\n";
+        # Loop through the files, processing each group of three.
+        for my $regFile (@regFiles) {
+            # Extract the genome number.
+            my ($genome) = ($regFile =~ /regulons\.(\d+)/);
+            $stats->Add(genomes => 1);
+            # Read in the three files. The first hash tracks the actual
+            # data for each regulon. The second will track all of the
+            # feature IDs read in.
+            my (%regData, %features);
+            for my $fileType (qw(regulons binding_sites transcription_factors)) {
+                # Compute the file name.
+                my $fileName = "$inDirectory/$fileType.$genome.tab";
+                # Insure it exists.
+                if (! -f $fileName) {
+                    print "No $fileType found for genome $genome.\n";
+                    $stats->Add(missingFile => 1);
+                } else {
+                    # Open the file and loop through it.
+                    open(my $ih, "<$fileName") || die "Could not open $fileName: $!\n";
+                    $stats->Add("$fileType-file" => 1);
+                    print "Processing $fileType for genome $genome.\n";
+                    while (! eof $ih) {
+                        my ($regulon, $data) = $loader->GetLine($ih);
+                        push @{$regData{$regulon}{$fileType}}, $data;
+                        $stats->Add(lineIn => 1);
+                        # If this is not the binding-sites file, save
+                        # the data value in the list of feature IDs.
+                        if ($fileType ne 'binding_sites') {
+                            $features{$data} = 1;
+                        }
+                    }
                 }
             }
-            # If there's anything left over, process it as well.
-            if ($batch > 0) {
-                ProcessBatch($loader, \%fids, \%regulons, \%coregs, $relName{$fileName});
+            # Now we get the KBase feature IDs.
+            print "Interrogating ID server for $genome.\n";
+            my $idMap = $loader->FindKBaseIDs('Feature', [keys %features]);
+            # And now the KBase regulon IDs. Unlike the feature IDs, these don't
+            # need to already exist in the database.
+            my @regulons = keys %regData;
+            my $regMap = $loader->GetKBaseIDs('kb|reg', 'Regulon', \@regulons);
+            print "Producing output for $genome.\n";
+            # Loop through the regulons.
+            for my $regulon (keys %regData) {
+                # Get the regulon's KBase ID.
+                my $kbID = $regMap->{$regulon};
+                # Create the regulon object itself.
+                $loader->InsertObject('Formulated', from_link => 'RegPrecise',
+                    to_link => $kbID);
+                $loader->InsertObject('CoregulatedSet', id => $kbID, source_id =>
+                    $regulon);
+                $stats->Add(regulons => 1);
+                # Add the binding offsets.
+                my $bindings = $regData{$regulon}{binding_sites};
+                if ($bindings) {
+                    $stats->Add(boundRegulons => 1);
+                    for my $binding (@$bindings) {
+                        $loader->InsertObject('CoregulatedSetBinding', id => $kbID,
+                            binding_location => $binding);
+                        $stats->Add(bindingValues => 1);
+                    }
+                }
+                # Attach the features. Note we have to deal with the possibility
+                # that a particular feature does not exist.
+                my $features = $regData{$regulon}{regulons};
+                if ($features) {
+                    for my $feature (@$features) {
+                        my $kbFid = $idMap->{$feature};
+                        if (! $kbFid) {
+                            $stats->Add(memberFeatureNotFound => 1);
+                        } else {
+                            $loader->InsertObject('IsRegulatedIn', from_link => $kbFid,
+                                to_link => $kbID);
+                            $stats->Add(featureInRegulon => 1);
+                        }
+                    }
+                }
+                # Finally, attach the transcription factors.
+                my $factors = $regData{$regulon}{transcription_factors};
+                if ($factors) {
+                    $stats->Add(factorsFound => 1);
+                    for my $factor (@$factors) {
+                        my $kbFid = $idMap->{$factor};
+                        if (! $kbFid) {
+                            $stats->Add(factorFeatureNotFound => 1);
+                        } else {
+                            $loader->InsertObject('Controls', from_link => $kbFid,
+                                to_link => $kbID);
+                            $stats->Add(factorForRegulon => 1);
+                        }
+                    }
+                }
             }
-            # Close the input file.
-            close $ih;
+            print "$genome processed.\n";
         }
         # Unspool the relations.
-        print "Unspooling relations.\n";
         $loader->LoadRelations();
-        # Display the statistics.
-        print "All done.\n" . $stats->Show();
+        # Display the load statistics.
+        print "All done:\n" . $stats->Show();
     }
 }
-
-=head2 Subroutines
-
-=head3 ProcessBatch
-
-    ProcessBatch($loader, \%fids, \%regulons, \%coregs, $relName);
-
-Process a batch of regulon information. The feature and regulon IDs
-must be converted to KBase IDs, and the appropriate relation populated.
-In addition, the B<CoregulatedSet> and B<Formulated> records must be
-created for coregulated sets we haven't seen yet.
-
-=over 4
-
-=item loader
-
-L<CMDILoader> object for assisting in the load.
-
-=item fids
-
-Reference to a hash containing the feature IDs for this batch in its
-keys.
-
-=item regulons
-
-Reference to a hash mapping each regulon ID to its related features.
-
-=item coregs
-
-Reference to a hash mapping each known regulon ID to its corresponding
-KBase ID. It also identifies regulons that have already been output to
-the B<CoregulatedSet> relation.
-
-=item relName
-
-Name of the relation being built from this data.
-
-=back
-
-=cut
-
-sub ProcessBatch {
-    # Get the parameters.
-    my ($loader, $fids, $regulons, $coregs, $relName) = @_;
-    # Get the statistics object.
-    my $stats = $loader->stats;
-    # Get the KBase IDs for the features.
-    my $fidMapping = $loader->FindKBaseIDs('MOL', 'Feature', [keys %$fids]);
-    # Extract all the new regulon IDs.
-    my @newRegs;
-    for my $regulon (keys %$regulons) {
-        if (! $coregs->{$regulon}) {
-            push @newRegs, $regulon;
-        }
-    }
-    # Get KBase IDs for the new regulons.
-    my $regMapping = $loader->GetKBaseIDs('kb|reg', 'MOL', 'Regulon', \@newRegs);
-    # Create the new regulons.
-    for my $regulon (@newRegs) {
-        # Get this regulon's KBase ID.
-        my $regulonID = $regMapping->{$regulon};
-        # Save it in the coregulated-set hash.
-        $coregs->{$regulon} = $regulonID;
-        # Create the regulon record.
-        $loader->InsertObject('CoregulatedSet', id => $regulonID, source_id => $regulon);
-        $loader->InsertObject('Formulated', from_link => 'RegPrecise', to_link => $regulonID);
-        $stats->Add(regulonCreated => 1);
-    }
-    # Connect the regulons to the features.
-    for my $regulon (keys %$regulons) {
-        $stats->Add(regulonGroup => 1);
-        # Get this regulon's features.
-        my $fids = $regulons->{$regulon};
-        for my $fid (@$fids) {
-            # Get the feature's KBase ID.
-            my $kbid = $fidMapping->{$fid};
-            # Check to see if the feature is in the KBase.
-            if (! $kbid) {
-                $stats->Add(featureNotFound => 1);
-            } else {
-                $loader->InsertObject($relName, from_link => $fidMapping->{$fid},
-                        to_link => $coregs->{$regulon});
-                $stats->Add("$relName-fid" => 1);
-            }
-        }
-    }
-    print "Batch processed for $relName. " . $stats->Ask('lineIn') . " lines read.\n";
-}
-

@@ -25,7 +25,7 @@
 
 =head1 CDMI FIGfam Loader
 
-    CDMILoadFIGfams [options] releaseDirectory
+    CDMILoadFamilies [options] releaseDirectory
 
 This script loads FIGfam data from the SEED. The raw FIGfam files
 are read in and the feature IDs converted from FIG IDs to KBase IDs. Only

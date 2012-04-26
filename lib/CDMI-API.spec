@@ -787,4 +787,126 @@ module CDMI_API : CDMI_API {
 
      typedef int how;
      funcdef close_genomes(genomes,how,int n) returns (mapping<genome,genomes>);
+
+     typedef string sequence;
+     typedef tuple<id,comment,sequence> seq_triple;
+     typedef list<seq_triple> seq_set;
+     typedef list<id> id_set;
+
+     typedef structure {
+	     seq_set  existing_reps;
+	     string   order;     /* keywords: long-to-short */
+	     int      alg;
+	     string   type_sim;  /* identity_fraction, positive_fraction, score_per_position */
+             float    cutoff;    /* fractions or bits */
+	} rep_seq_parms;
+
+	/* we return two arguments.  The first is the list of representative triples,
+	   and the second is the list of sets (the first entry always being the
+	   representative sequence)
+	*/
+     funcdef representative_sequences(seq_set,rep_seq_parms) returns (id_set,list<id_set>);
+
+     typedef structure {
+	     int anchors;
+	     int brenner;
+             int cluster;
+             int dimer;
+             int diags;
+             int diags1;
+             int diags2;
+             int le;
+             int noanchors;
+             int sp;
+             int spn;
+             int stable;
+             int sv;
+      
+             string anchorspacing;
+             string center;
+             string cluster1;
+             string cluster2;
+             string diagbreak;
+             string diaglength;
+             string diagmargin;
+             string distance1;
+             string distance2;
+             string gapopen;
+             string log;
+             string loga;
+             string matrix;
+             string maxhours;
+             string maxiters;
+             string maxmb;
+             string maxtrees;
+             string minbestcolscore;
+             string minsmoothscore;
+             string objscore;
+             string refinewindow;
+             string root1;
+             string root2;
+             string scorefile;
+             string seqtype;
+             string smoothscorecell;
+             string smoothwindow;
+             string spscore;
+             string SUEFF;
+             string usetree;
+             string weight1;
+             string weight2;
+     } muscle_parms_t;
+
+     typedef structure {
+        int sixmerpair;
+        int amino;
+        int anysymbol;
+        int auto;
+        int clustalout;
+        int dpparttree;
+        int fastapair;
+        int fastaparttree;
+        int fft;
+        int fmodel;
+        int genafpair;
+        int globalpair;
+        int inputorder;
+        int localpair;
+        int memsave;
+        int nofft;
+        int noscore;
+        int parttree;
+        int reorder;
+        int treeout;
+
+	string alg;   /* linsi | einsi | ginsi | nwnsi | nwns | fftnsi | fftns (D) */
+
+        string aamatrix;
+        string bl;
+        string ep;
+        string groupsize;
+        string jtt;
+        string lap;
+        string lep;
+        string lepx;
+        string LOP;
+        string LEXP;
+        string maxiterate;
+        string op;
+        string partsize;
+        string retree;
+        string thread;
+        string tm;
+        string weighti;
+	     
+     } mafft_parms_t;
+
+     typedef structure {
+	muscle_parms_t muscle_parms;
+	mafft_parms_t  mafft_parms;
+        string         tool;
+	int            align_ends_with_clustal;	
+     } align_seq_parms;
+             
+     funcdef align_sequences(seq_set,align_seq_parms) returns (seq_set);
+
 };

@@ -4599,9 +4599,11 @@ sub UpdateEntity {
     # Verify that the fields exist.
     my $checker = $self->GetFieldTable($entityName);
     for my $field (@fieldList) {
-        if ($field eq 'id') {
+        my $normalizedField = $field;
+        $normalizedField =~ tr/_/-/;
+        if ($normalizedField eq 'id') {
             Confess("Cannot update the ID field for entity $entityName.");
-        } elsif ($checker->{$field}->{relation} ne $entityName) {
+        } elsif ($checker->{$normalizedField}->{relation} ne $entityName) {
             Confess("Cannot find $field in primary relation of $entityName.");
         }
     }
@@ -4817,7 +4819,7 @@ sub Delete {
 
 =head3 Disconnect
 
-    $erdb->Disconnect($relationshipName, $originEntityName, $originEntityID);
+    my $count = $erdb->Disconnect($relationshipName, $originEntityName, $originEntityID);
 
 Disconnect an entity instance from all the objects to which it is related via
 a specific relationship. This will delete each relationship instance that
@@ -4837,6 +4839,10 @@ Name of the entity that is to be disconnected.
 
 ID of the entity that is to be disconnected.
 
+=item RETURN
+
+Returns the number of rows deleted.
+
 =back
 
 =cut
@@ -4844,6 +4850,8 @@ ID of the entity that is to be disconnected.
 sub Disconnect {
     # Get the parameters.
     my ($self, $relationshipName, $originEntityName, $originEntityID) = @_;
+    # Initialize the return count.
+    my $retVal = 0;
     # Encode the entity ID.
     my $idParameter = $self->EncodeField("$originEntityName(id)", $originEntityID);
     # Get the relationship descriptor.
@@ -4870,6 +4878,7 @@ sub Disconnect {
                 while (! $done) {
                     # Do the delete.
                     my $rows = $dbh->SQL("DELETE FROM $self->{_quote}$relationshipName$self->{_quote} WHERE ${dir}_link = ? $limitClause", 0, $idParameter);
+                    $retVal += $rows;
                     # See if we're done. We're done if no rows were found or the delete is unlimited.
                     $done = ($rows == 0 || ! $limitClause);
                 }
@@ -4879,6 +4888,8 @@ sub Disconnect {
         if (! $found) {
             Confess("Entity \"$originEntityName\" does not use $relationshipName.");
         }
+        # Return the count.
+        return $retVal;
     }
 }
 

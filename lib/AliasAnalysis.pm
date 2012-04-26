@@ -97,6 +97,15 @@ my %AliasTable = (
                             },
             normalize   =>  'cmr|',
         },
+        IMG => {
+            pattern     =>  'img\|(\d+)',
+            home        =>  'http://img.jgi.doe.gov',
+            convert     =>  { natural    => '$1',
+                              export     => 'img|$1',
+                              url        => 'http://img.jgi.doe.gov/cgi-bin/w/main.cgi?page=geneDetail&gene_oid=$1',
+                            },
+            normalize   =>  'img|',
+        },
         SwissProt => {
             pattern     =>  'sp\|([A-Z0-9]{6})',
             home        =>  'http://us.expasy.org',
@@ -110,7 +119,7 @@ my %AliasTable = (
             pattern     =>  'uni\|([A-Z0-9_]+?)',
             home        =>  'http://www.uniprot.org',
             convert     =>  { natural   => '$1',
-                              export    => 'UniProtKB:',
+                              export    => 'UniProtKB:$1',
                               url       => 'http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=$1',
                             },
             normalize   =>  'uni|',
@@ -157,6 +166,13 @@ my %AliasTable = (
                             },
             normalize   =>  'GENE:',
             },
+        ERIC => {
+            pattern     => 'eric\|(\w+\-\d+)',
+            convert     => { natural    => '$1',
+                             export     => 'eric|$1',
+                             url        => 'http://asap.ahabs.wisc.edu/asap/feature_info.php?FeatureID=$1',
+            },
+        }
     );
 
 =head3 BlackList

@@ -69,6 +69,7 @@ if (! $cdmi) {
 } else {
     # Create the loader utility object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
+    $loader->SetSource('SEED');
     # Get the statistics object inside it.
     my $stats = $loader->stats;
     # Get the genome set file name.

@@ -22,8 +22,6 @@ package ServerThing;
 
     no warnings qw(once);
 
-    use Cache::Memcached::Fast;
-
     # Maximum number of requests to run per invocation.
     use constant MAX_REQUESTS => 50;
 
@@ -208,7 +206,7 @@ sub RunRabbitMQClient {
 	else
 	{
 	    $type = 'application/json';
-	}	    
+	}
 
 	print STDERR "publish request to $exchange_name rpc.$function\n";
 	$conn->publish($channel, "rpc.$function", $cgi->param('args'),
@@ -349,7 +347,7 @@ sub RunRabbitMQClientAsync {
     while (1)
     {
 	$loop->loop_once();
-	
+
 	if ($global->{request_exit} && $global->{queue_size} == 0)
 	{
 	    my $n = scalar grep { $_->isa("IO::Async::Handle") } $loop->notifiers();
@@ -475,7 +473,7 @@ sub AsyncFcgiReq
     else
     {
 	$type = 'application/json';
-    }	    
+    }
 
     my $now = gettimeofday;
 
@@ -553,9 +551,10 @@ sub RunRabbitMQServer {
 		namespace => $conf->{memcache_namespace},
 	    };
 	    print STDERR "Create memcache with config " . Dumper($mcc);
+	    require Cache::Memcached::Fast;
 	    my $mc = Cache::Memcached::Fast->new($mcc);
 	    $serverThing->_set_memcache($mc);
-	    
+
 	}
     }
 

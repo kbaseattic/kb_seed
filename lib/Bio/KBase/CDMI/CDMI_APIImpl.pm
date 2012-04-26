@@ -6353,6 +6353,399 @@ sub close_genomes
 
 
 
+=head2 representative_sequences
+
+  $return_1, $return_2 = $obj->representative_sequences($seq_set, $rep_seq_parms)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seq_set is a seq_set
+$rep_seq_parms is a rep_seq_parms
+$return_1 is an id_set
+$return_2 is a reference to a list where each element is an id_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+rep_seq_parms is a reference to a hash where the following keys are defined:
+	existing_reps has a value which is a seq_set
+	order has a value which is a string
+	alg has a value which is an int
+	type_sim has a value which is a string
+	cutoff has a value which is a float
+id_set is a reference to a list where each element is an id
+
+</pre>
+
+=end html
+
+=begin text
+
+$seq_set is a seq_set
+$rep_seq_parms is a rep_seq_parms
+$return_1 is an id_set
+$return_2 is a reference to a list where each element is an id_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+rep_seq_parms is a reference to a hash where the following keys are defined:
+	existing_reps has a value which is a seq_set
+	order has a value which is a string
+	alg has a value which is an int
+	type_sim has a value which is a string
+	cutoff has a value which is a float
+id_set is a reference to a list where each element is an id
+
+
+=end text
+
+
+
+=item Description
+
+we return two arguments.  The first is the list of representative triples,
+and the second is the list of sets (the first entry always being the
+representative sequence)
+
+=back
+
+=cut
+
+sub representative_sequences
+{
+    my $self = shift;
+    my($seq_set, $rep_seq_parms) = @_;
+
+    my @_bad_arguments;
+    (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seq_set\" (value was \"$seq_set\")");
+    (ref($rep_seq_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"rep_seq_parms\" (value was \"$rep_seq_parms\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to representative_sequences:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'representative_sequences');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return_1, $return_2);
+    #BEGIN representative_sequences
+    my $options = {};
+    use gjoseqlib;
+    use representative_sequences;
+    
+    local $_;
+    my($rep,$reping);
+    if ($rep_seq_parms->{order}) { $options->{by_size} = $rep_seq_parms->{order} }
+    if ($_ = $rep_seq_parms->{type_sim}) { $options->{sim_meas} = $_ }
+    if ($_ = $rep_seq_parms->{cutoff})   { $options->{max_sim} = $_ }
+    my @args = ($seq_set,$options);
+    if ($_ = $rep_seq_parms->{existing_reps})
+    {
+	unshift(@args,$_);
+    }
+    if ($options->{alg})
+    {
+	($rep,$reping) = &representative_sequences::rep_seq_2(@args);
+    }
+    else
+    {
+	($rep,$reping) = &representative_sequences::rep_seq(@args);
+    }
+    $return_1 = [map { $_->[0] } @$rep];
+    $return_2 = [ map { [ $_, @{ $reping->{ $_ } } ] } @$return_1 ]; 
+    #END representative_sequences
+    my @_bad_returns;
+    (ref($return_1) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return_1\" (value was \"$return_1\")");
+    (ref($return_2) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return_2\" (value was \"$return_2\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to representative_sequences:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'representative_sequences');
+    }
+    return($return_1, $return_2);
+}
+
+
+
+
+=head2 align_sequences
+
+  $return = $obj->align_sequences($seq_set, $align_seq_parms)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seq_set is a seq_set
+$align_seq_parms is an align_seq_parms
+$return is a seq_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+align_seq_parms is a reference to a hash where the following keys are defined:
+	muscle_parms has a value which is a muscle_parms_t
+	mafft_parms has a value which is a mafft_parms_t
+	tool has a value which is a string
+	align_ends_with_clustal has a value which is an int
+muscle_parms_t is a reference to a hash where the following keys are defined:
+	anchors has a value which is an int
+	brenner has a value which is an int
+	cluster has a value which is an int
+	dimer has a value which is an int
+	diags has a value which is an int
+	diags1 has a value which is an int
+	diags2 has a value which is an int
+	le has a value which is an int
+	noanchors has a value which is an int
+	sp has a value which is an int
+	spn has a value which is an int
+	stable has a value which is an int
+	sv has a value which is an int
+	anchorspacing has a value which is a string
+	center has a value which is a string
+	cluster1 has a value which is a string
+	cluster2 has a value which is a string
+	diagbreak has a value which is a string
+	diaglength has a value which is a string
+	diagmargin has a value which is a string
+	distance1 has a value which is a string
+	distance2 has a value which is a string
+	gapopen has a value which is a string
+	log has a value which is a string
+	loga has a value which is a string
+	matrix has a value which is a string
+	maxhours has a value which is a string
+	maxiters has a value which is a string
+	maxmb has a value which is a string
+	maxtrees has a value which is a string
+	minbestcolscore has a value which is a string
+	minsmoothscore has a value which is a string
+	objscore has a value which is a string
+	refinewindow has a value which is a string
+	root1 has a value which is a string
+	root2 has a value which is a string
+	scorefile has a value which is a string
+	seqtype has a value which is a string
+	smoothscorecell has a value which is a string
+	smoothwindow has a value which is a string
+	spscore has a value which is a string
+	SUEFF has a value which is a string
+	usetree has a value which is a string
+	weight1 has a value which is a string
+	weight2 has a value which is a string
+mafft_parms_t is a reference to a hash where the following keys are defined:
+	sixmerpair has a value which is an int
+	amino has a value which is an int
+	anysymbol has a value which is an int
+	auto has a value which is an int
+	clustalout has a value which is an int
+	dpparttree has a value which is an int
+	fastapair has a value which is an int
+	fastaparttree has a value which is an int
+	fft has a value which is an int
+	fmodel has a value which is an int
+	genafpair has a value which is an int
+	globalpair has a value which is an int
+	inputorder has a value which is an int
+	localpair has a value which is an int
+	memsave has a value which is an int
+	nofft has a value which is an int
+	noscore has a value which is an int
+	parttree has a value which is an int
+	reorder has a value which is an int
+	treeout has a value which is an int
+	alg has a value which is a string
+	aamatrix has a value which is a string
+	bl has a value which is a string
+	ep has a value which is a string
+	groupsize has a value which is a string
+	jtt has a value which is a string
+	lap has a value which is a string
+	lep has a value which is a string
+	lepx has a value which is a string
+	LOP has a value which is a string
+	LEXP has a value which is a string
+	maxiterate has a value which is a string
+	op has a value which is a string
+	partsize has a value which is a string
+	retree has a value which is a string
+	thread has a value which is a string
+	tm has a value which is a string
+	weighti has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seq_set is a seq_set
+$align_seq_parms is an align_seq_parms
+$return is a seq_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+align_seq_parms is a reference to a hash where the following keys are defined:
+	muscle_parms has a value which is a muscle_parms_t
+	mafft_parms has a value which is a mafft_parms_t
+	tool has a value which is a string
+	align_ends_with_clustal has a value which is an int
+muscle_parms_t is a reference to a hash where the following keys are defined:
+	anchors has a value which is an int
+	brenner has a value which is an int
+	cluster has a value which is an int
+	dimer has a value which is an int
+	diags has a value which is an int
+	diags1 has a value which is an int
+	diags2 has a value which is an int
+	le has a value which is an int
+	noanchors has a value which is an int
+	sp has a value which is an int
+	spn has a value which is an int
+	stable has a value which is an int
+	sv has a value which is an int
+	anchorspacing has a value which is a string
+	center has a value which is a string
+	cluster1 has a value which is a string
+	cluster2 has a value which is a string
+	diagbreak has a value which is a string
+	diaglength has a value which is a string
+	diagmargin has a value which is a string
+	distance1 has a value which is a string
+	distance2 has a value which is a string
+	gapopen has a value which is a string
+	log has a value which is a string
+	loga has a value which is a string
+	matrix has a value which is a string
+	maxhours has a value which is a string
+	maxiters has a value which is a string
+	maxmb has a value which is a string
+	maxtrees has a value which is a string
+	minbestcolscore has a value which is a string
+	minsmoothscore has a value which is a string
+	objscore has a value which is a string
+	refinewindow has a value which is a string
+	root1 has a value which is a string
+	root2 has a value which is a string
+	scorefile has a value which is a string
+	seqtype has a value which is a string
+	smoothscorecell has a value which is a string
+	smoothwindow has a value which is a string
+	spscore has a value which is a string
+	SUEFF has a value which is a string
+	usetree has a value which is a string
+	weight1 has a value which is a string
+	weight2 has a value which is a string
+mafft_parms_t is a reference to a hash where the following keys are defined:
+	sixmerpair has a value which is an int
+	amino has a value which is an int
+	anysymbol has a value which is an int
+	auto has a value which is an int
+	clustalout has a value which is an int
+	dpparttree has a value which is an int
+	fastapair has a value which is an int
+	fastaparttree has a value which is an int
+	fft has a value which is an int
+	fmodel has a value which is an int
+	genafpair has a value which is an int
+	globalpair has a value which is an int
+	inputorder has a value which is an int
+	localpair has a value which is an int
+	memsave has a value which is an int
+	nofft has a value which is an int
+	noscore has a value which is an int
+	parttree has a value which is an int
+	reorder has a value which is an int
+	treeout has a value which is an int
+	alg has a value which is a string
+	aamatrix has a value which is a string
+	bl has a value which is a string
+	ep has a value which is a string
+	groupsize has a value which is a string
+	jtt has a value which is a string
+	lap has a value which is a string
+	lep has a value which is a string
+	lepx has a value which is a string
+	LOP has a value which is a string
+	LEXP has a value which is a string
+	maxiterate has a value which is a string
+	op has a value which is a string
+	partsize has a value which is a string
+	retree has a value which is a string
+	thread has a value which is a string
+	tm has a value which is a string
+	weighti has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub align_sequences
+{
+    my $self = shift;
+    my($seq_set, $align_seq_parms) = @_;
+
+    my @_bad_arguments;
+    (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seq_set\" (value was \"$seq_set\")");
+    (ref($align_seq_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"align_seq_parms\" (value was \"$align_seq_parms\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to align_sequences:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'align_sequences');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN align_sequences
+    #END align_sequences
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to align_sequences:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'align_sequences');
+    }
+    return($return);
+}
+
+
+
+
 =head1 TYPES
 
 
@@ -9130,6 +9523,424 @@ an int
 =begin text
 
 an int
+
+=end text
+
+=back
+
+
+
+=head2 sequence
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 seq_triple
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 3 items:
+0: an id
+1: a comment
+2: a sequence
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 3 items:
+0: an id
+1: a comment
+2: a sequence
+
+
+=end text
+
+=back
+
+
+
+=head2 seq_set
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a seq_triple
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a seq_triple
+
+=end text
+
+=back
+
+
+
+=head2 id_set
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an id
+
+=end text
+
+=back
+
+
+
+=head2 rep_seq_parms
+
+=over 4
+
+
+
+=item Description
+
+fractions or bits
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+existing_reps has a value which is a seq_set
+order has a value which is a string
+alg has a value which is an int
+type_sim has a value which is a string
+cutoff has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+existing_reps has a value which is a seq_set
+order has a value which is a string
+alg has a value which is an int
+type_sim has a value which is a string
+cutoff has a value which is a float
+
+
+=end text
+
+=back
+
+
+
+=head2 muscle_parms_t
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+anchors has a value which is an int
+brenner has a value which is an int
+cluster has a value which is an int
+dimer has a value which is an int
+diags has a value which is an int
+diags1 has a value which is an int
+diags2 has a value which is an int
+le has a value which is an int
+noanchors has a value which is an int
+sp has a value which is an int
+spn has a value which is an int
+stable has a value which is an int
+sv has a value which is an int
+anchorspacing has a value which is a string
+center has a value which is a string
+cluster1 has a value which is a string
+cluster2 has a value which is a string
+diagbreak has a value which is a string
+diaglength has a value which is a string
+diagmargin has a value which is a string
+distance1 has a value which is a string
+distance2 has a value which is a string
+gapopen has a value which is a string
+log has a value which is a string
+loga has a value which is a string
+matrix has a value which is a string
+maxhours has a value which is a string
+maxiters has a value which is a string
+maxmb has a value which is a string
+maxtrees has a value which is a string
+minbestcolscore has a value which is a string
+minsmoothscore has a value which is a string
+objscore has a value which is a string
+refinewindow has a value which is a string
+root1 has a value which is a string
+root2 has a value which is a string
+scorefile has a value which is a string
+seqtype has a value which is a string
+smoothscorecell has a value which is a string
+smoothwindow has a value which is a string
+spscore has a value which is a string
+SUEFF has a value which is a string
+usetree has a value which is a string
+weight1 has a value which is a string
+weight2 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+anchors has a value which is an int
+brenner has a value which is an int
+cluster has a value which is an int
+dimer has a value which is an int
+diags has a value which is an int
+diags1 has a value which is an int
+diags2 has a value which is an int
+le has a value which is an int
+noanchors has a value which is an int
+sp has a value which is an int
+spn has a value which is an int
+stable has a value which is an int
+sv has a value which is an int
+anchorspacing has a value which is a string
+center has a value which is a string
+cluster1 has a value which is a string
+cluster2 has a value which is a string
+diagbreak has a value which is a string
+diaglength has a value which is a string
+diagmargin has a value which is a string
+distance1 has a value which is a string
+distance2 has a value which is a string
+gapopen has a value which is a string
+log has a value which is a string
+loga has a value which is a string
+matrix has a value which is a string
+maxhours has a value which is a string
+maxiters has a value which is a string
+maxmb has a value which is a string
+maxtrees has a value which is a string
+minbestcolscore has a value which is a string
+minsmoothscore has a value which is a string
+objscore has a value which is a string
+refinewindow has a value which is a string
+root1 has a value which is a string
+root2 has a value which is a string
+scorefile has a value which is a string
+seqtype has a value which is a string
+smoothscorecell has a value which is a string
+smoothwindow has a value which is a string
+spscore has a value which is a string
+SUEFF has a value which is a string
+usetree has a value which is a string
+weight1 has a value which is a string
+weight2 has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 mafft_parms_t
+
+=over 4
+
+
+
+=item Description
+
+linsi | einsi | ginsi | nwnsi | nwns | fftnsi | fftns (D)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+sixmerpair has a value which is an int
+amino has a value which is an int
+anysymbol has a value which is an int
+auto has a value which is an int
+clustalout has a value which is an int
+dpparttree has a value which is an int
+fastapair has a value which is an int
+fastaparttree has a value which is an int
+fft has a value which is an int
+fmodel has a value which is an int
+genafpair has a value which is an int
+globalpair has a value which is an int
+inputorder has a value which is an int
+localpair has a value which is an int
+memsave has a value which is an int
+nofft has a value which is an int
+noscore has a value which is an int
+parttree has a value which is an int
+reorder has a value which is an int
+treeout has a value which is an int
+alg has a value which is a string
+aamatrix has a value which is a string
+bl has a value which is a string
+ep has a value which is a string
+groupsize has a value which is a string
+jtt has a value which is a string
+lap has a value which is a string
+lep has a value which is a string
+lepx has a value which is a string
+LOP has a value which is a string
+LEXP has a value which is a string
+maxiterate has a value which is a string
+op has a value which is a string
+partsize has a value which is a string
+retree has a value which is a string
+thread has a value which is a string
+tm has a value which is a string
+weighti has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+sixmerpair has a value which is an int
+amino has a value which is an int
+anysymbol has a value which is an int
+auto has a value which is an int
+clustalout has a value which is an int
+dpparttree has a value which is an int
+fastapair has a value which is an int
+fastaparttree has a value which is an int
+fft has a value which is an int
+fmodel has a value which is an int
+genafpair has a value which is an int
+globalpair has a value which is an int
+inputorder has a value which is an int
+localpair has a value which is an int
+memsave has a value which is an int
+nofft has a value which is an int
+noscore has a value which is an int
+parttree has a value which is an int
+reorder has a value which is an int
+treeout has a value which is an int
+alg has a value which is a string
+aamatrix has a value which is a string
+bl has a value which is a string
+ep has a value which is a string
+groupsize has a value which is a string
+jtt has a value which is a string
+lap has a value which is a string
+lep has a value which is a string
+lepx has a value which is a string
+LOP has a value which is a string
+LEXP has a value which is a string
+maxiterate has a value which is a string
+op has a value which is a string
+partsize has a value which is a string
+retree has a value which is a string
+thread has a value which is a string
+tm has a value which is a string
+weighti has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 align_seq_parms
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+muscle_parms has a value which is a muscle_parms_t
+mafft_parms has a value which is a mafft_parms_t
+tool has a value which is a string
+align_ends_with_clustal has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+muscle_parms has a value which is a muscle_parms_t
+mafft_parms has a value which is a mafft_parms_t
+tool has a value which is a string
+align_ends_with_clustal has a value which is an int
+
 
 =end text
 

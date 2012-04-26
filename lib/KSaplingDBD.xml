@@ -93,7 +93,7 @@
         <RegionInfo name="Models" row="6" col="1" caption="Reaction\nRule"/>
       </DisplayInfo>
       <Notes>A reaction rule represents the way a reaction takes place
-      within the context of a model.</Notes>
+      within the context of a complex.</Notes>
       <Fields>
         <Field name="direction" type="char">
           <Notes>reaction directionality (&gt; for forward, &lt; for
@@ -521,7 +521,7 @@ and all genomes implementing a specific variant can easily be accessed.
       <DisplayInfo theme="green" col="3" row="7" caption="Protein Sequence">
         <RegionInfo name="" row="3" col="1"/>
         <RegionInfo name="Chemistry" row="7" col="2"/>
-        <RegionInfo name="Annotations" row="3" col="1"/>
+        <RegionInfo name="Annotations" row="5" col="1"/>
         <RegionInfo name="Alignments" col="3" row="1" />
       </DisplayInfo>
       <Notes>
@@ -575,6 +575,10 @@ protein-encoding Features.
           <Notes>optional free-form description of the family. For function-based
           families, this would be the functional role for the family
           members.</Notes>
+        </Field>
+        <Field name="alignment" type="text" relation="FamilyAlignment">
+          <Notes>FASTA-formatted alignment of the family's protein
+          sequences</Notes>
         </Field>
       </Fields>
       <Indexes>
@@ -966,6 +970,10 @@ binding sites, pathogenicity islands, or whatever.
           addition, the function may have comment text at the
           end.</Asides>
         </Field>
+        <Field name="alias" type="string" relation="FeatureAlias">
+          <Notes>alternative identifier for the feature. These are
+          highly unstructured, and frequently non-unique.</Notes>
+        </Field>
       </Fields>
       <FulltextIndexes>
 	<FulltextIndex type="field" name="feature-type"/>
@@ -986,41 +994,10 @@ binding sites, pathogenicity islands, or whatever.
             <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
-      </Indexes>
-    </Entity>
-    <Entity name="Identifier" keyType="string">
-      <DisplayInfo theme="green" col="3" row="9">
-        <RegionInfo name="" row="5" col="1"/>
-        <RegionInfo name="Annotations" row="5" col="1"/>
-      </DisplayInfo>
-      <Notes>An identifier is an alternate name for a protein sequence.
-      The identifier is typically stored in a prefixed form that
-      indicates the database it came from.</Notes>
-      <Fields>
-        <Field name="source" type="string">
-          <Notes>Specific type of the identifier, such as its source
-          database or category. The type can usually be decoded to
-          convert the identifier to a URL.</Notes>
-        </Field>
-        <Field name="natural-form" type="string">
-          <Notes>Natural form of the identifier. This is how the identifier looks
-          without the identifying prefix (if one is present).</Notes>
-        </Field>
-      </Fields>
-      <Indexes>
         <Index>
-          <Notes>This index allows all the identifiers of a specified
-          type to be located.</Notes>
+          <Notes>This index is used to find features by their alias identifiers.</Notes>
           <IndexFields>
-            <IndexField name="source" order="ascending"/>
-            <IndexField name="natural-form" order="ascending"/>
-          </IndexFields>
-        </Index>
-        <Index>
-          <Notes>This index allows looking up a natural identifier (that is,
-          one without the identifying prefix..</Notes>
-          <IndexFields>
-            <IndexField name="natural-form" order="ascending"/>
+            <IndexField name="alias" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -1134,13 +1111,17 @@ that are coregulated using transcription binding sites and
 corresponding transcription regulatory proteins.
 
 We represent a coregulated set (which may, or may not, be considered
-an atomic regulon) using CoregulatedSet.
+a regulon) using CoregulatedSet.
 
       </Notes>
       <Fields>
         <Field name="source-id" type="string">
           <Notes>original ID of this coregulated set in the source (core)
           database</Notes>
+        </Field>
+        <Field name="binding-location" type="int" relation="CoregulatedSetBinding">
+          <Notes>binding location for this set's transcription factor;
+          there may be none of these or there may be more than one</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -1266,12 +1247,6 @@ tools will be supported.
     </Entity>
   </Entities>
   <Relationships>
-    <Relationship name="Imported" from="Source" to="Identifier"
-                  arity="1M" converse="WasImportedFrom">
-      <Notes>This relationship specifies the import source for
-      identifiers. It is used when reloading identifiers to
-      provide for rapid deletion of the previous load's results.</Notes>
-    </Relationship>
     <Relationship name="Formulated" from="Source" to="CoregulatedSet"
                   arity="1M" converse="WasFormulatedBy">
       <Notes>This relationship connects a coregulated set to the
@@ -1308,15 +1283,6 @@ tools will be supported.
       </DisplayInfo>
       <Notes>This relationship connects a coregulated set to the
       features that are used as its transcription factors.</Notes>
-    </Relationship>
-    <Relationship name="IsBindingSiteFor" from="Feature" to="CoregulatedSet"
-                  converse="IsBoundBy" arity="1M">
-      <DisplayInfo theme="cyan">
-        <RegionInfo name="Expression" caption="Is\nBinding Site\nFor"
-                    fixed="1" row="1" col="3" />
-      </DisplayInfo>
-      <Notes>This relationship connects a coregulated set to the
-      binding site to which its feature attaches.</Notes>
     </Relationship>
     <Relationship name="Provided" from="Source" to="Subsystem" arity="1M"
                   converse="WasProvidedBy">
@@ -2102,6 +2068,22 @@ tools will be supported.
       constituent features. A family always has many features, and a
       single feature can be found in many families.</Notes>
     </Relationship>
+    <Relationship name="HasProteinMember" from="Family" to="ProteinSequence" arity="MM"
+                  converse="IsProteinMemberOf">
+      <DisplayInfo theme="brown" caption="Is\nProtein Member\nOf">
+        <RegionInfo name="Annotations"/>
+      </DisplayInfo>
+      <Notes>This relationship connects each feature family to its
+      constituent protein sequences. A family always has many protein sequences,
+      and a single sequence can be found in many families.</Notes>
+      <Fields>
+        <Field name="source-id" type="string">
+          <Notes>Native identifier used for the protein in the definition
+          of the family. This will be its ID in the alignment, if one
+          exists.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
     <Relationship name="Concerns" from="Publication" to="ProteinSequence" arity="MM" converse="IsATopicOf">
       <DisplayInfo theme="green">
         <RegionInfo name=""/>
@@ -2120,20 +2102,46 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="HasAssertionFrom" from="Identifier" to="Source" converse="Asserts" arity="MM">
-      <DisplayInfo theme="black" caption="Has\nAssertion\nFrom">
+    <Relationship name="AssertsFunctionFor" from="Source" to="ProteinSequence" converse="HasAssertedFunctionFrom" arity="MM">
+      <DisplayInfo theme="black" caption="Has Asserted\nFunction From">
         <RegionInfo name="Annotations"/>
       </DisplayInfo>
-      <Notes>Sources (users) can make assertions about identifiers using the annotation clearinghouse.
-      When a user makes a new assertion about an identifier, it erases the old one.</Notes>
+      <Notes>Sources (users) can make assertions about protein sequence function.
+      The assertion is associated with an external identifier.</Notes>
       <Fields>
         <Field name="function" type="text">
-          <Notes>The function is the text of the assertion made about the identifier.</Notes>
+          <Notes>text of the assertion made about the identifier.
+          It may be an empty string, indicating the function is unknown.</Notes>
         </Field>
-        <Field name="expert" type="boolean">
-          <Notes>TRUE if this is an expert assertion, else FALSE</Notes>
+        <Field name="external-id" type="string">
+          <Notes>external identifier used in making the assertion</Notes>
+        </Field>
+        <Field name="organism" type="string">
+          <Notes>organism name associated with this assertion. If the
+          assertion is not associated with a specific organism, this
+          will be an empty string.</Notes>
+        </Field>
+        <Field name="gi-number" type="counter">
+          <Notes>NCBI GI number associated with the asserted identifier</Notes>
+        </Field>
+        <Field name="release-date" type="date">
+          <Notes>date and time the assertion was downloaded</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index>
+          <Notes>This index supports finding proteins by GI number.</Notes>
+          <IndexFields>
+            <IndexField name="gi-number" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index supports finding proteins by external identifier.</Notes>
+          <IndexFields>
+            <IndexField name="external-id" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Relationship>
     <Relationship name="IsDeterminedBy" from="PairSet" to="Pairing" arity="1M" converse="Determines">
       <DisplayInfo theme="brown" caption="Determines">
@@ -2220,17 +2228,6 @@ tools will be supported.
           <IndexField name="begin" order="ascending"/>
         </IndexFields>
       </ToIndex>
-    </Relationship>
-    <Relationship name="IsNamedBy" from="ProteinSequence" to="Identifier" arity="MM" converse="Names">
-      <DisplayInfo theme="green" caption="Is\nNamed\nBy">
-        <RegionInfo name="Annotations"/>
-        <RegionInfo name=""/>
-      </DisplayInfo>
-      <Notes>The normal case is that an identifier names a single
-      protein sequence, while a protein sequence can have many identifiers,
-      but some identifiers name multiple sequences.</Notes>
-      <Asides>This relationship is populated with data submitted to the annotation
-      clearinghouse as well as external IDs in the non-redundant database.</Asides>
     </Relationship>
     <Relationship name="HasSection" from="ContigSequence" to="ContigChunk" arity="1M" converse="IsSectionOf">
       <DisplayInfo caption="Has Section" theme="red">

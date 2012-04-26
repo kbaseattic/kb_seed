@@ -70,9 +70,7 @@ and used to create the C<name.tab> file.
 
 This is a tab-delimited file with five columns-- (0) the feature ID, (1) the
 feature type, (2) the parent feature ID, (3) the gene name, and (4) a
-comma-delimited list of location strings. feature IDs are not unique between
-genomes, so the genome ID must be prefixed to the feature ID when forming
-the source feature ID. If the parent feature ID is a period, then the feature
+comma-delimited list of location strings. If the parent feature ID is a period, then the feature
 has no parent. Gene names are known to be non-unique and will not be prefixed;
 however, it's worth noting they are ultimately applied to protein sequences.
 If the gene name is the same as the feature ID it will be ignored. Finally,
@@ -82,8 +80,7 @@ in order to match the contig IDs in the B<contigs.*.fa> file.
 =item functions.*.tsv
 
 This is a tab-delimited file with two columns-- (0) the feature ID, and (2) the
-functional assignment. As with the B<features.*.tsv> file, the genome ID must be
-prefixed to the feature ID to make it globally unique.
+functional assignment.
 
 =back
 
@@ -142,8 +139,7 @@ Name of the directory containing the plant genome files.
         mkdir $outDirectory;
     }
     print "Processing $genomeID from $inDirectory.\n";
-    # First, construct the contigs file. This involves adding the genome
-    # ID to each contig ID.
+    # First, construct the contigs file.
     my ($oh, $ih);
     print "Translating contig file.\n";
     open($ih, "<$inDirectory/contigs.$genomeID.fa") || die "Could not open $genomeID contigs file: $!\n";
@@ -152,7 +148,7 @@ Name of the directory containing the plant genome files.
         my $line = <$ih>;
         $stats->Add(contigLineIn => 1);
         if (substr($line,0,1) eq '>') {
-            $line = ">$genomeID:" . substr($line,1);
+            $line = ">" . substr($line,1);
             $stats->Add(contigLineFixed => 1);
         }
         print $oh $line;
@@ -161,25 +157,22 @@ Name of the directory containing the plant genome files.
     # Close the files and free the file handles.
     close $oh; undef $oh;
     close $ih; undef $ih;
-    # Now we must process the functions file. The genome ID must be added
-    # to the feature ID. There is one feature per line and the feature ID
-    # is first, so this is trivial.
+    # Now we must process the functions file.
     print "Translating functions file.\n";
     open($ih, "<$inDirectory/functions.$genomeID.tsv") || die "Could not open $genomeID functions file: $!\n";
     open($oh, ">$outDirectory/functions.tab") || die "Could not create $genomeID functions output file: $!\n";
     while (! eof $ih) {
         my $line = <$ih>;
-        print $oh "$genomeID:$line";
+        print $oh "$line";
         $stats->Add(functionLineProcessed => 1);
     }
     # Close the files and free the file handles.
     close $oh; undef $oh;
     close $ih; undef $ih;
     # Next comes the features file. This requires the most changes.
-    # In addition to prefixing feature IDs, we have to fix the
-    # contig IDs in the locations, and move the parent and gene IDs
-    # to the end columns. We also need to keep track of the CDS for
-    # each mRNA, because the mRNA's protein really belongs to the CDS.
+    # We have to fix the contig IDs in the locations and move the parent
+    # and gene IDs to the end columns. We also need to keep track of the CDS
+    # for each mRNA, because the mRNA's protein really belongs to the CDS.
     # A hash will map mRNA IDs to CDS IDs.
     my %mRnaHash;
     print "Translating features file.\n";
@@ -193,11 +186,8 @@ Name of the directory containing the plant genome files.
             $parent = "";
             $stats->Add(parentAbsent => 1);
         } else {
-            $parent = "$genomeID:$parent";
-            $stats->Add(parentFixed => 1);
+            $stats->Add(parentFound => 1);
         }
-        # Fix the main feature ID.
-        $fid = "$genomeID:$fid";
         # If this is a CDS, add it to the mRNA map.
         if ($type eq 'CDS' && $parent) {
             $mRnaHash{$parent} = $fid;
@@ -222,7 +212,7 @@ Name of the directory containing the plant genome files.
                 } else {
                     $prevContig = $contig;
                 }
-                push @oLocs, "$genomeID:$contig$suffix";
+                push @oLocs, "$contig$suffix";
                 $stats->Add(locationFixed => 1);
             } else {
                 print "Invalid location for feature $fid: $loc.\n";
@@ -244,8 +234,8 @@ Name of the directory containing the plant genome files.
     # Close the files and free the file handles.
     close $oh; undef $oh;
     close $ih; undef $ih;
-    # Now we need to translate the feature IDs in the Protein FASTA file.
-    # In addition, the name is changing.
+    # Now we need to copy the Protein FASTA file. In addition, the name is
+    # changing.
     print "Translating protein file.\n";
     open($ih, "<$inDirectory/translations.$genomeID.fa") || die "Could not open $genomeID translations file: $!\n";
     open($oh, ">$outDirectory/proteins.fa") || die "Could not create $genomeID proteins output file: $!\n";
@@ -253,9 +243,8 @@ Name of the directory containing the plant genome files.
         my $line = <$ih>;
         $stats->Add(protLineIn => 1);
         if ($line =~ /^>(\S+)(.*)/) {
-            # Here we have a header line. Compute the real feature ID and
-            # save the residual part of the line.
-            my $fid = "$genomeID:$1";
+            # Here we have a header line. Save the residual part of the line.
+            my $fid = $1;
             my $suffix = $2;
             # Check to see if this is an mRNA. If it is, we map it to the
             # CDS.
@@ -272,19 +261,17 @@ Name of the directory containing the plant genome files.
     # Close the files and free the file handles.
     close $oh; undef $oh;
     close $ih; undef $ih;
-    # Finally, we have the metadata file, which we parse to harvest the
-    # species name.
+    # Finally, we have to copy the metadata file.
     print "Processing metadata file.\n";
-    open($oh, ">$outDirectory/name.tab") || die "Could not create $genomeID name output file: $!\n";
-    my $attrHash = CDMILoader::ParseMetadata("$inDirectory/metadata.$genomeID.tbl");
-    $stats->Add(metadataRecords => scalar(keys %$attrHash));
-    # Get the species name.
-    my $name = $attrHash->{species};
-    if (! $name) {
-        print "Species name not found for $genomeID.\n";
-        $stats->Add(missingSpeciesName => 1);
-        $name = "<unknown>";
+    open($oh, ">$outDirectory/metadata.tbl") || die "Could not create $genomeID metadata output file: $!\n";
+    open($ih, "<$inDirectory/metadata.$genomeID.tbl") || die "Could not open $genomeID metadata input file: $!\n";
+    while (! eof $ih) {
+        my $line = <$ih>;
+        $stats->Add(metadataIn => 1);
+        print $oh $line;
+        $stats->Add(metadataOut => 1);
     }
-    print $oh "$genomeID\t$name\n";
-    close $oh;
-}
+    # Close the files and free the file handles.
+    close $oh; undef $oh;
+    close $ih; undef $ih;
+ }

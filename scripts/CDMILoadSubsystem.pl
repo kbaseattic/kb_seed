@@ -66,6 +66,8 @@ my ($recursive, $clear, $id_server_url);
 
 $id_server_url = "http://bio-data-1.mcs.anl.gov:8080/services/idserver";
 
+# Prevent buffering on STDOUT.
+$| = 1;
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "clear" => \$clear, "idserver=s" => \$id_server_url);
 if (! $cdmi) {
@@ -83,6 +85,7 @@ if (! $cdmi) {
         # Connect to the KBID server and create the loader utility object.
         my $id_server = IDServerAPIClient->new($id_server_url);
         my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
+        $loader->SetSource($source);
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the subsystem tables.
@@ -153,7 +156,13 @@ sub LoadSubsystem {
     my @pathParts = split /\\|\//, $subsystemDirectory;
     my $foreignID = pop @pathParts;
     my $subsysName = $foreignID;
+    # Fix up the underscores at the end.
+    if ($subsysName =~ /(.+?)(_+)$/) {
+        my $suffix = (length $2) + 1;
+        $subsysName = "$1 $suffix";
+    }
     $subsysName =~ tr/_/ /;
+    print "Subsystem name is $subsysName.\n";
     # Delete any existing copy.
     DeleteSubsystem($loader, $subsysName);
     # Initialize the relation loaders.
@@ -515,7 +524,7 @@ sub ParseSpreadsheet {
                         $stats->Add(variantNotInNotes => 1);
 
                     }
-                    my $rowID = "$digest:$realVariant:$genomeID:$regionString";
+                    my $rowID = "$digest:$realVariant:$genomeKBID:$regionString";
                     # Insure the row is not a duplicate. Duplicates crash the load.
                     if ($rowIDs{$rowID}) {
                         $stats->AddMessage("Invalid duplicate row for $genome in $subsysID.");
@@ -528,41 +537,49 @@ sub ParseSpreadsheet {
                                            region => $regionString);
                         $loader->InsertObject('Uses', from_link => $genomeKBID, to_link => $rowID);
                         $stats->Add(subsysRow => 1);
+                        $loader->SetGenome($genomeID);
                         # Now loop through the cells.
                         my @rolesFound;
                         for (my $i = 0; $i <= $#cells; $i++) {
                             my $cell = $cells[$i];
                             # Is this cell occupied?
                             if ($cell) {
-                                # Yes. Get this cell's role abbreviation and add it to the list of roles found
-                                # in this row.
+                                # Yes. Get this cell's role abbreviation.
                                 my $abbr = $abbrList[$i];
-                                push @rolesFound, $abbr;
-                                # Create the cell.
-                                my $cellID = "$rowID:$abbr";
-                                $loader->InsertObject('IsRowOf', from_link => $rowID, to_link => $cellID);
-                                $loader->InsertObject('SSCell', id => $cellID);
-                                $loader->InsertObject('IsRoleOf', from_link => $roleMap{$roleHash{$abbr}},
-                                                   to_link => $cellID);
-                                $stats->Add(subsysCell => 1);
-                                # Get the pegs in this cell.
-                                my @pegs;
-                                for my $pegNum (split /\s*,\s*/, $cell) {
-                                    if ($pegNum =~ /[a-z]+/) {
-                                        push @pegs, "fig|$genomeID.$pegNum";
-                                    } else {
-                                        push @pegs, "fig|$genomeID.peg.$pegNum";
+                                if (! $abbr) {
+                                    # Here we have an invalid cell.
+                                    print STDERR "Extra cell found for $genomeID in $subsysID.\n";
+                                    $stats->Add(extraCells => 1);
+                                } else {
+                                    push @rolesFound, $abbr;
+                                    # Create the cell.
+                                    my $cellID = "$rowID:$abbr";
+                                    $loader->InsertObject('IsRowOf', from_link => $rowID, to_link => $cellID);
+                                    $loader->InsertObject('SSCell', id => $cellID);
+                                    $loader->InsertObject('IsRoleOf', from_link => $roleMap{$roleHash{$abbr}},
+                                                       to_link => $cellID);
+                                    $stats->Add(subsysCell => 1);
+                                    # Get the pegs in this cell.
+                                    my @pegs;
+                                    for my $pegNum (split /\s*,\s*/, $cell) {
+                                        if ($source ne 'SEED') {
+                                            push @pegs, $pegNum;
+                                        } elsif ($pegNum =~ /[a-z]+/) {
+                                            push @pegs, "fig|$genomeID.$pegNum";
+                                        } else {
+                                            push @pegs, "fig|$genomeID.peg.$pegNum";
+                                        }
                                     }
-                                }
-                                my $pegMap = $loader->FindKBaseIDs($source, 'Feature', \@pegs);
-                                for my $peg (@pegs) {
-                                    my $kbPeg = $pegMap->{$peg};
-                                    if (! $kbPeg) {
-                                        $stats->Add(pegNotFound => 1);
-                                    } else {
-                                        $loader->InsertObject('Contains', from_link => $cellID,
-                                                           to_link => $pegMap->{$peg});
-                                        $stats->Add(subsysPeg => 1);
+                                    my $pegMap = $loader->FindKBaseIDs('Feature', \@pegs);
+                                    for my $peg (@pegs) {
+                                        my $kbPeg = $pegMap->{$peg};
+                                        if (! $kbPeg) {
+                                            $stats->Add(pegNotFound => 1);
+                                        } else {
+                                            $loader->InsertObject('Contains', from_link => $cellID,
+                                                               to_link => $pegMap->{$peg});
+                                            $stats->Add(subsysPeg => 1);
+                                        }
                                     }
                                 }
                             }

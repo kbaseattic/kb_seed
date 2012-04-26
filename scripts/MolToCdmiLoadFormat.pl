@@ -42,8 +42,9 @@ C<features.11002.tab>, C<proteins.11002.tab>, and C<name.11002.tab>.
 In addition, the features file is different. The feature types are
 in text form and must be translated to the standard codes and the
 location strings consist of a start location, two periods, a stop
-location, one period and a strad. In addition, the columns are
+location, one period and a strand. In addition, the columns are
 (0) contig ID, (1) feature ID, (2) feature type, (3) location string.
+Finally, the name file must be converted to a metadata file.
 This script will create subdirectories to contain the correctly-named
 load files and will perform the format translation for the feature file.
 
@@ -67,6 +68,8 @@ Name of the directory containing the microbes online files.
 
 =cut
 
+    # Turn off buffering for progress messages.
+    $| = 1;
     # Create the statistics object.
     my $stats = Stats->new();
     # Get the directories.
@@ -103,13 +106,13 @@ Name of the directory containing the microbes online files.
     if (! -d $outDirectory) {
         mkdir $outDirectory;
     }
+    $stats->Add(genomes => 1);
     print "Processing $genomeID from $inDirectory.\n";
     # Copy the basic files.
     print "Copying files for $genomeID.\n";
     copy("$inDirectory/contigs.$genomeID.fa", "$outDirectory/contigs.fa");
     copy("$inDirectory/functions.$genomeID.tab", "$outDirectory/functions.tab");
     copy("$inDirectory/proteins.$genomeID.fa", "$outDirectory/proteins.fa");
-    copy("$inDirectory/name.$genomeID.tab", "$outDirectory/name.tab");
     print "Processing features for $genomeID.\n";
     # Now we must process the features.
     open(my $ih, "<$inDirectory/features.$genomeID.tab") || die "Could not open features input file for $genomeID: $!\n";
@@ -123,7 +126,7 @@ Name of the directory containing the microbes online files.
         my $realType;
         my $lcType = lc $type;
         if ($lcType =~ /protein/) {
-            $realType = 'peg';
+            $realType = 'CDS';
         } elsif ($lcType =~ /crispr\s+spacer/) {
             $realType = 'crs';
         } elsif ($lcType =~ /crispr/) {
@@ -162,6 +165,16 @@ Name of the directory containing the microbes online files.
             $stats->Add(featuresOut => 1);
         }
     }
+    close $oh; undef $oh;
+    close $ih; undef $ih;
+    # Now we create the metadata file.
+    print "Creating metadata file.\n";
+    open($ih, "<$inDirectory/name.$genomeID.tab") || die "Could not open name file for $genomeID: $!\n";
+    open($oh, ">$outDirectory/metadata.tbl") || die "Could not create metadata file for $genomeID: $!\n";
+    my ($id, $name) = Bio::KBase::CDMI::CDMILoader::GetLine($ih);
+    print $oh "name\n";
+    print $oh "$name\n";
+    print $oh "//\n";
     close $oh;
     close $ih;
     print "Genome completed.\n";

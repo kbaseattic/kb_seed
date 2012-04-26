@@ -84,6 +84,7 @@ if (! $cdmi) {
 } else {
     # Create the loader object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
+    $loader->SetSource('SEED');
     # Extract the statistics object.
     my $stats = $loader->stats;
     # Get the directories.
@@ -313,7 +314,7 @@ sub ProcessPairingBatch {
     # Get the statistics object.
     my $stats = $loader->stats;
     # Get the feature IDs from the ID server.
-    my $idMapping = $loader->FindKBaseIDs('SEED', 'Feature', [keys %$fidMap]);
+    my $idMapping = $loader->FindKBaseIDs('Feature', [keys %$fidMap]);
     # Loop through the pairs.
     for my $pair (@$pairs) {
         my ($fid1, $fid2) = @$pair;
@@ -380,7 +381,7 @@ sub ProcessPairsetBatch {
     # Get the statistics object.
     my $stats = $loader->stats;
     # Get the feature IDs from the ID server.
-    my $idMapping = $loader->FindKBaseIDs('SEED', 'Feature', [keys %$fidMap]);
+    my $idMapping = $loader->FindKBaseIDs('Feature', [keys %$fidMap]);
     # Loop through the pairs.
     for my $pair (@$pairs) {
         my ($pairset, $fid1, $fid2, $inverted) = @$pair;

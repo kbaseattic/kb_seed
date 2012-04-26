@@ -450,6 +450,42 @@ sub SQL {
     return $retVal;
 }
 
+=head3 show_create_table
+
+    my $createString = $db->show_create_table($tableName);
+
+Return the CREATE TABLE string for the specified relation.
+
+=over 4
+
+=item tableName
+
+Name of the SQL table whose creation string is desired.
+
+=item RETURN
+
+Returns a CREATE TABLE statement in SQL that can be used to re-create
+the specified table.
+
+=back
+
+=cut
+
+sub show_create_table {
+    # Get the parameters.
+    my ($self, $tableName) = @_;
+    # Declare the return variable.
+    my $retVal = "";
+    # Execute a SHOW CREATE TABLE statement.
+    my $result = $self->{_dbh}->selectall_arrayref("SHOW CREATE TABLE $tableName");
+    # Extract the result.
+    if ($result->[0]) {
+        $retVal = $result->[0][1];
+    }
+    # Return it.
+    return $retVal;
+}
+
 =head3 Reconnect
 
     $db->Reconnect();
@@ -945,7 +981,7 @@ sub load_table {
             Trace("Loading $tbl into MySQL using file $file and style $style.") if T(2);
             # Decide whether this is a local file or a server file.
             my $place = ($self->{_host} ne "localhost" ? "LOCAL" : "");
-	    my $sql = "LOAD DATA $style $place INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim' LINES TERMINATED BY '$lineEnd';";
+	    my $sql = "LOAD DATA $style $place INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
 	    Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         } elsif ($dbms eq "Pg") {
@@ -1007,8 +1043,9 @@ sub load_table {
             Confess "Attempting load_table on unsupported database $dbms\n";
         }
         if (!defined $rv) {
+            my $errno = $dbh->err;
             my $errorMessage = $dbh->errstr;
-            Trace("Error in $tbl load: $errorMessage") if T(0);
+            Trace("Error in $tbl load ($errno): $errorMessage") if T(0);
         } elsif ($rv >= 0) {
             Trace("$rv rows loaded into $tbl.") if T(3);
         } else {

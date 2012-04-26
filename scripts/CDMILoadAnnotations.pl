@@ -46,12 +46,6 @@ the following.
 
 =over 4
 
-=item typed
-
-If specified, the source is treated as having typed IDs; that is, the
-IDs are assumed to only be unique within object type, rather than
-unique over the scope of the source database.
-
 =item clear
 
 If specified, the tables will be deleted and re-created before loading.
@@ -62,23 +56,21 @@ There are two positional parameters: the name of the source database
 (C<SEED>, C<MOL>, etc) and the name of the file containing the annotations.
 There is no attempt to verify that the annotations are new: if they
 have already been processed, duplicates will appear in the database.
+In addition, the source database cannot use genome-based IDs. These
+issues may be addressed in the future.
 
 =cut
 
 # Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database using the command-line options.
-my ($typed, $clear);
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(typed => \$typed, clear => \$clear);
+my ($clear);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear);
 if (! $cdmi) {
     print "usage: CDMILoadAnnotations [options] source inputFile\n";
 } else {
     # Create the loader object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    # If we're typed, make sure the loader knows.
-    if ($typed) {
-        $loader->SetTyped(1);
-    }
     # Extract the statistics object.
     my $stats = $loader->stats;
     # Get the input parameters.
@@ -91,6 +83,11 @@ if (! $cdmi) {
     } elsif (! -f $inFile) {
         die "Invalid input file $inFile.\n";
     } else {
+        # Inform the loader of our source.
+        $loader->SetSource($source);
+        if ($loader->{sourceData}->genomeBased) {
+            die "Cannot use this script for genome-based sources.\n";
+        }
         # Get the list of tables.
         my @tables = qw(Annotation IsAnnotatedBy);
         # Are we clearing?
@@ -195,7 +192,7 @@ sub ProcessBatch {
     # Get the CDMI object.
     my $cdmi = $loader->cdmi;
     # Get the KBase IDs for the features.
-    my $idMapping = $loader->FindKBaseIDs($source, 'Feature', [keys %$fids]);
+    my $idMapping = $loader->FindKBaseIDs('Feature', [keys %$fids]);
     # Loop through the annotations, adding them to the database.
     for my $annotation (@$annotations) {
         $stats->Add(annotationProcessed => 1);

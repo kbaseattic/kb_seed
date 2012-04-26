@@ -209,6 +209,10 @@ genome IDs for the genomes to load in its first column.
                 # Parse the locations.
                 my @locs = split /\s*,\s*/, $locs;
                 my $convertedLocs = join(",", map { "$genomeID:" . BasicLocation->new($_)->String() } @locs);
+                # Translate the feature type.
+                if ($fidType eq 'peg') {
+                    $fidType = 'CDS';
+                }
                 # Output the feature information.
                 print $oh join("\t", $fid, $fidType, $convertedLocs) . "\n";
                 $stats->Add(outputFromTbl => 1);
@@ -272,29 +276,26 @@ genome IDs for the genomes to load in its first column.
     }
     close $ih;
     close $oh;
-    # Write out the genome name.
-    my ($genomeName) = Tracer::GetFile("$inDirectory/GENOME");
-    $oh = Open(undef, ">$outDirectory/name.tab");
-    print $oh "$genomeID\t$genomeName\n";
-    close $oh;
-    # Finally, we must create the attributes file.
-    $oh = Open(undef, ">$outDirectory/attributes.tab");
+    # Finally, we must create the metadata file.
+    $oh = Open(undef, ">$outDirectory/metadata.tbl");
     Trace("Writing genome attributes.") if T(3);
+    my ($genomeName) = Tracer::GetFile("$inDirectory/GENOME");
+    print $oh "name\n$genomeName\n//\n";
     if (-f "$inDirectory/COMPLETE") {
-        print $oh "COMPLETE\t1\n";
+        print $oh "complete\n1\n//\n";
     } else {
-        print $oh "COMPLETE\t0\n";
+        print $oh "complete\n0\n//\n";
     }
-    $stats->Add(attributeLine => 1);
+    $stats->Add(attribute => 1);
     my ($taxonomy) = Tracer::GetFile("$inDirectory/TAXONOMY");
-    print $oh "TAXONOMY\t$taxonomy\n";
-    $stats->Add(attributeLine => 1);
+    print $oh "taxonomy\n$taxonomy\n//\n";
+    $stats->Add(attribute => 1);
     for my $attribute (qw(PROJECT VERSION TAXONOMY_ID GENETIC_CODE)) {
         my $fileName = "$inDirectory/$attribute";
         if (-f $fileName) {
             my ($value) = Tracer::GetFile($fileName);
-            print $oh "$attribute\t$value\n";
-            $stats->Add(attributeLine => 1);
+            print $oh lc($attribute) . "\n$value\n//\n";
+            $stats->Add(attribute => 1);
         } else {
             $stats->Add(attributeNotFound => 1);
         }

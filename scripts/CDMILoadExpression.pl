@@ -113,11 +113,6 @@ not already found in the database.
 If this option is specified, the expression tables will be recreated
 before loading.
 
-=item idserver
-
-URL to use for the ID server. The default uses the standard KBase ID
-server.
-
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -134,9 +129,11 @@ use constant TABLES => [qw(ProbeSet IndicatedLevelsFor ProducedResultsFor
 # Create the command-line option variables.
 my ($recursive, $newOnly, $clear, $id_server_url);
 
+# Prevent buffering on STDOUT.
+$| = 1;
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url);
+        "clear" => \$clear);
 if (! $cdmi) {
     print "usage: CDMILoadExpression [options] source genomeDirectory\n";
     exit;
@@ -151,14 +148,9 @@ if (! $cdmi) {
     } elsif (! -d $expDirectory) {
         die "Expression directory $expDirectory not found.\n";
     } else {
-
-        # Connect to the KBID server and create the loader utility object.
-	my $id_server;
-	if ($id_server_url) {
-	    $id_server = IDServerAPIClient->new($id_server_url);
-	}
-        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
-
+        # Create the loader.
+        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
+        $loader->SetSource($source);
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the expression tables.
@@ -170,7 +162,7 @@ if (! $cdmi) {
         # Are we in recursive mode?
         if (! $recursive) {
             # No. Load the one expression directory.
-            LoadExpressionData($loader, $source, $expDirectory);
+            LoadExpressionData($loader, $expDirectory);
         } else {
             # Yes. Get the subdirectories.
             opendir(TMP, $expDirectory) || die "Could not open $expDirectory.\n";
@@ -180,7 +172,7 @@ if (! $cdmi) {
             for my $subDir (@subDirs) {
                 my $fullPath = "$expDirectory/$subDir";
                 if (-d $fullPath) {
-                    LoadExpressionData($loader, $source, $fullPath);
+                    LoadExpressionData($loader, $fullPath);
                 }
             }
         }
@@ -193,7 +185,7 @@ if (! $cdmi) {
 
 =head3 LoadExpressionData
 
-    LoadExpression($loader, $source, $genomeDirectory);
+    LoadExpression($loader, $genomeDirectory);
 
 Load a single genome's expression data from the specified directory.
 
@@ -202,10 +194,6 @@ Load a single genome's expression data from the specified directory.
 =item loader
 
 L<CDMILoader> object to help manager the load.
-
-=item source
-
-Source database the genome came from.
 
 =item expDirectory
 
@@ -217,7 +205,7 @@ Directory containing the expression data files.
 
 sub LoadExpressionData {
     # Get the parameters.
-    my ($loader, $source, $expDataDirectory) = @_;
+    my ($loader, $expDataDirectory) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Get the database.
@@ -227,6 +215,7 @@ sub LoadExpressionData {
     if ($expDataDirectory =~ m#.+\/([^/]+)#) {
         $genomeID = $1;
     }
+    $loader->SetGenome($genomeID);
     # Convert it to KBase. If it's not in the database, we won't find it
     # and we'll skip it.
     my ($genome) = $cdmi->GetFlat("Submitted Genome",
@@ -254,7 +243,7 @@ sub LoadExpressionData {
             $stats->Add(customChipID => 1);
         } else {
             # Generate a default chip ID.
-            $chipID = $loader->GetKBaseID('kb|chip', $source, 'Chip', "Chip:$genomeID");
+            $chipID = $loader->GetKBaseID('kb|chip', 'Chip', "Chip:$genomeID");
         }
         # Create the chip record.
         $loader->InsertObject('ProbeSet', id => $chipID);

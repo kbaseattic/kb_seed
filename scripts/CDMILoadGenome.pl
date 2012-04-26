@@ -44,8 +44,8 @@ A FASTA file containing the DNA sequences for the contigs.
 A tab-delimited file with one line for each feature. The first column
 contains the feature ID, the second contains the feature type,
 the third contains the feature location, the fourth contains an optional
-parent feature ID, and the fifth contains an optional alternate identifier
-for the feature's protein.
+parent feature ID, and the fifth contains an optional subset ID,
+and the remaining columns contain alternate identifiers for the feature.
 
 =item functions.tab
 
@@ -58,29 +58,28 @@ assignment.
 A FASTA file containing the protein translations for each feature in
 the genome.
 
-=item name.tab
+=item metadata.tbl
 
-A tab-delimited file containing a single line. The first column is
-the genome ID and the second is the genome's scientific name.
-
-=item attributes.tab
-
-A tab-delimited file containing genome attributes, one per line.
-Each line consists of an attribute name (in all caps) followed by an
-attribute value. If an attribute is not found, a default value is
-presumed. The attributes currently used are
+A file containing named attributes. Each attribute is represented by
+a single line containing the attribute name followed by one or more
+lines containing the attribute value, terminated by a line containing
+double slashes (C<//>). The attributes currently used are
 
 =over 8
 
-=item COMPLETE
+=item complete
 
 C<1> for a complete genome, C<0> for an incomplete genome. The default
 is C<1>.
 
-=item GENETIC_CODE
+=item genetic_code
 
 The genetic code used for protein translation for most of the contigs
 in the genome. The default is C<11>.
+
+=item name
+
+The scientific name of the genome. This field is required.
 
 =back
 
@@ -115,7 +114,7 @@ binding site
 
 =item CDS
 
-contiguous component of a gene
+protein-encoding gene
 
 =item crispr
 
@@ -136,10 +135,6 @@ gene transcript
 =item pbs
 
 protein binding site
-
-=item peg
-
-protein-encoding gene
 
 =item pp
 
@@ -192,12 +187,6 @@ before loading.
 URL to use for the ID server. The default uses the standard KBase ID
 server.
 
-=item typed
-
-If specified, then the incoming IDs are only unique within a particular
-datatype. When the IDs are passed to the ID server, the source type
-will have the data type included.
-
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -206,14 +195,13 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url, $typed);
+my ($recursive, $newOnly, $clear, $id_server_url);
 # Turn off buffering for progress messages.
 $| = 1;
 
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url,
-        "typed" => \$typed);
+        "clear" => \$clear, "idserver=s" => \$id_server_url);
 if (! $cdmi) {
     print "usage: CDMILoadGenome [options] source genomeDirectory\n";
     exit;
@@ -235,16 +223,13 @@ print "Connected to CDMI.\n";
             $id_server = IDServerAPIClient->new($id_server_url);
         }
         my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
-        # Insure the loader knows if we are using typed ID services.
-        if ($typed) {
-            $loader->SetTyped(1);
-        }
+        $loader->SetSource($source);
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the genome tables.
             my @tables = qw(Publication Role Concerns IsFunctionalIn
-                ProteinSequence IsProteinFor Feature
-                IsNamedBy Identifier IsLocatedIn IsOwnerOf Submitted
+                ProteinSequence IsProteinFor Feature FeatureAlias
+                IsLocatedIn IsOwnerOf Submitted
                 Contig IsComposedOf Genome IsAlignedIn Variation
                 IsSequenceOf IsTaxonomyOf ContigSequence HasSection
                 ContigChunk Encompasses);
@@ -256,7 +241,7 @@ print "Connected to CDMI.\n";
         # Are we in recursive mode?
         if (! $recursive) {
             # No. Load the one genome.
-            LoadGenome($loader, $source, $genomeDirectory);
+            LoadGenome($loader, $genomeDirectory);
         } else {
             # Yes. Get the subdirectories.
             opendir(TMP, $genomeDirectory) || die "Could not open $genomeDirectory.\n";
@@ -266,7 +251,7 @@ print "Connected to CDMI.\n";
             for my $subDir (@subDirs) {
                 my $fullPath = "$genomeDirectory/$subDir";
                 if (-d $fullPath) {
-                    LoadGenome($loader, $source, $fullPath);
+                    LoadGenome($loader, $fullPath);
                 }
             }
         }
@@ -279,7 +264,7 @@ print "Connected to CDMI.\n";
 
 =head3 LoadGenome
 
-    LoadGenome($loader, $source, $genomeDirectory);
+    LoadGenome($loader, $genomeDirectory);
 
 Load a single genome from the specified genome directory.
 
@@ -303,14 +288,23 @@ Directory containing the genome load files.
 
 sub LoadGenome {
     # Get the parameters.
-    my ($loader, $source, $genomeDirectory) = @_;
+    my ($loader, $genomeDirectory) = @_;
     # Indicate our progress.
     print "Processing $genomeDirectory.\n";
-    # Open the name file and get the genome ID and name.
-    open(my $ih, "<$genomeDirectory/name.tab") || die "Could not open name file: $!\n";
-    my ($genomeOriginalID, $scientificName) = $loader->GetLine($ih);
+    # Compute the genome ID from the directory name.
+    my @parts = split /\//, $genomeDirectory;
+    my $genomeOriginalID = pop @parts;
+    print "Computed genome ID is $genomeOriginalID.\n";
+    $loader->SetGenome($genomeOriginalID);
+    # Read the metadata file.
+    my $metaHash = Bio::KBase::CDMI::CDMILoader::ParseMetadata("$genomeDirectory/metadata.tbl");
+    # Extract the genome name.
+    my $scientificName = $metaHash->{name};
+    if (! $scientificName) {
+        die "No scientific name found in metadata for $genomeDirectory.\n";
+    }
     # Get the KBID for this genome.
-    my $genomeID = $loader->GetKBaseID('kb|g', $source, 'Genome', $genomeOriginalID);
+    my $genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
     # If this genome exists and we are only loading new genomes, skip it.
     if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
         $loader->stats->Add(genomeSkipped => 1);
@@ -330,18 +324,17 @@ sub LoadGenome {
                     IsProteinFor Encompasses));
             # Load the contigs.
             my ($contigMap, $dnaSize, $gcContent, $md5) = LoadContigs($loader,
-                    $source, $genomeID, $genomeOriginalID, "$genomeDirectory/contigs.fa");
+                    $genomeID, $genomeOriginalID, "$genomeDirectory/contigs.fa");
             # Load the features.
-            my ($pegs, $rnas, $id_mapping, $aliasMap) = LoadFeatures($loader, $source, $genomeID,
+            my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader, $genomeID,
                     $genomeDirectory, $contigMap);
             # Load the proteins.
-            LoadProteins($loader, $source, $id_mapping, $aliasMap, "$genomeDirectory/proteins.fa");
+            LoadProteins($loader, $id_mapping, "$genomeDirectory/proteins.fa");
             # Unspool the relation loaders.
             $loader->LoadRelations();
             # Create the genome record.
-            CreateGenome($loader, $source, $genomeID, $genomeOriginalID,
-                    $scientificName, $dnaSize, $gcContent, $md5, $pegs, $rnas,
-                    scalar(keys %$contigMap), "$genomeDirectory/attributes.tab");
+            CreateGenome($loader, $source, $genomeID, $genomeOriginalID, $metaHash,
+                    $dnaSize, $gcContent, $md5, $pegs, $rnas, scalar(keys %$contigMap));
         }
     }
 }
@@ -405,7 +398,7 @@ sub DeleteGenome {
 =head3 LoadContigs
 
     my ($contigMap, $dnaSize, $gcContent, $md5) =
-        LoadContigs($loader, $source, $genomeID, $genomeOriginalID,
+        LoadContigs($loader, $genomeID, $genomeOriginalID,
         $contigFastaFile);
 
 Load the contigs for the specified genome into the database.
@@ -415,10 +408,6 @@ Load the contigs for the specified genome into the database.
 =item loader
 
 L<CDMILoader> object to help manager the load.
-
-=item source
-
-Source database the genome came from.
 
 =item genomeID
 
@@ -445,7 +434,7 @@ the contigs put together, (2) the percent GC content in the DNA, and
 
 sub LoadContigs {
     # Get the parameters.
-    my ($loader, $source, $genomeID, $genomeOriginalID, $contigFastaFile) = @_;
+    my ($loader, $genomeID, $genomeOriginalID, $contigFastaFile) = @_;
     # Get the CDMI database object.
     my $cdmi = $loader->cdmi;
     # Get the statistics object.
@@ -493,7 +482,7 @@ sub LoadContigs {
             undef $sequence;
             # Compute the contig's MD5.
             my $contigMD5 = $md5Object->ProcessContig($foreignID, \@chunks);
-            my $contigKBID = $loader->GetKBaseID("$genomeID.c", $source, 'Contig',
+            my $contigKBID = $loader->GetKBaseID("$genomeID.c", 'Contig',
                     $foreignID);
             $contigMap->{$foreignID} = $contigKBID;
             # We now have all the information we need to load the contig
@@ -546,8 +535,8 @@ sub LoadContigs {
 
 =head3 LoadFeatures
 
-    my ($pegs, $rnas, $id_mapping, $aliasMap) = LoadFeatures($loader,
-            $source, $genomeID, $genomeDirectory, $contigMap);
+    my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader,
+            $genomeID, $genomeDirectory, $contigMap);
 
 Load the genome's features into the database from the feature files.
 The feature information is kept in two tab-delimited files-- one
@@ -559,10 +548,6 @@ specifies each feature's functional assignment.
 =item loader
 
 L<CDMILoader> object to help manager the load.
-
-=item source
-
-Source database the genome came from.
 
 =item genomeID
 
@@ -580,9 +565,8 @@ its KBase ID.
 =item RETURN
 
 Returns a list containing (0) the number of protein-encoding genes
-in the genome, (1) the number of RNAs in the genome, (2) a
-reference to a hash mapping foreign feature IDs to KBase IDs, and
-(3) a reference to a hash mapping foreign feature IDs to gene names.
+in the genome, (1) the number of RNAs in the genome, and (2) a
+reference to a hash mapping foreign feature IDs to KBase IDs.
 
 =back
 
@@ -590,15 +574,16 @@ reference to a hash mapping foreign feature IDs to KBase IDs, and
 
 sub LoadFeatures {
     # Get the parameters.
-    my ($loader, $source, $genomeID, $genomeDirectory, $contigMap) = @_;
+    my ($loader, $genomeID, $genomeDirectory, $contigMap) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Initialize the return variables.
     my ($pegs, $rnas) = (0, 0);
     # Count the total features for the progress display.
     my $fidCount = 0;
-    # Create the feature ID and alias mappings.
+    # Create the feature ID mapping.
     my $id_mapping = {};
+    # This will save the aliases.
     my $aliasMap = {};
     # We'll track the parents in here.
     my %parentMap;
@@ -608,7 +593,7 @@ sub LoadFeatures {
     # column, so we sort them and use standard merge logic.
 
     open(my $feath, "sort \"$genomeDirectory/features.tab\" |") || die "Could not open features file: $!\n";
-    my ($fid1, $type, $locations, $parent, $alias) = $loader->GetLine($feath);
+    my ($fid1, $type, $locations, $parent, $subset, @aliases) = $loader->GetLine($feath);
     $fidCount++;
     open(my $funch, "sort \"$genomeDirectory/functions.tab\" |") || die "Could not open functions file: $!\n";
     $stats->Add(functionLines => 1);
@@ -650,12 +635,13 @@ sub LoadFeatures {
             ($fid2, $function) = $loader->GetLine($funch);
             $stats->Add(functionLines => 1);
         }
-        # If this feature has an alias, save it.
-        if ($alias) {
-            $aliasMap->{$fid1} = $alias;
-            $stats->Add(aliasIn => 1);
+        # If this feature has aliases, save them.
+        if (@aliases) {
+            $aliasMap->{$fid1} = \@aliases;
+            $stats->Add(aliasesFound => 1);
+            $stats->Add(aliasIn => scalar(@aliases));
         }
-        # Similarly, save the parent.
+        # If this feature has a parent, save it.
         if ($parent) {
             $parentMap{$fid1} = $parent;
             $stats->Add(parentIn => 1);
@@ -666,8 +652,8 @@ sub LoadFeatures {
         # Is the batch full?
         if ($batchSize >= 1000) {
             # Yes. Process It.
-            ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $source, $genomeID,
-                    \%fidBatch, $contigMap);
+            ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $genomeID,
+                    \%fidBatch, $contigMap, $aliasMap);
             # Start the next one.
             %fidBatch = ();
             $batchSize = 0;
@@ -678,8 +664,8 @@ sub LoadFeatures {
     }
     # Process the residual batch.
     if ($batchSize > 0) {
-        ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $source, $genomeID,
-                \%fidBatch, $contigMap);
+        ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $genomeID,
+                \%fidBatch, $contigMap, $aliasMap);
     }
     # Finish out the function file. We only do this to get the statistics.
     while (defined $fid2) {
@@ -704,13 +690,13 @@ sub LoadFeatures {
     # Display our progress.
     print "$fidCount features loaded from $genomeDirectory.\n";
     # Return the feature type counts and the mappings.
-    return ($pegs, $rnas, $id_mapping, $aliasMap);
+    return ($pegs, $rnas, $id_mapping);
 }
 
 =head3 ProcessFeatureBatch
 
-    ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $source,
-                        $genomeID, \%fidBatch, \%contigMap);
+    ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas,
+                        $genomeID, \%fidBatch, \%contigMap, \%aliasMap);
 
 Load a batch of features into the database. Features are processed
 in batches to reduce the overhead for requesting feature IDs from
@@ -734,10 +720,6 @@ Reference to the counter for the number of protein-encoding genes found.
 
 Reference to the counter for the number of RNAs found.
 
-=item source
-
-Source database the genome came from.
-
 =item genomeID
 
 KBase ID of the genome being loaded.
@@ -753,11 +735,17 @@ and (2) the feature's functional assignment.
 Reference to a hash that maps each contig's foreign identifier to
 its KBase ID.
 
+=item aliasMap
+
+Reference to a hash that maps each feature's foreign identifier to
+a list of aliases (if any).
+
 =cut
 
 sub ProcessFeatureBatch {
     # Get the parameters.
-    my ($loader, $id_mapping, $pegs, $rnas, $source, $genomeID, $fidBatch, $contigMap) = @_;
+    my ($loader, $id_mapping, $pegs, $rnas, $genomeID,
+            $fidBatch, $contigMap, $aliasMap) = @_;
     # Get the CDMI database.
     my $cdmi = $loader->cdmi;
     # Get the statistics object.
@@ -777,7 +765,7 @@ sub ProcessFeatureBatch {
         push(@{$typemap{$type}}, $fid);
     }
     for my $type (keys %typemap) {
-        my $h = $loader->GetKBaseIDs("$genomeID.$type", $source, 'Feature',
+        my $h = $loader->GetKBaseIDs("$genomeID.$type", 'Feature',
                $typemap{$type});
         $id_mapping->{$_} = $h->{$_} foreach keys %$h;
     }
@@ -802,9 +790,18 @@ sub ProcessFeatureBatch {
                 feature_type => $type, function => $function,
                 sequence_length => $len, source_id => $fid);
         $stats->Add(features => 1);
+        # Check for aliases.
+        my $aliases = $aliasMap->{$fid};
+        if (defined $aliases) {
+            for my $alias (@$aliases) {
+                $loader->InsertObject('FeatureAlias', id => $fidKBID,
+                        alias => $alias);
+                $stats->Add(featureAlias => 1);
+            }
+        }
         # Count the feature type.
         $stats->Add("featureType-$type" => 1);
-        $$pegs++ if $type eq 'peg';
+        $$pegs++ if $type eq 'CDS';
         $$rnas++ if $type eq 'rna';
         # Check the contig IDs in the locations.  If we find an
         # invalid contig ID, we must skip the location data for
@@ -868,7 +865,7 @@ sub ProcessFeatureBatch {
 
 =head3 LoadProteins
 
-    LoadProteins($loader, $source, $id_mapping, $proteinFastaFile);
+    LoadProteins($loader, $id_mapping, $proteinFastaFile);
 
 Load the protein translations into the database.
 
@@ -878,18 +875,9 @@ Load the protein translations into the database.
 
 L<CDMILoader> object to help manager the load.
 
-=item source
-
-Source database the genome came from.
-
 =item id_mapping
 
 Reference to a hash mapping foreign feature IDs to KBase IDs.
-
-=item aliasMap
-
-Reference to a hash mapping foreign feature IDs to gene names. These
-will be stored as protein aliases.
 
 =item proteinFastaFile
 
@@ -901,11 +889,9 @@ Name of a FASTA file containing the protein translation for each feature.
 
 sub LoadProteins {
     # Get the parameters.
-    my ($loader, $source, $id_mapping, $aliasMap, $proteinFastaFile) = @_;
+    my ($loader, $id_mapping, $proteinFastaFile) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
-    # Get the database object.
-    my $cdki = $loader->cdmi;
     # Ensure the protein file exists and is nonempty.
     if (! -s $proteinFastaFile) {
         $stats->Add(emptyProteinFile => 1);
@@ -939,39 +925,6 @@ sub LoadProteins {
                     $loader->InsertObject('IsProteinFor', from_link => $protID,
                             to_link => $kbid);
                     $stats->Add(featureProtein => 1);
-                    # Is there a gene name for this feature?
-                    if ($aliasMap->{$fid}) {
-                        # Yes. We must add it as an identifier.
-                        my $naturalID = $aliasMap->{$fid};
-                        my $prefixed = "$source|$naturalID";
-                        # Insure the identifier is in the database.
-                        my $created = $loader->InsureEntity(Identifier => $prefixed,
-                            natural_form => $naturalID, source => $source);
-                        $stats->Add(aliasFound => 1);
-                        # If the identifier previously existed, see if it's
-                        # already connected to this protein.
-                        if ($created) {
-                            $stats->Add(newIdentifier => 1);
-                        } else {
-                            $stats->Add(oldIdentifier => 1);
-                            my ($test) = $cdmi->GetFlat("IsNamedBy",
-                                    'IsNamedBy(from_link) = ? AND IsNamedBy(to_link) = ?',
-                                    [$protID, $prefixed], 'to-link');
-                            if (! defined $test) {
-                                # It's not, so denote that this is a new connection.
-                                $created = 1;
-                                $stats->Add(oldIdentifierNewIdConnection => 1);
-                            } else {
-                                $stats->Add(oldIdConnection => 1);
-                            }
-                        }
-                        if ($created) {
-                            # Connect the identifier to the protein.
-                            $cdmi->InsertObject('IsNamedBy', from_link => $protID,
-                                    to_link => $prefixed);
-                            $stats->Add(newIdConnection => 1);
-                        }
-                    }
                 }
                 # Set up for the next feature.
                 $fid = $nextFid;
@@ -987,8 +940,8 @@ sub LoadProteins {
 =head3 CreateGenome
 
     CreateGenome($loader, $source, $genomeID, $genomeOriginalID,
-                 $scientificName, $dnaSize, $gcContent, $md5, $pegs,
-                 $rnas, $attributeFileName);
+                 $metaHash, $dnaSize, $gcContent, $md5, $pegs,
+                 $rnas);
 
 Create the genome record.
 
@@ -1014,9 +967,9 @@ Source database the genome came from.
 
 Foreign identifier of the genome in the source database.
 
-=item scientificName
+=item metaHash
 
-Scientific name of the genome.
+Reference to a hash containing the contents of the metadata file.
 
 =item dnaSize
 
@@ -1042,35 +995,25 @@ Number of RNAs in the genome.
 
 Number of contigs in the genome.
 
-=item attributeFileName
-
-Name of the attributes file.
-
 =back
 
 =cut
 
 sub CreateGenome {
     # Get the parameters.
-    my ($loader, $source, $genomeID, $genomeOriginalID, $scientificName, $dnaSize, $gcContent, $md5, $pegs, $rnas, $contigs, $attributeFileName) = @_;
+    my ($loader, $source, $genomeID, $genomeOriginalID, $metaHash, $dnaSize, $gcContent, $md5, $pegs, $rnas, $contigs) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Get the database object.
     my $cdmi = $loader->cdmi;
-    # Read in the attributes. Note that a missing attribute file is not an error:
-    # we simply default everything.
-    my %attributeHash;
-    if (-f $attributeFileName) {
-        open(my $ih, "<$attributeFileName") || die "Could not open attribute file: $!\n";
-        while (! eof $ih) {
-            my ($attribute, $value) = $loader->GetLine($ih);
-            $attributeHash{$attribute} = $value;
-            $stats->Add(attributesRead => 1);
-        }
-    }
     # Default the domain to an empty string (unknown).
     my $domain = "";
     my $prokaryotic = 0;
+    # Get the scientific name from the metadata.
+    my $scientificName = $metaHash->{name};
+    if (! $scientificName) {
+        die "Invalid or missing name for $genomeOriginalID.\n";
+    }
     # Try to find the taxon ID for this genome.
     my $taxID = $cdmi->ComputeTaxonID($scientificName);
     # If we found one, connect it to the genome and compute the domain.
@@ -1110,8 +1053,8 @@ sub CreateGenome {
     $cdmi->InsertObject('Submitted', from_link => $source, to_link => $genomeID);
     $loader->InsureEntity(Source => $source);
     # Get the attributes.
-    my $geneticCode = $attributeHash{GENETIC_CODE} || 11;
-    my $complete = $attributeHash{COMPLETE} || 1;
+    my $geneticCode = $metaHash->{genetic_code} || 11;
+    my $complete = $metaHash->{complete} || 1;
     # Now we create the genome record itself.
     $cdmi->InsertObject('Genome', id => $genomeID, complete => $complete,
             contigs => $contigs, dna_size => $dnaSize, domain => $domain,
