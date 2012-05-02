@@ -15,6 +15,7 @@ GenomeAnnotation
 #BEGIN_HEADER
 
 use ANNOserver;
+use SeedUtils;
 use Bio::KBase::IDServer::Client;
 use Data::Dumper;
 use gjoseqlib;
@@ -41,9 +42,9 @@ sub new
 
 
 
-=head2 annotate_genome
+=head2 genomeTO_to_reconstructionTO
 
-  $return = $obj->annotate_genome($genome)
+  $return = $obj->genomeTO_to_reconstructionTO($genomeTO)
 
 =over 4
 
@@ -52,9 +53,631 @@ sub new
 =begin html
 
 <pre>
-$genome is a genome
-$return is a genome
-genome is a reference to a hash where the following keys are defined:
+$genomeTO is a genomeTO
+$return is a reconstructionTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a reconstructionTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub genomeTO_to_reconstructionTO
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to genomeTO_to_reconstructionTO:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'genomeTO_to_reconstructionTO');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN genomeTO_to_reconstructionTO
+
+    use ANNOserver;
+    my $annoO = ANNOserver->new;
+    my %in_models = map { chop; ($_ => 1) } `all_roles_used_in_models`;
+    my %bindings_to_roles;
+
+    my $features = $genomeTO->{features};
+    my @role_fid_tuples;
+    my $assignments = [];
+    foreach my $fidH (@$features)
+    {
+	my $fid = $fidH->{id};
+	my $f = $fidH->{function};
+	if ($f)
+	{
+	    
+	    push(@$assignments,[$fid,$f]);
+	    foreach my $role (&SeedUtils::roles_of_function($f))
+	    {
+		push(@role_fid_tuples,[$role,$fid]);
+		if ($in_models{$role}) { $bindings_to_roles{$role}->{$fid} = 1 }
+	    }
+	}
+    }
+    my $mr = $annoO->metabolic_reconstruction({-roles => \@role_fid_tuples});
+    my $sub_vars = [];
+    my $bindings = [];
+    my %subsys;
+    foreach my $tuple (@$mr)
+    {
+	my($sub_var,$role,$fid) = @$tuple;
+	my($sub,$var) = split(/:/,$sub_var);
+	if ($var !~ /\*?(0|-1)\b/)
+	{
+	    $subsys{$sub} = $var;
+	    $bindings_to_roles{$role}->{$fid} = 1;
+	}
+    }
+    foreach my $role (keys(%bindings_to_roles))
+    {
+	my $roles = $bindings_to_roles{$role};
+	my @fids = keys(%$roles);
+	foreach my $fid (@fids)
+	{
+	    push(@$bindings,[$fid,$role]);
+	}
+    }
+    my @sv = map { [$_,$subsys{$_}] } keys(%subsys);
+    $return = {
+	subsystems => \@sv,
+	assignments => $assignments,
+	bindings   => $bindings,
+    };
+    
+    #END genomeTO_to_reconstructionTO
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to genomeTO_to_reconstructionTO:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'genomeTO_to_reconstructionTO');
+    }
+    return($return);
+}
+
+
+
+
+=head2 genomeTO_to_feature_data
+
+  $return = $obj->genomeTO_to_feature_data($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a fid_data_tuples
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+fid_data_tuples is a reference to a list where each element is a fid_data_tuple
+fid_data_tuple is a reference to a list containing 4 items:
+	0: a fid
+	1: a md5
+	2: a location
+	3: a function
+fid is a string
+md5 is a string
+function is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a fid_data_tuples
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+fid_data_tuples is a reference to a list where each element is a fid_data_tuple
+fid_data_tuple is a reference to a list containing 4 items:
+	0: a fid
+	1: a md5
+	2: a location
+	3: a function
+fid is a string
+md5 is a string
+function is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub genomeTO_to_feature_data
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to genomeTO_to_feature_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'genomeTO_to_feature_data');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN genomeTO_to_feature_data
+
+    my $feature_data = [];
+    my $features = $genomeTO->{features};
+    foreach my $feature (@$features)
+    {
+	my $fid = $feature->{id};
+	my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_; 
+				 "$contig\_$beg$strand$len" 
+			       } @{$feature->{location}});
+	my $type = $feature->{type};
+	my $func = $feature->{function};
+	my $aliases = join(",",@{$feature->{aliases}});
+	push(@$feature_data,[$fid,$loc,$type,$func,$aliases]);
+    }
+    $return = $feature_data;
+    #END genomeTO_to_feature_data
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to genomeTO_to_feature_data:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'genomeTO_to_feature_data');
+    }
+    return($return);
+}
+
+
+
+
+=head2 reconstructionTO_to_roles
+
+  $return = $obj->reconstructionTO_to_roles($reconstructionTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$reconstructionTO is a reconstructionTO
+$return is a reference to a list where each element is a role
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$reconstructionTO is a reconstructionTO
+$return is a reference to a list where each element is a role
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub reconstructionTO_to_roles
+{
+    my $self = shift;
+    my($reconstructionTO) = @_;
+
+    my @_bad_arguments;
+    (ref($reconstructionTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"reconstructionTO\" (value was \"$reconstructionTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to reconstructionTO_to_roles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'reconstructionTO_to_roles');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN reconstructionTO_to_roles
+
+    my $bindings = $reconstructionTO->{bindings};
+    my %roles = map { ($_->[1] => 1) } @$bindings;
+    $return = [sort keys(%roles)];
+
+    #END reconstructionTO_to_roles
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to reconstructionTO_to_roles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'reconstructionTO_to_roles');
+    }
+    return($return);
+}
+
+
+
+
+=head2 reconstructionTO_to_subsystems
+
+  $return = $obj->reconstructionTO_to_subsystems($reconstructionTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$reconstructionTO is a reconstructionTO
+$return is a variant_subsystem_pairs
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$reconstructionTO is a reconstructionTO
+$return is a variant_subsystem_pairs
+reconstructionTO is a reference to a hash where the following keys are defined:
+	subsystems has a value which is a variant_subsystem_pairs
+	bindings has a value which is a fid_role_pairs
+	assignments has a value which is a fid_function_pairs
+variant_subsystem_pairs is a reference to a list where each element is a variant_of_subsystem
+variant_of_subsystem is a reference to a list containing 2 items:
+	0: a subsystem
+	1: a variant
+subsystem is a string
+variant is a string
+fid_role_pairs is a reference to a list where each element is a fid_role_pair
+fid_role_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a role
+fid is a string
+role is a string
+fid_function_pairs is a reference to a list where each element is a fid_function_pair
+fid_function_pair is a reference to a list containing 2 items:
+	0: a fid
+	1: a function
+function is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub reconstructionTO_to_subsystems
+{
+    my $self = shift;
+    my($reconstructionTO) = @_;
+
+    my @_bad_arguments;
+    (ref($reconstructionTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"reconstructionTO\" (value was \"$reconstructionTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to reconstructionTO_to_subsystems:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'reconstructionTO_to_subsystems');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN reconstructionTO_to_subsystems
+
+    my $subsys_pairs = $reconstructionTO->{subsystems};
+    $return = $subsys_pairs;
+    
+    #END reconstructionTO_to_subsystems
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to reconstructionTO_to_subsystems:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'reconstructionTO_to_subsystems');
+    }
+    return($return);
+}
+
+
+
+
+=head2 annotate_genome
+
+  $return = $obj->annotate_genome($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
 	id has a value which is a genome_id
 	scientific_name has a value which is a string
 	domain has a value which is a string
@@ -95,9 +718,9 @@ annotation is a reference to a list containing 3 items:
 
 =begin text
 
-$genome is a genome
-$return is a genome
-genome is a reference to a hash where the following keys are defined:
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
 	id has a value which is a genome_id
 	scientific_name has a value which is a string
 	domain has a value which is a string
@@ -149,10 +772,10 @@ and functional annotation and return the annotated genome.
 sub annotate_genome
 {
     my $self = shift;
-    my($genome) = @_;
+    my($genomeTO) = @_;
 
     my @_bad_arguments;
-    (ref($genome) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genome\" (value was \"$genome\")");
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to annotate_genome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -162,7 +785,7 @@ sub annotate_genome
     my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
     my($return);
     #BEGIN annotate_genome
-
+    my $genome = $genomeTO;
     my $anno = ANNOserver->new();
 
     #
@@ -321,7 +944,7 @@ sub annotate_genome
 
 =head2 annotate_proteins
 
-  $return = $obj->annotate_proteins($genome)
+  $return = $obj->annotate_proteins($genomeTO)
 
 =over 4
 
@@ -330,9 +953,9 @@ sub annotate_genome
 =begin html
 
 <pre>
-$genome is a genome
-$return is a genome
-genome is a reference to a hash where the following keys are defined:
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
 	id has a value which is a genome_id
 	scientific_name has a value which is a string
 	domain has a value which is a string
@@ -373,9 +996,9 @@ annotation is a reference to a list containing 3 items:
 
 =begin text
 
-$genome is a genome
-$return is a genome
-genome is a reference to a hash where the following keys are defined:
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
 	id has a value which is a genome_id
 	scientific_name has a value which is a string
 	domain has a value which is a string
@@ -428,10 +1051,10 @@ genome object.
 sub annotate_proteins
 {
     my $self = shift;
-    my($genome) = @_;
+    my($genomeTO) = @_;
 
     my @_bad_arguments;
-    (ref($genome) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genome\" (value was \"$genome\")");
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to annotate_proteins:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -456,6 +1079,58 @@ sub annotate_proteins
 
 
 =head1 TYPES
+
+
+
+=head2 md5
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 md5s
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a md5
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a md5
+
+=end text
+
+=back
 
 
 
@@ -751,7 +1426,7 @@ dna has a value which is a string
 
 
 
-=head2 genome
+=head2 genomeTO
 
 =over 4
 
@@ -788,6 +1463,406 @@ source_id has a value which is a string
 contigs has a value which is a reference to a list where each element is a contig
 features has a value which is a reference to a list where each element is a feature
 
+
+=end text
+
+=back
+
+
+
+=head2 subsystem
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 variant
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 variant_of_subsystem
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a subsystem
+1: a variant
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a subsystem
+1: a variant
+
+
+=end text
+
+=back
+
+
+
+=head2 variant_subsystem_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a variant_of_subsystem
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a variant_of_subsystem
+
+=end text
+
+=back
+
+
+
+=head2 fid
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 role
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 function
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 fid_role_pair
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a fid
+1: a role
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a fid
+1: a role
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_role_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fid_role_pair
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fid_role_pair
+
+=end text
+
+=back
+
+
+
+=head2 fid_function_pair
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a fid
+1: a function
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a fid
+1: a function
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_function_pairs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fid_function_pair
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fid_function_pair
+
+=end text
+
+=back
+
+
+
+=head2 reconstructionTO
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+subsystems has a value which is a variant_subsystem_pairs
+bindings has a value which is a fid_role_pairs
+assignments has a value which is a fid_function_pairs
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+subsystems has a value which is a variant_subsystem_pairs
+bindings has a value which is a fid_role_pairs
+assignments has a value which is a fid_function_pairs
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_data_tuple
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 4 items:
+0: a fid
+1: a md5
+2: a location
+3: a function
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 4 items:
+0: a fid
+1: a md5
+2: a location
+3: a function
+
+
+=end text
+
+=back
+
+
+
+=head2 fid_data_tuples
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a fid_data_tuple
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a fid_data_tuple
 
 =end text
 

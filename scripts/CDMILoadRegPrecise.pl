@@ -61,7 +61,7 @@ The source in this case is C<RegPrecise>.
 
 There is a single positional parameter-- the name of the directory
 containing the input files. In addition to the command-line options in
-L<CDMI/new_for_script>, it supports the following.
+L<Bio::KBase::CDMI::CDMI/new_for_script>, it supports the following.
 
 =over 4
 

@@ -10,8 +10,7 @@ use Carp;
 
 =head1 get_entity_Variation
 
-A variation describes a set of aligned regions
-in two or more contigs.
+A variation is a difference in DNA sequence between the reference genome and the observational unit.  The variation has a position on a contig.
 
 Example:
 
@@ -37,7 +36,15 @@ The Variation entity has the following relationship links:
 
 =over 4
     
-=item IsAlignmentFor Contig
+=item Impacts Trait
+
+=item IsLocatedOn Contig
+
+=item IsVariantOf ObservationalUnit
+
+=item SummarizedBy AlleleFrequency
+
+=item WasDetermiedBy Assay
 
 
 =back
@@ -61,7 +68,9 @@ strings. The following fields are available:
 
 =over 4
 
-=item notes
+=item position
+
+=item value
 
 =back    
 
@@ -80,7 +89,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'notes' );
+my @all_fields = ( 'position', 'value' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Variation [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

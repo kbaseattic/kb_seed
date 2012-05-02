@@ -1,5 +1,7 @@
 module GenomeAnnotation
 {
+    typedef string md5;
+    typedef list<md5> md5s;
     typedef string genome_id;
     typedef string feature_id;
     typedef string contig_id;
@@ -49,19 +51,45 @@ module GenomeAnnotation
 	
 	list<contig> contigs;
 	list<feature> features;
-    } genome;
+    } genomeTO;
+
+    typedef string subsystem;
+    typedef string variant;
+    typedef tuple<subsystem,variant> variant_of_subsystem;
+    typedef list<variant_of_subsystem> variant_subsystem_pairs;
+    typedef string fid;
+    typedef string role;
+    typedef string function;
+    typedef tuple<fid,role> fid_role_pair;
+    typedef list<fid_role_pair> fid_role_pairs;
+    typedef tuple<fid,function> fid_function_pair;
+    typedef list<fid_function_pair> fid_function_pairs;
+
+    typedef structure {
+	variant_subsystem_pairs subsystems;
+	fid_role_pairs bindings;
+	fid_function_pairs assignments;
+    } reconstructionTO;
+
+    typedef tuple<fid,md5,location,function> fid_data_tuple;
+    typedef list<fid_data_tuple> fid_data_tuples;
+
+    funcdef genomeTO_to_reconstructionTO (genomeTO) returns (reconstructionTO);
+    funcdef genomeTO_to_feature_data (genomeTO) returns (fid_data_tuples);
+    funcdef reconstructionTO_to_roles (reconstructionTO) returns (list<role>);
+    funcdef reconstructionTO_to_subsystems(reconstructionTO) returns (variant_subsystem_pairs);
 
     /*
      * Given a genome object populated with contig data, perform gene calling
      * and functional annotation and return the annotated genome.
      */
-    funcdef annotate_genome(genome) returns (genome);
+    funcdef annotate_genome(genomeTO) returns (genomeTO);
 
     /*
      * Given a genome object populated with feature data, reannotate
      * the features that have protein translations. Return the updated
      * genome object.
      */
-    funcdef annotate_proteins(genome) returns (genome);
+    funcdef annotate_proteins(genomeTO) returns (genomeTO);
 
 };

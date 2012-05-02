@@ -49,7 +49,7 @@ relationship from publications to protein sequences.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus the
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus the
 following.
 
 =over 4

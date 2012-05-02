@@ -55,7 +55,7 @@ relationship from pairings to pairsets
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus
 the following.
 
 =over 4
@@ -285,7 +285,7 @@ from them, then connect them to the features.
 
 =item loader
 
-L<CDMILoader> object for accessing the ID server.
+L<Bio::KBase::CDMI::CDMILoader> object for accessing the ID server.
 
 =item oh
 
@@ -350,7 +350,7 @@ keys. This may change the inversion state of the pairing.
 
 =item loader
 
-L<CDMILoader> object for accessing the ID server.
+L<Bio::KBase::CDMI::CDMILoader> object for accessing the ID server.
 
 =item oh
 

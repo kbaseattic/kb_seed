@@ -27,7 +27,7 @@ A L<Stats> object for tracking statistics about the load.
 
 =item db
 
-The L<CDMI> object for the database being loaded.
+The L<Bio::KBase::CDMI::CDMI> object for the database being loaded.
 
 =item idserver
 
@@ -66,7 +66,7 @@ ID of the genome currently being loaded (if any)
 
 =head3 GetLine
 
-    my @fields = CDMILoader::GetLine($ih);
+    my @fields = Bio::KBase::CDMI::CDMILoader::GetLine($ih);
 
 or
 
@@ -83,7 +83,8 @@ Open input file handle.
 
 =item RETURN
 
-Returns a list of the fields in the next input line.
+Returns a list of the fields in the next input line. Note that fields
+containing a single period (C<.>) will be converted to null strings.
 
 =back
 
@@ -98,12 +99,13 @@ sub GetLine {
     my $line = <$ih>;
     chomp $line;
     # Return the individual fields.
-    return split /\t/, $line;
+    my @retVal = map { ($_ eq '.' ? '' : $_) } split /\t/, $line;
+    return @retVal;
 }
 
 =head3 ReadFastaRecord
 
-    my ($sequence, $nextID, $nextComment) = CDMILoader::ReadFastaRecord($ih);
+    my ($sequence, $nextID, $nextComment) = Bio::KBase::CDMI::CDMILoader::ReadFastaRecord($ih);
 
 or
 
@@ -164,7 +166,7 @@ sub ReadFastaRecord {
 
 =head3 ParseMetadata
 
-    my $metaHash = CDMILoader::ParseMetadata($fileName);
+    my $metaHash = Bio::KBase::CDMI::CDMILoader::ParseMetadata($fileName);
 
 or
 
@@ -237,7 +239,7 @@ sub ParseMetadata {
 
 =head3 ReadAttribute
 
-    my $value = CDMILoader::ReadAttribute($fileName);
+    my $value = Bio::KBase::CDMI::CDMILoader::ReadAttribute($fileName);
 
 or
 
@@ -280,7 +282,7 @@ sub ReadAttribute {
 
 =head3 ConvertTime
 
-    my $timeValue = CDMILoader::ConvertTime($modelTime);
+    my $timeValue = Bio::KBase::CDMI::CDMILoader::ConvertTime($modelTime);
 
 Convert a time from ModelSEED format to an ERDB time value. The ModelSEED
 format is
@@ -334,7 +336,7 @@ Create a new CDMI loader object for the specified CMDI database.
 
 =item cdmi
 
-A L<CDMI> object for the database being loaded.
+A L<Bio::KBase::CDMI::CDMI> object for the database being loaded.
 
 =item idserver
 
@@ -555,6 +557,59 @@ sub LoadRelations {
 
 
 =head2 Loader Utility Methods
+
+=head3 genome_load_file_name
+
+    my $fileName = $loader->genome_load_file_name($directory, $name);
+
+Compute the fully-qualified name of a load file. The load file will be
+located in the specified directory and will have either the name
+given, or the name given with the current genome ID inserted before
+the extension. So, for example, if the given name is C<contigs.fa>
+and the genome ID is C<100226.1>, this method will look for
+C<contigs.100226.1.fa> first, and if that is not found return
+C<contigs.fa>.
+
+=over 4
+
+=item directory
+
+Directory containing the load files.
+
+=item name
+
+Name of the particular load file.
+
+=item RETURN
+
+Returns a fully-qualified file name to use in the load.
+
+=back
+
+=cut
+
+sub genome_load_file_name {
+    # Get the parameters.
+    my ($self, $directory, $name) = @_;
+    # Start with the default file name.
+    my $retVal = "$directory/$name";
+    # Get the genome ID.
+    my $genome = $self->{genome};
+    # Only Check for a genome-altered file if we have a genome ID.
+    if ($genome) {
+        # Compute the genome-altered file name.
+        my @parts = split /\./, $name;
+        my $extension = pop @parts;
+        my $altName = $directory . "/" . join(".", @parts, $genome, $extension);
+        # Check to see if it exists.
+        if (-f $altName) {
+            # It does, so use it.
+            $retVal = $altName;
+        }
+    }
+    # Return the file name found.
+    return $retVal;
+}
 
 =head3 CheckRole
 
@@ -1037,6 +1092,20 @@ sub GetKBaseID {
     return $idHash->{$id};
 }
 
+=head3 source
+
+    my $source = $loader->source;
+
+Return the source name associated with this load.
+
+=cut
+
+sub source {
+    # Get the parameters.
+    my ($self) = @_;
+    # Return the source name.
+    return $self->{sourceData}->name;
+}
 
 =head3 realSource
 

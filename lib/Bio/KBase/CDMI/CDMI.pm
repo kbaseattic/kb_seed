@@ -153,7 +153,7 @@ unless it's needed.
 
 If TRUE, then the development database will be used. The development
 database is located on a different server with a different DBD. This
-option overrides C<dbhost>, C<externalDBD>, and C<DBD>.
+option overrides C<dbhost>, C<externalDBD>, C<dbname>, and C<DBD>.
 
 =back
 
@@ -168,13 +168,14 @@ sub new {
     }
     my $dbd = $options{DBD} || $ENV{CDMIDBD} || "$options{loadDirectory}/Published/KSaplingDBD.xml";
     my $dbhost = $options{dbhost} || "db1.chicago.kbase.us"; # "bio-data-1.mcs.anl.gov";
+    my $dbName = $options{dbName} || "kbase_sapling_v1";
+    my $userData = $options{userData} || "kbase_sapselect/oiwn22&dmwWEe";
     if ($options{develop}) {
         $dbd = "$options{loadDirectory}/KSaplingDBD.xml";
         $dbhost = "oak.mcs.anl.gov";
+        $dbName = "kbase_sapling";
         $options{externalDBD} = 1;
     }
-    my $dbName = $options{dbName} || "kbase_sapling";
-    my $userData = $options{userData} || "seed/";
     my $port = $options{port} || 3306;
     my $dbms = $options{dbms} || 'mysql';
     # Insure that if the user specified a DBD, it overrides the internal one.
@@ -251,7 +252,8 @@ Database management system to use (e.g. C<postgres>, default C<mysql>).
 
 If specified, then the development database will be used. This database
 is located on a different server with a different DBD. The C<develop>
-option overrides C<dbhost> and C<DBD>, and forces use of an external DBD.
+option overrides C<dbhost>, C<dbname> and C<DBD>, and forces use of an
+external DBD.
 
 =back
 

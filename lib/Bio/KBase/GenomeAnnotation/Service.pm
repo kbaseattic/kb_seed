@@ -13,6 +13,10 @@ has 'valid_methods' => (is => 'ro', isa => 'HashRef', lazy => 1,
 our $CallContext;
 
 our %return_counts = (
+        'genomeTO_to_reconstructionTO' => 1,
+        'genomeTO_to_feature_data' => 1,
+        'reconstructionTO_to_roles' => 1,
+        'reconstructionTO_to_subsystems' => 1,
         'annotate_genome' => 1,
         'annotate_proteins' => 1,
 );
@@ -21,6 +25,10 @@ sub _build_valid_methods
 {
     my($self) = @_;
     my $methods = {
+        'genomeTO_to_reconstructionTO' => 1,
+        'genomeTO_to_feature_data' => 1,
+        'reconstructionTO_to_roles' => 1,
+        'reconstructionTO_to_subsystems' => 1,
         'annotate_genome' => 1,
         'annotate_proteins' => 1,
     };

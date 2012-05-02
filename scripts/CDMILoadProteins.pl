@@ -24,7 +24,7 @@ Describes the amino acids in a protein.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script>.
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script>.
 There is a single positional parameter: the name of a protein FASTA file.
 If it is omitted, the standard input is used.
 

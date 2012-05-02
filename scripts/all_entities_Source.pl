@@ -28,15 +28,13 @@ The Source entity has the following relationship links:
 
 =over 4
     
-=item Asserts Identifier
+=item AssertsFunctionFor ProteinSequence
 
 =item Formulated CoregulatedSet
 
 =item HasCompoundAliasFrom Compound
 
 =item HasReactionAliasFrom Reaction
-
-=item Imported Identifier
 
 =item Provided Subsystem
 

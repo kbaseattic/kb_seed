@@ -41,7 +41,7 @@ remaining lines form the annotation text.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus
 the following.
 
 =over 4
@@ -163,7 +163,7 @@ created so that the two relations can be amended with the new annotations.
 
 =item loader
 
-L<CDMILoader> object for loading the database and tracking statistics.
+L<Bio::KBase::CDMI::CDMILoader> object for loading the database and tracking statistics.
 
 =item annotations
 

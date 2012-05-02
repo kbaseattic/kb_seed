@@ -106,7 +106,7 @@ files with a heading line.
 
 =head2 Command-Line Options
 
-The command-line options are those specified in L<CDMI/new_for_script>.
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script>.
 
 =head2 Positional Parameters
 

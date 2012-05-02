@@ -3330,6 +3330,110 @@ sub close_genomes
 
 
 
+=head2 $result = representative_sequences(seq_set, rep_seq_parms)
+
+we return two arguments.  The first is the list of representative triples,
+and the second is the list of sets (the first entry always being the
+representative sequence)
+
+=cut
+
+sub representative_sequences
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function representative_sequences (received $n, expecting 2)");
+    }
+    {
+	my($seq_set, $rep_seq_parms) = @args;
+
+	my @_bad_arguments;
+        (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seq_set\" (value was \"$seq_set\")");
+        (ref($rep_seq_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 2 \"rep_seq_parms\" (value was \"$rep_seq_parms\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to representative_sequences:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'representative_sequences');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.representative_sequences",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'representative_sequences',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method representative_sequences",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'representative_sequences',
+				       );
+    }
+}
+
+
+
+=head2 $result = align_sequences(seq_set, align_seq_parms)
+
+
+
+=cut
+
+sub align_sequences
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function align_sequences (received $n, expecting 2)");
+    }
+    {
+	my($seq_set, $align_seq_parms) = @args;
+
+	my @_bad_arguments;
+        (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seq_set\" (value was \"$seq_set\")");
+        (ref($align_seq_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 2 \"align_seq_parms\" (value was \"$align_seq_parms\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to align_sequences:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'align_sequences');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.align_sequences",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'align_sequences',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method align_sequences",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'align_sequences',
+				       );
+    }
+}
+
+
+
 
 
 =head2 $result = get_entity_AlignmentTree(ids, fields)
@@ -3538,6 +3642,192 @@ sub all_entities_AlignmentTree
 
 
 
+=head2 $result = get_entity_AlleleFrequency(ids, fields)
+
+An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Specific position on the contig where the allele occurs
+
+
+=item minor_AF
+
+Minor allele frequency.  Floating point number from 0.0 to 0.5.
+
+
+=item minor_allele
+
+Text letter representation of the minor allele. Valid values are A, C, G, and T.
+
+
+=item major_AF
+
+Major allele frequency.  Floating point number less than or equal to 1.0.
+
+
+=item major_allele
+
+Text letter representation of the major allele. Valid values are A, C, G, and T.
+
+
+
+=back
+
+=cut
+
+sub get_entity_AlleleFrequency
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_AlleleFrequency (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_AlleleFrequency');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_AlleleFrequency",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_AlleleFrequency',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_AlleleFrequency",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_AlleleFrequency',
+				       );
+    }
+}
+
+
+
+=head2 $result = query_entity_AlleleFrequency(qry, fields)
+
+
+
+=cut
+
+sub query_entity_AlleleFrequency
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_AlleleFrequency (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_AlleleFrequency');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_AlleleFrequency",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_AlleleFrequency',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_AlleleFrequency",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_AlleleFrequency',
+				       );
+    }
+}
+
+
+
+=head2 $result = all_entities_AlleleFrequency(start, count, fields)
+
+
+
+=cut
+
+sub all_entities_AlleleFrequency
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_AlleleFrequency (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_AlleleFrequency');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_AlleleFrequency",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_AlleleFrequency',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_AlleleFrequency",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_AlleleFrequency',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_entity_Annotation(ids, fields)
 
 An annotation is a comment attached to a feature. Annotations
@@ -3712,6 +4002,177 @@ sub all_entities_Annotation
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Annotation",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_Annotation',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_entity_Assay(ids, fields)
+
+An assay is an experimental design for determining alleles at specific chromosome positions.
+It has the following fields:
+
+=over 4
+
+
+=item assay_type
+
+Text description of the type of assay (e.g., SNP, length, sequence, categorical, array, short read, SSR marker, AFLP marker)
+
+
+=item positions
+
+Vector Data Type.  Every 4 bytes represent an integer value of a position on a chromosome.  This field is conditional based on the type of assay.  Short read and array type assays have positions. SSR marker and AFLP marker assays do not have specific positions.
+
+
+
+=back
+
+=cut
+
+sub get_entity_Assay
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Assay (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Assay');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Assay",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_Assay',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Assay",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Assay',
+				       );
+    }
+}
+
+
+
+=head2 $result = query_entity_Assay(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Assay
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Assay (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Assay');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Assay",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_Assay',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Assay",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Assay',
+				       );
+    }
+}
+
+
+
+=head2 $result = all_entities_Assay(start, count, fields)
+
+
+
+=cut
+
+sub all_entities_Assay
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Assay (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Assay');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Assay",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_Assay',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Assay",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Assay',
 				       );
     }
 }
@@ -5500,7 +5961,7 @@ regulatory mechanism.  In particular, we wish to represent genes
 that are coregulated using transcription binding sites and
 corresponding transcription regulatory proteins.
 We represent a coregulated set (which may, or may not, be considered
-an atomic regulon) using CoregulatedSet.
+a regulon) using CoregulatedSet.
 
 It has the following fields:
 
@@ -5511,6 +5972,12 @@ It has the following fields:
 
 original ID of this coregulated set in the source (core)
 database
+
+
+=item binding_location
+
+binding location for this set's transcription factor;
+there may be none of these or there may be more than one
 
 
 
@@ -6211,11 +6678,22 @@ It has the following fields:
 type of protein family (e.g. FIGfam, equivalog)
 
 
+=item release
+
+release number / subtype of protein family
+
+
 =item family_function
 
 optional free-form description of the family. For function-based
 families, this would be the functional role for the family
 members.
+
+
+=item alignment
+
+FASTA-formatted alignment of the family's protein
+sequences
 
 
 
@@ -6412,6 +6890,12 @@ Number of base pairs in this feature.
 Functional assignment for this feature. This will
 often indicate the feature's functional role or roles, and
 may also have comments.
+
+
+=item alias
+
+alternative identifier for the feature. These are
+highly unstructured, and frequently non-unique.
 
 
 
@@ -6807,27 +7291,57 @@ sub all_entities_Genome
 
 
 
-=head2 $result = get_entity_Identifier(ids, fields)
+=head2 $result = get_entity_Locality(ids, fields)
 
-An identifier is an alternate name for a protein sequence.
-The identifier is typically stored in a prefixed form that
-indicates the database it came from.
+A locality is a geographic location.
 It has the following fields:
 
 =over 4
 
 
-=item source
+=item source_name
 
-Specific type of the identifier, such as its source
-database or category. The type can usually be decoded to
-convert the identifier to a URL.
+Name or description of the location used as a collection site.
 
 
-=item natural_form
+=item city
 
-Natural form of the identifier. This is how the identifier looks
-without the identifying prefix (if one is present).
+City of the collecting site.
+
+
+=item state
+
+City of the collecting site.
+
+
+=item country
+
+Country of the collecting site.
+
+
+=item origcty
+
+3-letter ISO 3166-1 extended country code for the country of origin.
+
+
+=item elevation
+
+Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
+
+
+=item latitude
+
+Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
+
+
+=item longitude
+
+Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
+
+
+=item lo_accession
+
+Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
 
 
 
@@ -6835,14 +7349,14 @@ without the identifying prefix (if one is present).
 
 =cut
 
-sub get_entity_Identifier
+sub get_entity_Locality
 {
     my($self, @args) = @_;
 
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_entity_Identifier (received $n, expecting 2)");
+							       "Invalid argument count for function get_entity_Locality (received $n, expecting 2)");
     }
     {
 	my($ids, $fields) = @args;
@@ -6851,49 +7365,49 @@ sub get_entity_Identifier
         (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
         (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_entity_Identifier:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_entity_Identifier');
+								   method_name => 'get_entity_Locality');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_entity_Identifier",
+	method => "CDMI_EntityAPI.get_entity_Locality",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'get_entity_Identifier',
+					       method_name => 'get_entity_Locality',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Identifier",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Locality",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'get_entity_Identifier',
+					    method_name => 'get_entity_Locality',
 				       );
     }
 }
 
 
 
-=head2 $result = query_entity_Identifier(qry, fields)
+=head2 $result = query_entity_Locality(qry, fields)
 
 
 
 =cut
 
-sub query_entity_Identifier
+sub query_entity_Locality
 {
     my($self, @args) = @_;
 
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function query_entity_Identifier (received $n, expecting 2)");
+							       "Invalid argument count for function query_entity_Locality (received $n, expecting 2)");
     }
     {
 	my($qry, $fields) = @args;
@@ -6902,49 +7416,49 @@ sub query_entity_Identifier
         (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
         (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to query_entity_Identifier:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to query_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'query_entity_Identifier');
+								   method_name => 'query_entity_Locality');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.query_entity_Identifier",
+	method => "CDMI_EntityAPI.query_entity_Locality",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'query_entity_Identifier',
+					       method_name => 'query_entity_Locality',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Identifier",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Locality",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'query_entity_Identifier',
+					    method_name => 'query_entity_Locality',
 				       );
     }
 }
 
 
 
-=head2 $result = all_entities_Identifier(start, count, fields)
+=head2 $result = all_entities_Locality(start, count, fields)
 
 
 
 =cut
 
-sub all_entities_Identifier
+sub all_entities_Locality
 {
     my($self, @args) = @_;
 
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function all_entities_Identifier (received $n, expecting 3)");
+							       "Invalid argument count for function all_entities_Locality (received $n, expecting 3)");
     }
     {
 	my($start, $count, $fields) = @args;
@@ -6954,29 +7468,29 @@ sub all_entities_Identifier
         (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
         (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to all_entities_Identifier:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to all_entities_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'all_entities_Identifier');
+								   method_name => 'all_entities_Locality');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.all_entities_Identifier",
+	method => "CDMI_EntityAPI.all_entities_Locality",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'all_entities_Identifier',
+					       method_name => 'all_entities_Locality',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Identifier",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Locality",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'all_entities_Identifier',
+					    method_name => 'all_entities_Locality',
 				       );
     }
 }
@@ -7712,6 +8226,177 @@ sub all_entities_OTU
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_OTU",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_OTU',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_entity_ObservationalUnit(ids, fields)
+
+An ObservationalUnit is an individual plant that 1) is part of an experiment or study, 2) has measured traits, and 3) is assayed for the purpose of determining alleles.  
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name/ID by which the observational unit may be known by the originator and is used in queries.
+
+
+=item source_name2
+
+Secondary name/ID by which the observational unit may be known and is queried.
+
+
+
+=back
+
+=cut
+
+sub get_entity_ObservationalUnit
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_ObservationalUnit (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_ObservationalUnit');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_ObservationalUnit",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_ObservationalUnit',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_ObservationalUnit",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_ObservationalUnit',
+				       );
+    }
+}
+
+
+
+=head2 $result = query_entity_ObservationalUnit(qry, fields)
+
+
+
+=cut
+
+sub query_entity_ObservationalUnit
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_ObservationalUnit (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_ObservationalUnit');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ObservationalUnit",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_ObservationalUnit',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_ObservationalUnit",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_ObservationalUnit',
+				       );
+    }
+}
+
+
+
+=head2 $result = all_entities_ObservationalUnit(start, count, fields)
+
+
+
+=cut
+
+sub all_entities_ObservationalUnit
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_ObservationalUnit (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_ObservationalUnit');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_ObservationalUnit",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_ObservationalUnit',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_ObservationalUnit",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_ObservationalUnit',
 				       );
     }
 }
@@ -8773,7 +9458,7 @@ sub all_entities_Reaction
 =head2 $result = get_entity_ReactionRule(ids, fields)
 
 A reaction rule represents the way a reaction takes place
-within the context of a model.
+within the context of a complex.
 It has the following fields:
 
 =over 4
@@ -10169,6 +10854,182 @@ sub all_entities_Source
 
 
 
+=head2 $result = get_entity_StudyExperiment(ids, fields)
+
+An Experiment is a collection of observational units with one originator that are part of a specific study.  An experiment may be conducted at more than one location and in more than one season or year.
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name/ID by which the experiment is known at the source.  
+
+
+=item design
+
+Design of the experiment including the numbers and types of observational units, traits, replicates, sampling plan, and analysis that are planned.
+
+
+=item originator
+
+Name of the individual or program that are the originators of the experiment.
+
+
+
+=back
+
+=cut
+
+sub get_entity_StudyExperiment
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_StudyExperiment (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_StudyExperiment');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_StudyExperiment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_StudyExperiment',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_StudyExperiment",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_StudyExperiment',
+				       );
+    }
+}
+
+
+
+=head2 $result = query_entity_StudyExperiment(qry, fields)
+
+
+
+=cut
+
+sub query_entity_StudyExperiment
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_StudyExperiment (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_StudyExperiment');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_StudyExperiment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_StudyExperiment',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_StudyExperiment",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_StudyExperiment',
+				       );
+    }
+}
+
+
+
+=head2 $result = all_entities_StudyExperiment(start, count, fields)
+
+
+
+=cut
+
+sub all_entities_StudyExperiment
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_StudyExperiment (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_StudyExperiment');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_StudyExperiment",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_StudyExperiment',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_StudyExperiment",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_StudyExperiment',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_entity_Subsystem(ids, fields)
 
 A subsystem is a set of functional roles that have been annotated simultaneously (e.g.,
@@ -10736,6 +11597,187 @@ sub all_entities_TaxonomicGrouping
 
 
 
+=head2 $result = get_entity_Trait(ids, fields)
+
+A Trait is a phenotypic quality that can be measured or observed for an observational unit.  Examples include height, sugar content, color, or cold tolerance.
+It has the following fields:
+
+=over 4
+
+
+=item trait_name
+
+Text name or description of the trait
+
+
+=item unit_of_measure
+
+The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
+
+
+=item TO_ID
+
+Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
+
+
+=item protocol
+
+A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
+
+
+
+=back
+
+=cut
+
+sub get_entity_Trait
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Trait (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Trait');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Trait",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_Trait',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Trait",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Trait',
+				       );
+    }
+}
+
+
+
+=head2 $result = query_entity_Trait(qry, fields)
+
+
+
+=cut
+
+sub query_entity_Trait
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Trait (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Trait');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Trait",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_Trait',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Trait",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Trait',
+				       );
+    }
+}
+
+
+
+=head2 $result = all_entities_Trait(start, count, fields)
+
+
+
+=cut
+
+sub all_entities_Trait
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Trait (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Trait');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Trait",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_Trait',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Trait",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Trait',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_entity_Variant(ids, fields)
 
 Each subsystem may include the designation of distinct variants.  Thus,
@@ -10931,17 +11973,20 @@ sub all_entities_Variant
 
 =head2 $result = get_entity_Variation(ids, fields)
 
-A variation describes a set of aligned regions
-in two or more contigs.
+A variation is a difference in DNA sequence between the reference genome and the observational unit.  The variation has a position on a contig.
 It has the following fields:
 
 =over 4
 
 
-=item notes
+=item position
 
-optional text description of what the variation
-means
+Specific position on the contig where the variation occurs
+
+
+=item value
+
+Text representation of the replacement base(s) for the position
 
 
 
@@ -11355,6 +12400,148 @@ sub get_relationship_IsAlignedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsAlignedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsAlignedBy',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_AssertsFunctionFor(ids, from_fields, rel_fields, to_fields)
+
+Sources (users) can make assertions about protein sequence function.
+The assertion is associated with an external identifier.
+It has the following fields:
+
+=over 4
+
+
+=item function
+
+text of the assertion made about the identifier.
+It may be an empty string, indicating the function is unknown.
+
+
+=item external_id
+
+external identifier used in making the assertion
+
+
+=item organism
+
+organism name associated with this assertion. If the
+assertion is not associated with a specific organism, this
+will be an empty string.
+
+
+=item gi_number
+
+NCBI GI number associated with the asserted identifier
+
+
+=item release_date
+
+date and time the assertion was downloaded
+
+
+
+=back
+
+=cut
+
+sub get_relationship_AssertsFunctionFor
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AssertsFunctionFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AssertsFunctionFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AssertsFunctionFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AssertsFunctionFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_AssertsFunctionFor',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AssertsFunctionFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AssertsFunctionFor',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_HasAssertedFunctionFrom(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_HasAssertedFunctionFrom
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasAssertedFunctionFrom (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasAssertedFunctionFrom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasAssertedFunctionFrom');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasAssertedFunctionFrom",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasAssertedFunctionFrom',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAssertedFunctionFrom",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasAssertedFunctionFrom',
 				       );
     }
 }
@@ -12290,130 +13477,6 @@ sub get_relationship_WasGeneratedFrom
 
 
 
-=head2 $result = get_relationship_HasAssertionFrom(ids, from_fields, rel_fields, to_fields)
-
-Sources (users) can make assertions about identifiers using the annotation clearinghouse.
-When a user makes a new assertion about an identifier, it erases the old one.
-It has the following fields:
-
-=over 4
-
-
-=item function
-
-The function is the text of the assertion made about the identifier.
-
-
-=item expert
-
-TRUE if this is an expert assertion, else FALSE
-
-
-
-=back
-
-=cut
-
-sub get_relationship_HasAssertionFrom
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_HasAssertionFrom (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_HasAssertionFrom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_HasAssertionFrom');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_HasAssertionFrom",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_HasAssertionFrom',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAssertionFrom",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_HasAssertionFrom',
-				       );
-    }
-}
-
-
-
-=head2 $result = get_relationship_Asserts(ids, from_fields, rel_fields, to_fields)
-
-
-
-=cut
-
-sub get_relationship_Asserts
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_Asserts (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_Asserts:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_Asserts');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_Asserts",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_Asserts',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Asserts",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_Asserts',
-				       );
-    }
-}
-
-
-
 =head2 $result = get_relationship_HasCompoundAliasFrom(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a source (database or organization)
@@ -13029,6 +14092,128 @@ sub get_relationship_IsPresentIn
 
 
 
+=head2 $result = get_relationship_HasProteinMember(ids, from_fields, rel_fields, to_fields)
+
+This relationship connects each feature family to its
+constituent protein sequences. A family always has many protein sequences,
+and a single sequence can be found in many families.
+It has the following fields:
+
+=over 4
+
+
+=item source_id
+
+Native identifier used for the protein in the definition
+of the family. This will be its ID in the alignment, if one
+exists.
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasProteinMember
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasProteinMember (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasProteinMember:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasProteinMember');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasProteinMember",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasProteinMember',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasProteinMember",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasProteinMember',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsProteinMemberOf(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_IsProteinMemberOf
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsProteinMemberOf (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsProteinMemberOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsProteinMemberOf');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsProteinMemberOf",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsProteinMemberOf',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsProteinMemberOf",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsProteinMemberOf',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_relationship_HasReactionAliasFrom(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a source (database or organization)
@@ -13613,6 +14798,242 @@ sub get_relationship_IsStepOf
 
 
 
+=head2 $result = get_relationship_HasTrait(ids, from_fields, rel_fields, to_fields)
+
+This relationship contains the measurement values of a trait on a specific observational Unit
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+
+
+
+=item statistic_type
+
+
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasTrait
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasTrait (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasTrait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasTrait');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasTrait",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasTrait',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasTrait",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasTrait',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_Measures(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_Measures
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_Measures (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_Measures:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_Measures');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_Measures",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_Measures',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Measures",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_Measures',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_HasUnits(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates observational units with the geographic location where the unit is planted.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasUnits
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasUnits (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasUnits:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasUnits');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasUnits",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasUnits',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasUnits",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasUnits',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsLocated(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_IsLocated
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsLocated (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsLocated:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsLocated');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsLocated",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsLocated',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsLocated",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsLocated',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_relationship_HasUsage(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a biomass compound specification
@@ -13847,11 +15268,9 @@ sub get_relationship_HasValueIn
 
 
 
-=head2 $result = get_relationship_Imported(ids, from_fields, rel_fields, to_fields)
+=head2 $result = get_relationship_HasVariant(ids, from_fields, rel_fields, to_fields)
 
-This relationship specifies the import source for
-identifiers. It is used when reloading identifiers to
-provide for rapid deletion of the previous load's results.
+This relationship associates observational units with the variations that have been determined by assay.
 It has the following fields:
 
 =over 4
@@ -13862,14 +15281,14 @@ It has the following fields:
 
 =cut
 
-sub get_relationship_Imported
+sub get_relationship_HasVariant
 {
     my($self, @args) = @_;
 
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_Imported (received $n, expecting 4)");
+							       "Invalid argument count for function get_relationship_HasVariant (received $n, expecting 4)");
     }
     {
 	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
@@ -13880,49 +15299,49 @@ sub get_relationship_Imported
         (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
         (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_Imported:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_relationship_HasVariant:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_Imported');
+								   method_name => 'get_relationship_HasVariant');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_Imported",
+	method => "CDMI_EntityAPI.get_relationship_HasVariant",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'get_relationship_Imported',
+					       method_name => 'get_relationship_HasVariant',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Imported",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasVariant",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_Imported',
+					    method_name => 'get_relationship_HasVariant',
 				       );
     }
 }
 
 
 
-=head2 $result = get_relationship_WasImportedFrom(ids, from_fields, rel_fields, to_fields)
+=head2 $result = get_relationship_IsVariantOf(ids, from_fields, rel_fields, to_fields)
 
 
 
 =cut
 
-sub get_relationship_WasImportedFrom
+sub get_relationship_IsVariantOf
 {
     my($self, @args) = @_;
 
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_WasImportedFrom (received $n, expecting 4)");
+							       "Invalid argument count for function get_relationship_IsVariantOf (received $n, expecting 4)");
     }
     {
 	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
@@ -13933,29 +15352,265 @@ sub get_relationship_WasImportedFrom
         (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
         (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_WasImportedFrom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_relationship_IsVariantOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_WasImportedFrom');
+								   method_name => 'get_relationship_IsVariantOf');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_WasImportedFrom",
+	method => "CDMI_EntityAPI.get_relationship_IsVariantOf",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'get_relationship_WasImportedFrom',
+					       method_name => 'get_relationship_IsVariantOf',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_WasImportedFrom",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsVariantOf",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_WasImportedFrom',
+					    method_name => 'get_relationship_IsVariantOf',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_HasVariation(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates variations with the reference contig.  
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasVariation
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasVariation (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasVariation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasVariation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasVariation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasVariation',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasVariation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasVariation',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsLocatedOn(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_IsLocatedOn
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsLocatedOn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsLocatedOn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsLocatedOn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsLocatedOn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsLocatedOn',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsLocatedOn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsLocatedOn',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_Impacts(ids, from_fields, rel_fields, to_fields)
+
+This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+
+
+
+=item statistic_type
+
+
+
+
+
+=back
+
+=cut
+
+sub get_relationship_Impacts
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_Impacts (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_Impacts:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_Impacts');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_Impacts",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_Impacts',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Impacts",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_Impacts',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsImpactedBy(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_IsImpactedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsImpactedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsImpactedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsImpactedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsImpactedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsImpactedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsImpactedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsImpactedBy',
 				       );
     }
 }
@@ -14093,6 +15748,119 @@ sub get_relationship_IsIncludedIn
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsIncludedIn",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsIncludedIn',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IncludesPart(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates observational units with the geographic location where the unit is planted.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IncludesPart
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IncludesPart (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IncludesPart:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IncludesPart');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IncludesPart",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IncludesPart',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IncludesPart",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IncludesPart',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsPartOf(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_IsPartOf
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsPartOf (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsPartOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsPartOf');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsPartOf",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsPartOf',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsPartOf",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsPartOf',
 				       );
     }
 }
@@ -14447,135 +16215,6 @@ sub get_relationship_IsARequirementOf
 
 
 
-=head2 $result = get_relationship_IsAlignedIn(ids, from_fields, rel_fields, to_fields)
-
-This relationship connects each variation to the
-contig regions that it aligns.
-It has the following fields:
-
-=over 4
-
-
-=item start
-
-start location of region
-
-
-=item len
-
-length of region
-
-
-=item dir
-
-direction of region (+ or -)
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsAlignedIn
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_IsAlignedIn (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_IsAlignedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_IsAlignedIn');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_IsAlignedIn",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_IsAlignedIn',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsAlignedIn",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_IsAlignedIn',
-				       );
-    }
-}
-
-
-
-=head2 $result = get_relationship_IsAlignmentFor(ids, from_fields, rel_fields, to_fields)
-
-
-
-=cut
-
-sub get_relationship_IsAlignmentFor
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_IsAlignmentFor (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_IsAlignmentFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_IsAlignmentFor');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_IsAlignmentFor",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_IsAlignmentFor',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsAlignmentFor",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_IsAlignmentFor',
-				       );
-    }
-}
-
-
-
 =head2 $result = get_relationship_IsAnnotatedBy(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a feature to its annotations. A
@@ -14685,120 +16324,6 @@ sub get_relationship_Annotates
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Annotates",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_Annotates',
-				       );
-    }
-}
-
-
-
-=head2 $result = get_relationship_IsBindingSiteFor(ids, from_fields, rel_fields, to_fields)
-
-This relationship connects a coregulated set to the
-binding site to which its feature attaches.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsBindingSiteFor
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_IsBindingSiteFor (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_IsBindingSiteFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_IsBindingSiteFor');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_IsBindingSiteFor",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_IsBindingSiteFor',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsBindingSiteFor",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_IsBindingSiteFor',
-				       );
-    }
-}
-
-
-
-=head2 $result = get_relationship_IsBoundBy(ids, from_fields, rel_fields, to_fields)
-
-
-
-=cut
-
-sub get_relationship_IsBoundBy
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_IsBoundBy (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_IsBoundBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_IsBoundBy');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_IsBoundBy",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_IsBoundBy',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsBoundBy",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_IsBoundBy',
 				       );
     }
 }
@@ -17387,121 +18912,6 @@ sub get_relationship_Models
 
 
 
-=head2 $result = get_relationship_IsNamedBy(ids, from_fields, rel_fields, to_fields)
-
-The normal case is that an identifier names a single
-protein sequence, while a protein sequence can have many identifiers,
-but some identifiers name multiple sequences.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsNamedBy
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_IsNamedBy (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_IsNamedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_IsNamedBy');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_IsNamedBy",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_IsNamedBy',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsNamedBy",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_IsNamedBy',
-				       );
-    }
-}
-
-
-
-=head2 $result = get_relationship_Names(ids, from_fields, rel_fields, to_fields)
-
-
-
-=cut
-
-sub get_relationship_Names
-{
-    my($self, @args) = @_;
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_Names (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_Names:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_Names');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_Names",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_Names',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Names",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_Names',
-				       );
-    }
-}
-
-
-
 =head2 $result = get_relationship_IsOwnerOf(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a genome to the features it
@@ -17982,6 +19392,119 @@ sub get_relationship_HasRealLocationIn
 
 
 
+=head2 $result = get_relationship_IsReferencedBy(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates observational units with the reference genome that it will be compared to.  All variations will be differences between the observational unit and the reference.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsReferencedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsReferencedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsReferencedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsReferencedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsReferencedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsReferencedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsReferencedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsReferencedBy',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_UsesReference(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_UsesReference
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_UsesReference (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_UsesReference:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_UsesReference');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_UsesReference",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_UsesReference',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_UsesReference",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_UsesReference',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_relationship_IsRegulatedIn(ids, from_fields, rel_fields, to_fields)
 
 This relationship connects a feature to the set of coregulated features.
@@ -18204,6 +19727,119 @@ sub get_relationship_IsRelevantTo
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRelevantTo",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsRelevantTo',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_IsRepresentedBy(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsRepresentedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsRepresentedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsRepresentedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsRepresentedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsRepresentedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsRepresentedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRepresentedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsRepresentedBy',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_DefinedBy(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_DefinedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_DefinedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_DefinedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_DefinedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_DefinedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_DefinedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DefinedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_DefinedBy',
 				       );
     }
 }
@@ -20313,6 +21949,119 @@ sub get_relationship_WasProvidedBy
 
 
 
+=head2 $result = get_relationship_ResultsIn(ids, from_fields, rel_fields, to_fields)
+
+This relationship defines the assay design that resulted in the determination of the variation.  One assay can result in the discovery of many variations.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_ResultsIn
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_ResultsIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_ResultsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_ResultsIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_ResultsIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_ResultsIn',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ResultsIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_ResultsIn',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_WasDetermiedBy(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_WasDetermiedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_WasDetermiedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_WasDetermiedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_WasDetermiedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_WasDetermiedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_WasDetermiedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_WasDetermiedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_WasDetermiedBy',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_relationship_Shows(ids, from_fields, rel_fields, to_fields)
 
 This relationship indicates that a compound appears on a
@@ -20541,6 +22290,119 @@ sub get_relationship_WasSubmittedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_WasSubmittedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_WasSubmittedBy',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_Summarizes(ids, from_fields, rel_fields, to_fields)
+
+This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=cut
+
+sub get_relationship_Summarizes
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_Summarizes (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_Summarizes');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_Summarizes",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_Summarizes',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Summarizes",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_Summarizes',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_relationship_SummarizedBy(ids, from_fields, rel_fields, to_fields)
+
+
+
+=cut
+
+sub get_relationship_SummarizedBy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SummarizedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SummarizedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SummarizedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_SummarizedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SummarizedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SummarizedBy',
 				       );
     }
 }

@@ -47,7 +47,7 @@ relationship that organizes taxonomic groupings into a hierarchy
 In addition, genomes connected to taxonomy IDs that have been remapped
 will be moved to from the old IDs to the new ones.
 
-The command-line options are those specified in L<CDMI/new_for_script>.
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script>.
 There is a single positional parameter that specifies the directory
 containing the NCBI taxonomy files.
 
@@ -90,7 +90,7 @@ since the information is global. As a result, the statistics are fairly uninform
 
 =item cdmi
 
-L<CDMI> object used to access the target database.
+L<Bio::KBase::CDMI::CDMI> object used to access the target database.
 
 =item RETURN
 
@@ -126,7 +126,7 @@ Read the NCBI taxonomy groupings from the specified directory.
 
 =item cdmi
 
-L<CDMI> object for accessing the database.
+L<Bio::KBase::CDMI::CDMI> object for accessing the database.
 
 =item directoryName
 

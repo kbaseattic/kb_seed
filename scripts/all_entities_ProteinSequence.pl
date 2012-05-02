@@ -31,15 +31,17 @@ The ProteinSequence entity has the following relationship links:
 
 =over 4
     
+=item HasAssertedFunctionFrom Source
+
 =item IsATopicOf Publication
 
 =item IsAlignedBy AlignmentTree
 
-=item IsNamedBy Identifier
-
 =item IsProjectedOnto ProteinSequence
 
 =item IsProteinFor Feature
+
+=item IsProteinMemberOf Family
 
 =item ProjectsOnto ProteinSequence
 

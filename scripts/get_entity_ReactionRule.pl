@@ -11,7 +11,7 @@ use Carp;
 =head1 get_entity_ReactionRule
 
 A reaction rule represents the way a reaction takes place
-within the context of a model.
+within the context of a complex.
 
 Example:
 

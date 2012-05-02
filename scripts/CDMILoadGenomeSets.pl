@@ -41,7 +41,7 @@ relationship that connects OTUs to genomes
 
 =back
 
-The command-line options are those specified in L<CDMI/new_for_script>
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script>
 plus the following.
 
 =over 4

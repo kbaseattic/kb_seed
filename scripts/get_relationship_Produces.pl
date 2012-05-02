@@ -83,6 +83,8 @@ strings. The following fields are available:
 
 =item function
 
+=item alias
+
 =back    
 
 =back
@@ -100,7 +102,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'feature_type', 'source_id', 'sequence_length', 'function' );
+my @all_from_fields = ( 'id', 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'sequence' );
 

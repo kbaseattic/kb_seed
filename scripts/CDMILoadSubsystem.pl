@@ -33,7 +33,7 @@ is represented by a standard SEED subsystem directory.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus the
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus the
 following.
 
 =over 4
@@ -131,7 +131,7 @@ Load a single subsystem from the specified subsystem directory.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item source
 
@@ -190,7 +190,7 @@ delete any roles, since these do not belong to the subsystem.
 
 =item loader
 
-L<CDMILoader> object to help manage the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manage the load.
 
 =item subsysID
 
@@ -216,7 +216,7 @@ classifications.
 
 =item loader
 
-L<CDMILoader> object to help manage the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manage the load.
 
 =item source
 
@@ -396,7 +396,7 @@ for genomes currently in the database will be processed.
 
 =item loader
 
-L<CDMILoader> object to help manage the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manage the load.
 
 =item source
 

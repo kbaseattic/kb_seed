@@ -49,8 +49,6 @@ The Feature entity has the following relationship links:
 
 =item IsAnnotatedBy Annotation
 
-=item IsBindingSiteFor CoregulatedSet
-
 =item IsContainedIn SSCell
 
 =item IsCoregulatedWith Feature
@@ -104,6 +102,8 @@ strings. The following fields are available:
 
 =item function
 
+=item alias
+
 =back    
    
 =back
@@ -121,7 +121,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'feature_type', 'source_id', 'sequence_length', 'function' );
+my @all_fields = ( 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_Feature [-show-fields] [-a | -f field list] > entity.data";

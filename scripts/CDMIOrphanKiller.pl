@@ -29,7 +29,7 @@
 This script looks for orphan relationships, that is, relationships records
 that are missing a target, and deletes them from the database.
 
-The command-line options are as specified in L<CDMI/new_for_script>. The
+The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>. The
 sole positional parameter is the name of the relationship. The orphan check
 will be in the to-link direction.
 

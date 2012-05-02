@@ -73,7 +73,7 @@ relation is built from the C<family.functions> input file.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus
 the following.
 
 =over 4
@@ -278,7 +278,7 @@ output B<HasMember> records for them.
 
 =item loader
 
-L<CDMILoader> object for loading the database and tracking statistics.
+L<Bio::KBase::CDMI::CDMILoader> object for loading the database and tracking statistics.
 
 =item figFams
 
@@ -334,7 +334,7 @@ appropriate B<HasRepresentativeOf> records.
 
 =item loader
 
-L<CDMILoader> object for loading the database and tracking statistics.
+L<Bio::KBase::CDMI::CDMILoader> object for loading the database and tracking statistics.
 
 =item genomes
 

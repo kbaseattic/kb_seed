@@ -15,7 +15,7 @@ regulatory mechanism.  In particular, we wish to represent genes
 that are coregulated using transcription binding sites and
 corresponding transcription regulatory proteins.
 We represent a coregulated set (which may, or may not, be considered
-an atomic regulon) using CoregulatedSet.
+a regulon) using CoregulatedSet.
 
 
 Example:
@@ -42,8 +42,6 @@ The CoregulatedSet entity has the following relationship links:
 
 =over 4
     
-=item IsBoundBy Feature
-
 =item IsControlledUsing Feature
 
 =item IsRegulatedSetOf Feature
@@ -74,6 +72,8 @@ strings. The following fields are available:
 
 =item source_id
 
+=item binding_location
+
 =back    
 
 =back
@@ -91,7 +91,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'source_id' );
+my @all_fields = ( 'source_id', 'binding_location' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_CoregulatedSet [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

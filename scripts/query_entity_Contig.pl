@@ -32,7 +32,7 @@ The Contig entity has the following relationship links:
     
 =item HasAsSequence ContigSequence
 
-=item IsAlignedIn Variation
+=item HasVariation Variation
 
 =item IsComponentOf Genome
 

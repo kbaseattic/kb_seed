@@ -28,7 +28,7 @@
 
     CDMITest [options]
 
-The command-line options are as specified in L<CDMI/new_for_script>. There are
+The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>. There are
 no positional parameters.
 
 =cut
@@ -38,20 +38,10 @@ my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    # This version of the script looks for Microbes Online IDs.
-    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    $loader->SetTyped(0);
-    my $genomeH = $loader->FindKBaseIDs('MOL.Genome', '', [325240]);
-    my @ids = qw(6863495 6863494 6863493 6863490 6863491 6863492 6931558
-                 6931557 6931556 6931555 6931554 6931553 6931552 6978110
-                 6978112 6978111 6978116);
-    my $hash = $loader->FindKBaseIDs('MOL.Feature', '', \@ids);
-    print Dumper($hash);
-    for my $id (@ids) {
-        if ($hash->{$id}) {
-            print "$id = $hash->{$id}\n";
-        } else {
-            print "$id not found.\n";
-        }
-    }
+    # This version of the script gets some basic genome stuff.
+    my @feats = $cdmi->GetAll('IsOwnerOf Feature', 'IsOwnerOf(from-link) = ?', ['kb|g.0'],
+            'Feature(id) Feature(function)');
+   for my $feat (@feats) {
+       print "$feat->[0]: $feat->[1]\n";
+   }
 }

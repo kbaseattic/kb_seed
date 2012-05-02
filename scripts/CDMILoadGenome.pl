@@ -160,7 +160,7 @@ riboswitch
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus the
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus the
 following.
 
 =over 4
@@ -272,7 +272,7 @@ Load a single genome from the specified genome directory.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item source
 
@@ -297,7 +297,8 @@ sub LoadGenome {
     print "Computed genome ID is $genomeOriginalID.\n";
     $loader->SetGenome($genomeOriginalID);
     # Read the metadata file.
-    my $metaHash = Bio::KBase::CDMI::CDMILoader::ParseMetadata("$genomeDirectory/metadata.tbl");
+    my $metaName = $loader->genome_load_file_name($genomeDirectory, "metadata.tbl");
+    my $metaHash = Bio::KBase::CDMI::CDMILoader::ParseMetadata($metaName);
     # Extract the genome name.
     my $scientificName = $metaHash->{name};
     if (! $scientificName) {
@@ -313,23 +314,25 @@ sub LoadGenome {
         # Delete any existing data for this genome.
         DeleteGenome($loader, $genomeID);
         # Ensure the genome has data.
-        if (! -s "$genomeDirectory/contigs.fa") {
+        my $contigName = $loader->genome_load_file_name($genomeDirectory, "contigs.fa");
+        if (! -s $contigName) {
             print "Genome skipped: no contig data.\n";
         } else {
             # Initialize the relation loaders. The order of the relations is
             # important, since it determines whether or not the DeleteGenome
             # method will work properly.
             $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
-                    IsOwnerOf Feature IsLocatedIn IsFunctionalIn
+                    IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
                     IsProteinFor Encompasses));
             # Load the contigs.
             my ($contigMap, $dnaSize, $gcContent, $md5) = LoadContigs($loader,
-                    $genomeID, $genomeOriginalID, "$genomeDirectory/contigs.fa");
+                    $genomeID, $genomeOriginalID, $contigName);
             # Load the features.
             my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader, $genomeID,
                     $genomeDirectory, $contigMap);
             # Load the proteins.
-            LoadProteins($loader, $id_mapping, "$genomeDirectory/proteins.fa");
+            my $protName = $loader->genome_load_file_name($genomeDirectory, "proteins.fa");
+            LoadProteins($loader, $id_mapping, $protName);
             # Unspool the relation loaders.
             $loader->LoadRelations();
             # Create the genome record.
@@ -351,7 +354,7 @@ delete any roles or proteins, since these do not belong to the genome.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item genomeID
 
@@ -407,7 +410,7 @@ Load the contigs for the specified genome into the database.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item genomeID
 
@@ -547,7 +550,7 @@ specifies each feature's functional assignment.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item genomeID
 
@@ -591,11 +594,12 @@ sub LoadFeatures {
     # containing the locations and the feature types, and one containing
     # the assignments. Both files have the feature ID in the first
     # column, so we sort them and use standard merge logic.
-
-    open(my $feath, "sort \"$genomeDirectory/features.tab\" |") || die "Could not open features file: $!\n";
+    my $featFileName = $loader->genome_load_file_name($genomeDirectory, 'features.tab');
+    my $funcFileName = $loader->genome_load_file_name($genomeDirectory, 'functions.tab');
+    open(my $feath, "sort \"$featFileName\" |") || die "Could not open features file: $!\n";
     my ($fid1, $type, $locations, $parent, $subset, @aliases) = $loader->GetLine($feath);
     $fidCount++;
-    open(my $funch, "sort \"$genomeDirectory/functions.tab\" |") || die "Could not open functions file: $!\n";
+    open(my $funch, "sort \"$funcFileName\" |") || die "Could not open functions file: $!\n";
     $stats->Add(functionLines => 1);
     my ($fid2, $function) = $loader->GetLine($funch);
 
@@ -706,7 +710,7 @@ the KBase ID service.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item id_mapping
 
@@ -779,6 +783,7 @@ sub ProcessFeatureBatch {
         my @locs = map { BasicLocation->new($_) } split /\s*,\s*/, $locations;
         $stats->Add(featureLocations => scalar @locs);
         # Compute the total feature length.
+        print "Processing $fid.\n"; ##HACK
         my $len = $locs[0]->Length;
         for (my $i = 1; $i < @locs; $i++) {
             $len += $locs[$i]->Length;
@@ -873,7 +878,7 @@ Load the protein translations into the database.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item id_mapping
 
@@ -949,7 +954,7 @@ Create the genome record.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item source
 

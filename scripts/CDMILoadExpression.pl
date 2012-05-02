@@ -91,7 +91,7 @@ list of the on-off values.
 
 =head2 Command-Line Options and Parameters
 
-The command-line options are those specified in L<CDMI/new_for_script> plus the
+The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus the
 following.
 
 =over 4
@@ -193,7 +193,7 @@ Load a single genome's expression data from the specified directory.
 
 =item loader
 
-L<CDMILoader> object to help manager the load.
+L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 =item expDirectory
 

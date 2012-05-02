@@ -30,7 +30,7 @@ This script stores the specified database definition file in the CDMI database.
 This insures that the correct definition remains with the database no matter
 what happens to DBD on disk.
 
-The command-line options are as specified in L<CDMI/new_for_script>. There
+The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>. There
 are no positional parameters.
 
 =cut

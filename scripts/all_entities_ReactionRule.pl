@@ -12,7 +12,7 @@ use Carp;
 Return all instances of the ReactionRule entity.
 
 A reaction rule represents the way a reaction takes place
-within the context of a model.
+within the context of a complex.
 
 Example:
 

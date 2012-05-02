@@ -450,6 +450,74 @@ sub SQL {
     return $retVal;
 }
 
+sub SQL_returning_hash {
+    my($self,$sql,$key, $verbose, @bind_values) = @_;
+
+    if ($verbose) {
+        Trace("Executing SQL statement: $sql") if T(0);
+    }
+
+    my $dbh  = $self->{_dbh};
+    my $retVal;
+    if ($sql =~ /^\s*select/i) {
+
+        # Choose to use the readonly handle if one exists.
+
+        my $ro = $self->{_ro_dbh};
+        if (ref($ro))
+        {
+            $dbh = $ro if ref($ro);
+            #warn "using RO for $sql\n";
+        }
+        # We may need to try multiple times.
+        my $tries_left = $self->{_retries};
+        # In MySQL test mode, we turn off query caching.
+        # If we run out of retries, we'll confess. Otherwise, $retVal will get a
+        # value put in it.
+        while (! defined $retVal) {
+            Trace("Executing SQL query: $sql") if T(SQL => 3);
+            eval {
+                $retVal = $dbh->selectall_hashref($sql, $key, undef, @bind_values);
+            };
+            if ($@) {
+                Confess("Query failed: $@");
+            } elsif (! defined $retVal) {
+                # We have a soft error. Save the message.
+                my $msg = $dbh->errstr;
+                # See if we can retry. A retry is possible if the error is
+                # timeout or connection-related.
+                if ($tries_left && $msg =~ /connect|gone|lost|timeout/) {
+                    # Yes. Attempt a reconect.
+                    $self->Reconnect();
+                    # Get back the database handle.
+                    $dbh = $self->{_dbh};
+                    # Denote we've used up a retry.
+                    $tries_left--;
+                } else {
+                    # We can't recover, so confess.
+                    Confess("SELECT failed: $msg");
+                }
+                Confess("Query failed: " . $dbh->errstr);
+            } else {
+                Trace(@{$retVal} . " rows returned from query.") if T(SQL => 3);
+            }
+        }
+    } else {
+        Trace("Executing SQL command: $sql") if T(SQL => 3);
+        eval {
+            $retVal = $dbh->do($sql, undef, @bind_values);
+        };
+        if ($@) {
+            Confess("Query '$sql' failed: $@");
+        } elsif (! defined $retVal) {
+            Confess("Query failed: " . $dbh->errstr);
+        } else {
+            Trace("$retVal rows altered by command.") if T(SQL => 3);
+        }
+    }
+    return $retVal;
+}
+
 =head3 show_create_table
 
     my $createString = $db->show_create_table($tableName);
