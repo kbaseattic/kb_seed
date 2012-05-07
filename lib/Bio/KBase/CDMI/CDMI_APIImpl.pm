@@ -4465,15 +4465,13 @@ $return is a reference to a hash where the key is a protein and the value is a f
 proteins is a reference to a list where each element is a protein
 protein is a string
 function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
+function_assertion is a reference to a list containing 3 items:
 	0: an id
 	1: a function
 	2: a source
-	3: an expert
 id is a string
 function is a string
 source is a string
-expert is a string
 
 </pre>
 
@@ -4486,15 +4484,13 @@ $return is a reference to a hash where the key is a protein and the value is a f
 proteins is a reference to a list where each element is a protein
 protein is a string
 function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
+function_assertion is a reference to a list containing 3 items:
 	0: an id
 	1: a function
 	2: a source
-	3: an expert
 id is a string
 function is a string
 source is a string
-expert is a string
 
 
 =end text
@@ -4535,7 +4531,7 @@ sub equiv_sequence_assertions
 
     my $n = @$proteins;
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
-    my $protein_constraint1 = "IsNamedBy(from_link) IN $targets";
+    my $protein_constraint1 = "HasAssertedFunctionFrom(from_link) IN $targets";
     my $protein_constraint2 = "IsProteinFor(from_link) IN $targets";
     my @res = $kb->GetAll('IsProteinFor Feature IsOwnedBy Genome WasSubmittedBy',
 			  $protein_constraint2,
@@ -4545,18 +4541,18 @@ sub equiv_sequence_assertions
     foreach my $tuple (@res)
     {
 	my($md5,$id,$function,$source) = @$tuple;
-	push(@{$return->{$md5}},[$id,$function,$source,0]);
+	push(@{$return->{$md5}},[$id,$function,$source]);
     }
 
-    @res = $kb->GetAll('IsNamedBy Identifier HasAssertionFrom',
+    @res = $kb->GetAll('HasAssertedFunctionFrom',
 			  $protein_constraint1,
 			  $proteins,
-			  'IsNamedBy(from_link) HasAssertionFrom(from_link) HasAssertionFrom(function) HasAssertionFrom(to_link) HasAssertionFrom(expert)');
+			  'HasAssertedFunctionFrom(from_link) HasAssertedFunctionFrom(external_id) HasAssertedFunctionFrom(function) HasAssertedFunctionFrom(to_link)');
 
     foreach my $tuple (@res)
     {
-	my($md5,$id,$function,$source,$expert) = @$tuple;
-	push(@{$return->{$md5}},[$id,$function,$source,$expert]);
+	my($md5,$id,$function,$source) = @$tuple;
+	push(@{$return->{$md5}},[$id,$function,$source]);
     }
 
     #END equiv_sequence_assertions
@@ -8970,11 +8966,10 @@ a string
 =begin html
 
 <pre>
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 </pre>
 
@@ -8982,11 +8977,10 @@ a reference to a list containing 4 items:
 
 =begin text
 
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 
 =end text

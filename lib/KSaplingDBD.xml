@@ -776,7 +776,7 @@ colon and a complemented ten-digit sequence number.
     <Entity name="Contig" keyType="string">
       <DisplayInfo theme="red">
         <RegionInfo name="" row="5" col="3"/>
-        <RegionInfo name="GenoPheno" row="8" col="1" />
+        <RegionInfo name="GenoPheno" row="9" col="1" />
       </DisplayInfo>
       <Notes>
 A contig is thought of as composing a part of the DNA associated with a specific
@@ -1128,7 +1128,7 @@ This includes, for each genome, a list of ever larger taxonomic groups.
           <Notes>City of the collecting site.</Notes>
         </Field>
         <Field name="state" type="string">
-          <Notes>City of the collecting site.</Notes>
+          <Notes>State or province of the collecting site.</Notes>
         </Field>
         <Field name="country" type="string">
           <Notes>Country of the collecting site.</Notes>
@@ -1146,7 +1146,7 @@ This includes, for each genome, a list of ever larger taxonomic groups.
           <Notes>Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.</Notes>
         </Field>
         <Field name="lo-accession" type="string">
-          <Notes>Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.</Notes>
+          <Notes>gazeteer ontology term ID</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -1160,7 +1160,7 @@ This includes, for each genome, a list of ever larger taxonomic groups.
         <Field name="source-name" type="string">
           <Notes>Name/ID by which the observational unit may be known by the originator and is used in queries.</Notes>
         </Field>
-        <Field name="source-name2" type="string">
+        <Field name="source-name2" type="string" relation="ObservationalUnitName2">
           <Notes>Secondary name/ID by which the observational unit may be known and is queried.</Notes>
         </Field>
       </Fields>
@@ -1188,16 +1188,15 @@ This includes, for each genome, a list of ever larger taxonomic groups.
     </Entity>
     <Entity name="Assay" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" row="1" col="1" caption="Assay" />
+        <RegionInfo name="GenoPheno" row="7" col="1" caption="Assay" />
       </DisplayInfo>
       <Notes>An assay is an experimental design for determining alleles at specific chromosome positions.</Notes>
-      <Asides />
       <Fields>
         <Field name="assay-type" type="string">
           <Notes>Text description of the type of assay (e.g., SNP, length, sequence, categorical, array, short read, SSR marker, AFLP marker)</Notes>
         </Field>
-        <Field name="positions" type="countVector">
-          <Notes>Vector Data Type.  Every 4 bytes represent an integer value of a position on a chromosome.  This field is conditional based on the type of assay.  Short read and array type assays have positions. SSR marker and AFLP marker assays do not have specific positions.</Notes>
+        <Field name="assay-type-id" type="string">
+          <Notes>source ID associated with the assay type (informational)</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -1218,7 +1217,7 @@ This includes, for each genome, a list of ever larger taxonomic groups.
     </Entity>
     <Entity name="AlleleFrequency" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" row="1" col="4" caption="Allele Frequency" />
+        <RegionInfo name="GenoPheno" row="1" col="1" caption="Allele Frequency" />
       </DisplayInfo>
       <Notes>An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.</Notes>
       <Asides />
@@ -1391,7 +1390,7 @@ tools will be supported.
     <Relationship name="ResultsIn" from="Assay" to="Variation" arity="1M" converse="WasDetermiedBy">
       <Notes>This relationship defines the assay design that resulted in the determination of the variation.  One assay can result in the discovery of many variations.</Notes>
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" caption="Results In" />
+        <RegionInfo name="GenoPheno" caption="Was\nDetermined\nBy" />
       </DisplayInfo>
     </Relationship>
     <Relationship name="HasTrait" from="ObservationalUnit" to="Trait" arity="MM" converse="Measures">
@@ -1400,8 +1399,15 @@ tools will be supported.
         <RegionInfo name="GenoPheno" caption="Measures" />
       </DisplayInfo>
       <Fields>
-        <Field name="value" type="string" />
-        <Field name="statistic-type" type="string" />
+        <Field name="value" type="float">
+          <Notes>value of the trait measurement</Notes>
+        </Field>
+        <Field name="statistic-type" type="string">
+          <Notes>text description of the statistic type (e.g. mean, median)</Notes>
+        </Field>
+        <Field name="measure-id" type="string">
+          <Notes>internal ID given to this measurement</Notes>
+        </Field>
       </Fields>
     </Relationship>
     <Relationship name="Impacts" from="Variation" to="Trait" arity="MM" converse="IsImpactedBy">
@@ -1410,12 +1416,19 @@ tools will be supported.
         <RegionInfo name="GenoPheno" caption="Impacts" />
       </DisplayInfo>
       <Fields>
-        <Field name="value" type="string" />
-        <Field name="statistic-type" type="string" />
+        <Field name="source-name" type="string">
+          <Notes>Name of the study which analyzed the data and determined that a variation has impact on a trait</Notes>
+        </Field>
+        <Field name="rank" type="int">
+          <Notes>Rank of the position among all positions correlated with this trait.</Notes>
+        </Field>
+        <Field name="pvalue" type="float">
+          <Notes>P-value of the correlation between the variation and the trait</Notes>
+        </Field>
       </Fields>
     </Relationship>
-    <Relationship name="HasVariation" from="Contig" to="Variation" arity="1M" converse="IsLocatedOn">
-      <Notes>This relationship associates variations with the reference contig.  </Notes>
+    <Relationship name="IsAssayedBy" from="Contig" to="Assay" arity="1M" converse="IsLocatedOn">
+      <Notes>This relationship associates each assay with the reference contig.  </Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nLocated\nOn" />
       </DisplayInfo>

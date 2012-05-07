@@ -15,6 +15,7 @@ GenomeAnnotation
 #BEGIN_HEADER
 
 use ANNOserver;
+use Digest::MD5 'md5_hex';
 use SeedUtils;
 use Bio::KBase::IDServer::Client;
 use Data::Dumper;
@@ -421,8 +422,10 @@ sub genomeTO_to_feature_data
 			       } @{$feature->{location}});
 	my $type = $feature->{type};
 	my $func = $feature->{function};
+	my $md5 = "";
+	$md5 = md5_hex(uc($feature->{protein_translation})) if $feature->{protein_translation};
 	my $aliases = join(",",@{$feature->{aliases}});
-	push(@$feature_data,[$fid,$loc,$type,$func,$aliases]);
+	push(@$feature_data,[$fid,$loc,$type,$func,$aliases,$md5]);
     }
     $return = $feature_data;
     #END genomeTO_to_feature_data
@@ -871,7 +874,8 @@ sub annotate_genome
     #
     my $n_pegs = @$protein_locations;
     my $protein_prefix = "$genome->{id}.peg";
-    my $peg_id_start = $id_server->allocate_id_range($protein_prefix, $n_pegs);
+    my $peg_id_start = $id_server->allocate_id_range($protein_prefix, $n_pegs) + 0;
+    print STDERR "allocated peg id start $peg_id_start for $n_pegs pegs\n";
 
     open($prot_fh, "<", \$fasta_proteins) or die "Cannot open the fasta string as a filehandle: $!";
     my $next_id = $peg_id_start;
@@ -904,7 +908,7 @@ sub annotate_genome
     #
     my $n_rnas = @$rna_locations;
     my $rna_prefix = "$genome->{id}.rna";
-    my $rna_id_start = $id_server->allocate_id_range($rna_prefix, $n_rnas);
+    my $rna_id_start = $id_server->allocate_id_range($rna_prefix, $n_rnas) + 0;
     print STDERR "allocated id start $rna_id_start for $n_rnas nras\n";
 
     my $rna_fh;
@@ -918,7 +922,7 @@ sub annotate_genome
 	my $feature = {
 	    id => $kb_id,
 	    location => [$loc],
-	    feature_type => 'rna',
+	    type => 'rna',
 	    $feature_func{$id} ? (function => $feature_func{$id}) : (),
 	    aliases => [],
 	    annotations => [ ['Initial RNA call performed by find_rnas', 'genome annotation service', time] ],
