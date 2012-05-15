@@ -390,6 +390,7 @@ sub trim_alignment {
 
     my $trim0 = $to_domain ? trim_ali_to_conserved_domains($ali, $opts) :
         gjoalignandtree::trim_align_to_median_ends($ali, {begin => 1, end => 1, fract_cov => $fract_cov});
+    # my $trim0 = $to_domain ? trim_ali_to_conserved_domains($ali, $opts) : $ali;
 
     if (!$keep_def && $skip_psiblast) {
         my %full = map { $_->[0] => $_->[2] } @$ali;
@@ -681,7 +682,7 @@ sub incremental_psiblast_search {
 #-------------------------------------------------------------------------------
 
 sub blast {
-    my ($db, $query, $opts);
+    my ($db, $query, $opts) = @_;
 
     if    (@_ >= 2 && ref $_[1] eq 'ARRAY') { ($db, $query, $opts) = @_ }
     elsif (@_ >= 1 && ref $_[0] eq 'ARRAY') { ($query, $opts)      = @_ }

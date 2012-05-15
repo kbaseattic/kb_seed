@@ -36,9 +36,10 @@ eval { use Data::Dumper };  # Not in all installations
 #
 #  Options:
 #
-#     max_prefix => $limit  #  limit of residues to be added at beginning
-#     max_suffix => $limit  #  limit of residues to be added at end
-#     pad_char   => $char   #  character to pad beginning and end (D = ' ')
+#     literal    => \%literals  #  ids of sequences to be printed literally
+#     max_prefix =>  $limit     #  limit of residues to be added at beginning
+#     max_suffix =>  $limit     #  limit of residues to be added at end
+#     pad_char   =>  $char      #  character to pad beginning and end (D = ' ')
 #
 #-------------------------------------------------------------------------------
 #  Change the pad character at the ends of an alignment:
@@ -50,8 +51,9 @@ eval { use Data::Dumper };  # Not in all installations
 #
 #  Options:
 #
-#     pad_char => $char      #  character to pad beginning and end (D = ' ')
-#     old_pad  => $regexp    #  characters to replace at end (D = [^A-Za-z.*])
+#     literal  => \%literals  #  ids of sequences to be printed literally
+#     pad_char =>  $char      #  character to pad beginning and end (D = ' ')
+#     old_pad  =>  $regexp    #  characters to replace at end (D = [^A-Za-z.*])
 #
 #-------------------------------------------------------------------------------
 #  Color an alignment by residue type
@@ -63,11 +65,12 @@ eval { use Data::Dumper };  # Not in all installations
 #
 #  Options:
 #
-#      align     => \@alignment  #  alignment if not supplied as parameter
-#      alignment => \@alignment  #  alignment if not supplied as parameter
-#      colors    => \%colors     #  character colors (html spec.)
-#      pallet    =>  $pallet     #  ale | gde | default
-#      protein   =>  $bool       #  indicates a protein alignment
+#     align     => \@alignment  #  alignment if not supplied as parameter
+#     alignment => \@alignment  #  alignment if not supplied as parameter
+#     colors    => \%colors     #  character colors (html spec.)
+#     literal   => \%literals   #  ids of sequences to be printed literally
+#     pallet    =>  $pallet     #  ale | gde | default
+#     protein   =>  $bool       #  indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
 #  Color an alignment by consensus
@@ -79,14 +82,15 @@ eval { use Data::Dumper };  # Not in all installations
 #
 #  Options:
 #
-#      align      => \@alignment   #  Alignment if not supplied as parameter
-#      alignment  => \@alignment   #  Alignment if not supplied as parameter
-#      colors     => \%colors      #  HTML colors for consensus categories
-#      matrix     => \%scr_matrix  #  Hash of hashes of character align scores
-#      max_f_diff =>  $max_f_diff  #  Maximum fraction exceptions to consensus
-#      max_n_diff =>  $max_n_diff  #  Maximum number of exceptions to consensus
-#      min_score  =>  $score       #  Score for conservative change (D=1)
-#      protein    =>  $is_protein  #  Indicates a protein alignment
+#     align      => \@alignment   #  Alignment if not supplied as parameter
+#     alignment  => \@alignment   #  Alignment if not supplied as parameter
+#     colors     => \%colors      #  HTML colors for consensus categories
+#     literal    => \%literals    #  ids of sequences to be printed literally
+#     matrix     => \%scr_matrix  #  Hash of hashes of character align scores
+#     max_f_diff =>  $max_f_diff  #  Maximum fraction exceptions to consensus
+#     max_n_diff =>  $max_n_diff  #  Maximum number of exceptions to consensus
+#     min_score  =>  $score       #  Score for conservative change (D=1)
+#     protein    =>  $is_protein  #  Indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
 #  Make an html table with an alignment:
@@ -154,9 +158,10 @@ my $minblos    = 1;     # Minimum score to be called a conservative change
 #
 #  Options:
 #
-#     max_prefix => $limit  #  limit of residues to be added at beginning
-#     max_suffix => $limit  #  limit of residues to be added at end
-#     pad_char   => $char   #  character to pad beginning and end (D = ' ')
+#     literal    => \%literals  #  ids of sequences to be printed literally
+#     max_prefix =>  $limit     #  limit of residues to be added at beginning
+#     max_suffix =>  $limit     #  limit of residues to be added at end
+#     pad_char   =>  $char      #  character to pad beginning and end (D = ' ')
 #
 #-------------------------------------------------------------------------------
 sub add_alignment_context
@@ -180,7 +185,8 @@ sub add_alignment_context
 
     my $max_prefix = defined( $options{ maxprefix } ) ? $options{ maxprefix } : 1e100;
     my $max_suffix = defined( $options{ maxsuffix } ) ? $options{ maxsuffix } : 1e100;
-    my $pad_char   = $options{ padchar } ? substr( $options{ padchar }, 0, 1 ) : ' ';
+    my $pad_char   = substr( $options{ padchar } || ' ', 0, 1 );
+    my $literal    = $options{ literal } || {};
 
     my $pre_len = 0;
     my $ali_len = length( $align->[0]->[2] );
@@ -194,7 +200,7 @@ sub add_alignment_context
     foreach ( @$align )
     {
         ( $id, $def, $aln_seq ) = @$_;
-        if ( $index{$id} )
+        if ( $index{$id} && ! $literal->{$id} )
         {
             $aligned = lc $aln_seq;
             $aligned =~ tr/a-z//cd;
@@ -212,9 +218,12 @@ sub add_alignment_context
             }
             else
             {
-                $npre = 0;
-                $nsuf = 0;
+                $npre = $nsuf = 0;
             }
+        }
+        else
+        {
+            $npre = $nsuf = 0;
         }
         $fix_data{ $id } = [ $pre0, $npre, $suf0, $nsuf, $index{$id} ];
     }
@@ -224,17 +233,25 @@ sub add_alignment_context
     foreach ( @$align )
     {
         ( $id, $def, $aln_seq ) = @$_;
-        ( $pre0, $npre, $suf0, $nsuf, $seq_entry ) = @{ $fix_data{ $id } };
-
         @parts = ();
-        push @parts, $pad_char x ( $pre_len - $npre ) if ( $npre < $pre_len );
-        push @parts, lc substr( $seq_entry->[2], $pre0, $npre ) if $npre;
-        $aln_seq =~ s/^([^A-Za-z.]+)/$pad_char x length($1)/e if ( $pre_len && ! $npre );
-        $aln_seq =~ s/([^A-Za-z.]+)$/$pad_char x length($1)/e if ( $suf_len && ! $nsuf );
-        push @parts, uc $aln_seq;
-        push @parts, lc substr( $seq_entry->[2], $suf0, $nsuf ) if $nsuf;
-        push @parts, $pad_char x ( $suf_len - $nsuf ) if ( $nsuf < $suf_len );
+        if ( ! $literal->{$id} )
+        {
+            ( $pre0, $npre, $suf0, $nsuf, $seq_entry ) = @{ $fix_data{ $id } };
 
+            push @parts, $pad_char x ( $pre_len - $npre ) if ( $npre < $pre_len );
+            push @parts, lc substr( $seq_entry->[2], $pre0, $npre ) if $npre;
+            $aln_seq =~ s/^([^A-Za-z.]+)/$pad_char x length($1)/e if ( $pre_len && ! $npre );
+            $aln_seq =~ s/([^A-Za-z.]+)$/$pad_char x length($1)/e if ( $suf_len && ! $nsuf );
+            push @parts, uc $aln_seq;
+            push @parts, lc substr( $seq_entry->[2], $suf0, $nsuf ) if $nsuf;
+            push @parts, $pad_char x ( $suf_len - $nsuf ) if ( $nsuf < $suf_len );
+        }
+        else
+        {
+            push @parts, ' ' x $pre_len if $pre_len;
+            push @parts, $aln_seq;
+            push @parts, ' ' x $suf_len if $suf_len;
+        }
         push @align2, [ $id, $def, join( '', @parts ) ];
     }
 
@@ -252,8 +269,9 @@ sub add_alignment_context
 #
 #  Options:
 #
-#     pad_char => $char      #  character to pad beginning and end (D = ' ')
-#     old_pad  => $regexp    #  characters to replace at end (D = [^A-Za-z.*])
+#     literal  => \%literals  #  ids of sequences to be printed literally
+#     pad_char =>  $char      #  character to pad beginning and end (D = ' ')
+#     old_pad  =>  $regexp    #  characters to replace at end (D = [^A-Za-z.*])
 #
 #-------------------------------------------------------------------------------
 sub repad_alignment
@@ -271,6 +289,8 @@ sub repad_alignment
         return ();
     }
 
+    my $literal = $data{ literal } || {};
+
     $data{ padchar } ||= $data{ pad };  #  Make this a fallback synonym;
     my $pad_char = $data{ padchar } ? substr( $data{ padchar }, 0, 1 ) : ' ';
 
@@ -285,8 +305,8 @@ sub repad_alignment
     foreach ( @$align )
     {
         ( $id, $def, $seq ) = @$_;
-        $seq =~ s/$reg1/$pad_char x length($1)/e;
-        $seq =~ s/$reg2/$pad_char x length($1)/e;
+        $seq =~ s/$reg1/$pad_char x length($1)/e if ! $literal->{ $id };
+        $seq =~ s/$reg2/$pad_char x length($1)/e if ! $literal->{ $id };
         push @align2, [ $id, $def, $seq ];
     }
 
@@ -304,11 +324,12 @@ sub repad_alignment
 #
 #  Options:
 #
-#      align     => \@alignment  #  alignment if not supplied as parameter
-#      alignment => \@alignment  #  alignment if not supplied as parameter
-#      colors    => \%colors     #  character colors (html spec.)
-#      pallet    =>  $pallet     #  ale | gde | default
-#      protein   =>  $bool       #  indicates a protein alignment
+#     align     => \@alignment  #  alignment if not supplied as parameter
+#     alignment => \@alignment  #  alignment if not supplied as parameter
+#     colors    => \%colors     #  character colors (html spec.)
+#     literal   => \%literals   #  ids of sequences to be printed literally
+#     pallet    =>  $pallet     #  ale | gde | default
+#     protein   =>  $bool       #  indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
 sub color_alignment_by_residue
@@ -340,6 +361,8 @@ sub color_alignment_by_residue
         $colors = $is_prot ? aa_colors( $pallet ) : nt_colors( $pallet );
     }
 
+    my $literal = $data{ literal } || {};
+
     my ( $id, $def, $seq );
     my $pad_char = $data{ padchar } || $data{ pad } || ' ';
     my $reg1 = qr/^([^A-Za-z.*]+)/;
@@ -349,9 +372,16 @@ sub color_alignment_by_residue
     foreach ( @$align )
     {
         ( $id, $def, $seq ) = @$_;
-        $seq =~ s/$reg1/$pad_char x length($1)/e;
-        $seq =~ s/$reg2/$pad_char x length($1)/e;
-        push @colored_align, [ $id, $def, scalar color_sequence( $seq, $colors ) ];
+        if ( $literal->{ $id } )
+        {
+            push @colored_align, [ @$_ ];
+        }
+        else
+        {
+            $seq =~ s/$reg1/$pad_char x length($1)/e;
+            $seq =~ s/$reg2/$pad_char x length($1)/e;
+            push @colored_align, [ $id, $def, scalar color_sequence( $seq, $colors ) ];
+        }
     }
 
     my @legend = ();  #  Need to create this still
@@ -397,14 +427,15 @@ sub color_sequence
 #
 #  Options:
 #
-#      align      => \@alignment   #  Alignment if not supplied as parameter
-#      alignment  => \@alignment   #  Alignment if not supplied as parameter
-#      colors     => \%colors      #  HTML colors for consensus categories
-#      matrix     => \%scr_matrix  #  Hash of hashes of character align scores
-#      max_f_diff =>  $max_f_diff  #  Maximum fraction exceptions to consensus
-#      max_n_diff =>  $max_n_diff  #  Maximum number of exceptions to consensus
-#      min_score  =>  $score       #  Score for conservative change (D=1)
-#      protein    =>  $is_protein  #  Indicates a protein alignment
+#     align      => \@alignment   #  Alignment if not supplied as parameter
+#     alignment  => \@alignment   #  Alignment if not supplied as parameter
+#     colors     => \%colors      #  HTML colors for consensus categories
+#     literal    => \%literals    #  ids of sequences to be printed literally
+#     matrix     => \%scr_matrix  #  Hash of hashes of character align scores
+#     max_f_diff =>  $max_f_diff  #  Maximum fraction exceptions to consensus
+#     max_n_diff =>  $max_n_diff  #  Maximum number of exceptions to consensus
+#     min_score  =>  $score       #  Score for conservative change (D=1)
+#     protein    =>  $is_protein  #  Indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
 sub color_alignment_by_consensus
@@ -424,6 +455,8 @@ sub color_alignment_by_consensus
         return ();
     }
 
+    my $literal = $data{ literal } || {};
+  
     my ( $pallet, $legend ) = consensus_pallet( $data{ color } );
 
     my $conserve_list = conservative_change_list( \%data );
@@ -441,6 +474,7 @@ sub color_alignment_by_consensus
                     $s =~ s/$reg2/$pad_char x length($1)/e;
                     $s
                   }
+              grep { ! $literal->{ $_->[0] } }
               @$align;
 
     #  Define the consensus type(s) for each site.  There are a 3 options:
@@ -483,13 +517,20 @@ sub color_alignment_by_consensus
             )
     {
         ( $id, $def, $seq ) = @$_;
-        $seq =~ s/^([^A-Za-z.]+)/$pad_char x length($1)/e;
-        $seq =~ s/([^A-Za-z.]+)$/$pad_char x length($1)/e;
+        if ( ! $literal->{ $id } )
+        {
+            $seq =~ s/^([^A-Za-z.]+)/$pad_char x length($1)/e;
+            $seq =~ s/([^A-Za-z.]+)$/$pad_char x length($1)/e;
 
-        $i = 0;
-        my @clr_seq = map { [ $_, $col_clr[$i++]->{$_} || '#ffffff' ] }
-                      split //, $seq;
-        push @color_align, [ $id, $def, \@clr_seq ];
+            $i = 0;
+            my @clr_seq = map { [ $_, $col_clr[$i++]->{$_} || '#ffffff' ] }
+                          split //, $seq;
+            push @color_align, [ $id, $def, \@clr_seq ];
+        }
+        else
+        {
+            push @color_align, [ $id, $def, $seq ];
+        }
     }
 
     wantarray ? ( \@color_align, $legend ) : \@color_align;
@@ -918,7 +959,12 @@ sub alignment_2_html_table
 #-------------------------------------------------------------------------------
 sub sequence_2_html
 {
-    return $_[0] if ref( $_[0] ) ne 'ARRAY';
+    if ( ref( $_[0] ) ne 'ARRAY' )
+    {
+        my $seq = html_esc( $_[0] );
+        $seq =~ s/ /&nbsp;/g;
+        return $seq;
+    }
 
     my $string = shift;
     my @html = ();

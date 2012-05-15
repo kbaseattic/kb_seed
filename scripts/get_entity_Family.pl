@@ -56,8 +56,6 @@ The Family entity has the following relationship links:
     
 =item HasMember Feature
 
-=item HasProteinMember ProteinSequence
-
 =item IsCoupledTo Family
 
 =item IsCoupledWith Family
@@ -90,11 +88,7 @@ strings. The following fields are available:
 
 =item type
 
-=item release
-
 =item family_function
-
-=item alignment
 
 =back    
 
@@ -113,7 +107,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'type', 'release', 'family_function', 'alignment' );
+my @all_fields = ( 'type', 'family_function' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Family [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

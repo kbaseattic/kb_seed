@@ -32,8 +32,6 @@ The TaxonomicGrouping entity has the following relationship links:
 
 =item IsInGroup TaxonomicGrouping
 
-=item IsRepresentedBy ObservationalUnit
-
 =item IsTaxonomyOf Genome
 
 

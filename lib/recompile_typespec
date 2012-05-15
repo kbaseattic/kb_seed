@@ -1,6 +1,7 @@
 #!/bin/sh
 
-/home/olson/kb_test/bin/compile_dbd_to_typespec CDMI_API CDMI_EntityAPI KSaplingDBD.xml CDMI-EntityAPI.spec  \
+dbd=/home/parrello/CdmiData/Published/KSaplingDBD.xml
+/home/olson/kb_test/bin/compile_dbd_to_typespec CDMI_API CDMI_EntityAPI $dbd CDMI-EntityAPI.spec  \
 	Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm er_scripts
 
 /home/olson/kb_test/bin/compile_typespec \

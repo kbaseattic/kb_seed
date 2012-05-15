@@ -27,26 +27,11 @@ our $entity_field_defs = {
 		    'tree_properties' => 1,
 	
     },
-    'AlleleFrequency' => {
-	id => 1,
-		    'position' => 1,
-		    'minor_AF' => 1,
-		    'minor_allele' => 1,
-		    'major_AF' => 1,
-		    'major_allele' => 1,
-	
-    },
     'Annotation' => {
 	id => 1,
 		    'annotator' => 1,
 		    'comment' => 1,
 		    'annotation_time' => 1,
-	
-    },
-    'Assay' => {
-	id => 1,
-		    'assay_type' => 1,
-		    'positions' => 1,
 	
     },
     'AtomicRegulon' => {
@@ -137,9 +122,7 @@ our $entity_field_defs = {
     'Family' => {
 	id => 1,
 		    'type' => 1,
-		    'release' => 1,
 		    'family_function' => 1,
-		    'alignment' => 1,
 	
     },
     'Feature' => {
@@ -166,19 +149,6 @@ our $entity_field_defs = {
 		    'phenotype' => 1,
 		    'md5' => 1,
 		    'source_id' => 1,
-	
-    },
-    'Locality' => {
-	id => 1,
-		    'source_name' => 1,
-		    'city' => 1,
-		    'state' => 1,
-		    'country' => 1,
-		    'origcty' => 1,
-		    'elevation' => 1,
-		    'latitude' => 1,
-		    'longitude' => 1,
-		    'lo_accession' => 1,
 	
     },
     'Media' => {
@@ -210,12 +180,6 @@ our $entity_field_defs = {
     },
     'OTU' => {
 	id => 1,
-	
-    },
-    'ObservationalUnit' => {
-	id => 1,
-		    'source_name' => 1,
-		    'source_name2' => 1,
 	
     },
     'PairSet' => {
@@ -298,13 +262,6 @@ our $entity_field_defs = {
 	id => 1,
 	
     },
-    'StudyExperiment' => {
-	id => 1,
-		    'source_name' => 1,
-		    'design' => 1,
-		    'originator' => 1,
-	
-    },
     'Subsystem' => {
 	id => 1,
 		    'version' => 1,
@@ -329,14 +286,6 @@ our $entity_field_defs = {
 		    'alias' => 1,
 	
     },
-    'Trait' => {
-	id => 1,
-		    'trait_name' => 1,
-		    'unit_of_measure' => 1,
-		    'TO_ID' => 1,
-		    'protocol' => 1,
-	
-    },
     'Variant' => {
 	id => 1,
 		    'role_rule' => 1,
@@ -347,8 +296,7 @@ our $entity_field_defs = {
     },
     'Variation' => {
 	id => 1,
-		    'position' => 1,
-		    'value' => 1,
+		    'notes' => 1,
 	
     },
 
@@ -357,11 +305,7 @@ our $entity_field_defs = {
 our $entity_field_rels = {
     'AlignmentTree' => {
     },
-    'AlleleFrequency' => {
-    },
     'Annotation' => {
-    },
-    'Assay' => {
     },
     'AtomicRegulon' => {
     },
@@ -397,15 +341,12 @@ our $entity_field_rels = {
     },
     'Family' => {
 	    'family_function' => 'FamilyFunction',
-	    'alignment' => 'FamilyAlignment',
     },
     'Feature' => {
 	    'alias' => 'FeatureAlias',
     },
     'Genome' => {
 	    'phenotype' => 'GenomeSequencePhenotype',
-    },
-    'Locality' => {
     },
     'Media' => {
     },
@@ -415,8 +356,6 @@ our $entity_field_rels = {
 	    'label' => 'ModelCompartmentLabel',
     },
     'OTU' => {
-    },
-    'ObservationalUnit' => {
     },
     'PairSet' => {
     },
@@ -446,8 +385,6 @@ our $entity_field_rels = {
     },
     'Source' => {
     },
-    'StudyExperiment' => {
-    },
     'Subsystem' => {
     },
     'SubsystemClass' => {
@@ -455,12 +392,11 @@ our $entity_field_rels = {
     'TaxonomicGrouping' => {
 	    'alias' => 'TaxonomicGroupingAlias',
     },
-    'Trait' => {
-    },
     'Variant' => {
 	    'role_rule' => 'VariantRole',
     },
     'Variation' => {
+	    'notes' => 'VariationNotes',
     },
 
 };
@@ -634,16 +570,6 @@ our $relationship_field_defs = {
 		    'maximum_flux' => 1,
 	
     },
-    'HasProteinMember' => {
-	to_link => 1, from_link => 1,
-		    'source_id' => 1,
-	
-    },
-    'IsProteinMemberOf' => {
-	to_link => 1, from_link => 1,
-		    'source_id' => 1,
-	
-    },
     'HasReactionAliasFrom' => {
 	to_link => 1, from_link => 1,
 		    'alias' => 1,
@@ -688,26 +614,6 @@ our $relationship_field_defs = {
 	to_link => 1, from_link => 1,
 	
     },
-    'HasTrait' => {
-	to_link => 1, from_link => 1,
-		    'value' => 1,
-		    'statistic_type' => 1,
-	
-    },
-    'Measures' => {
-	to_link => 1, from_link => 1,
-		    'value' => 1,
-		    'statistic_type' => 1,
-	
-    },
-    'HasUnits' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'IsLocated' => {
-	to_link => 1, from_link => 1,
-	
-    },
     'HasUsage' => {
 	to_link => 1, from_link => 1,
 	
@@ -726,34 +632,6 @@ our $relationship_field_defs = {
 		    'value' => 1,
 	
     },
-    'HasVariant' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'IsVariantOf' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'HasVariation' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'IsLocatedOn' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'Impacts' => {
-	to_link => 1, from_link => 1,
-		    'value' => 1,
-		    'statistic_type' => 1,
-	
-    },
-    'IsImpactedBy' => {
-	to_link => 1, from_link => 1,
-		    'value' => 1,
-		    'statistic_type' => 1,
-	
-    },
     'Includes' => {
 	to_link => 1, from_link => 1,
 		    'sequence' => 1,
@@ -766,14 +644,6 @@ our $relationship_field_defs = {
 		    'sequence' => 1,
 		    'abbreviation' => 1,
 		    'auxiliary' => 1,
-	
-    },
-    'IncludesPart' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'IsPartOf' => {
-	to_link => 1, from_link => 1,
 	
     },
     'IndicatedLevelsFor' => {
@@ -800,6 +670,20 @@ our $relationship_field_defs = {
     },
     'IsARequirementOf' => {
 	to_link => 1, from_link => 1,
+	
+    },
+    'IsAlignedIn' => {
+	to_link => 1, from_link => 1,
+		    'start' => 1,
+		    'len' => 1,
+		    'dir' => 1,
+	
+    },
+    'IsAlignmentFor' => {
+	to_link => 1, from_link => 1,
+		    'start' => 1,
+		    'len' => 1,
+		    'dir' => 1,
 	
     },
     'IsAnnotatedBy' => {
@@ -1040,14 +924,6 @@ our $relationship_field_defs = {
 		    'type' => 1,
 	
     },
-    'IsReferencedBy' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'UsesReference' => {
-	to_link => 1, from_link => 1,
-	
-    },
     'IsRegulatedIn' => {
 	to_link => 1, from_link => 1,
 	
@@ -1061,14 +937,6 @@ our $relationship_field_defs = {
 	
     },
     'IsRelevantTo' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'IsRepresentedBy' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'DefinedBy' => {
 	to_link => 1, from_link => 1,
 	
     },
@@ -1228,14 +1096,6 @@ our $relationship_field_defs = {
 	to_link => 1, from_link => 1,
 	
     },
-    'ResultsIn' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'WasDetermiedBy' => {
-	to_link => 1, from_link => 1,
-	
-    },
     'Shows' => {
 	to_link => 1, from_link => 1,
 		    'location' => 1,
@@ -1251,14 +1111,6 @@ our $relationship_field_defs = {
 	
     },
     'WasSubmittedBy' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'Summarizes' => {
-	to_link => 1, from_link => 1,
-	
-    },
-    'SummarizedBy' => {
 	to_link => 1, from_link => 1,
 	
     },
@@ -1338,10 +1190,6 @@ our $relationship_field_rels = {
     },
     'IsPresentIn' => {
     },
-    'HasProteinMember' => {
-    },
-    'IsProteinMemberOf' => {
-    },
     'HasReactionAliasFrom' => {
     },
     'UsesAliasForReaction' => {
@@ -1362,14 +1210,6 @@ our $relationship_field_rels = {
     },
     'IsStepOf' => {
     },
-    'HasTrait' => {
-    },
-    'Measures' => {
-    },
-    'HasUnits' => {
-    },
-    'IsLocated' => {
-    },
     'HasUsage' => {
     },
     'IsUsageOf' => {
@@ -1378,25 +1218,9 @@ our $relationship_field_rels = {
     },
     'HasValueIn' => {
     },
-    'HasVariant' => {
-    },
-    'IsVariantOf' => {
-    },
-    'HasVariation' => {
-    },
-    'IsLocatedOn' => {
-    },
-    'Impacts' => {
-    },
-    'IsImpactedBy' => {
-    },
     'Includes' => {
     },
     'IsIncludedIn' => {
-    },
-    'IncludesPart' => {
-    },
-    'IsPartOf' => {
     },
     'IndicatedLevelsFor' => {
     },
@@ -1409,6 +1233,10 @@ our $relationship_field_rels = {
     'IsARequirementIn' => {
     },
     'IsARequirementOf' => {
+    },
+    'IsAlignedIn' => {
+    },
+    'IsAlignmentFor' => {
     },
     'IsAnnotatedBy' => {
     },
@@ -1518,10 +1346,6 @@ our $relationship_field_rels = {
     },
     'HasRealLocationIn' => {
     },
-    'IsReferencedBy' => {
-    },
-    'UsesReference' => {
-    },
     'IsRegulatedIn' => {
     },
     'IsRegulatedSetOf' => {
@@ -1529,10 +1353,6 @@ our $relationship_field_rels = {
     'IsRelevantFor' => {
     },
     'IsRelevantTo' => {
-    },
-    'IsRepresentedBy' => {
-    },
-    'DefinedBy' => {
     },
     'IsRequiredBy' => {
     },
@@ -1606,10 +1426,6 @@ our $relationship_field_rels = {
     },
     'WasProvidedBy' => {
     },
-    'ResultsIn' => {
-    },
-    'WasDetermiedBy' => {
-    },
     'Shows' => {
     },
     'IsShownOn' => {
@@ -1617,10 +1433,6 @@ our $relationship_field_rels = {
     'Submitted' => {
     },
     'WasSubmittedBy' => {
-    },
-    'Summarizes' => {
-    },
-    'SummarizedBy' => {
     },
     'Uses' => {
     },
@@ -1662,8 +1474,6 @@ our $relationship_entities = {
     'ParticipatesIn' => [ 'Reaction', 'Scenario' ],
     'HasPresenceOf' => [ 'Media', 'Compound' ],
     'IsPresentIn' => [ 'Compound', 'Media' ],
-    'HasProteinMember' => [ 'Family', 'ProteinSequence' ],
-    'IsProteinMemberOf' => [ 'ProteinSequence', 'Family' ],
     'HasReactionAliasFrom' => [ 'Source', 'Reaction' ],
     'UsesAliasForReaction' => [ 'Reaction', 'Source' ],
     'HasRepresentativeOf' => [ 'Genome', 'Family' ],
@@ -1674,30 +1484,20 @@ our $relationship_entities = {
     'IsSectionOf' => [ 'ContigChunk', 'ContigSequence' ],
     'HasStep' => [ 'Complex', 'ReactionRule' ],
     'IsStepOf' => [ 'ReactionRule', 'Complex' ],
-    'HasTrait' => [ 'ObservationalUnit', 'Trait' ],
-    'Measures' => [ 'Trait', 'ObservationalUnit' ],
-    'HasUnits' => [ 'Locality', 'ObservationalUnit' ],
-    'IsLocated' => [ 'ObservationalUnit', 'Locality' ],
     'HasUsage' => [ 'Compound', 'BiomassCompound' ],
     'IsUsageOf' => [ 'BiomassCompound', 'Compound' ],
     'HasValueFor' => [ 'Experiment', 'Attribute' ],
     'HasValueIn' => [ 'Attribute', 'Experiment' ],
-    'HasVariant' => [ 'ObservationalUnit', 'Variation' ],
-    'IsVariantOf' => [ 'Variation', 'ObservationalUnit' ],
-    'HasVariation' => [ 'Contig', 'Variation' ],
-    'IsLocatedOn' => [ 'Variation', 'Contig' ],
-    'Impacts' => [ 'Variation', 'Trait' ],
-    'IsImpactedBy' => [ 'Trait', 'Variation' ],
     'Includes' => [ 'Subsystem', 'Role' ],
     'IsIncludedIn' => [ 'Role', 'Subsystem' ],
-    'IncludesPart' => [ 'StudyExperiment', 'ObservationalUnit' ],
-    'IsPartOf' => [ 'ObservationalUnit', 'StudyExperiment' ],
     'IndicatedLevelsFor' => [ 'ProbeSet', 'Feature' ],
     'HasLevelsFrom' => [ 'Feature', 'ProbeSet' ],
     'Involves' => [ 'Reaction', 'Reagent' ],
     'IsInvolvedIn' => [ 'Reagent', 'Reaction' ],
     'IsARequirementIn' => [ 'Model', 'Requirement' ],
     'IsARequirementOf' => [ 'Requirement', 'Model' ],
+    'IsAlignedIn' => [ 'Contig', 'Variation' ],
+    'IsAlignmentFor' => [ 'Variation', 'Contig' ],
     'IsAnnotatedBy' => [ 'Feature', 'Annotation' ],
     'Annotates' => [ 'Annotation', 'Feature' ],
     'IsClassFor' => [ 'SubsystemClass', 'Subsystem' ],
@@ -1752,14 +1552,10 @@ our $relationship_entities = {
     'Produces' => [ 'Feature', 'ProteinSequence' ],
     'IsRealLocationOf' => [ 'ModelCompartment', 'Requirement' ],
     'HasRealLocationIn' => [ 'Requirement', 'ModelCompartment' ],
-    'IsReferencedBy' => [ 'Genome', 'ObservationalUnit' ],
-    'UsesReference' => [ 'ObservationalUnit', 'Genome' ],
     'IsRegulatedIn' => [ 'Feature', 'CoregulatedSet' ],
     'IsRegulatedSetOf' => [ 'CoregulatedSet', 'Feature' ],
     'IsRelevantFor' => [ 'Diagram', 'Subsystem' ],
     'IsRelevantTo' => [ 'Subsystem', 'Diagram' ],
-    'IsRepresentedBy' => [ 'TaxonomicGrouping', 'ObservationalUnit' ],
-    'DefinedBy' => [ 'ObservationalUnit', 'TaxonomicGrouping' ],
     'IsRequiredBy' => [ 'Reaction', 'Requirement' ],
     'Requires' => [ 'Requirement', 'Reaction' ],
     'IsRoleOf' => [ 'Role', 'SSCell' ],
@@ -1796,14 +1592,10 @@ our $relationship_entities = {
     'IsProjectedOnto' => [ 'ProteinSequence', 'ProteinSequence' ],
     'Provided' => [ 'Source', 'Subsystem' ],
     'WasProvidedBy' => [ 'Subsystem', 'Source' ],
-    'ResultsIn' => [ 'Assay', 'Variation' ],
-    'WasDetermiedBy' => [ 'Variation', 'Assay' ],
     'Shows' => [ 'Diagram', 'Compound' ],
     'IsShownOn' => [ 'Compound', 'Diagram' ],
     'Submitted' => [ 'Source', 'Genome' ],
     'WasSubmittedBy' => [ 'Genome', 'Source' ],
-    'Summarizes' => [ 'AlleleFrequency', 'Variation' ],
-    'SummarizedBy' => [ 'Variation', 'AlleleFrequency' ],
     'Uses' => [ 'Genome', 'SSRow' ],
     'IsUsedBy' => [ 'SSRow', 'Genome' ],
 
@@ -2652,305 +2444,6 @@ sub all_entities_AlignmentTree
 
 
 
-=head2 get_entity_AlleleFrequency
-
-  $return = $obj->get_entity_AlleleFrequency($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-
-=end text
-
-
-
-=item Description
-
-An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.
-It has the following fields:
-
-=over 4
-
-
-=item position
-
-Specific position on the contig where the allele occurs
-
-
-=item minor_AF
-
-Minor allele frequency.  Floating point number from 0.0 to 0.5.
-
-
-=item minor_allele
-
-Text letter representation of the minor allele. Valid values are A, C, G, and T.
-
-
-=item major_AF
-
-Major allele frequency.  Floating point number less than or equal to 1.0.
-
-
-=item major_allele
-
-Text letter representation of the major allele. Valid values are A, C, G, and T.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_AlleleFrequency
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_AlleleFrequency');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_AlleleFrequency
-
-    $return = $self->_get_entity($ctx, 'AlleleFrequency', $ids, $fields);
-
-    #END get_entity_AlleleFrequency
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_AlleleFrequency');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_AlleleFrequency
-
-  $return = $obj->query_entity_AlleleFrequency($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_AlleleFrequency
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_AlleleFrequency');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_AlleleFrequency
-
-    $return = $self->_query_entity($ctx, 'AlleleFrequency', $qry, $fields);
-
-    #END query_entity_AlleleFrequency
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_AlleleFrequency');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_AlleleFrequency
-
-  $return = $obj->all_entities_AlleleFrequency($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_AlleleFrequency
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_AlleleFrequency');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_AlleleFrequency
-
-    $return = $self->_all_entities($ctx, 'AlleleFrequency', $start, $count, $fields);
-
-    #END all_entities_AlleleFrequency
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_AlleleFrequency:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_AlleleFrequency');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_entity_Annotation
 
   $return = $obj->get_entity_Annotation($ids, $fields)
@@ -3225,278 +2718,6 @@ sub all_entities_Annotation
 	my $msg = "Invalid returns passed to all_entities_Annotation:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'all_entities_Annotation');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_entity_Assay
-
-  $return = $obj->get_entity_Assay($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-
-=end text
-
-
-
-=item Description
-
-An assay is an experimental design for determining alleles at specific chromosome positions.
-It has the following fields:
-
-=over 4
-
-
-=item assay_type
-
-Text description of the type of assay (e.g., SNP, length, sequence, categorical, array, short read, SSR marker, AFLP marker)
-
-
-=item positions
-
-Vector Data Type.  Every 4 bytes represent an integer value of a position on a chromosome.  This field is conditional based on the type of assay.  Short read and array type assays have positions. SSR marker and AFLP marker assays do not have specific positions.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_Assay
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Assay');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_Assay
-
-    $return = $self->_get_entity($ctx, 'Assay', $ids, $fields);
-
-    #END get_entity_Assay
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Assay');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_Assay
-
-  $return = $obj->query_entity_Assay($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_Assay
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Assay');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_Assay
-
-    $return = $self->_query_entity($ctx, 'Assay', $qry, $fields);
-
-    #END query_entity_Assay
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_Assay:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Assay');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_Assay
-
-  $return = $obj->all_entities_Assay($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Assay
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_Assay
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_Assay:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Assay');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_Assay
-
-    $return = $self->_all_entities($ctx, 'Assay', $start, $count, $fields);
-
-    #END all_entities_Assay
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_Assay:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Assay');
     }
     return($return);
 }
@@ -7325,9 +6546,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7341,9 +6560,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -7381,22 +6598,11 @@ It has the following fields:
 type of protein family (e.g. FIGfam, equivalog)
 
 
-=item release
-
-release number / subtype of protein family
-
-
 =item family_function
 
 optional free-form description of the family. For function-based
 families, this would be the functional role for the family
 members.
-
-
-=item alignment
-
-FASTA-formatted alignment of the family's protein
-sequences
 
 
 
@@ -7460,9 +6666,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7479,9 +6683,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -7548,9 +6750,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -7565,9 +6765,7 @@ $return is a reference to a hash where the key is a string and the value is a fi
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -8326,349 +7524,6 @@ sub all_entities_Genome
 	my $msg = "Invalid returns passed to all_entities_Genome:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'all_entities_Genome');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_entity_Locality
-
-  $return = $obj->get_entity_Locality($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-A locality is a geographic location.
-It has the following fields:
-
-=over 4
-
-
-=item source_name
-
-Name or description of the location used as a collection site.
-
-
-=item city
-
-City of the collecting site.
-
-
-=item state
-
-City of the collecting site.
-
-
-=item country
-
-Country of the collecting site.
-
-
-=item origcty
-
-3-letter ISO 3166-1 extended country code for the country of origin.
-
-
-=item elevation
-
-Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
-
-
-=item latitude
-
-Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
-
-
-=item longitude
-
-Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
-
-
-=item lo_accession
-
-Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_Locality
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Locality');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_Locality
-
-    $return = $self->_get_entity($ctx, 'Locality', $ids, $fields);
-
-    #END get_entity_Locality
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Locality');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_Locality
-
-  $return = $obj->query_entity_Locality($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_Locality
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Locality');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_Locality
-
-    $return = $self->_query_entity($ctx, 'Locality', $qry, $fields);
-
-    #END query_entity_Locality
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_Locality:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Locality');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_Locality
-
-  $return = $obj->all_entities_Locality($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Locality
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_Locality
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_Locality:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Locality');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_Locality
-
-    $return = $self->_all_entities($ctx, 'Locality', $start, $count, $fields);
-
-    #END all_entities_Locality
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_Locality:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Locality');
     }
     return($return);
 }
@@ -9826,272 +8681,6 @@ sub all_entities_OTU
 	my $msg = "Invalid returns passed to all_entities_OTU:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'all_entities_OTU');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_entity_ObservationalUnit
-
-  $return = $obj->get_entity_ObservationalUnit($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-An ObservationalUnit is an individual plant that 1) is part of an experiment or study, 2) has measured traits, and 3) is assayed for the purpose of determining alleles.  
-It has the following fields:
-
-=over 4
-
-
-=item source_name
-
-Name/ID by which the observational unit may be known by the originator and is used in queries.
-
-
-=item source_name2
-
-Secondary name/ID by which the observational unit may be known and is queried.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_ObservationalUnit
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_ObservationalUnit');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_ObservationalUnit
-
-    $return = $self->_get_entity($ctx, 'ObservationalUnit', $ids, $fields);
-
-    #END get_entity_ObservationalUnit
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_ObservationalUnit');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_ObservationalUnit
-
-  $return = $obj->query_entity_ObservationalUnit($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_ObservationalUnit
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_ObservationalUnit');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_ObservationalUnit
-
-    $return = $self->_query_entity($ctx, 'ObservationalUnit', $qry, $fields);
-
-    #END query_entity_ObservationalUnit
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_ObservationalUnit');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_ObservationalUnit
-
-  $return = $obj->all_entities_ObservationalUnit($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_ObservationalUnit
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_ObservationalUnit
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_ObservationalUnit');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_ObservationalUnit
-
-    $return = $self->_all_entities($ctx, 'ObservationalUnit', $start, $count, $fields);
-
-    #END all_entities_ObservationalUnit
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_ObservationalUnit:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_ObservationalUnit');
     }
     return($return);
 }
@@ -13856,283 +12445,6 @@ sub all_entities_Source
 
 
 
-=head2 get_entity_StudyExperiment
-
-  $return = $obj->get_entity_StudyExperiment($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-An Experiment is a collection of observational units with one originator that are part of a specific study.  An experiment may be conducted at more than one location and in more than one season or year.
-It has the following fields:
-
-=over 4
-
-
-=item source_name
-
-Name/ID by which the experiment is known at the source.  
-
-
-=item design
-
-Design of the experiment including the numbers and types of observational units, traits, replicates, sampling plan, and analysis that are planned.
-
-
-=item originator
-
-Name of the individual or program that are the originators of the experiment.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_StudyExperiment
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_StudyExperiment');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_StudyExperiment
-
-    $return = $self->_get_entity($ctx, 'StudyExperiment', $ids, $fields);
-
-    #END get_entity_StudyExperiment
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_StudyExperiment');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_StudyExperiment
-
-  $return = $obj->query_entity_StudyExperiment($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_StudyExperiment
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_StudyExperiment');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_StudyExperiment
-
-    $return = $self->_query_entity($ctx, 'StudyExperiment', $qry, $fields);
-
-    #END query_entity_StudyExperiment
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_StudyExperiment');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_StudyExperiment
-
-  $return = $obj->all_entities_StudyExperiment($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_StudyExperiment
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_StudyExperiment
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_StudyExperiment');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_StudyExperiment
-
-    $return = $self->_all_entities($ctx, 'StudyExperiment', $start, $count, $fields);
-
-    #END all_entities_StudyExperiment
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_StudyExperiment:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_StudyExperiment');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_entity_Subsystem
 
   $return = $obj->get_entity_Subsystem($ids, $fields)
@@ -15021,294 +13333,6 @@ sub all_entities_TaxonomicGrouping
 
 
 
-=head2 get_entity_Trait
-
-  $return = $obj->get_entity_Trait($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-A Trait is a phenotypic quality that can be measured or observed for an observational unit.  Examples include height, sugar content, color, or cold tolerance.
-It has the following fields:
-
-=over 4
-
-
-=item trait_name
-
-Text name or description of the trait
-
-
-=item unit_of_measure
-
-The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
-
-
-=item TO_ID
-
-Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
-
-
-=item protocol
-
-A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_Trait
-{
-    my $self = shift;
-    my($ids, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Trait');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_entity_Trait
-
-    $return = $self->_get_entity($ctx, 'Trait', $ids, $fields);
-
-    #END get_entity_Trait
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_entity_Trait');
-    }
-    return($return);
-}
-
-
-
-
-=head2 query_entity_Trait
-
-  $return = $obj->query_entity_Trait($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_Trait
-{
-    my $self = shift;
-    my($qry, $fields) = @_;
-
-    my @_bad_arguments;
-    (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"qry\" (value was \"$qry\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to query_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Trait');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN query_entity_Trait
-
-    $return = $self->_query_entity($ctx, 'Trait', $qry, $fields);
-
-    #END query_entity_Trait
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to query_entity_Trait:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'query_entity_Trait');
-    }
-    return($return);
-}
-
-
-
-
-=head2 all_entities_Trait
-
-  $return = $obj->all_entities_Trait($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Trait
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_Trait
-{
-    my $self = shift;
-    my($start, $count, $fields) = @_;
-
-    my @_bad_arguments;
-    (!ref($start)) or push(@_bad_arguments, "Invalid type for argument \"start\" (value was \"$start\")");
-    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
-    (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to all_entities_Trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Trait');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN all_entities_Trait
-
-    $return = $self->_all_entities($ctx, 'Trait', $start, $count, $fields);
-
-    #END all_entities_Trait
-    my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to all_entities_Trait:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'all_entities_Trait');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_entity_Variant
 
   $return = $obj->get_entity_Variant($ids, $fields)
@@ -15625,8 +13649,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -15639,8 +13662,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -15649,20 +13671,17 @@ fields_Variation is a reference to a hash where the following keys are defined:
 
 =item Description
 
-A variation is a difference in DNA sequence between the reference genome and the observational unit.  The variation has a position on a contig.
+A variation describes a set of aligned regions
+in two or more contigs.
 It has the following fields:
 
 =over 4
 
 
-=item position
+=item notes
 
-Specific position on the contig where the variation occurs
-
-
-=item value
-
-Text representation of the replacement base(s) for the position
+optional text description of what the variation
+means
 
 
 
@@ -15725,8 +13744,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -15742,8 +13760,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -15809,8 +13826,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -15824,8 +13840,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Variation
 fields_Variation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -18924,9 +16939,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -18954,9 +16967,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -19056,9 +17067,7 @@ fields_HasMember is a reference to a hash where the following keys are defined:
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -19086,9 +17095,7 @@ fields_HasMember is a reference to a hash where the following keys are defined:
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -19653,238 +17660,6 @@ sub get_relationship_IsPresentIn
 
 
 
-=head2 get_relationship_HasProteinMember
-
-  $return = $obj->get_relationship_HasProteinMember($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Family
-	1: a fields_HasProteinMember
-	2: a fields_ProteinSequence
-fields_Family is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	type has a value which is a string
-	release has a value which is a string
-	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
-fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Family
-	1: a fields_HasProteinMember
-	2: a fields_ProteinSequence
-fields_Family is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	type has a value which is a string
-	release has a value which is a string
-	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
-fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship connects each feature family to its
-constituent protein sequences. A family always has many protein sequences,
-and a single sequence can be found in many families.
-It has the following fields:
-
-=over 4
-
-
-=item source_id
-
-Native identifier used for the protein in the definition
-of the family. This will be its ID in the alignment, if one
-exists.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_HasProteinMember
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_HasProteinMember:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasProteinMember');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_HasProteinMember
-
-    $return = $self->_get_relationship($ctx, 'HasProteinMember', 'HasProteinMember', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_HasProteinMember
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_HasProteinMember:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasProteinMember');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsProteinMemberOf
-
-  $return = $obj->get_relationship_IsProteinMemberOf($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ProteinSequence
-	1: a fields_HasProteinMember
-	2: a fields_Family
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_Family is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	type has a value which is a string
-	release has a value which is a string
-	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ProteinSequence
-	1: a fields_HasProteinMember
-	2: a fields_Family
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_Family is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	type has a value which is a string
-	release has a value which is a string
-	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsProteinMemberOf
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsProteinMemberOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsProteinMemberOf');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsProteinMemberOf
-
-    $return = $self->_get_relationship($ctx, 'IsProteinMemberOf', 'HasProteinMember', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsProteinMemberOf
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsProteinMemberOf:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsProteinMemberOf');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_relationship_HasReactionAliasFrom
 
   $return = $obj->get_relationship_HasReactionAliasFrom($ids, $from_fields, $rel_fields, $to_fields)
@@ -20158,9 +17933,7 @@ fields_HasRepresentativeOf is a reference to a hash where the following keys are
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -20196,9 +17969,7 @@ fields_HasRepresentativeOf is a reference to a hash where the following keys are
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -20281,9 +18052,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -20319,9 +18088,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
@@ -21031,490 +18798,6 @@ sub get_relationship_IsStepOf
 
 
 
-=head2 get_relationship_HasTrait
-
-  $return = $obj->get_relationship_HasTrait($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasTrait
-	2: a fields_Trait
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasTrait
-	2: a fields_Trait
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship contains the measurement values of a trait on a specific observational Unit
-It has the following fields:
-
-=over 4
-
-
-=item value
-
-
-
-
-=item statistic_type
-
-
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_HasTrait
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_HasTrait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasTrait');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_HasTrait
-
-    $return = $self->_get_relationship($ctx, 'HasTrait', 'HasTrait', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_HasTrait
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_HasTrait:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasTrait');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_Measures
-
-  $return = $obj->get_relationship_Measures($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Trait
-	1: a fields_HasTrait
-	2: a fields_ObservationalUnit
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Trait
-	1: a fields_HasTrait
-	2: a fields_ObservationalUnit
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_Measures
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_Measures:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Measures');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_Measures
-
-    $return = $self->_get_relationship($ctx, 'Measures', 'HasTrait', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_Measures
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_Measures:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Measures');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_HasUnits
-
-  $return = $obj->get_relationship_HasUnits($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Locality
-	1: a fields_HasUnits
-	2: a fields_ObservationalUnit
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Locality
-	1: a fields_HasUnits
-	2: a fields_ObservationalUnit
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with the geographic location where the unit is planted.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_HasUnits
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_HasUnits:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasUnits');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_HasUnits
-
-    $return = $self->_get_relationship($ctx, 'HasUnits', 'HasUnits', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_HasUnits
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_HasUnits:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasUnits');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsLocated
-
-  $return = $obj->get_relationship_IsLocated($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasUnits
-	2: a fields_Locality
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasUnits
-	2: a fields_Locality
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Locality is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	city has a value which is a string
-	state has a value which is a string
-	country has a value which is a string
-	origcty has a value which is a string
-	elevation has a value which is an int
-	latitude has a value which is an int
-	longitude has a value which is an int
-	lo_accession has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsLocated
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsLocated:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocated');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsLocated
-
-    $return = $self->_get_relationship($ctx, 'IsLocated', 'HasUnits', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsLocated
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsLocated:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocated');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_relationship_HasUsage
 
   $return = $obj->get_relationship_HasUsage($ids, $from_fields, $rel_fields, $to_fields)
@@ -21969,673 +19252,6 @@ sub get_relationship_HasValueIn
 
 
 
-=head2 get_relationship_HasVariant
-
-  $return = $obj->get_relationship_HasVariant($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasVariant
-	2: a fields_Variation
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasVariant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_HasVariant
-	2: a fields_Variation
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_HasVariant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with the variations that have been determined by assay.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_HasVariant
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_HasVariant:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasVariant');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_HasVariant
-
-    $return = $self->_get_relationship($ctx, 'HasVariant', 'HasVariant', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_HasVariant
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_HasVariant:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasVariant');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsVariantOf
-
-  $return = $obj->get_relationship_IsVariantOf($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_HasVariant
-	2: a fields_ObservationalUnit
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_HasVariant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_HasVariant
-	2: a fields_ObservationalUnit
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_HasVariant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsVariantOf
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsVariantOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsVariantOf');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsVariantOf
-
-    $return = $self->_get_relationship($ctx, 'IsVariantOf', 'HasVariant', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsVariantOf
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsVariantOf:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsVariantOf');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_HasVariation
-
-  $return = $obj->get_relationship_HasVariation($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Contig
-	1: a fields_HasVariation
-	2: a fields_Variation
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_HasVariation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Contig
-	1: a fields_HasVariation
-	2: a fields_Variation
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_HasVariation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates variations with the reference contig.  
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_HasVariation
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_HasVariation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasVariation');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_HasVariation
-
-    $return = $self->_get_relationship($ctx, 'HasVariation', 'HasVariation', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_HasVariation
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_HasVariation:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_HasVariation');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsLocatedOn
-
-  $return = $obj->get_relationship_IsLocatedOn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_HasVariation
-	2: a fields_Contig
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_HasVariation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_HasVariation
-	2: a fields_Contig
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_HasVariation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsLocatedOn
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsLocatedOn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocatedOn');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsLocatedOn
-
-    $return = $self->_get_relationship($ctx, 'IsLocatedOn', 'HasVariation', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsLocatedOn
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsLocatedOn:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocatedOn');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_Impacts
-
-  $return = $obj->get_relationship_Impacts($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_Impacts
-	2: a fields_Trait
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_Impacts
-	2: a fields_Trait
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.
-It has the following fields:
-
-=over 4
-
-
-=item value
-
-
-
-
-=item statistic_type
-
-
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_Impacts
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_Impacts:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Impacts');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_Impacts
-
-    $return = $self->_get_relationship($ctx, 'Impacts', 'Impacts', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_Impacts
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_Impacts:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Impacts');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsImpactedBy
-
-  $return = $obj->get_relationship_IsImpactedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Trait
-	1: a fields_Impacts
-	2: a fields_Variation
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Trait
-	1: a fields_Impacts
-	2: a fields_Variation
-fields_Trait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	trait_name has a value which is a string
-	unit_of_measure has a value which is a string
-	TO_ID has a value which is a string
-	protocol has a value which is a string
-fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	value has a value which is a string
-	statistic_type has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsImpactedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsImpactedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsImpactedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsImpactedBy
-
-    $return = $self->_get_relationship($ctx, 'IsImpactedBy', 'Impacts', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsImpactedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsImpactedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsImpactedBy');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_relationship_Includes
 
   $return = $obj->get_relationship_Includes($ids, $from_fields, $rel_fields, $to_fields)
@@ -22900,225 +19516,6 @@ sub get_relationship_IsIncludedIn
 	my $msg = "Invalid returns passed to get_relationship_IsIncludedIn:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_IsIncludedIn');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IncludesPart
-
-  $return = $obj->get_relationship_IncludesPart($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_StudyExperiment
-	1: a fields_IncludesPart
-	2: a fields_ObservationalUnit
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_StudyExperiment
-	1: a fields_IncludesPart
-	2: a fields_ObservationalUnit
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with the geographic location where the unit is planted.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_IncludesPart
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IncludesPart:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IncludesPart');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IncludesPart
-
-    $return = $self->_get_relationship($ctx, 'IncludesPart', 'IncludesPart', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IncludesPart
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IncludesPart:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IncludesPart');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsPartOf
-
-  $return = $obj->get_relationship_IsPartOf($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IncludesPart
-	2: a fields_StudyExperiment
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IncludesPart
-	2: a fields_StudyExperiment
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsPartOf
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsPartOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsPartOf');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsPartOf
-
-    $return = $self->_get_relationship($ctx, 'IsPartOf', 'IncludesPart', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsPartOf
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsPartOf:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsPartOf');
     }
     return($return);
 }
@@ -23837,6 +20234,241 @@ sub get_relationship_IsARequirementOf
 	my $msg = "Invalid returns passed to get_relationship_IsARequirementOf:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_IsARequirementOf');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship_IsAlignedIn
+
+  $return = $obj->get_relationship_IsAlignedIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Contig
+	1: a fields_IsAlignedIn
+	2: a fields_Variation
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_IsAlignedIn is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	start has a value which is an int
+	len has a value which is an int
+	dir has a value which is a string
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Contig
+	1: a fields_IsAlignedIn
+	2: a fields_Variation
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_IsAlignedIn is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	start has a value which is an int
+	len has a value which is an int
+	dir has a value which is a string
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+This relationship connects each variation to the
+contig regions that it aligns.
+It has the following fields:
+
+=over 4
+
+
+=item start
+
+start location of region
+
+
+=item len
+
+length of region
+
+
+=item dir
+
+direction of region (+ or -)
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsAlignedIn
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_IsAlignedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAlignedIn');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_IsAlignedIn
+
+    $return = $self->_get_relationship($ctx, 'IsAlignedIn', 'IsAlignedIn', 0, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_IsAlignedIn
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_IsAlignedIn:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAlignedIn');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship_IsAlignmentFor
+
+  $return = $obj->get_relationship_IsAlignmentFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Variation
+	1: a fields_IsAlignedIn
+	2: a fields_Contig
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+fields_IsAlignedIn is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	start has a value which is an int
+	len has a value which is an int
+	dir has a value which is a string
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Variation
+	1: a fields_IsAlignedIn
+	2: a fields_Contig
+fields_Variation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	notes has a value which is a reference to a list where each element is a string
+fields_IsAlignedIn is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	start has a value which is an int
+	len has a value which is an int
+	dir has a value which is a string
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsAlignmentFor
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_IsAlignmentFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAlignmentFor');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_IsAlignmentFor
+
+    $return = $self->_get_relationship($ctx, 'IsAlignmentFor', 'IsAlignedIn', 1, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_IsAlignmentFor
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_IsAlignmentFor:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAlignmentFor');
     }
     return($return);
 }
@@ -25748,9 +22380,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -25773,9 +22403,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -25876,9 +22504,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -25901,9 +22527,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	co_occurrence_evidence has a value which is an int
@@ -27144,9 +23768,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
@@ -27170,9 +23792,7 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
@@ -27263,9 +23883,7 @@ fields_IsFamilyFor is a reference to a hash where the following keys are defined
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -27289,9 +23907,7 @@ fields_IsFamilyFor is a reference to a hash where the following keys are defined
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
-	release has a value which is a string
 	family_function has a value which is a reference to a list where each element is a string
-	alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -30207,265 +26823,6 @@ sub get_relationship_HasRealLocationIn
 
 
 
-=head2 get_relationship_IsReferencedBy
-
-  $return = $obj->get_relationship_IsReferencedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Genome
-	1: a fields_IsReferencedBy
-	2: a fields_ObservationalUnit
-fields_Genome is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	pegs has a value which is an int
-	rnas has a value which is an int
-	scientific_name has a value which is a string
-	complete has a value which is an int
-	prokaryotic has a value which is an int
-	dna_size has a value which is an int
-	contigs has a value which is an int
-	domain has a value which is a string
-	genetic_code has a value which is an int
-	gc_content has a value which is a float
-	phenotype has a value which is a reference to a list where each element is a string
-	md5 has a value which is a string
-	source_id has a value which is a string
-fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Genome
-	1: a fields_IsReferencedBy
-	2: a fields_ObservationalUnit
-fields_Genome is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	pegs has a value which is an int
-	rnas has a value which is an int
-	scientific_name has a value which is a string
-	complete has a value which is an int
-	prokaryotic has a value which is an int
-	dna_size has a value which is an int
-	contigs has a value which is an int
-	domain has a value which is a string
-	genetic_code has a value which is an int
-	gc_content has a value which is a float
-	phenotype has a value which is a reference to a list where each element is a string
-	md5 has a value which is a string
-	source_id has a value which is a string
-fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with the reference genome that it will be compared to.  All variations will be differences between the observational unit and the reference.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_IsReferencedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsReferencedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsReferencedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsReferencedBy
-
-    $return = $self->_get_relationship($ctx, 'IsReferencedBy', 'IsReferencedBy', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsReferencedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsReferencedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsReferencedBy');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_UsesReference
-
-  $return = $obj->get_relationship_UsesReference($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IsReferencedBy
-	2: a fields_Genome
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Genome is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	pegs has a value which is an int
-	rnas has a value which is an int
-	scientific_name has a value which is a string
-	complete has a value which is an int
-	prokaryotic has a value which is an int
-	dna_size has a value which is an int
-	contigs has a value which is an int
-	domain has a value which is a string
-	genetic_code has a value which is an int
-	gc_content has a value which is a float
-	phenotype has a value which is a reference to a list where each element is a string
-	md5 has a value which is a string
-	source_id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IsReferencedBy
-	2: a fields_Genome
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Genome is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	pegs has a value which is an int
-	rnas has a value which is an int
-	scientific_name has a value which is a string
-	complete has a value which is an int
-	prokaryotic has a value which is an int
-	dna_size has a value which is an int
-	contigs has a value which is an int
-	domain has a value which is a string
-	genetic_code has a value which is an int
-	gc_content has a value which is a float
-	phenotype has a value which is a reference to a list where each element is a string
-	md5 has a value which is a string
-	source_id has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_UsesReference
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_UsesReference:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_UsesReference');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_UsesReference
-
-    $return = $self->_get_relationship($ctx, 'UsesReference', 'IsReferencedBy', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_UsesReference
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_UsesReference:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_UsesReference');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_relationship_IsRegulatedIn
 
   $return = $obj->get_relationship_IsRegulatedIn($ids, $from_fields, $rel_fields, $to_fields)
@@ -30927,229 +27284,6 @@ sub get_relationship_IsRelevantTo
 	my $msg = "Invalid returns passed to get_relationship_IsRelevantTo:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_IsRelevantTo');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsRepresentedBy
-
-  $return = $obj->get_relationship_IsRepresentedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_TaxonomicGrouping
-	1: a fields_IsRepresentedBy
-	2: a fields_ObservationalUnit
-fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	domain has a value which is an int
-	hidden has a value which is an int
-	scientific_name has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_TaxonomicGrouping
-	1: a fields_IsRepresentedBy
-	2: a fields_ObservationalUnit
-fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	domain has a value which is an int
-	hidden has a value which is an int
-	scientific_name has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_IsRepresentedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsRepresentedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsRepresentedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsRepresentedBy
-
-    $return = $self->_get_relationship($ctx, 'IsRepresentedBy', 'IsRepresentedBy', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsRepresentedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsRepresentedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsRepresentedBy');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_DefinedBy
-
-  $return = $obj->get_relationship_DefinedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IsRepresentedBy
-	2: a fields_TaxonomicGrouping
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	domain has a value which is an int
-	hidden has a value which is an int
-	scientific_name has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ObservationalUnit
-	1: a fields_IsRepresentedBy
-	2: a fields_TaxonomicGrouping
-fields_ObservationalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	source_name2 has a value which is a string
-fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	domain has a value which is an int
-	hidden has a value which is an int
-	scientific_name has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_DefinedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_DefinedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_DefinedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_DefinedBy
-
-    $return = $self->_get_relationship($ctx, 'DefinedBy', 'IsRepresentedBy', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_DefinedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_DefinedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_DefinedBy');
     }
     return($return);
 }
@@ -35284,225 +31418,6 @@ sub get_relationship_WasProvidedBy
 
 
 
-=head2 get_relationship_ResultsIn
-
-  $return = $obj->get_relationship_ResultsIn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Assay
-	1: a fields_ResultsIn
-	2: a fields_Variation
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-fields_ResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Assay
-	1: a fields_ResultsIn
-	2: a fields_Variation
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-fields_ResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship defines the assay design that resulted in the determination of the variation.  One assay can result in the discovery of many variations.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_ResultsIn
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_ResultsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_ResultsIn');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_ResultsIn
-
-    $return = $self->_get_relationship($ctx, 'ResultsIn', 'ResultsIn', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_ResultsIn
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_ResultsIn:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_ResultsIn');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_WasDetermiedBy
-
-  $return = $obj->get_relationship_WasDetermiedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_ResultsIn
-	2: a fields_Assay
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_ResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_ResultsIn
-	2: a fields_Assay
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_ResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	positions has a value which is a countVector
-countVector is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_WasDetermiedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_WasDetermiedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_WasDetermiedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_WasDetermiedBy
-
-    $return = $self->_get_relationship($ctx, 'WasDetermiedBy', 'ResultsIn', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_WasDetermiedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_WasDetermiedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_WasDetermiedBy');
-    }
-    return($return);
-}
-
-
-
-
 =head2 get_relationship_Shows
 
   $return = $obj->get_relationship_Shows($ids, $from_fields, $rel_fields, $to_fields)
@@ -36002,233 +31917,6 @@ sub get_relationship_WasSubmittedBy
 	my $msg = "Invalid returns passed to get_relationship_WasSubmittedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_WasSubmittedBy');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_Summarizes
-
-  $return = $obj->get_relationship_Summarizes($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_AlleleFrequency
-	1: a fields_Summarizes
-	2: a fields_Variation
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_AlleleFrequency
-	1: a fields_Summarizes
-	2: a fields_Variation
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_Summarizes
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Summarizes');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_Summarizes
-
-    $return = $self->_get_relationship($ctx, 'Summarizes', 'Summarizes', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_Summarizes
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Summarizes');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_SummarizedBy
-
-  $return = $obj->get_relationship_SummarizedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_Summarizes
-	2: a fields_AlleleFrequency
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Variation
-	1: a fields_Summarizes
-	2: a fields_AlleleFrequency
-fields_Variation is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	value has a value which is a string
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_SummarizedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_SummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_SummarizedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_SummarizedBy
-
-    $return = $self->_get_relationship($ctx, 'SummarizedBy', 'Summarizes', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_SummarizedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_SummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_SummarizedBy');
     }
     return($return);
 }
@@ -39819,46 +35507,6 @@ tree_properties has a value which is a string
 
 
 
-=head2 fields_AlleleFrequency
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-position has a value which is an int
-minor_AF has a value which is a float
-minor_allele has a value which is a float
-major_AF has a value which is a float
-major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-position has a value which is an int
-minor_AF has a value which is a float
-minor_allele has a value which is a float
-major_AF has a value which is a float
-major_allele has a value which is a float
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_Annotation
 
 =over 4
@@ -39887,40 +35535,6 @@ id has a value which is a string
 annotator has a value which is a string
 comment has a value which is a string
 annotation_time has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Assay
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-assay_type has a value which is a string
-positions has a value which is a countVector
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-assay_type has a value which is a string
-positions has a value which is a countVector
 
 
 =end text
@@ -40421,9 +36035,7 @@ source has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 type has a value which is a string
-release has a value which is a string
 family_function has a value which is a reference to a list where each element is a string
-alignment has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -40434,9 +36046,7 @@ alignment has a value which is a reference to a list where each element is a str
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 type has a value which is a string
-release has a value which is a string
 family_function has a value which is a reference to a list where each element is a string
-alignment has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -40533,54 +36143,6 @@ gc_content has a value which is a float
 phenotype has a value which is a reference to a list where each element is a string
 md5 has a value which is a string
 source_id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Locality
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-city has a value which is a string
-state has a value which is a string
-country has a value which is a string
-origcty has a value which is a string
-elevation has a value which is an int
-latitude has a value which is an int
-longitude has a value which is an int
-lo_accession has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-city has a value which is a string
-state has a value which is a string
-country has a value which is a string
-origcty has a value which is a string
-elevation has a value which is an int
-latitude has a value which is an int
-longitude has a value which is an int
-lo_accession has a value which is a string
 
 
 =end text
@@ -40731,40 +36293,6 @@ id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_ObservationalUnit
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-source_name2 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-source_name2 has a value which is a string
 
 
 =end text
@@ -41241,42 +36769,6 @@ id has a value which is a string
 
 
 
-=head2 fields_StudyExperiment
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-design has a value which is a string
-originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_name has a value which is a string
-design has a value which is a string
-originator has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_Subsystem
 
 =over 4
@@ -41391,44 +36883,6 @@ alias has a value which is a reference to a list where each element is a string
 
 
 
-=head2 fields_Trait
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-trait_name has a value which is a string
-unit_of_measure has a value which is a string
-TO_ID has a value which is a string
-protocol has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-trait_name has a value which is a string
-unit_of_measure has a value which is a string
-TO_ID has a value which is a string
-protocol has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_Variant
 
 =over 4
@@ -41480,8 +36934,7 @@ comment has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-position has a value which is an int
-value has a value which is a string
+notes has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -41491,8 +36944,7 @@ value has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-position has a value which is an int
-value has a value which is a string
+notes has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -42021,38 +37473,6 @@ maximum_flux has a value which is a float
 
 
 
-=head2 fields_HasProteinMember
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-source_id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_HasReactionAliasFrom
 
 =over 4
@@ -42207,70 +37627,6 @@ id has a value which is a string
 
 
 
-=head2 fields_HasTrait
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-value has a value which is a string
-statistic_type has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-value has a value which is a string
-statistic_type has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_HasUnits
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_HasUsage
 
 =over 4
@@ -42333,100 +37689,6 @@ value has a value which is a string
 
 
 
-=head2 fields_HasVariant
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_HasVariation
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Impacts
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-value has a value which is a string
-statistic_type has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-value has a value which is a string
-statistic_type has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_Includes
 
 =over 4
@@ -42455,36 +37717,6 @@ id has a value which is a string
 sequence has a value which is an int
 abbreviation has a value which is a string
 auxiliary has a value which is an int
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_IncludesPart
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
 
 
 =end text
@@ -42577,6 +37809,42 @@ id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsAlignedIn
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+start has a value which is an int
+len has a value which is an int
+dir has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+start has a value which is an int
+len has a value which is an int
+dir has a value which is a string
 
 
 =end text
@@ -43417,36 +38685,6 @@ type has a value which is a string
 
 
 
-=head2 fields_IsReferencedBy
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_IsRegulatedIn
 
 =over 4
@@ -43478,36 +38716,6 @@ id has a value which is a string
 
 
 =head2 fields_IsRelevantFor
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_IsRepresentedBy
 
 =over 4
 
@@ -44089,36 +39297,6 @@ id has a value which is a string
 
 
 
-=head2 fields_ResultsIn
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
 =head2 fields_Shows
 
 =over 4
@@ -44152,36 +39330,6 @@ location has a value which is a rectangle
 
 
 =head2 fields_Submitted
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Summarizes
 
 =over 4
 

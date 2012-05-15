@@ -43,6 +43,13 @@ package gjoseqlib;
 #
 #  Write a fasta format file from sequences.
 #
+#  write_fasta(                @seq_entry_list ); # STDOUT
+#  write_fasta(               \@seq_entry_list ); # STDOUT
+#  write_fasta( \*FILEHANDLE,  @seq_entry_list );
+#  write_fasta( \*FILEHANDLE, \@seq_entry_list );
+#  write_fasta(  $filename,    @seq_entry_list );
+#  write_fasta(  $filename,   \@seq_entry_list );
+#
 #  print_alignment_as_fasta(                @seq_entry_list ); # STDOUT
 #  print_alignment_as_fasta(               \@seq_entry_list ); # STDOUT
 #  print_alignment_as_fasta( \*FILEHANDLE,  @seq_entry_list );
@@ -211,6 +218,7 @@ our @EXPORT = qw(
         split_fasta_title
         print_seq_list_as_fasta
         print_alignment_as_fasta
+        write_fasta
         print_alignment_as_phylip
         print_alignment_as_nexus
         print_seq_as_fasta
@@ -657,6 +665,13 @@ sub print_seq_list_as_fasta { print_alignment_as_fasta( @_ ) }
 #  Print list of sequence entries in fasta format.
 #  Missing, undef or "" filename defaults to STDOUT.
 #
+#     write_fasta(                @seq_entry_list ); # STDOUT
+#     write_fasta(               \@seq_entry_list ); # STDOUT
+#     write_fasta( \*FILEHANDLE,  @seq_entry_list );
+#     write_fasta( \*FILEHANDLE, \@seq_entry_list );
+#     write_fasta(  $filename,    @seq_entry_list );
+#     write_fasta(  $filename,   \@seq_entry_list );
+#
 #     print_alignment_as_fasta(                @seq_entry_list ); # STDOUT
 #     print_alignment_as_fasta(               \@seq_entry_list ); # STDOUT
 #     print_alignment_as_fasta( \*FILEHANDLE,  @seq_entry_list );
@@ -665,6 +680,11 @@ sub print_seq_list_as_fasta { print_alignment_as_fasta( @_ ) }
 #     print_alignment_as_fasta(  $filename,   \@seq_entry_list );
 #-----------------------------------------------------------------------------
 sub print_alignment_as_fasta {
+
+    return &write_fasta(@_);
+}
+
+sub write_fasta {
     my ( $fh, $close, $unused ) = output_filehandle( shift );
     ( unshift @_, $unused ) if $unused;
 
