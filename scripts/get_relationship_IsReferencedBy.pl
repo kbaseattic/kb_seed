@@ -9,7 +9,9 @@ use Carp;
 
 =head1 get_relationship_IsReferencedBy
 
-This relationship associates observational units with the reference genome that it will be compared to.  All variations will be differences between the observational unit and the reference.
+This relationship associates each observational unit with the reference 
+genome that it will be compared to.  All variations will be differences 
+between the observational unit and the reference.
 
 Example:
 
@@ -100,6 +102,8 @@ strings. The following fields are available:
 
 =item source_name2
 
+=item plant_id
+
 =back    
 
 =back
@@ -119,7 +123,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'pegs', 'rnas', 'scientific_name', 'complete', 'prokaryotic', 'dna_size', 'contigs', 'domain', 'genetic_code', 'gc_content', 'phenotype', 'md5', 'source_id' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'source_name', 'source_name2' );
+my @all_to_fields = ( 'id', 'source_name', 'source_name2', 'plant_id' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

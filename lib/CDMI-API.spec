@@ -771,6 +771,12 @@ module CDMI_API : CDMI_API {
 	} correspondence;
 
      funcdef corresponds(fids,genome) returns (mapping<fid,correspondence>);
+     
+     funcdef corresponds_from_sequences(list<tuple<fid, protein_sequence>> g1_sequences, 
+					list<tuple<fid, location>> g1_locations,
+					list<tuple<fid, protein_sequence>> g2_sequences, 
+					list<tuple<fid, location>> g2_locations) 
+     	returns (mapping<fid,correspondence>);
 
 	/* A close_genomes is used to get a set of relatively close genomes (for
 	   each input genome, a set of close genomes is calculated, but the

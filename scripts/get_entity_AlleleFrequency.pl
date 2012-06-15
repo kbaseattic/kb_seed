@@ -36,7 +36,7 @@ The AlleleFrequency entity has the following relationship links:
 
 =over 4
     
-=item Summarizes Variation
+=item Summarizes Contig
 
 
 =back

@@ -23,7 +23,7 @@ The Assay entity has the following relationship links:
 
 =over 4
     
-=item ResultsIn Variation
+=item IsLocatedOn StudyExperiment
 
 
 =back
@@ -82,7 +82,7 @@ strings. The following fields are available:
 
 =item assay_type
 
-=item positions
+=item assay_type_id
 
 =back    
    
@@ -100,7 +100,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'assay_type', 'positions' );
+my @all_fields = ( 'assay_type', 'assay_type_id' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 my $usage = "usage: query_entity_Assay [-is field,value] [-like field,value] [-op operator,field,value] [-show-fields] [-a | -f field list] > entity.data";

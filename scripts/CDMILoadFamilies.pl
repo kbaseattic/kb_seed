@@ -25,7 +25,7 @@
 
 =head1 CDMI Protein Family Loader
 
-    CDMILoadFamilies [options] releaseDirectory
+    CDMILoadFamilies [options] type releaseDirectory
 
 This script loads protein family data into the KBase. Protein families
 come in two basic styles-- FIGfams, which are feature-based, and
@@ -108,6 +108,13 @@ the following.
 
 If specified, the tables will be deleted and re-created before loading.
 
+=item nodelete
+
+If specified, old families of the specified type will NOT be deleted
+prior to loading. Use this option if the families of a specified type
+must be loaded in multiple passes, to prevent the families of previous
+passes from being removed.
+
 =item release
 
 Release code for this set of families. If omitted, the final segment of
@@ -123,9 +130,9 @@ the directory containing the family files.
 # Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database using the command-line options.
-my ($clear, $release);
+my ($clear, $release, $nodelete);
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear,
-        "release=s" => \$release);
+        "release=s" => \$release, nodelete => \$nodelete);
 if (! $cdmi) {
     print "usage: CDMILoadFIGfams [options] type releaseDirectory\n";
 } else {
@@ -176,14 +183,16 @@ if (! $cdmi) {
         my $releaseCode = $ftype->release;
         # We are now ready to begin. Start by deleting any existing
         # families.
-        print "Deleting old families of type $type.\n";
-        my $ffQ = $cdmi->Get('Family', 'Family(type) = ?', [$typeName]);
-        while (my $family = $ffQ->Fetch()) {
-            my $newStats = $cdmi->Delete(Family => $family->PrimaryValue('id'));
-            $stats->Accumulate($newStats);
-            $count++;
-            if ($count % 5000 == 0) {
-                print "$count families deleted.\n";
+        if (! $nodelete) {
+            print "Deleting old families of type $type.\n";
+            my $ffQ = $cdmi->Get('Family', 'Family(type) = ?', [$typeName]);
+            while (my $family = $ffQ->Fetch()) {
+                my $newStats = $cdmi->Delete(Family => $family->PrimaryValue('id'));
+                $stats->Accumulate($newStats);
+                $count++;
+                if ($count % 5000 == 0) {
+                    print "$count families deleted.\n";
+                }
             }
         }
         # The first task is to create the families themselves. We do this

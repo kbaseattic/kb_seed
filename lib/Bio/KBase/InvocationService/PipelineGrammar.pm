@@ -43,13 +43,9 @@ our $LEX = sub {
 
       /\G([ \t]+)/gc and $self->tokenline($1 =~ tr{\n}{});
 
-      m{\G(\>\>|\<|\||\>)}gc and return ($1, $1);
+      m{\G(2\>\>|2\>|\>\>|\<|\||\>)}gc and return ($1, $1);
 
-      /\G((?:http|ftp):\/\/\S+)/gc and return ('URL', $1);
-      /\G([a-zA-Z0-9-_.]*(?:\/[a-zA-Z0-9-_.]*)+)/gc and return ('PATH', $1);
-      /\G([a-zA-Z][a-zA-Z0-9-_.]*)/gc and return ('TERM', $1);
-      /\G(-[a-zA-Z][a-zA-Z0-9-_]*)/gc and return ('OPTION', $1);
-      /\G([a-zA-Z0-9-_]+)/gc and return ('GENERAL_TERM', $1);
+      /\G(\S+)/gc and return ('TERM', $1);
       /\G"((?:[^\\"]|\\.)*)"/gc and return ('DQSTRING', $1);
       /\G'((?:[^\\']|\\.)*)'/gc and return ('SQSTRING', $1);
 
@@ -68,7 +64,7 @@ our $LEX = sub {
 ;
 
 
-#line 71 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 67 Bio/KBase/InvocationService/PipelineGrammar.pm
 
 my $warnmessage =<< "EOFWARN";
 Warning!: Did you changed the \@Bio::KBase::InvocationService::PipelineGrammar::ISA variable inside the header section of the eyapp program?
@@ -95,17 +91,17 @@ sub new {
   [ 'arg_9' => 'arg', [ 'TERM' ], 0 ],
   [ 'arg_10' => 'arg', [ 'SQSTRING' ], 0 ],
   [ 'arg_11' => 'arg', [ 'DQSTRING' ], 0 ],
-  [ 'arg_12' => 'arg', [ 'OPTION' ], 0 ],
-  [ 'arg_13' => 'arg', [ 'GENERAL_TERM' ], 0 ],
-  [ 'redirections_14' => 'redirections', [  ], 0 ],
-  [ 'redirections_15' => 'redirections', [ 'redirection' ], 0 ],
-  [ 'redirections_16' => 'redirections', [ 'redirections', 'redirection' ], 0 ],
-  [ 'redirection_17' => 'redirection', [ '<', 'path' ], 0 ],
-  [ 'redirection_18' => 'redirection', [ '>', 'path' ], 0 ],
-  [ 'redirection_19' => 'redirection', [ '>>', 'path' ], 0 ],
-  [ 'path_20' => 'path', [ 'PATH' ], 0 ],
-  [ 'path_21' => 'path', [ 'TERM' ], 0 ],
-  [ 'path_22' => 'path', [ 'URL' ], 0 ],
+  [ 'redirections_12' => 'redirections', [  ], 0 ],
+  [ 'redirections_13' => 'redirections', [ 'redirection' ], 0 ],
+  [ 'redirections_14' => 'redirections', [ 'redirections', 'redirection' ], 0 ],
+  [ 'redirection_15' => 'redirection', [ '<', 'path' ], 0 ],
+  [ 'redirection_16' => 'redirection', [ '>', 'path' ], 0 ],
+  [ 'redirection_17' => 'redirection', [ '2>', 'path' ], 0 ],
+  [ 'redirection_18' => 'redirection', [ '>>', 'path' ], 0 ],
+  [ 'redirection_19' => 'redirection', [ '2>>', 'path' ], 0 ],
+  [ 'path_20' => 'path', [ 'TERM' ], 0 ],
+  [ 'path_21' => 'path', [ 'SQSTRING' ], 0 ],
+  [ 'path_22' => 'path', [ 'DQSTRING' ], 0 ],
 ],
     yyLABELS  =>
 {
@@ -121,11 +117,11 @@ sub new {
   'arg_9' => 9,
   'arg_10' => 10,
   'arg_11' => 11,
-  'arg_12' => 12,
-  'arg_13' => 13,
+  'redirections_12' => 12,
+  'redirections_13' => 13,
   'redirections_14' => 14,
-  'redirections_15' => 15,
-  'redirections_16' => 16,
+  'redirection_15' => 15,
+  'redirection_16' => 16,
   'redirection_17' => 17,
   'redirection_18' => 18,
   'redirection_19' => 19,
@@ -135,17 +131,15 @@ sub new {
 },
     yyTERMS  =>
 { '' => { ISSEMANTIC => 0 },
+	'2>' => { ISSEMANTIC => 0 },
+	'2>>' => { ISSEMANTIC => 0 },
 	'<' => { ISSEMANTIC => 0 },
 	'>' => { ISSEMANTIC => 0 },
 	'>>' => { ISSEMANTIC => 0 },
 	'|' => { ISSEMANTIC => 0 },
 	DQSTRING => { ISSEMANTIC => 1 },
-	GENERAL_TERM => { ISSEMANTIC => 1 },
-	OPTION => { ISSEMANTIC => 1 },
-	PATH => { ISSEMANTIC => 1 },
 	SQSTRING => { ISSEMANTIC => 1 },
 	TERM => { ISSEMANTIC => 1 },
-	URL => { ISSEMANTIC => 1 },
 	error => { ISSEMANTIC => 0 },
 },
     yyFILENAME  => 'pipeline.yp',
@@ -176,21 +170,19 @@ sub new {
 	},
 	{#State 4
 		ACTIONS => {
-			'OPTION' => 7,
-			'DQSTRING' => 12,
-			'SQSTRING' => 13,
-			'GENERAL_TERM' => 8,
-			'TERM' => 10
+			'DQSTRING' => 10,
+			'SQSTRING' => 11,
+			'TERM' => 8
 		},
 		DEFAULT => -6,
 		GOTOS => {
-			'arg' => 9,
-			'args' => 11
+			'arg' => 7,
+			'args' => 9
 		}
 	},
 	{#State 5
 		ACTIONS => {
-			'' => 14
+			'' => 12
 		}
 	},
 	{#State 6
@@ -198,253 +190,281 @@ sub new {
 			'TERM' => 2
 		},
 		GOTOS => {
-			'pipe_item' => 15,
+			'pipe_item' => 13,
 			'command' => 4
 		}
 	},
 	{#State 7
-		DEFAULT => -12
-	},
-	{#State 8
-		DEFAULT => -13
-	},
-	{#State 9
 		DEFAULT => -7
 	},
-	{#State 10
+	{#State 8
 		DEFAULT => -9
 	},
-	{#State 11
+	{#State 9
 		ACTIONS => {
-			'OPTION' => 7,
-			"<" => 16,
-			'DQSTRING' => 12,
-			'SQSTRING' => 13,
-			'GENERAL_TERM' => 8,
-			'TERM' => 10,
-			">>" => 20,
-			">" => 21
+			"<" => 14,
+			'DQSTRING' => 10,
+			'SQSTRING' => 11,
+			"2>" => 18,
+			'TERM' => 8,
+			"2>>" => 19,
+			">" => 21,
+			">>" => 20
 		},
-		DEFAULT => -14,
+		DEFAULT => -12,
 		GOTOS => {
-			'arg' => 17,
-			'redirections' => 18,
-			'redirection' => 19
+			'arg' => 15,
+			'redirections' => 16,
+			'redirection' => 17
 		}
 	},
-	{#State 12
+	{#State 10
 		DEFAULT => -11
 	},
-	{#State 13
+	{#State 11
 		DEFAULT => -10
 	},
-	{#State 14
+	{#State 12
 		DEFAULT => 0
 	},
-	{#State 15
+	{#State 13
 		DEFAULT => -3
 	},
-	{#State 16
+	{#State 14
 		ACTIONS => {
-			'URL' => 22,
 			'TERM' => 25,
-			'PATH' => 24
+			'DQSTRING' => 22,
+			'SQSTRING' => 24
 		},
 		GOTOS => {
 			'path' => 23
 		}
 	},
-	{#State 17
+	{#State 15
 		DEFAULT => -8
 	},
-	{#State 18
+	{#State 16
 		ACTIONS => {
-			"<" => 16,
+			"<" => 14,
+			"2>>" => 19,
 			">" => 21,
-			">>" => 20
+			">>" => 20,
+			"2>" => 18
 		},
 		DEFAULT => -4,
 		GOTOS => {
 			'redirection' => 26
 		}
 	},
-	{#State 19
-		DEFAULT => -15
+	{#State 17
+		DEFAULT => -13
 	},
-	{#State 20
+	{#State 18
 		ACTIONS => {
-			'URL' => 22,
 			'TERM' => 25,
-			'PATH' => 24
+			'DQSTRING' => 22,
+			'SQSTRING' => 24
 		},
 		GOTOS => {
 			'path' => 27
 		}
 	},
-	{#State 21
+	{#State 19
 		ACTIONS => {
-			'URL' => 22,
 			'TERM' => 25,
-			'PATH' => 24
+			'DQSTRING' => 22,
+			'SQSTRING' => 24
 		},
 		GOTOS => {
 			'path' => 28
+		}
+	},
+	{#State 20
+		ACTIONS => {
+			'TERM' => 25,
+			'DQSTRING' => 22,
+			'SQSTRING' => 24
+		},
+		GOTOS => {
+			'path' => 29
+		}
+	},
+	{#State 21
+		ACTIONS => {
+			'TERM' => 25,
+			'DQSTRING' => 22,
+			'SQSTRING' => 24
+		},
+		GOTOS => {
+			'path' => 30
 		}
 	},
 	{#State 22
 		DEFAULT => -22
 	},
 	{#State 23
-		DEFAULT => -17
+		DEFAULT => -15
 	},
 	{#State 24
-		DEFAULT => -20
-	},
-	{#State 25
 		DEFAULT => -21
 	},
+	{#State 25
+		DEFAULT => -20
+	},
 	{#State 26
-		DEFAULT => -16
+		DEFAULT => -14
 	},
 	{#State 27
-		DEFAULT => -19
+		DEFAULT => -17
 	},
 	{#State 28
+		DEFAULT => -19
+	},
+	{#State 29
 		DEFAULT => -18
+	},
+	{#State 30
+		DEFAULT => -16
 	}
 ],
     yyrules  =>
 [
 	[#Rule _SUPERSTART
 		 '$start', 2, undef
-#line 320 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 334 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule start_1
 		 'start', 1, undef
-#line 324 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 338 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule pipeline_2
 		 'pipeline', 1,
 sub {
-#line 25 "pipeline.yp"
+#line 21 "pipeline.yp"
 my $item = $_[1];  [ $item ] }
-#line 331 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 345 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule pipeline_3
 		 'pipeline', 3,
 sub {
-#line 26 "pipeline.yp"
+#line 22 "pipeline.yp"
 my $item = $_[3]; my $pipeline = $_[1];  [ @$pipeline, $item ] }
-#line 338 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 352 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule pipe_item_4
 		 'pipe_item', 3,
 sub {
-#line 29 "pipeline.yp"
+#line 25 "pipeline.yp"
 my $redir = $_[3]; my $cmd = $_[1]; my $args = $_[2];  { cmd => $cmd, args => $args, redir => $redir } }
-#line 345 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 359 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule command_5
 		 'command', 1, undef
-#line 349 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 363 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule args_6
 		 'args', 0,
 sub {
-#line 35 "pipeline.yp"
+#line 31 "pipeline.yp"
  [] }
-#line 356 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 370 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule args_7
 		 'args', 1,
 sub {
-#line 36 "pipeline.yp"
+#line 32 "pipeline.yp"
 my $arg = $_[1];  [ $arg ] }
-#line 363 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 377 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule args_8
 		 'args', 2,
 sub {
-#line 37 "pipeline.yp"
+#line 33 "pipeline.yp"
 my $arg = $_[2]; my $args = $_[1];  [ @$args, $arg ] }
-#line 370 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 384 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule arg_9
 		 'arg', 1, undef
-#line 374 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 388 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule arg_10
 		 'arg', 1, undef
-#line 378 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 392 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule arg_11
 		 'arg', 1, undef
-#line 382 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 396 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
-	[#Rule arg_12
-		 'arg', 1, undef
-#line 386 Bio/KBase/InvocationService/PipelineGrammar.pm
-	],
-	[#Rule arg_13
-		 'arg', 1, undef
-#line 390 Bio/KBase/InvocationService/PipelineGrammar.pm
-	],
-	[#Rule redirections_14
+	[#Rule redirections_12
 		 'redirections', 0,
 sub {
-#line 47 "pipeline.yp"
+#line 41 "pipeline.yp"
  [] }
-#line 397 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 403 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
-	[#Rule redirections_15
+	[#Rule redirections_13
 		 'redirections', 1,
 sub {
-#line 48 "pipeline.yp"
+#line 42 "pipeline.yp"
 my $item = $_[1];  [ $item ] }
-#line 404 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 410 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
-	[#Rule redirections_16
+	[#Rule redirections_14
 		 'redirections', 2,
 sub {
-#line 49 "pipeline.yp"
+#line 43 "pipeline.yp"
 my $item = $_[2]; my $list = $_[1];  [ @$list, $item ] }
-#line 411 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 417 Bio/KBase/InvocationService/PipelineGrammar.pm
+	],
+	[#Rule redirection_15
+		 'redirection', 2,
+sub {
+#line 46 "pipeline.yp"
+my $path = $_[2];  [ '<', $path ] }
+#line 424 Bio/KBase/InvocationService/PipelineGrammar.pm
+	],
+	[#Rule redirection_16
+		 'redirection', 2,
+sub {
+#line 47 "pipeline.yp"
+my $path = $_[2];  [ '>', $path ] }
+#line 431 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule redirection_17
 		 'redirection', 2,
 sub {
-#line 52 "pipeline.yp"
-my $path = $_[2];  [ '<', $path ] }
-#line 418 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 48 "pipeline.yp"
+my $path = $_[2];  [ '2>', $path ] }
+#line 438 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule redirection_18
 		 'redirection', 2,
 sub {
-#line 53 "pipeline.yp"
-my $path = $_[2];  [ '>', $path ] }
-#line 425 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 49 "pipeline.yp"
+my $path = $_[2];  [ '>>', $path ] }
+#line 445 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule redirection_19
 		 'redirection', 2,
 sub {
-#line 54 "pipeline.yp"
-my $path = $_[2];  [ '>>', $path ] }
-#line 432 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 50 "pipeline.yp"
+my $path = $_[2];  [ '2>>', $path ] }
+#line 452 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule path_20
 		 'path', 1, undef
-#line 436 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 456 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule path_21
 		 'path', 1, undef
-#line 440 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 460 Bio/KBase/InvocationService/PipelineGrammar.pm
 	],
 	[#Rule path_22
 		 'path', 1, undef
-#line 444 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 464 Bio/KBase/InvocationService/PipelineGrammar.pm
 	]
 ],
-#line 447 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 467 Bio/KBase/InvocationService/PipelineGrammar.pm
     yybypass       => 0,
     yybuildingtree => 0,
     yyprefix       => '',
@@ -470,11 +490,11 @@ my $path = $_[2];  [ '>>', $path ] }
          'arg_9', 
          'arg_10', 
          'arg_11', 
-         'arg_12', 
-         'arg_13', 
+         'redirections_12', 
+         'redirections_13', 
          'redirections_14', 
-         'redirections_15', 
-         'redirections_16', 
+         'redirection_15', 
+         'redirection_16', 
          'redirection_17', 
          'redirection_18', 
          'redirection_19', 
@@ -491,7 +511,7 @@ my $path = $_[2];  [ '>>', $path ] }
 =cut
 
 
-#line 494 Bio/KBase/InvocationService/PipelineGrammar.pm
+#line 514 Bio/KBase/InvocationService/PipelineGrammar.pm
 
 
 

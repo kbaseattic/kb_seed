@@ -38,6 +38,8 @@ The ProteinSequence entity has the following relationship links:
 
 =item IsProteinFor Feature
 
+=item IsProteinMemberOf Family
+
 =item ProjectsOnto ProteinSequence
 
 

@@ -39,38 +39,6 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Variation entity to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item id
-
-=item position
-
-=item value
-
-=back    
-
-=item -rel field-list
-
-Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item from_link
-
-=item to_link
-
-=item value
-
-=item statistic_type
-
-=back    
-
-=item -to field-list
-
 Choose a set of fields from the Trait entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
@@ -85,6 +53,40 @@ strings. The following fields are available:
 =item TO_ID
 
 =item protocol
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=item source_name
+
+=item rank
+
+=item pvalue
+
+=item position
+
+=back    
+
+=item -to field-list
+
+Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item source_id
 
 =back    
 
@@ -103,9 +105,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'trait_name', 'unit_of_measure', 'TO_ID', 'protocol' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'value', 'statistic_type' );
-my @all_to_fields = ( 'id', 'position', 'value' );
+my @all_from_fields = ( 'id', 'source_id' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'source_name', 'rank', 'pvalue', 'position' );
+my @all_to_fields = ( 'id', 'trait_name', 'unit_of_measure', 'TO_ID', 'protocol' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

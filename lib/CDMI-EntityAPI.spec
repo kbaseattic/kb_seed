@@ -79,6 +79,59 @@ funcdef all_entities_AlignmentTree(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	int position nullable;
+	float minor_AF nullable;
+	float minor_allele nullable;
+	float major_AF nullable;
+	float major_allele nullable;
+} fields_AlleleFrequency ;
+
+/*
+An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Specific position on the contig where the allele occurs
+
+
+=item minor_AF
+
+Minor allele frequency.  Floating point number from 0.0 to 0.5.
+
+
+=item minor_allele
+
+Text letter representation of the minor allele. Valid values are A, C, G, and T.
+
+
+=item major_AF
+
+Major allele frequency.  Floating point number less than or equal to 1.0.
+
+
+=item major_allele
+
+Text letter representation of the major allele. Valid values are A, C, G, and T.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_AlleleFrequency(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_AlleleFrequency>);
+funcdef query_entity_AlleleFrequency(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AlleleFrequency>);
+funcdef all_entities_AlleleFrequency(int start, int count, list<string> fields)
+	returns(mapping<string, fields_AlleleFrequency>);
+
+typedef structure {
+	string id;
 	string annotator nullable;
 	string comment nullable;
 	string annotation_time nullable;
@@ -121,6 +174,41 @@ funcdef query_entity_Annotation(list<tuple<string, string, string>> qry, list<st
 	returns(mapping<string, fields_Annotation>);
 funcdef all_entities_Annotation(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Annotation>);
+
+typedef structure {
+	string id;
+	string assay_type nullable;
+	string assay_type_id nullable;
+} fields_Assay ;
+
+/*
+An assay is an experimental design for determining alleles at specific chromosome positions.
+It has the following fields:
+
+=over 4
+
+
+=item assay_type
+
+Text description of the type of assay (e.g., SNP, length, sequence, categorical, array, short read, SSR marker, AFLP marker)
+
+
+=item assay_type_id
+
+source ID associated with the assay type (informational)
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Assay(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Assay>);
+funcdef query_entity_Assay(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Assay>);
+funcdef all_entities_Assay(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Assay>);
 
 typedef structure {
 	string id;
@@ -690,7 +778,9 @@ funcdef all_entities_Experiment(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	string type nullable;
+	string release nullable;
 	list<string> family_function nullable;
+	list<string> alignment nullable;
 } fields_Family ;
 
 /*
@@ -723,11 +813,22 @@ It has the following fields:
 type of protein family (e.g. FIGfam, equivalog)
 
 
+=item release
+
+release number / subtype of protein family
+
+
 =item family_function
 
 optional free-form description of the family. For function-based
 families, this would be the functional role for the family
 members.
+
+
+=item alignment
+
+FASTA-formatted alignment of the family's protein
+sequences
 
 
 
@@ -928,6 +1029,83 @@ funcdef all_entities_Genome(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string source_name nullable;
+	string city nullable;
+	string state nullable;
+	string country nullable;
+	string origcty nullable;
+	int elevation nullable;
+	int latitude nullable;
+	int longitude nullable;
+	string lo_accession nullable;
+} fields_Locality ;
+
+/*
+A locality is a geographic location.
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name or description of the location used as a collection site.
+
+
+=item city
+
+City of the collecting site.
+
+
+=item state
+
+State or province of the collecting site.
+
+
+=item country
+
+Country of the collecting site.
+
+
+=item origcty
+
+3-letter ISO 3166-1 extended country code for the country of origin.
+
+
+=item elevation
+
+Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
+
+
+=item latitude
+
+Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
+
+
+=item longitude
+
+Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
+
+
+=item lo_accession
+
+gazeteer ontology term ID
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Locality(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Locality>);
+funcdef query_entity_Locality(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Locality>);
+funcdef all_entities_Locality(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Locality>);
+
+typedef structure {
+	string id;
 	string mod_date nullable;
 	string name nullable;
 	string type nullable;
@@ -1123,6 +1301,49 @@ funcdef query_entity_OTU(list<tuple<string, string, string>> qry, list<string> f
 	returns(mapping<string, fields_OTU>);
 funcdef all_entities_OTU(int start, int count, list<string> fields)
 	returns(mapping<string, fields_OTU>);
+
+typedef structure {
+	string id;
+	string source_name nullable;
+	list<string> source_name2 nullable;
+	string plant_id nullable;
+} fields_ObservationalUnit ;
+
+/*
+An ObservationalUnit is an individual plant that 1) is part of an experiment or study, 2) has measured traits, and 3) is assayed for the purpose of determining alleles.  
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name/ID by which the observational unit may be known by the originator and is used in queries.
+
+
+=item source_name2
+
+Secondary name/ID by which the observational unit may be known and is queried.
+
+
+=item plant_id
+
+ID of the plant that was tested to produce this
+observational unit. Observational units with the same plant
+ID are different assays of a single physical organism.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_ObservationalUnit(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ObservationalUnit>);
+funcdef query_entity_ObservationalUnit(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ObservationalUnit>);
+funcdef all_entities_ObservationalUnit(int start, int count, list<string> fields)
+	returns(mapping<string, fields_ObservationalUnit>);
 
 typedef structure {
 	string id;
@@ -1669,6 +1890,47 @@ funcdef all_entities_Source(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string source_name nullable;
+	string design nullable;
+	string originator nullable;
+} fields_StudyExperiment ;
+
+/*
+An Experiment is a collection of observational units with one originator that are part of a specific study.  An experiment may be conducted at more than one location and in more than one season or year.
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name/ID by which the experiment is known at the source.  
+
+
+=item design
+
+Design of the experiment including the numbers and types of observational units, traits, replicates, sampling plan, and analysis that are planned.
+
+
+=item originator
+
+Name of the individual or program that are the originators of the experiment.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_StudyExperiment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_StudyExperiment>);
+funcdef query_entity_StudyExperiment(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_StudyExperiment>);
+funcdef all_entities_StudyExperiment(int start, int count, list<string> fields)
+	returns(mapping<string, fields_StudyExperiment>);
+
+typedef structure {
+	string id;
 	int version nullable;
 	string curator nullable;
 	string notes nullable;
@@ -1834,6 +2096,53 @@ funcdef all_entities_TaxonomicGrouping(int start, int count, list<string> fields
 
 typedef structure {
 	string id;
+	string trait_name nullable;
+	string unit_of_measure nullable;
+	string TO_ID nullable;
+	string protocol nullable;
+} fields_Trait ;
+
+/*
+A Trait is a phenotypic quality that can be measured or observed for an observational unit.  Examples include height, sugar content, color, or cold tolerance.
+It has the following fields:
+
+=over 4
+
+
+=item trait_name
+
+Text name or description of the trait
+
+
+=item unit_of_measure
+
+The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
+
+
+=item TO_ID
+
+Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
+
+
+=item protocol
+
+A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Trait(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Trait>);
+funcdef query_entity_Trait(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Trait>);
+funcdef all_entities_Trait(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Trait>);
+
+typedef structure {
+	string id;
 	list<string> role_rule nullable;
 	string code nullable;
 	string type nullable;
@@ -1890,37 +2199,6 @@ funcdef query_entity_Variant(list<tuple<string, string, string>> qry, list<strin
 	returns(mapping<string, fields_Variant>);
 funcdef all_entities_Variant(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Variant>);
-
-typedef structure {
-	string id;
-	list<string> notes nullable;
-} fields_Variation ;
-
-/*
-A variation describes a set of aligned regions
-in two or more contigs.
-It has the following fields:
-
-=over 4
-
-
-=item notes
-
-optional text description of what the variation
-means
-
-
-
-=back
-
-
-*/
-funcdef get_entity_Variation(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_Variation>);
-funcdef query_entity_Variation(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_Variation>);
-funcdef all_entities_Variation(int start, int count, list<string> fields)
-	returns(mapping<string, fields_Variation>);
 
 typedef structure {
 	string id;
@@ -2422,6 +2700,37 @@ funcdef get_relationship_IsPresentIn(list<string> ids, list<string> from_fields,
 
 typedef structure {
 	string id;
+	string source_id nullable;
+} fields_HasProteinMember ;
+
+/*
+This relationship connects each feature family to its
+constituent protein sequences. A family always has many protein sequences,
+and a single sequence can be found in many families.
+It has the following fields:
+
+=over 4
+
+
+=item source_id
+
+Native identifier used for the protein in the definition
+of the family. This will be its ID in the alignment, if one
+exists.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasProteinMember(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Family, fields_HasProteinMember, fields_ProteinSequence>>);
+funcdef get_relationship_IsProteinMemberOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ProteinSequence, fields_HasProteinMember, fields_Family>>);
+
+typedef structure {
+	string id;
 	string alias nullable;
 } fields_HasReactionAliasFrom ;
 
@@ -2548,6 +2857,67 @@ funcdef get_relationship_IsStepOf(list<string> ids, list<string> from_fields, li
 
 typedef structure {
 	string id;
+	float value nullable;
+	string statistic_type nullable;
+	string measure_id nullable;
+} fields_HasTrait ;
+
+/*
+This relationship contains the measurement values of a trait on a specific observational Unit
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+value of the trait measurement
+
+
+=item statistic_type
+
+text description of the statistic type (e.g. mean, median)
+
+
+=item measure_id
+
+internal ID given to this measurement
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasTrait(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_HasTrait, fields_Trait>>);
+funcdef get_relationship_Measures(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Trait, fields_HasTrait, fields_ObservationalUnit>>);
+
+typedef structure {
+	string id;
+} fields_HasUnits ;
+
+/*
+This relationship associates observational units with the 
+geographic location where the unit is planted.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasUnits(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Locality, fields_HasUnits, fields_ObservationalUnit>>);
+funcdef get_relationship_IsLocated(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_HasUnits, fields_Locality>>);
+
+typedef structure {
+	string id;
 } fields_HasUsage ;
 
 /*
@@ -2599,6 +2969,109 @@ funcdef get_relationship_HasValueIn(list<string> ids, list<string> from_fields, 
 
 typedef structure {
 	string id;
+	int position nullable;
+	int len nullable;
+	string data nullable;
+	string data2 nullable;
+	float quality nullable;
+} fields_HasVariationIn ;
+
+/*
+This relationship defines an observational unit's DNA variation
+from a contig in the reference genome.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Position of this variation in the reference contig.
+
+
+=item len
+
+Length of the variation in the reference contig. A length
+of zero indicates an insertion.
+
+
+=item data
+
+Replacement DNA for the variation on the primary chromosome. An 
+empty string indicates a deletion. The primary chromosome is chosen
+arbitrarily among the two chromosomes of a plant's chromosome pair
+(one coming from the mother and one from the father).
+
+
+=item data2
+
+Replacement DNA for the variation on the secondary chromosome.
+This will frequently be the same as the primary chromosome string.
+
+
+=item quality
+
+Quality score assigned to this variation.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasVariationIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Contig, fields_HasVariationIn, fields_ObservationalUnit>>);
+funcdef get_relationship_IsVariedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_HasVariationIn, fields_Contig>>);
+
+typedef structure {
+	string id;
+	string source_name nullable;
+	int rank nullable;
+	float pvalue nullable;
+	int position nullable;
+} fields_Impacts ;
+
+/*
+This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.
+It has the following fields:
+
+=over 4
+
+
+=item source_name
+
+Name of the study which analyzed the data and determined that a variation has impact on a trait
+
+
+=item rank
+
+Rank of the position among all positions correlated with this trait.
+
+
+=item pvalue
+
+P-value of the correlation between the variation and the trait
+
+
+=item position
+
+Position in the reference contig where the trait
+has an impact.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Impacts(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Trait, fields_Impacts, fields_Contig>>);
+funcdef get_relationship_IsImpactedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Contig, fields_Impacts, fields_Trait>>);
+
+typedef structure {
+	string id;
 	int sequence nullable;
 	string abbreviation nullable;
 	int auxiliary nullable;
@@ -2644,6 +3117,28 @@ funcdef get_relationship_Includes(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Subsystem, fields_Includes, fields_Role>>);
 funcdef get_relationship_IsIncludedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Role, fields_Includes, fields_Subsystem>>);
+
+typedef structure {
+	string id;
+} fields_IncludesPart ;
+
+/*
+This relationship associates observational units with the 
+experiments that generated the data on them.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IncludesPart(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_StudyExperiment, fields_IncludesPart, fields_ObservationalUnit>>);
+funcdef get_relationship_IsPartOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_IncludesPart, fields_StudyExperiment>>);
 
 typedef structure {
 	string id;
@@ -2720,46 +3215,6 @@ funcdef get_relationship_IsARequirementOf(list<string> ids, list<string> from_fi
 
 typedef structure {
 	string id;
-	int start nullable;
-	int len nullable;
-	string dir nullable;
-} fields_IsAlignedIn ;
-
-/*
-This relationship connects each variation to the
-contig regions that it aligns.
-It has the following fields:
-
-=over 4
-
-
-=item start
-
-start location of region
-
-
-=item len
-
-length of region
-
-
-=item dir
-
-direction of region (+ or -)
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsAlignedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Contig, fields_IsAlignedIn, fields_Variation>>);
-funcdef get_relationship_IsAlignmentFor(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Variation, fields_IsAlignedIn, fields_Contig>>);
-
-typedef structure {
-	string id;
 } fields_IsAnnotatedBy ;
 
 /*
@@ -2780,6 +3235,28 @@ funcdef get_relationship_IsAnnotatedBy(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Feature, fields_IsAnnotatedBy, fields_Annotation>>);
 funcdef get_relationship_Annotates(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Annotation, fields_IsAnnotatedBy, fields_Feature>>);
+
+typedef structure {
+	string id;
+} fields_IsAssayedBy ;
+
+/*
+This relationship associates each assay with the relevant 
+experiments.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsAssayedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_StudyExperiment, fields_IsAssayedBy, fields_Assay>>);
+funcdef get_relationship_IsLocatedOn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Assay, fields_IsAssayedBy, fields_StudyExperiment>>);
 
 typedef structure {
 	string id;
@@ -3464,6 +3941,29 @@ funcdef get_relationship_HasRealLocationIn(list<string> ids, list<string> from_f
 
 typedef structure {
 	string id;
+} fields_IsReferencedBy ;
+
+/*
+This relationship associates each observational unit with the reference 
+genome that it will be compared to.  All variations will be differences 
+between the observational unit and the reference.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsReferencedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Genome, fields_IsReferencedBy, fields_ObservationalUnit>>);
+funcdef get_relationship_UsesReference(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_IsReferencedBy, fields_Genome>>);
+
+typedef structure {
+	string id;
 } fields_IsRegulatedIn ;
 
 /*
@@ -3505,6 +4005,28 @@ funcdef get_relationship_IsRelevantFor(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Diagram, fields_IsRelevantFor, fields_Subsystem>>);
 funcdef get_relationship_IsRelevantTo(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Subsystem, fields_IsRelevantFor, fields_Diagram>>);
+
+typedef structure {
+	string id;
+} fields_IsRepresentedBy ;
+
+/*
+This relationship associates observational units with a genus, 
+species, strain, and/or variety that was the source material.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsRepresentedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_TaxonomicGrouping, fields_IsRepresentedBy, fields_ObservationalUnit>>);
+funcdef get_relationship_DefinedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ObservationalUnit, fields_IsRepresentedBy, fields_TaxonomicGrouping>>);
 
 typedef structure {
 	string id;
@@ -4009,6 +4531,35 @@ funcdef get_relationship_Submitted(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Source, fields_Submitted, fields_Genome>>);
 funcdef get_relationship_WasSubmittedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Genome, fields_Submitted, fields_Source>>);
+
+typedef structure {
+	string id;
+	int position nullable;
+} fields_Summarizes ;
+
+/*
+This relationship describes the statistical frequencies of the
+most common alleles in various positions on the reference contig.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Position in the reference contig where the trait
+has an impact.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Summarizes(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlleleFrequency, fields_Summarizes, fields_Contig>>);
+funcdef get_relationship_SummarizedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Contig, fields_Summarizes, fields_AlleleFrequency>>);
 
 typedef structure {
 	string id;

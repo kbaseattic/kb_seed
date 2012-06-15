@@ -23,7 +23,7 @@ The Trait entity has the following relationship links:
 
 =over 4
     
-=item IsImpactedBy Variation
+=item Impacts Contig
 
 =item Measures ObservationalUnit
 

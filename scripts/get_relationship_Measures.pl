@@ -50,6 +50,8 @@ strings. The following fields are available:
 
 =item source_name2
 
+=item plant_id
+
 =back    
 
 =item -rel field-list
@@ -66,6 +68,8 @@ strings. The following fields are available:
 =item value
 
 =item statistic_type
+
+=item measure_id
 
 =back    
 
@@ -104,8 +108,8 @@ use Getopt::Long;
 #Default fields
  
 my @all_from_fields = ( 'id', 'trait_name', 'unit_of_measure', 'TO_ID', 'protocol' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'value', 'statistic_type' );
-my @all_to_fields = ( 'id', 'source_name', 'source_name2' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'value', 'statistic_type', 'measure_id' );
+my @all_to_fields = ( 'id', 'source_name', 'source_name2', 'plant_id' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

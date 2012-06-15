@@ -53,7 +53,11 @@ strings. The following fields are available:
 
 =item type
 
+=item release
+
 =item family_function
+
+=item alignment
 
 =back    
 
@@ -85,7 +89,11 @@ strings. The following fields are available:
 
 =item type
 
+=item release
+
 =item family_function
+
+=item alignment
 
 =back    
 
@@ -104,9 +112,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'type', 'family_function' );
+my @all_from_fields = ( 'id', 'type', 'release', 'family_function', 'alignment' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'co_occurrence_evidence', 'co_expression_evidence' );
-my @all_to_fields = ( 'id', 'type', 'family_function' );
+my @all_to_fields = ( 'id', 'type', 'release', 'family_function', 'alignment' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

@@ -21,140 +21,72 @@ use strict;
 use SeedUtils;
 use Bio::KBase::CDMI::CDMI;
 use Bio::KBase::CDMI::CDMILoader;
-use IDServerAPIClient;
-use MD5Computer;
 use BasicLocation;
-use Digest::MD5;
 
-=head1 CDMI Genome Loader
+=head1 CDMI Phenotype Variations Loader
 
-    CDMILoadGenome [options] source genomeDirectory
+    CDMILoadVariations [options] source genomeDirectory
 
-Load a genome into a KBase Central Data Model Instance. The genome
-is represented by five files in a single directory, as follows.
+Load the phenotype variation data for a genome into a KBase Central Data
+Model Instance. The variation data is represented by nine files in a
+single directory. All of the IDs in the files are from the source
+database, and need to be converted to KBase IDs. The low-level name
+of the directory must be the same as the genome's ID in the source
+database. In some cases there are two fields specified for an ID. In
+this case, the first is an ID from the source database and the second
+is a KBase ID. The KBase ID will be used if it is present, and the
+source ID will be converted otherwise. If neither ID is present, then
+it usually indicates that a particular link does not apply.
 
-=over 4
-
-=item contigs.fa
-
-A FASTA file containing the DNA sequences for the contigs.
-
-=item features.tab
-
-A tab-delimited file with one line for each feature. The first column
-contains the feature ID, the second contains the feature type,
-the third contains the feature location, the fourth contains an optional
-parent feature ID, and the fifth contains an optional subset ID,
-and the remaining columns contain alternate identifiers for the feature.
-
-=item functions.tab
-
-A tab-delimited file with one line for each feature. The first column
-contains the feature ID and the second contains the feature's functional
-assignment.
-
-=item proteins.fa
-
-A FASTA file containing the protein translations for each feature in
-the genome.
-
-=item metadata.tbl
-
-A file containing named attributes. Each attribute is represented by
-a single line containing the attribute name followed by one or more
-lines containing the attribute value, terminated by a line containing
-double slashes (C<//>). The attributes currently used are
-
-=over 8
-
-=item complete
-
-C<1> for a complete genome, C<0> for an incomplete genome. The default
-is C<1>.
-
-=item genetic_code
-
-The genetic code used for protein translation for most of the contigs
-in the genome. The default is C<11>.
-
-=item name
-
-The scientific name of the genome. This field is required.
-
-=back
-
-=back
-
-In the B<features.tab> file, a location is specified as a comma-separated
-list of one or more I<location strings>. Each location string consists of
-a contig ID, an underscore, a start location, a strand (C<+> or C<->),
-and a length. So, for example, C<NC_004663_4594728+66> indicates a feature
-beginning at location 4594728 on the plus strand of contig NC_004663
-and extending for 66 base pairs.
-
-The following feature types are expected.
+The files are as follows.
 
 =over 4
 
-=item 3putr
+=item experiment.tab
 
-3' UTR for a transcript
+This file is used to fill the B<StudyExperiment> table. It contains (0)
+the experiment ID (source-id), (1) the design of the experiment (design),
+and (2) the authors (originator). The authors are sometimes expressed as
+a paper citation.
 
-=item 5putr
+=item obs_unit.tab
 
-5' UTR for a transcript
+This file is used to fill the B<ObservationalUnit> table and its
+associated relationships. It contains (0) the observational unit ID
+(source-name), (1) the optional secondary name (source-name2),
+(2,3) the ID of the experiment to which the unit belongs
+(IncludesPart.from_link), (4,5) the ID of the locality where the
+observation took place (HasUnits.from_link), (6,7) the ID of the
+taxonomic grouping for the genetic source material, and (8) the
+KBase ID of the relvant reference genome (UsesReference.to_link).
 
-=item att
+=item locality.tab
 
-attachment site
+This file is used to fill the B<Locality> table. It contains (0) the
+locality ID (source-name), (1) the elevation in meters (elecation),
+(2) the city name (city), (3) the country name (country), (4) the
+ISO 3166-1 extended country code (origcty), (5) the latitude (latitude),
+(6) the longitude (longitude), (7) the state or province, and (8) the
+gazeteer ontology term ID (lo-accession).
 
-=item bs
+=item traits.tab
 
-binding site
+This file is used to fill the B<Trait> table. It contains (0) the
+trait ID (trait-name), (1) the unit of measure (unit-of-measure),
+(2) the trait ontology term ID (TO-ID), and (3) a description of the
+protocol for measuring the trait (protocol).
 
-=item CDS
+=item measures.tab
 
-protein-encoding gene
+This file is used to fill the B<HasTrait> table. It contains (0) the
+source identifier of the measurement (measure-id), (1,2) the
+ID of the trait being measured (to-link), (3,4) the ID of the
+observational unit whose trait is being measured (from-link), (5) the
+statistical type (statistic-type), and (6) the measurement value (value).
 
-=item crispr
+=item assay.tab
 
-CRISPR location
 
-=item crs
-
-CRISPR spacer
-
-=item locus
-
-genetic region possibly producing multiple proteins
-
-=item mRNA
-
-gene transcript
-
-=item pbs
-
-protein binding site
-
-=item pp
-
-prophage
-
-=item prm
-
-promoter region
-
-=item pseudo
-
-pseudogene
-
-=item rna
-
-RNA feature
-
-=item rsw
-
-riboswitch
 
 =back
 
@@ -172,38 +104,29 @@ the specified directory, a genome will be loaded from each subdirectory
 of the specified directory. This allows multiple genomes from a single
 source to be loaded in one pass.
 
-=item newOnly
-
-If this option is specified, a genome will only be loaded if it is
-not already found in the database.
-
 =item clear
 
-If this option is specified, the genome tables will be recreated
+If this option is specified, the variation tables will be recreated
 before loading.
-
-=item idserver
-
-URL to use for the ID server. The default uses the standard KBase ID
-server.
 
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
-C<MOL>, ...) and the name of the directory containing the genome data.
+C<MOL>, ...) and the name of the directory containing the variation data
+for the genome.
 
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url);
+my ($recursive, $clear);
 # Turn off buffering for progress messages.
 $| = 1;
 
 # Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive,
+        "clear" => \$clear);
 if (! $cdmi) {
-    print "usage: CDMILoadGenome [options] source genomeDirectory\n";
+    print "usage: CDMILoadVariations [options] source genomeDirectory\n";
     exit;
 }
 print "Connected to CDMI.\n";
@@ -217,16 +140,12 @@ print "Connected to CDMI.\n";
         die "Genome directory $genomeDirectory not found.\n";
     } else {
 
-        # Connect to the KBID server and create the loader utility object.
-        my $id_server;
-        if ($id_server_url) {
-            $id_server = IDServerAPIClient->new($id_server_url);
-        }
-        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
+        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
         $loader->SetSource($source);
         # Are we clearing?
         if($clear) {
-            # Yes. Recreate the genome tables.
+            # Yes. Recreate the variations tables.
+            ###TODO: YOU ARE HERE
             my @tables = qw(Publication Role Concerns IsFunctionalIn
                 ProteinSequence IsProteinFor Feature FeatureAlias
                 IsLocatedIn IsOwnerOf Submitted
@@ -298,7 +217,6 @@ sub LoadGenome {
     $loader->SetGenome($genomeOriginalID);
     # Read the metadata file.
     my $metaName = $loader->genome_load_file_name($genomeDirectory, "metadata.tbl");
-    print "Reading metadata from $metaName.\n";
     my $metaHash = Bio::KBase::CDMI::CDMILoader::ParseMetadata($metaName);
     # Extract the genome name.
     my $scientificName = $metaHash->{name};
@@ -308,7 +226,7 @@ sub LoadGenome {
     # Get the KBID for this genome.
     my $genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
     # If this genome exists and we are only loading new genomes, skip it.
-    if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
+    if ($cdmi->Exists(Genome => $genomeID)) {
         $loader->stats->Add(genomeSkipped => 1);
         print "Genome skipped: already in database.\n";
     } else {
@@ -373,35 +291,30 @@ sub DeleteGenome {
     my $cdmi = $loader->cdmi;
     # Get the statistics object.
     my $stats = $loader->stats;
-    # Does the genome exist?
-    if ($cdmi->Exists(Genome => $genomeID)) {
-        # Yes. Delete the genome itself.
-        my $subStats = $cdmi->Delete(Genome => $genomeID);
-        # Roll up the statistics.
-        $stats->Accumulate($subStats);
-    } else {
-        # No, we have to delete any remnants from a partial load.
-        # Delete the contigs.
-        $loader->DeleteRelatedRecords($genomeID, 'IsComposedOf', 'Contig');
-        # Delete the features.
-        $loader->DeleteRelatedRecords($genomeID, 'IsOwnerOf', 'Feature');
-        # Check for a taxonomy connection.
-        my ($taxon) = $cdmi->GetFlat("IsTaxonomyOf", 'IsTaxonomyOf(to_link) = ?',
-                [$genomeID], 'from-link');
-        if ($taxon) {
-            # We found one, so disconnect it.
-            $cdmi->DeleteRow('IsTaxonomyOf', $taxon, $genomeID);
-            $stats->Add(IsTaxonomyOf => 1);
-        }
-        # Check for a submit connection.
-        my ($source) = $cdmi->GetFlat("Submitted", 'Submitted(to_link) = ?',
-                [$genomeID], 'from-link');
-        if ($source) {
-            # We found one, so disconnect it.
-            $cdmi->DeleteRow('Submitted', $source, $genomeID);
-            $stats->Add(Submitted => 1);
-        }
+    # Delete the contigs.
+    $loader->DeleteRelatedRecords($genomeID, 'IsComposedOf', 'Contig');
+    # Delete the features.
+    $loader->DeleteRelatedRecords($genomeID, 'IsOwnerOf', 'Feature');
+    # Check for a taxonomy connection.
+    my ($taxon) = $cdmi->GetFlat("IsTaxonomyOf", 'IsTaxonomyOf(to_link) = ?',
+            [$genomeID], 'from-link');
+    if ($taxon) {
+        # We found one, so disconnect it.
+        $cdmi->DeleteRow('IsTaxonomyOf', $taxon, $genomeID);
+        $stats->Add(IsTaxonomyOf => 1);
     }
+    # Check for a submit connection.
+    my ($source) = $cdmi->GetFlat("Submitted", 'Submitted(to_link) = ?',
+            [$genomeID], 'from-link');
+    if ($source) {
+        # We found one, so disconnect it.
+        $cdmi->DeleteRow('Submitted', $source, $genomeID);
+        $stats->Add(Submitted => 1);
+    }
+    # Delete the genome itself.
+    my $subStats = $cdmi->Delete(Genome => $genomeID);
+    # Roll up the statistics.
+    $stats->Accumulate($subStats);
 }
 
 =head3 LoadContigs
@@ -750,8 +663,6 @@ its KBase ID.
 Reference to a hash that maps each feature's foreign identifier to
 a list of aliases (if any).
 
-=back
-
 =cut
 
 sub ProcessFeatureBatch {
@@ -790,20 +701,11 @@ sub ProcessFeatureBatch {
         # Parse the locations.
         my @locs = map { BasicLocation->new($_) } split /\s*,\s*/, $locations;
         $stats->Add(featureLocations => scalar @locs);
-        # The feature length will be computed in here.
-        my $len = 0;
-        # Recover from bad locations.
-        eval {
-            # Compute the total feature length.
-            for my $loc (@locs) {
-                $len += $loc->Length;
-            }
-        };
-        if ($@) {
-            die "Invalid locations for feature $fid: $@\n";
-        } elsif ($len == 0) {
-            print "Zero-length feature $fid found.\n";
-            $stats->Add(nullFeature => 1);
+        # Compute the total feature length.
+        print "Processing $fid.\n"; ##HACK
+        my $len = $locs[0]->Length;
+        for (my $i = 1; $i < @locs; $i++) {
+            $len += $locs[$i]->Length;
         }
         # Create the feature record.
         $loader->InsertObject('IsOwnerOf', from_link => $genomeID,
@@ -940,7 +842,7 @@ sub LoadProteins {
                 my $kbid = $id_mapping->{$fid};
                 if (! $kbid) {
                     # Not found, so we have an error.
-                    print "Feature $fid for protein sequence not found.\n";
+                    print STDERR "Feature $fid for protein sequence not found.\n";
                     $stats->Add(proteinFeatureNotFound => 1);
                 } else {
                     # Found, so we can connect the protein to the feature.

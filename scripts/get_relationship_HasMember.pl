@@ -50,7 +50,11 @@ strings. The following fields are available:
 
 =item type
 
+=item release
+
 =item family_function
+
+=item alignment
 
 =back    
 
@@ -103,7 +107,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'type', 'family_function' );
+my @all_from_fields = ( 'id', 'type', 'release', 'family_function', 'alignment' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
 

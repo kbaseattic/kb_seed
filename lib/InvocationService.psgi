@@ -9,7 +9,16 @@ use URI::Dispatch;
 
 my @dispatch;
 
-my $obj = Bio::KBase::InvocationService::InvocationServiceImpl->new("/tmp/storage");
+my $storage_dir = "/tmp/storage";
+
+my $kb_storage_dir = "/xfs/kb_inst/iris_storage";
+
+if (-d $kb_storage_dir && -w $kb_storage_dir)
+{
+    $storage_dir = $kb_storage_dir;
+}
+
+my $obj = Bio::KBase::InvocationService::InvocationServiceImpl->new($storage_dir);
 push(@dispatch, 'InvocationService' => $obj);
 
 my $server = Bio::KBase::InvocationService::Service->new(instance_dispatch => { @dispatch },
@@ -105,6 +114,19 @@ $dispatch->add('/download/#*', 'handle_download');
 
 	return [200, [], ['{ "success": true}']];
     }
+    sub options
+    {
+	my($req, $args) = @_;
+
+	my @origin_hdr = ('Access-Control-Allow-Origin', $req->env->{HTTP_ORIGIN},
+			  'Access-Control-Allow-Methods', $req->env->{HTTP_ACCESS_CONTROL_REQUEST_METHOD},
+			  'Access-Control-Allow-Headers', $req->env->{HTTP_ACCESS_CONTROL_REQUEST_HEADERS},
+			  'Access-Control-Expose-Headers', $req->env->{HTTP_ACCESS_CONTROL_REQUEST_HEADERS},
+			  'Access-Control-Allow-Credentials', 'true');
+
+	return [200, \@origin_hdr, []];
+    }
+
 }
 
 {
@@ -119,9 +141,12 @@ $dispatch->add('/download/#*', 'handle_download');
 	my($code, $hdrs, $body) = @$resp;
 #	if ($code =~ /^5/)
 	{
-	    push(@$hdrs, 'Access-Control-Allow-Origin', $req->env->{HTTP_ORIGIN});
+	    if ($req->env->{HTTP_ORIGIN})
+	    {
+		push(@$hdrs, 'Access-Control-Allow-Origin', $req->env->{HTTP_ORIGIN});
+	    }
 	}
-	# 	print Dumper($resp);
+			print Dumper($resp);
 	return $resp;
     }
 }

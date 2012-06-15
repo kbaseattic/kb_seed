@@ -28,6 +28,8 @@ The StudyExperiment entity has the following relationship links:
     
 =item IncludesPart ObservationalUnit
 
+=item IsAssayedBy Assay
+
 
 =back
 

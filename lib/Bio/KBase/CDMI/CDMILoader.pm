@@ -598,7 +598,7 @@ sub genome_load_file_name {
     # Only Check for a genome-altered file if we have a genome ID.
     if ($genome) {
         # Compute the genome-altered file name.
-        my @parts = split /\./, $name;
+        my @parts = split  /\./, $name;
         my $extension = pop @parts;
         my $altName = $directory . "/" . join(".", @parts, $genome, $extension);
         # Check to see if it exists.
@@ -989,7 +989,7 @@ sub FindKBaseIDs {
     my ($self, $type, $ids) = @_;
     # Compute the real source and the real IDs.
     my $realSource = $self->realSource($type);
-    my $idMap = $self->idMap($ids);
+    my $idMap = $self->idMap($type, $ids);
     # Call through to the ID server.
     my $kbMap = $self->idserver->external_ids_to_kbase_ids($realSource,
             [map { $idMap->{$_} } @$ids]);
@@ -1040,7 +1040,7 @@ sub GetKBaseIDs {
     }
     # Compute the real source and the real IDs.
     my $realSource = $self->realSource($type);
-    my $idMap = $self->idMap($ids);
+    my $idMap = $self->idMap($type, $ids);
     # Call through to the ID server.
     my $kbMap = $self->idserver->register_ids($prefix, $realSource,
             [map { $idMap->{$_} } @$ids]);
@@ -1147,7 +1147,7 @@ sub realSource {
 
 =head3 idMap
 
-    my $idMap = $loader->idMap(\@ids);
+    my $idMap = $loader->idMap($type, \@ids);
 
 Return a hash mapping each incoming source ID to the ID that should be
 passed to the ID server in order to find its KBase ID. This is either
@@ -1155,6 +1155,10 @@ the raw ID or (if the source has genome-based IDs) the ID prefixed by
 the current genome ID.
 
 =over 4
+
+=item type
+
+Type of object for the IDs.
 
 =item ids
 
@@ -1171,11 +1175,12 @@ should be used when looking it up on the ID server.
 
 sub idMap {
     # Get the parameters.
-    my ($self, $ids) = @_;
+    my ($self, $type, $ids) = @_;
     # Declare the return hash.
     my %retVal;
-    # Determine whether or not we are genome-based.
-    if ($self->{sourceData}->genomeBased) {
+    # Determine whether or not we are genome-based. Note that we are
+    # never genome-based when looking for genome IDs.
+    if ($self->{sourceData}->genomeBased && $type ne 'Genome') {
         # We are, so prefix the current genome ID.
         %retVal = map { $_ => "$self->{genome}:$_" } @$ids;
     } else {

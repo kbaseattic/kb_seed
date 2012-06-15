@@ -30,11 +30,11 @@ The ObservationalUnit entity has the following relationship links:
 
 =item HasTrait Trait
 
-=item HasVariant Variation
-
 =item IsLocated Locality
 
 =item IsPartOf StudyExperiment
+
+=item IsVariedIn Contig
 
 =item UsesReference Genome
 
@@ -65,6 +65,8 @@ strings. The following fields are available:
 
 =item source_name2
 
+=item plant_id
+
 =back    
    
 =back
@@ -82,7 +84,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'source_name', 'source_name2' );
+my @all_fields = ( 'source_name', 'source_name2', 'plant_id' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_ObservationalUnit [-show-fields] [-a | -f field list] > entity.data";

@@ -38,10 +38,13 @@ my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    # This version of the script gets some basic genome stuff.
-    my @feats = $cdmi->GetAll('IsOwnerOf Feature', 'IsOwnerOf(from-link) = ?', ['kb|g.0'],
-            'Feature(id) Feature(function)');
-   for my $feat (@feats) {
-       print "$feat->[0]: $feat->[1]\n";
-   }
+    # Get the CDMI loader.
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
+    # Get the plant genome IDs.
+    my @genomes = $cdmi->GetFlat('Submitted', 'Submitted(from-link) = ?',
+            ['EnsemblPlant'], 'to-link');
+    for my $genome (@genomes) {
+        my $stats = $cdmi->Delete(Genome => $genome);
+        print "$genome deleted:\n" . $stats->Show();
+    }
 }

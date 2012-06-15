@@ -6243,6 +6243,171 @@ sub corresponds
 
 
 
+=head2 corresponds_from_sequences
+
+  $return = $obj->corresponds_from_sequences($g1_sequences, $g1_locations, $g2_sequences, $g2_locations)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$g1_sequences is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a protein_sequence
+$g1_locations is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a location
+$g2_sequences is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a protein_sequence
+$g2_locations is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a location
+$return is a reference to a hash where the key is a fid and the value is a correspondence
+fid is a string
+protein_sequence is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+correspondence is a reference to a hash where the following keys are defined:
+	to has a value which is a fid
+	iden has a value which is a float
+	ncontext has a value which is an int
+	b1 has a value which is an int
+	e1 has a value which is an int
+	ln1 has a value which is an int
+	b2 has a value which is an int
+	e2 has a value which is an int
+	ln2 has a value which is an int
+	score has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$g1_sequences is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a protein_sequence
+$g1_locations is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a location
+$g2_sequences is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a protein_sequence
+$g2_locations is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a fid
+	1: a location
+$return is a reference to a hash where the key is a fid and the value is a correspondence
+fid is a string
+protein_sequence is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+correspondence is a reference to a hash where the following keys are defined:
+	to has a value which is a fid
+	iden has a value which is a float
+	ncontext has a value which is an int
+	b1 has a value which is an int
+	e1 has a value which is an int
+	ln1 has a value which is an int
+	b2 has a value which is an int
+	e2 has a value which is an int
+	ln2 has a value which is an int
+	score has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub corresponds_from_sequences
+{
+    my $self = shift;
+    my($g1_sequences, $g1_locations, $g2_sequences, $g2_locations) = @_;
+
+    my @_bad_arguments;
+    (ref($g1_sequences) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"g1_sequences\" (value was \"$g1_sequences\")");
+    (ref($g1_locations) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"g1_locations\" (value was \"$g1_locations\")");
+    (ref($g2_sequences) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"g2_sequences\" (value was \"$g2_sequences\")");
+    (ref($g2_locations) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"g2_locations\" (value was \"$g2_locations\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to corresponds_from_sequences:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'corresponds_from_sequences');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN corresponds_from_sequences
+    
+    use Corresponds;
+    $return = {};
+    
+    my($corr,$reps2,$reps1) = &Corresponds::correspondence_of_reps([map { [$_->[0], undef, $_->[1]] } @$g1_sequences],
+								   $g1_locations,
+								   [map { [$_->[0], undef, $_->[1]] } @$g2_sequences],
+								   $g2_locations,
+								   5,
+								   200);
+    foreach my $x (@$corr)
+    {
+	my($id1,$iden,$ncontext,$b1,$e1,$ln1,$b2,$e2,$ln2,$score,$to) = @$x;
+	
+	$return->{$id1} = { to       => $to,
+				iden     => $iden,
+				ncontext => $ncontext,
+				b1       => $b1,
+				e1       => $e1,
+				ln1      => $ln1,
+				b2       => $b2,
+				e2       => $e2,
+				ln2      => $ln2,
+				score    => $score
+				};
+    }
+    
+    
+    #END corresponds_from_sequences
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to corresponds_from_sequences:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'corresponds_from_sequences');
+    }
+    return($return);
+}
+
+
+
+
 =head2 close_genomes
 
   $return = $obj->close_genomes($genomes, $how, $n)

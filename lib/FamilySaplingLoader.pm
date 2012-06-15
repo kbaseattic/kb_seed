@@ -122,6 +122,10 @@ sub Generate {
             while (! eof $ih) {
                 my ($fam, $function) = Tracer::GetLine($ih);
                 $self->Track(familyFunctionRecord => $fam, 1000);
+                if (! defined $function) {
+                    $function = "";
+                    $self->Add(missingFamilyFunction => 1);
+                }
                 # Output the family record.
                 $self->PutE(Family => $fam);
                 $self->PutE(FamilyName => $fam,

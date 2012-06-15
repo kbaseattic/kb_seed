@@ -18,6 +18,7 @@ our %return_counts = (
         'list_files' => 2,
         'remove_files' => 0,
         'rename_file' => 0,
+        'copy' => 0,
         'make_directory' => 0,
         'remove_directory' => 0,
         'change_directory' => 0,
@@ -25,6 +26,7 @@ our %return_counts = (
         'get_file' => 1,
         'run_pipeline' => 2,
         'exit_session' => 0,
+        'get_tutorial_text' => 3,
 );
 
 sub _build_valid_methods
@@ -36,6 +38,7 @@ sub _build_valid_methods
         'list_files' => 1,
         'remove_files' => 1,
         'rename_file' => 1,
+        'copy' => 1,
         'make_directory' => 1,
         'remove_directory' => 1,
         'change_directory' => 1,
@@ -43,6 +46,7 @@ sub _build_valid_methods
         'get_file' => 1,
         'run_pipeline' => 1,
         'exit_session' => 1,
+        'get_tutorial_text' => 1,
     };
     return $methods;
 }

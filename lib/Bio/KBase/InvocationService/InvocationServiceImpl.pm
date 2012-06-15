@@ -22,7 +22,7 @@ use Cwd;
 use Cwd 'abs_path';
 use File::Path;
 use File::Basename;
-
+use File::Copy;
 my @valid_commands = qw(
 	all_roles_used_in_models atomic_regulons_to_fids close_genomes co_occurrence_evidence 
 	complexes_to_complex_data complexes_to_roles contigs_to_lengths contigs_to_md5s 
@@ -144,16 +144,55 @@ my @valid_commands = qw(
 	query_entity_Source query_entity_StudyExperiment query_entity_Subsystem query_entity_SubsystemClass 
 	query_entity_TaxonomicGrouping query_entity_Trait query_entity_Variant query_entity_Variation 
 	
-	annotate_genome fasta_to_genome genomeTO_to_feature_data genomeTO_to_reconstructionTO 
+	annotate_genome fasta_to_genome genomeTO_to_feature_data genomeTO_to_reconstructionTO
+	a_and_b a_not_b rel2tabs tabs2rel cluster_objects cs_to_genome
 	reconstructionTO_to_roles reconstructionTO_to_subsystems
-			genomeTO_to_html file_to_spreadsheet
+		      genomeTO_to_html file_to_spreadsheet
+
+			gapfill_fbamodel
+			exchangeFormat_to_gapfillingFormulation  gapfillingFormulation_to_exchangeFormat
+			exchangeformat_to_fbamodel               genome_to_fbamodel
+			fbamodel_to_exchangeformat               get_gapfilling_formulation
+			fbamodel_to_html                         runfba
+			fbamodel_to_sbml
+			
+
 );
 
 my %valid_commands = map { $_ => 1 } @valid_commands;
-my @command_path = ("/kb/deployment/bin", "/home/olson/FIGdisk/FIG/bin");
+my @command_path = ("/kb/deployment/bin", "/home/olson/FIGdisk/FIG/bin", "/kb/deployment/modeling");
 
-my @valid_shell_commands = qw(sort grep cut cat head tail date echo);
+my @valid_shell_commands = qw(sort grep cut cat head tail date echo wc diff join uniq);
 my %valid_shell_commands = map { $_ => 1 } @valid_shell_commands;
+
+sub validate_path
+{
+    my($self, $session_id, $cwd) = @_;
+    my $base = $self->_session_dir($session_id);
+    my $dir = $base.$cwd;
+    my $ap = abs_path($dir);
+    if ($ap =~ /^$base/ || $ap eq '/dev/null') {
+        return $ap;
+    } else {
+        die "Invalid path $ap";
+    }
+
+
+}
+
+sub _prepend_cwd
+{
+    my($cwd, $path) = @_;
+    if ($path =~ m,^/,)
+    {
+	return $path;
+    }
+    else
+    {
+	return $cwd . "/" . $ path;
+    }
+}
+     
 
 sub _valid_session_name
 {
@@ -178,13 +217,47 @@ sub _session_dir
 sub _expand_filename
 {
     my($self, $session, $file, $cwd) = @_;
-    if ($file !~ /^([a-zA-Z][a-zA-Z0-9-_]*(?:\/[a-zA-Z][a-zA-Z0-9-_]*)*)/)
+    if ($file eq '')
+    {
+	return $self->validate_path($session, $cwd);
+    }
+    elsif ($file =~ m,^(/?)(?:[a-zA-Z0-9_.-]*(?:/[a-zA-Z0-9_.-]*)*),)
+    {
+	if ($1)
+	{
+	    return $self->validate_path($session, $file);
+	}
+	else
+	{
+	    return $self->validate_path($session, $cwd."/".$file);
+	}
+    }
+    else
     {
 	die "Invalid filename $file";
     }
-    return $self->validate_path($session, $cwd."/".$file);
-
+    
     #return $self->_session_dir($session) . "/$file";
+}
+sub validate_path
+{
+    my($self, $session_id, $cwd) = @_;
+
+    if ($cwd eq '/dev/null')
+    {
+	return $cwd;
+    }
+    
+    my $base = $self->_session_dir($session_id);
+    my $dir = $base.$cwd;
+    my $ap = abs_path($dir);
+    if ($ap =~ /^$base/) {
+        return $ap;
+    } else {
+        die "Invalid path '$ap'";
+    }
+
+
 }
 
 sub _validate_command
@@ -428,7 +501,7 @@ sub valid_session
 
 =head2 list_files
 
-  $return_1, $return_2 = $obj->list_files($session_id, $cwd)
+  $return_1, $return_2 = $obj->list_files($session_id, $cwd, $d)
 
 =over 4
 
@@ -439,13 +512,16 @@ sub valid_session
 <pre>
 $session_id is a string
 $cwd is a string
+$d is a string
 $return_1 is a reference to a list where each element is a directory
 $return_2 is a reference to a list where each element is a file
 directory is a reference to a hash where the following keys are defined:
 	name has a value which is a string
+	full_path has a value which is a string
 	mod_date has a value which is a string
 file is a reference to a hash where the following keys are defined:
 	name has a value which is a string
+	full_path has a value which is a string
 	mod_date has a value which is a string
 	size has a value which is a string
 
@@ -457,13 +533,16 @@ file is a reference to a hash where the following keys are defined:
 
 $session_id is a string
 $cwd is a string
+$d is a string
 $return_1 is a reference to a list where each element is a directory
 $return_2 is a reference to a list where each element is a file
 directory is a reference to a hash where the following keys are defined:
 	name has a value which is a string
+	full_path has a value which is a string
 	mod_date has a value which is a string
 file is a reference to a hash where the following keys are defined:
 	name has a value which is a string
+	full_path has a value which is a string
 	mod_date has a value which is a string
 	size has a value which is a string
 
@@ -483,11 +562,12 @@ file is a reference to a hash where the following keys are defined:
 sub list_files
 {
     my $self = shift;
-    my($session_id, $cwd) = @_;
+    my($session_id, $cwd, $d) = @_;
 
     my @_bad_arguments;
     (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument \"session_id\" (value was \"$session_id\")");
     (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument \"cwd\" (value was \"$cwd\")");
+    (!ref($d)) or push(@_bad_arguments, "Invalid type for argument \"d\" (value was \"$d\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to list_files:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -498,8 +578,18 @@ sub list_files
     my($return_1, $return_2);
     #BEGIN list_files
 
-   
-    my $dir  = $self->validate_path($session_id, $cwd);
+    
+    my $dir  = $self->_expand_filename($session_id, $d, $cwd);
+    my $fpath;
+    my $base = $self->_session_dir($session_id);
+   if ($dir =~ /^$base(.*)/)
+    {
+	$fpath = $1 ? $1 : "/";
+    }
+    else
+    {
+	die "Invalid path $dir";
+    }
 
     my @dirs;
     my @files;
@@ -508,23 +598,19 @@ sub list_files
     while (my $file = readdir($dh)) {
 	next if ($file =~ m/^\./);
 	my($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = stat("$dir/$file");
+
 	my $date= strftime("%b %d %G %H:%M:%S", localtime($mtime));
-        #my $date= strftime("%+", localtime($mtime));
+
         if (-f "$dir/$file") {
-		push @files, [$file, $date, $size];
-        } else {
-                if (-d "$dir/$file") {
-			push @dirs, [$file, $date];
-                }
+	    push @files, { name => $file, full_path => "$fpath/$file", mod_date => $date, size => $size};
+        } elsif (-d "$dir/$file") {
+	    push @dirs, { name => $file, full_path => "$fpath/$file", mod_date => $date };
         }
     }
 
-
-
     $return_1  = \@dirs;
     $return_2 =  \@files;
-    #$return = [ sort { $a <=> $b } readdir($dh) ];
-    #$return = [ sort { $a <=> $b } grep { -f "$dir/$_" } readdir($dh) ];
+
     closedir($dh);
 
     #END list_files
@@ -599,13 +685,9 @@ sub remove_files
     #BEGIN remove_files
     my $ap;
 
-    if ($filename =~ /^\//) {
-        $ap = $self->validate_path($session_id, $filename);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$filename);
-   }
+    my $ap = $self->_expand_filename($session_id, $filename, $cwd);
 
-    unlink("$ap");
+    unlink($ap);
     #END remove_files
     return();
 }
@@ -675,28 +757,96 @@ sub rename_file
     my $apf;
     my $apt;
 
+    my $apf  = $self->_expand_filename($session_id, $from, $cwd);
+    my $apt  = $self->_expand_filename($session_id, $to, $cwd);
 
-    if ($from =~ /^\//) {
-        $apf = $self->validate_path($session_id, $from);
-    } else {
-        $apf = $self->validate_path($session_id, $cwd."/".$from);
-   }
-    if ($to =~ /^\//) {
-        $apt = $self->validate_path($session_id, $to);
-    } else {
-        $apt = $self->validate_path($session_id, $cwd."/".$to);
-   }
-   if (-d "$apt") {
-           my $f = basename $from;
-	    if ($to =~ /^\//) {
-		$apt = $self->validate_path($session_id, $to."/".$f);
-	    } else {
-		$apt = $self->validate_path($session_id, $cwd."/".$to."/".$f);
-	   }
+   if (-d $apt) {
+       my $f = basename $from;
+       $apt = $self->_expand_filename($session_id, "$to/$f", $cwd);
    }
 
-    rename("$apf", "$apt") || die ( "Error in renaming" );
+    rename($apf, $apt) || die ( "Error in renaming" );
     #END rename_file
+    return();
+}
+
+
+
+
+=head2 copy
+
+  $obj->copy($session_id, $cwd, $from, $to)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$session_id is a string
+$cwd is a string
+$from is a string
+$to is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$session_id is a string
+$cwd is a string
+$from is a string
+$to is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub copy
+{
+    my $self = shift;
+    my($session_id, $cwd, $from, $to) = @_;
+
+    my @_bad_arguments;
+    (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument \"session_id\" (value was \"$session_id\")");
+    (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument \"cwd\" (value was \"$cwd\")");
+    (!ref($from)) or push(@_bad_arguments, "Invalid type for argument \"from\" (value was \"$from\")");
+    (!ref($to)) or push(@_bad_arguments, "Invalid type for argument \"to\" (value was \"$to\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to copy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'copy');
+    }
+
+    my $ctx = $Bio::KBase::InvocationService::Service::CallContext;
+    #BEGIN copy
+    my $apf;
+    my $apt;
+    
+    
+    $apf = $self->_expand_filename($session_id, $from, $cwd);
+    if (-d $apf) {
+	die "Cannot copy a directory";
+    }
+    $apt = $self->_expand_filename($session_id, $to, $cwd);
+    if (-d $apt) {
+	my $f = basename $from;
+	$apt = $self->_expand_filename($session_id, "$to/$f", $cwd);
+    }
+
+    File::Copy::copy($apf, $apt) || die ( "Error in renaming" );
+    #END copy
     return();
 }
 
@@ -761,14 +911,9 @@ sub make_directory
 
     my $ap;
 
-    if ($directory =~ /^\//) {
-        $ap = $self->validate_path($session_id, $directory);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$directory);
-   }
+    $ap = $self->_expand_filename($session_id, $directory, $cwd);
 
-
-    mkdir("$ap") || die ( "Error in mkdir" );
+    mkdir($ap) || die ( "Error in mkdir" );
     #END make_directory
     return();
 }
@@ -834,13 +979,9 @@ sub remove_directory
 
     my $ap;
 
-    if ($directory =~ /^\//) {
-        $ap = $self->validate_path($session_id, $directory);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$directory);
-   }
+    $ap = $self->_expand_filename($session_id, $directory, $cwd);
 
-    rmtree("$ap") || die ( "Error in rmdir" );
+    rmtree($ap) || die ( "Error in rmdir" );
     #END remove_directory
     return();
 }
@@ -908,24 +1049,21 @@ sub change_directory
 
     my $ap;
 
-    if ($directory =~ /^\//) {
-        $ap = $self->validate_path($session_id, $directory);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$directory);
-   }
+    $ap = $self->_expand_filename($session_id, $directory, $cwd);
 
-   if ($ap =~ /^$base(.*)/) {
-	if (!$1) {
+    if (-d $ap) {
+	print "$ap is a dir";
+	if ($ap =~ /^$base(.*)/) {
+	    if (!$1) {
 		return "/";
-	} else {
+	    } else {
 		return $1;
+	    }
+	} else {
+	    die "invalid path";
 	}
-   } else {
-	die "invalid path";
-   }
-		 
-
-
+    } else { die "$directory not a directory";}
+    
     #END change_directory
     return();
 }
@@ -1001,11 +1139,8 @@ sub put_file
     }
     my $ap;
 
-    if ($filename =~ /^\//) {
-        $ap = $self->validate_path($session_id, $filename);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$filename);
-   }
+    $ap = $self->_expand_filename($session_id, $filename, $cwd);
+
     open(my $fh, ">", $ap) or die "Cannot open $ap: $!";
     print $fh $contents;
     close($fh);
@@ -1076,21 +1211,10 @@ sub get_file
     my($contents);
     #BEGIN get_file
 
-
-    #
-    # Filenames can't have any special characters or start with a /.
-    #
-    if ($filename !~ /^([a-zA-Z][a-zA-Z0-9-_]*(?:\/[a-zA-Z][a-zA-Z0-9-_]*)*)/)
-    {
-	die "Invalid filename";
-    }
     my $ap;
 
-    if ($filename =~ /^\//) {
-        $ap = $self->validate_path($session_id, $filename);
-    } else {
-        $ap = $self->validate_path($session_id, $cwd."/".$filename);
-   }
+    $ap = $self->_expand_filename($session_id, $filename, $cwd);
+
     open(my $fh, "<", $ap) or die "Cannot open $ap: $!";
     local $/;
     undef $/;
@@ -1228,12 +1352,20 @@ sub run_pipeline
 	}
 	$saved_stderr[$idx] = [];
 	push(@cmd_list, $cmd);
-	push(@cmds, [$cmd_path, @$args]);
+	if ($cmd eq 'sort')
+	{
+	    if (!grep { $_ eq '-t' } @$args)
+	    {
+		unshift(@$args, "-t", "\t");
+	    }
+	}
+	push(@cmds, [$cmd_path, map { s/\\t/\t/g; $_ } @$args]);
 	push @cmds, init => sub {
 	    chdir $dir or die $!;
 	};
 	my $have_output_redirect;
 	my $have_stderr_redirect;
+	my $have_stdin_redirect;
 	for my $r (@$redirect)
 	{
 	    my($what, $file) = @$r;
@@ -1245,15 +1377,30 @@ sub run_pipeline
 		    push(@$errors, "$file: input not found");
 		    next PIPELINE;
 		}
+		$have_stdin_redirect = 1;
 		push(@cmds, '<', $path);
 	    }
-	    elsif ($what eq '>' || $what eq '>>')
+	    elsif ($what eq '>' || $what eq '>>' || $what eq '2>' || $what eq '2>>')
 	    {
 		my $path = $self->_expand_filename($session_id, $file, $cwd);
 		push(@cmds, $what, $path);
-		$have_output_redirect = 1;
+		if ($what =~ /^2/)
+		{
+		    $have_stderr_redirect = 1;
+		}
+		else
+		{
+		    $have_output_redirect = 1;
+		}
 	    }
 	    
+	}
+	if ($idx == 0)
+	{
+	    if (!$have_stdin_redirect)
+	    {
+		push(@cmds, '<', '/dev/null');
+	    }
 	}
 	if ($idx == $#$tree)
 	{
@@ -1382,20 +1529,107 @@ sub exit_session
 }
 
 
-sub validate_path
+
+
+=head2 get_tutorial_text
+
+  $text, $prev, $next = $obj->get_tutorial_text($step)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$step is an int
+$text is a string
+$prev is an int
+$next is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$step is an int
+$text is a string
+$prev is an int
+$next is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_tutorial_text
 {
-    my($self, $session_id, $cwd) = @_;
-    my $base = $self->_session_dir($session_id);
-    my $dir = $base.$cwd;
-    my $ap = abs_path($dir);
-    if ($ap =~ /^$base/) {
-	return $ap;
-    } else {
-	die "Invalid path $ap";
+    my $self = shift;
+    my($step) = @_;
+
+    my @_bad_arguments;
+    (!ref($step)) or push(@_bad_arguments, "Invalid type for argument \"step\" (value was \"$step\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_tutorial_text:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_tutorial_text');
     }
 
+    my $ctx = $Bio::KBase::InvocationService::Service::CallContext;
+    my($text, $prev, $next);
+    #BEGIN get_tutorial_text
 
+    my $gpath = sub { sprintf "/home/olson/public_html/kbt/t%d.html", $_[0]; };
+
+    my $path = &$gpath($step);
+    if (! -f $path)
+    {
+	$step = 1;
+	$path = &$gpath($step);
+    }
+
+    if (open(my $fh, "<", $path))
+    {
+	local $/;
+	undef $/;
+	$text = <$fh>;
+
+	$prev = $step - 1;
+	$next = $step + 1;
+	if (! -f &$gpath($prev))
+	{
+	    $prev = -1;
+	}
+	if (! -f &$gpath($next))
+	{
+	    $next = -1;
+	}
+	close($fh);
+    }
+    #END get_tutorial_text
+    my @_bad_returns;
+    (!ref($text)) or push(@_bad_returns, "Invalid type for return variable \"text\" (value was \"$text\")");
+    (!ref($prev)) or push(@_bad_returns, "Invalid type for return variable \"prev\" (value was \"$prev\")");
+    (!ref($next)) or push(@_bad_returns, "Invalid type for return variable \"next\" (value was \"$next\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_tutorial_text:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_tutorial_text');
+    }
+    return($text, $prev, $next);
 }
+
+
+
 
 =head1 TYPES
 
@@ -1414,6 +1648,7 @@ sub validate_path
 <pre>
 a reference to a hash where the following keys are defined:
 name has a value which is a string
+full_path has a value which is a string
 mod_date has a value which is a string
 
 </pre>
@@ -1424,6 +1659,7 @@ mod_date has a value which is a string
 
 a reference to a hash where the following keys are defined:
 name has a value which is a string
+full_path has a value which is a string
 mod_date has a value which is a string
 
 
@@ -1446,6 +1682,7 @@ mod_date has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 name has a value which is a string
+full_path has a value which is a string
 mod_date has a value which is a string
 size has a value which is a string
 
@@ -1457,6 +1694,7 @@ size has a value which is a string
 
 a reference to a hash where the following keys are defined:
 name has a value which is a string
+full_path has a value which is a string
 mod_date has a value which is a string
 size has a value which is a string
 

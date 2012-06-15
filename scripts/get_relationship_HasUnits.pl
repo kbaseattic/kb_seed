@@ -9,7 +9,8 @@ use Carp;
 
 =head1 get_relationship_HasUnits
 
-This relationship associates observational units with the geographic location where the unit is planted.
+This relationship associates observational units with the 
+geographic location where the unit is planted.
 
 Example:
 
@@ -92,6 +93,8 @@ strings. The following fields are available:
 
 =item source_name2
 
+=item plant_id
+
 =back    
 
 =back
@@ -111,7 +114,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'source_name', 'city', 'state', 'country', 'origcty', 'elevation', 'latitude', 'longitude', 'lo_accession' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'source_name', 'source_name2' );
+my @all_to_fields = ( 'id', 'source_name', 'source_name2', 'plant_id' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

@@ -48,6 +48,8 @@ The Genome entity has the following relationship links:
 
 =item IsOwnerOf Feature
 
+=item IsReferencedBy ObservationalUnit
+
 =item Uses SSRow
 
 =item WasSubmittedBy Source

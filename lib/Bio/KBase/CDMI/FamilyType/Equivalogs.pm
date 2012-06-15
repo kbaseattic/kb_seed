@@ -71,42 +71,59 @@ sub ResolveProteinMember {
     # Parse the ID to determine how to convert it to a form we would find
     # in the database. If we don't parse it successfully, we will try it
     # unmodified.
-    my $realID = $memberID;
-    if ($memberID =~ /^(\w+)\|([^\/|]+)/) {
+    my ($filter, $parms, $type) = ('AssertsFunctionFor(external-id) = ?', 
+            [$memberID], "Raw");
+    if ($memberID =~ /^GP\|([^|]+)\|([^\/]+)/) {
+        # This is a special ID format where the real ID follows an ID of
+        # a type we don't understand.
+        $parms = [$2];
+        $type = 'GP';
+    } elsif ($memberID =~ /^(\w+)\|([^\/|]+)/) {
         # This is the standard ID format. We have a prefixed identifier
         # terminated by a slash or vertical bar. The prefix may need to
         # be changed.
         my ($prefix, $suffix) = ($1, $2);
         if ($prefix eq 'OMNI') {
-            $realID = "cmr|$2";
-            $stats->Add(proteinCMR => 1);
+            $filter .= ' AND AssertsFunctionFor(from-link) = ?';
+            $parms = [$2, 'CMR'];
+            $type = 'OMNI';
         } elsif ($prefix eq 'GB') {
-            $realID = "gb|$2";
-            $stats->Add(proteinGB => 1);
+            $parms = ["gb|$2"];
+            $type = 'GB';
         } elsif ($prefix eq 'PIR') {
-            $realID = "pir||$2";
-            $stats->Add(proteinPIR => 1);
+            $parms = ["pir||$2"];
+            $type = 'PIR';
         } elsif ($prefix eq 'RF') {
-            $realID = $2;
-            $stats->Add(proteinRF => 1);
+            $parms = ["ref|$2"];
+            $type = 'RF';
+        } elsif ($prefix eq 'SP') {
+            $filter = 'AssertsFunctionFor(external-id) LIKE ?';
+            $parms = ['sp|$2|%'];
+            $type = 'SP';
+        } elsif ($prefix eq 'gi') {
+            $filter = 'AssertsFunctionFor(gi-number) = ?';
+            $parms = [$2];
+            $type = 'GI';
         } else {
-            $realID = (lc $1) . "|$2";
-            $stats->Add(proteinPrefixUnknown => 1);
+            $parms = [(lc $1) . "|$2"];
+            $type = 'Unknown';
         }
     } elsif ($memberID =~ /^([^|\/]+)/) {
         # Here we have an unprefixed identifier, which is handled unmodified.
-        $realID = $1;
-        $stats->Add(proteinUnprefixed => 1);
+        $parms = [$1];
+        $type = 'Unprefixed';
     }
     # Look for the protein in the database.
-    my ($retVal) = $cdmi->GetFlat('AssertsFunctionFor',
-            'AssertsFunctionFor(external-id) = ?', [$realID],
+    my ($retVal) = $cdmi->GetFlat('AssertsFunctionFor', $filter, $parms,
             'to-link');
     # Track whether or not we found it.
     if ($retVal) {
-        $stats->Add(proteinMemberFound => 1);
+        $stats->Add("proteinFound$type" => 1);
+        $stats->Add(proteinFound => 1);
     } else {
-        $stats->Add(proteinMemberNotFound => 1);
+        print STDERR "$memberID not found.\n";
+        $stats->Add("proteinNotFound$type" => 1);
+        $stats->Add(proteinNotFound => 1);
     }
     # Return the result.
     return $retVal;

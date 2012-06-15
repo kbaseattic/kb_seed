@@ -134,7 +134,7 @@ sub valid_session
 
 
 
-=head2 $result = list_files(session_id, cwd)
+=head2 $result = list_files(session_id, cwd, d)
 
 
 
@@ -144,17 +144,18 @@ sub list_files
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 2)
+    if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_files (received $n, expecting 2)");
+							       "Invalid argument count for function list_files (received $n, expecting 3)");
     }
     {
-	my($session_id, $cwd) = @args;
+	my($session_id, $cwd, $d) = @args;
 
 	my @_bad_arguments;
         (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"session_id\" (value was \"$session_id\")");
         (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument 2 \"cwd\" (value was \"$cwd\")");
+        (!ref($d)) or push(@_bad_arguments, "Invalid type for argument 3 \"d\" (value was \"$d\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to list_files:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -284,6 +285,59 @@ sub rename_file
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method rename_file",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'rename_file',
+				       );
+    }
+}
+
+
+
+=head2 $result = copy(session_id, cwd, from, to)
+
+
+
+=cut
+
+sub copy
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function copy (received $n, expecting 4)");
+    }
+    {
+	my($session_id, $cwd, $from, $to) = @args;
+
+	my @_bad_arguments;
+        (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"session_id\" (value was \"$session_id\")");
+        (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument 2 \"cwd\" (value was \"$cwd\")");
+        (!ref($from)) or push(@_bad_arguments, "Invalid type for argument 3 \"from\" (value was \"$from\")");
+        (!ref($to)) or push(@_bad_arguments, "Invalid type for argument 4 \"to\" (value was \"$to\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to copy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'copy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "InvocationService.copy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'copy',
+					      );
+	} else {
+	    return;
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method copy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'copy',
 				       );
     }
 }
@@ -649,6 +703,56 @@ sub exit_session
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method exit_session",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'exit_session',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_tutorial_text(step)
+
+
+
+=cut
+
+sub get_tutorial_text
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_tutorial_text (received $n, expecting 1)");
+    }
+    {
+	my($step) = @args;
+
+	my @_bad_arguments;
+        (!ref($step)) or push(@_bad_arguments, "Invalid type for argument 1 \"step\" (value was \"$step\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_tutorial_text:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_tutorial_text');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "InvocationService.get_tutorial_text",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_tutorial_text',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_tutorial_text",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_tutorial_text',
 				       );
     }
 }

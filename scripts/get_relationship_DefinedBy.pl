@@ -9,7 +9,8 @@ use Carp;
 
 =head1 get_relationship_DefinedBy
 
-This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
+This relationship associates observational units with a genus, 
+species, strain, and/or variety that was the source material.
 
 Example:
 
@@ -82,6 +83,8 @@ strings. The following fields are available:
 
 =item source_name2
 
+=item plant_id
+
 =back    
 
 =back
@@ -99,7 +102,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'source_name', 'source_name2' );
+my @all_from_fields = ( 'id', 'source_name', 'source_name2', 'plant_id' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'domain', 'hidden', 'scientific_name', 'alias' );
 

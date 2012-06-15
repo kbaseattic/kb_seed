@@ -9,7 +9,8 @@ use Carp;
 
 =head1 get_relationship_Summarizes
 
-This relationship associates observational units with a genus, species, strain, and/or variety that was the source material.
+This relationship describes the statistical frequencies of the
+most common alleles in various positions on the reference contig.
 
 Example:
 
@@ -69,20 +70,20 @@ strings. The following fields are available:
 
 =item to_link
 
+=item position
+
 =back    
 
 =item -to field-list
 
-Choose a set of fields from the Variation entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item position
-
-=item value
+=item source_id
 
 =back    
 
@@ -102,8 +103,8 @@ use Getopt::Long;
 #Default fields
  
 my @all_from_fields = ( 'id', 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele' );
-my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'position', 'value' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'position' );
+my @all_to_fields = ( 'id', 'source_id' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

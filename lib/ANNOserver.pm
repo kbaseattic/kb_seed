@@ -415,7 +415,8 @@ sub call_genes
         if (defined $fileData) {
             my $input = [];
             if (ref($fileData) eq 'ARRAY') {
-                $input = $fileData;
+                # $input = $fileData;
+		push(@$input, map { $_->[0] . "," . $_->[2] } @$fileData);
             } else {
                 my $fh;
                 if (ref($fileData)) {
@@ -494,7 +495,17 @@ sub find_rnas
     
     my $params = [ map { $_ => $args->{$_} } keys %$args ];
 
-    if (ref($input) ne 'ARRAY')
+    if (ref($input) eq 'ARRAY')
+    {
+	if (@$input)
+	{
+	    if (ref($input->[0]))
+	    {
+		@$input = map { $_->[0] . "," . $_->[2] } @$input;
+	    }
+	}
+    }
+    else
     {
 	my $fh;
 	if (ref($input))

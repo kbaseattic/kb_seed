@@ -777,14 +777,13 @@ sub count_to_freq
     return undef if ref $cnts  ne 'ARRAY';
     $pseudocnt ||= 0;
 
-    [ map { my $i = 0;                          # elements in group
-            my $n = $pseudocnt;
-            foreach ( @$_ ) { $n += $_ ; $i++ } # total count in group
-            $n ||= 1;                           #   or 1
-            my $pci = $i ? $pseudocnt / $i : 0; # and per element pseudocount
-            [ map { ( $_ + $pci ) / $n } @$_ ]  # used to make frequencies
+    [ map { my $n = $pseudocnt;
+            foreach ( @$_ ) { $n += $_ }          # total count in group
+            $n ||= 1;                             #   or 1
+            my $pci = @$_ ? $pseudocnt / @$_ : 0; # and per element pseudocount
+            [ map { ( $_ + $pci ) / $n } @$_ ]    # used to make frequencies
           }
-      @$cnts[ 0 .. 17 ]                         # for each group of counts
+      @$cnts[ 0 .. 17 ]                           # for each group of counts
     ]
 }
 
@@ -804,17 +803,16 @@ sub count_to_freq
 #-----------------------------------------------------------------------------
 sub packaged_count_to_freq
 {
-    my $cnts = shift;
+    my ( $cnts, $pseudocnt ) = @_;
     ref( $cnts ) eq 'ARRAY' or return undef;
-    my $pseudocnt = ( shift ) || 0;
+    $pseudocnt ||= 0;
 
-    [ map { my $i = 0;                          # elements in group
-            my $n = $pseudocnt;
-            foreach ( @$_ ) { $n += $_ ; $i++ } # total count in group
-            $n ||= 1;                           #   or 1
-            my $pci = $i ? $pseudocnt / $i : 0; # and per element pseudocount
-            [ map { ( $_ + $pci ) / $n } @$_ ]  # used to make frequencies
-          } @$cnts[ 0 .. 17 ]                   # for each group of counts
+    [ map { my $n = $pseudocnt;
+            foreach ( @$_ ) { $n += $_ }          # total count in group
+            $n ||= 1;                             #   or 1
+            my $pci = @$_ ? $pseudocnt / @$_ : 0; # and per element pseudocount
+            [ map { ( $_ + $pci ) / $n } @$_ ]    # used to make frequencies
+          } @$cnts[ 0 .. 17 ]                     # for each group of counts
     ]
 }
 
@@ -3533,7 +3531,7 @@ sub k_from_f0_and_f1
         my @kaa = ();
         for ( my $i = 0; $i < @$f0aa; $i++ )
         {
-            push @kaa, log( $f1aa->[$i] / $f0aa->[$i] );
+            push @kaa, log( ( $f1aa->[$i] || 0.000001 ) / ( $f0aa->[$i] || 0.000001 ) );
         }
         push @k, \@kaa;
     }
