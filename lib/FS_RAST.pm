@@ -770,7 +770,7 @@ sub extend_to_start_stop {
     $opt->{is_init} = $params->{is_init} ? $params->{is_init} : ['ATG','GTG'];
     $opt->{is_alt}  = $params->{is_alt}  ? $params->{is_alt}  : ['TTG'];
 
-    if ((! $params->{code}) || ($params->{code} == 4))
+    if ($params->{code} && ($params->{code} == 4))
     {
 	$opt->{'is_term'} = [ qw( TAA TAG ) ];
     }

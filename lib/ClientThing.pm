@@ -28,7 +28,7 @@ package ClientThing;
     use POSIX;
     use HTTP::Message;
 
-    use constant AGENT_NAME => "myRAST version 1.017";
+    use constant AGENT_NAME => "myRAST version 1.018";
 
 =head1 Base Class for Server Helper Objects
 
@@ -702,7 +702,8 @@ sub _send_request {
 	{
 	    $want_retry = 1;
 	}
-	elsif ($code eq 500 && $response->header('client-warning') eq 'Internal response')
+	elsif ($code eq 500 && defined( $response->header('client-warning') )
+	                    && $response->header('client-warning') eq 'Internal response')
 	{
 	    #
 	    # Handle errors that were not thrown by the web

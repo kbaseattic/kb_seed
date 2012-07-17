@@ -1947,12 +1947,12 @@ sub translate_seq_with_user_code
     my $ambigs;
     if    ( $gc->{$UUU} && ! $gc->{$TTT} )  # RNA only code table
     {
-        $seq = tr/Tt/Uu/;
+        $seq =~ tr/Tt/Uu/;
         $ambigs = \%RNA_letter_can_be;
     }
     elsif ( $gc->{$TTT} && ! $gc->{$UUU} )  # DNA only code table
     {
-        $seq = tr/Uu/Tt/;
+        $seq =~ tr/Uu/Tt/;
         $ambigs = \%DNA_letter_can_be;
     }
     else
