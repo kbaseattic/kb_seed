@@ -79,11 +79,13 @@ funcdef all_entities_AlignmentTree(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string source_id nullable;
 	int position nullable;
 	float minor_AF nullable;
-	float minor_allele nullable;
+	string minor_allele nullable;
 	float major_AF nullable;
-	float major_allele nullable;
+	string major_allele nullable;
+	int obs_unit_count nullable;
 } fields_AlleleFrequency ;
 
 /*
@@ -91,6 +93,11 @@ An allele frequency represents a summary of the major and minor allele frequenci
 It has the following fields:
 
 =over 4
+
+
+=item source_id
+
+identifier for this allele in the original (source) database
 
 
 =item position
@@ -116,6 +123,12 @@ Major allele frequency.  Floating point number less than or equal to 1.0.
 =item major_allele
 
 Text letter representation of the major allele. Valid values are A, C, G, and T.
+
+
+=item obs_unit_count
+
+Number of observational units used to compute the allele frequencies. Indicates
+the quality of the analysis.
 
 
 
@@ -177,6 +190,7 @@ funcdef all_entities_Annotation(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string source_id nullable;
 	string assay_type nullable;
 	string assay_type_id nullable;
 } fields_Assay ;
@@ -186,6 +200,11 @@ An assay is an experimental design for determining alleles at specific chromosom
 It has the following fields:
 
 =over 4
+
+
+=item source_id
+
+identifier for this assay in the original (source) database
 
 
 =item assay_type
@@ -1187,7 +1206,8 @@ revision number of the model
 
 =item type
 
-ask Chris
+string indicating where the model came from
+(e.g. single genome, multiple genome, or community model)
 
 
 =item status
@@ -2899,7 +2919,7 @@ typedef structure {
 } fields_HasUnits ;
 
 /*
-This relationship associates observational units with the 
+This relationship associates observational units with the
 geographic location where the unit is planted.
 It has the following fields:
 
@@ -2997,7 +3017,7 @@ of zero indicates an insertion.
 
 =item data
 
-Replacement DNA for the variation on the primary chromosome. An 
+Replacement DNA for the variation on the primary chromosome. An
 empty string indicates a deletion. The primary chromosome is chosen
 arbitrarily among the two chromosomes of a plant's chromosome pair
 (one coming from the mother and one from the father).
@@ -3123,7 +3143,7 @@ typedef structure {
 } fields_IncludesPart ;
 
 /*
-This relationship associates observational units with the 
+This relationship associates observational units with the
 experiments that generated the data on them.
 It has the following fields:
 
@@ -3238,10 +3258,10 @@ funcdef get_relationship_Annotates(list<string> ids, list<string> from_fields, l
 
 typedef structure {
 	string id;
-} fields_IsAssayedBy ;
+} fields_IsAssayOf ;
 
 /*
-This relationship associates each assay with the relevant 
+This relationship associates each assay with the relevant
 experiments.
 It has the following fields:
 
@@ -3253,10 +3273,10 @@ It has the following fields:
 
 
 */
+funcdef get_relationship_IsAssayOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Assay, fields_IsAssayOf, fields_StudyExperiment>>);
 funcdef get_relationship_IsAssayedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_StudyExperiment, fields_IsAssayedBy, fields_Assay>>);
-funcdef get_relationship_IsLocatedOn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Assay, fields_IsAssayedBy, fields_StudyExperiment>>);
+	returns(list<tuple<fields_StudyExperiment, fields_IsAssayOf, fields_Assay>>);
 
 typedef structure {
 	string id;
@@ -3944,8 +3964,8 @@ typedef structure {
 } fields_IsReferencedBy ;
 
 /*
-This relationship associates each observational unit with the reference 
-genome that it will be compared to.  All variations will be differences 
+This relationship associates each observational unit with the reference
+genome that it will be compared to.  All variations will be differences
 between the observational unit and the reference.
 It has the following fields:
 
@@ -4011,7 +4031,7 @@ typedef structure {
 } fields_IsRepresentedBy ;
 
 /*
-This relationship associates observational units with a genus, 
+This relationship associates observational units with a genus,
 species, strain, and/or variety that was the source material.
 It has the following fields:
 
@@ -4141,6 +4161,35 @@ funcdef get_relationship_IsSubInstanceOf(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_Subsystem, fields_IsSubInstanceOf, fields_Scenario>>);
 funcdef get_relationship_Validates(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Scenario, fields_IsSubInstanceOf, fields_Subsystem>>);
+
+typedef structure {
+	string id;
+	int position nullable;
+} fields_IsSummarizedBy ;
+
+/*
+This relationship describes the statistical frequencies of the
+most common alleles in various positions on the reference contig.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Position in the reference contig where the trait
+has an impact.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsSummarizedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Contig, fields_IsSummarizedBy, fields_AlleleFrequency>>);
+funcdef get_relationship_Summarizes(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlleleFrequency, fields_IsSummarizedBy, fields_Contig>>);
 
 typedef structure {
 	string id;
@@ -4531,35 +4580,6 @@ funcdef get_relationship_Submitted(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Source, fields_Submitted, fields_Genome>>);
 funcdef get_relationship_WasSubmittedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Genome, fields_Submitted, fields_Source>>);
-
-typedef structure {
-	string id;
-	int position nullable;
-} fields_Summarizes ;
-
-/*
-This relationship describes the statistical frequencies of the
-most common alleles in various positions on the reference contig.
-It has the following fields:
-
-=over 4
-
-
-=item position
-
-Position in the reference contig where the trait
-has an impact.
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_Summarizes(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_AlleleFrequency, fields_Summarizes, fields_Contig>>);
-funcdef get_relationship_SummarizedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Contig, fields_Summarizes, fields_AlleleFrequency>>);
 
 typedef structure {
 	string id;

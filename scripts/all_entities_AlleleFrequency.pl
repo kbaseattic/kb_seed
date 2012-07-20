@@ -51,6 +51,8 @@ strings. The following fields are available:
 
 =over 4
 
+=item source_id
+
 =item position
 
 =item minor_AF
@@ -60,6 +62,8 @@ strings. The following fields are available:
 =item major_AF
 
 =item major_allele
+
+=item obs_unit_count
 
 =back    
    
@@ -78,7 +82,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele' );
+my @all_fields = ( 'source_id', 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele', 'obs_unit_count' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_AlleleFrequency [-show-fields] [-a | -f field list] > entity.data";

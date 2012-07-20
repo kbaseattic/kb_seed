@@ -9,7 +9,7 @@ use Carp;
 
 =head1 get_relationship_IsLocated
 
-This relationship associates observational units with the 
+This relationship associates observational units with the
 geographic location where the unit is planted.
 
 Example:

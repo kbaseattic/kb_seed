@@ -24,7 +24,21 @@ They construct as output a mapping which takes as input an id and
 associates as output a set of fields from that instance of the entity.  Each
 routine allows the user to specify which fields are desired.
 
-        NEEDS EXAMPLE
+For example, assume you have an input file "Staphylococci," which is a list of genome IDs for each species of Staphylococcus in the database. The get_entity_Genome command is used to retrieve detailed information about each genome in the file. By using different modifiers, you can specify what kind of information you want to display. In this example, the modifier "contigs" was used. Thus, the number next to the genome ID in the output file indicates the number of contigs each Staphylococcus genome has. For a list of available modifiers relating to each identity, please refer to the ER model.
+
+        > / cat Staphylococci | cut -f 1 | get_entity_Genome - f contigs
+        kb|g.134        2
+        kb|g.636        1
+        kb|g.2506        15
+        kb|g.9303        1
+        kb|g.3801        87
+        kb|g.2025        46
+        kb|g.2516        13
+        kb|g.2603        33
+        kb|g.19928        2
+        kb|g.1852        131
+        kb|g.8476        1
+        kb|g.2742        46
 
 To use these routines effectively, a user will need to gradually
 become familiar with the entities supported in the CDM.  We suggest
@@ -33,9 +47,10 @@ get a good introduction.
 
 The next simplest set of routines provide the "get relationship" routines.  These
 take as input a list of ids for a specific entity type, and the give access
-to the relationship nodes associated with each entity.  Thus,
+to the relationship nodes associated with each entity.  Thus, get_relationship_WasSubmittedBy takes the input genome ID and outputs the ID with an added column showing the source of that particular genome. It is essential to be able to navigate the ER model to successfully implement these commands, since not all relationship types are applicable to each entity.
 
-        NEEDS EXAMPLE
+        > / echo 'kb|g.0' | get_relationship_WasSubmittedBy -to id
+        kb|g.0        SEED
 
 Of the remaining CDMI-API routines, most are used to extract data by
 "crossing one or more relationships".  Thus,

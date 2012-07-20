@@ -9,8 +9,8 @@ use Carp;
 
 =head1 get_relationship_UsesReference
 
-This relationship associates each observational unit with the reference 
-genome that it will be compared to.  All variations will be differences 
+This relationship associates each observational unit with the reference
+genome that it will be compared to.  All variations will be differences
 between the observational unit and the reference.
 
 Example:

@@ -82,8 +82,15 @@ module GenomeAnnotation
     /*
      * Given a genome object populated with contig data, perform gene calling
      * and functional annotation and return the annotated genome.
+     *
+     *  NOTE: Many of these "transformations" modify the input hash and
+     *        copy the pointer.  Be warned.
      */
     funcdef annotate_genome(genomeTO) returns (genomeTO);
+    funcdef call_RNAs(genomeTO) returns (genomeTO);
+    funcdef call_CDSs(genomeTO) returns (genomeTO);
+    funcdef find_close_neighbors(genomeTO) returns (genomeTO);
+    funcdef assign_functions_to_CDSs(genomeTO) returns (genomeTO);
 
     /*
      * Given a genome object populated with feature data, reannotate

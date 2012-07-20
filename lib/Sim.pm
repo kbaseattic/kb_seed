@@ -50,6 +50,7 @@
 #       feature2   feature object for subject sequence
 #       nbsc       normalized bit score
 #
+
 =head1 Similarity Object
 
 =head2 Introduction
@@ -72,7 +73,9 @@ part of the data in the similarity.
 
 package Sim;
 
-=head3 new
+use strict;
+
+=head2 new
 
     my $sim = Sim->new(  @data );
     my $sim = Sim->new( \@data );
@@ -123,7 +126,7 @@ sub new {
 }
 
 
-=head3 new_from_hsp
+=head2 new_from_hsp
 
     my $sim = Sim->new_from_hsp(  @hsp );
     my $sim = Sim->new_from_hsp( \@hsp );
@@ -162,7 +165,7 @@ sub new_from_hsp {
 }
 
 
-=head3 as_string
+=head2 as_string
 
     my $simString = "$sim";
 
@@ -182,7 +185,7 @@ sub as_string {
     return sprintf("sim:%s->%s:%s:%s", $obj->id1, $obj->id2, $obj->psc, $obj->iden);
 }
 
-=head3 new_from_line
+=head2 new_from_line
 
     my $sim = Sim->new_from_line($line);
 
@@ -211,7 +214,7 @@ sub new_from_line {
     return bless $self, $class;
 }
 
-=head3 validate
+=head2 validate
 
     my $okFlag = $sim->validate();
 
@@ -237,7 +240,7 @@ sub validate {
             $self->ln2 =~ /^\d+$/);
 }
 
-=head3 as_line
+=head2 as_line
 
     my $line = $sim->as_line;
 
@@ -251,34 +254,8 @@ sub as_line {
     return join("\t", @$self) . "\n";
 }
 
-=head3 new
 
-    my $sim = Sim->new(  @data );
-    my $sim = Sim->new( \@data );
-
-Create a similarity object from an array of fields.
-
-=over 4
-
-=item data
-
-An array of data in fields as defined above.
-
-=item RETURN
-
-Returns a similarity object that allows the values to be accessed by name.
-
-=back
-
-=cut
-
-sub new {
-    my $class = shift;
-    my $self  = [ $_[0] && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_ ];
-    bless $self, $class;
-}
-
-=head3 id1
+=head2 id1
 
     my $id = $sim->id1;
 
@@ -291,7 +268,7 @@ sub id1 {
     return $sim->[0];
 }
 
-=head3 id2
+=head2 id2
 
     my $id = $sim->id2;
 
@@ -313,7 +290,7 @@ sub feature2 {
     return FeatureO->new($figO, $id);
 }
 
-=head3 iden
+=head2 iden
 
     my $percent = $sim->iden;
 
@@ -326,7 +303,7 @@ sub iden {
     return $sim->[2];
 }
 
-=head3 ali_ln
+=head2 ali_ln
 
     my $chars = $sim->ali_ln;
 
@@ -339,7 +316,7 @@ sub ali_ln {
     return $sim->[3];
 }
 
-=head3 mismatches
+=head2 mismatches
 
     my $count = $sim->mismatches;
 
@@ -352,7 +329,7 @@ sub mismatches {
     return $sim->[4];
 }
 
-=head3 gaps
+=head2 gaps
 
     my $count = $sim->gaps;
 
@@ -365,7 +342,7 @@ sub gaps {
     return $sim->[5];
 }
 
-=head3 b1
+=head2 b1
 
     my $beginOffset = $sim->b1;
 
@@ -378,7 +355,7 @@ sub b1 {
     return $sim->[6];
 }
 
-=head3 e1
+=head2 e1
 
     my $endOffset = $sim->e1;
 
@@ -391,7 +368,7 @@ sub e1 {
     return $sim->[7];
 }
 
-=head3 b2
+=head2 b2
 
     my $beginOffset = $sim->b2;
 
@@ -404,7 +381,7 @@ sub b2 {
     return $sim->[8];
 }
 
-=head3 e2
+=head2 e2
 
     my $endOffset = $sim->e2;
 
@@ -417,7 +394,7 @@ sub e2 {
     return $sim->[9];
 }
 
-=head3 psc
+=head2 psc
 
     my $score = $sim->psc;
 
@@ -433,7 +410,7 @@ sub psc {
     return ($sim->[10] =~ /^e-/) ? "1.0" . $sim->[10] : $sim->[10];
 }
 
-=head3 bsc
+=head2 bsc
 
     my $score = $sim->bsc;
 
@@ -448,7 +425,7 @@ sub bsc {
     return $sim->[11];
 }
 
-=head3 bsc
+=head2 bsc
 
     my $score = $sim->bit_score;
 
@@ -463,7 +440,7 @@ sub bit_score {
     return $sim->bsc;
 }
 
-=head3 nbsc
+=head2 nbsc
 
     my $score = $sim->nbsc;
 
@@ -489,7 +466,7 @@ sub min {
     return ($x < $y) ? $x : $y;
 }
 
-=head3 ln1
+=head2 ln1
 
     my $length = $sim->ln1;
 
@@ -502,7 +479,7 @@ sub ln1 {
     return $sim->[12];
 }
 
-=head3 ln2
+=head2 ln2
 
     my $length = $sim->ln2;
 
@@ -515,7 +492,7 @@ sub ln2 {
     return $sim->[13];
 }
 
-=head3 tool
+=head2 tool
 
     my $name = $sim->tool;
 
@@ -538,4 +515,28 @@ sub ali {
     return $sim->[16];
 }
 
+=head2 usage
+
+    my $pod_as_text = Module::usage;
+    my $pod_as_text = Module->usage;
+    my $pod_as_text = Package->usage;
+    my $pod_as_text = $object->usage;
+
+Returns the module's pod documentation as text.
+
+=cut
+
+sub usage {
+    seek(DATA,0,0)                          or return '';
+    eval { require Pod::Text }              or return '';
+    my $podout;
+    open(PODOUT, '>', \$podout)             or return '';
+    my $pod = Pod::Text->new( width => 79 ) or return '';;
+    $pod->parse_from_filehandle( \*DATA, \*PODOUT );
+    close( PODOUT );
+    $podout || '';
+}
+
 1;
+
+__DATA__

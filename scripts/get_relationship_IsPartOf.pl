@@ -9,7 +9,7 @@ use Carp;
 
 =head1 get_relationship_IsPartOf
 
-This relationship associates observational units with the 
+This relationship associates observational units with the
 experiments that generated the data on them.
 
 Example:

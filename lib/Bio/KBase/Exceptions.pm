@@ -38,4 +38,13 @@ sub full_message
     return $self->message . "\nHTTP status: " . $self->status_line . "\nFunction invoked: " . $self->method_name;
 }
 
+package Bio::KBase::Exceptions::JSONRPC;
+use strict;
+
+sub full_message
+{
+    my($self) = @_;
+    return sprintf("JSONRPC error:\n%s\nJSONRPC error code: %s\nJSONRPC error data:%s\n", $self->message, $self->code, $self->data);
+}
+
 1;

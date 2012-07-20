@@ -43,7 +43,7 @@ The Contig entity has the following relationship links:
 
 =item IsLocusFor Feature
 
-=item SummarizedBy AlleleFrequency
+=item IsSummarizedBy AlleleFrequency
 
 
 =back

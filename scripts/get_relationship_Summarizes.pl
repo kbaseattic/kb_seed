@@ -40,22 +40,14 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the AlleleFrequency entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item position
-
-=item minor_AF
-
-=item minor_allele
-
-=item major_AF
-
-=item major_allele
+=item source_id
 
 =back    
 
@@ -76,7 +68,7 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the AlleleFrequency entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
@@ -84,6 +76,18 @@ strings. The following fields are available:
 =item id
 
 =item source_id
+
+=item position
+
+=item minor_AF
+
+=item minor_allele
+
+=item major_AF
+
+=item major_allele
+
+=item obs_unit_count
 
 =back    
 
@@ -102,7 +106,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele' );
+my @all_from_fields = ( 'id', 'source_id', 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele', 'obs_unit_count' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'position' );
 my @all_to_fields = ( 'id', 'source_id' );
 

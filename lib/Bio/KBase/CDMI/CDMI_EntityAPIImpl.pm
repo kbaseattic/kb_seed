@@ -29,11 +29,13 @@ our $entity_field_defs = {
     },
     'AlleleFrequency' => {
 	id => 1,
+		    'source_id' => 1,
 		    'position' => 1,
 		    'minor_AF' => 1,
 		    'minor_allele' => 1,
 		    'major_AF' => 1,
 		    'major_allele' => 1,
+		    'obs_unit_count' => 1,
 	
     },
     'Annotation' => {
@@ -45,6 +47,7 @@ our $entity_field_defs = {
     },
     'Assay' => {
 	id => 1,
+		    'source_id' => 1,
 		    'assay_type' => 1,
 		    'assay_type_id' => 1,
 	
@@ -812,11 +815,11 @@ our $relationship_field_defs = {
 	to_link => 1, from_link => 1,
 	
     },
-    'IsAssayedBy' => {
+    'IsAssayOf' => {
 	to_link => 1, from_link => 1,
 	
     },
-    'IsLocatedOn' => {
+    'IsAssayedBy' => {
 	to_link => 1, from_link => 1,
 	
     },
@@ -1122,6 +1125,16 @@ our $relationship_field_defs = {
 	to_link => 1, from_link => 1,
 	
     },
+    'IsSummarizedBy' => {
+	to_link => 1, from_link => 1,
+		    'position' => 1,
+	
+    },
+    'Summarizes' => {
+	to_link => 1, from_link => 1,
+		    'position' => 1,
+	
+    },
     'IsSuperclassOf' => {
 	to_link => 1, from_link => 1,
 	
@@ -1254,16 +1267,6 @@ our $relationship_field_defs = {
     },
     'WasSubmittedBy' => {
 	to_link => 1, from_link => 1,
-	
-    },
-    'Summarizes' => {
-	to_link => 1, from_link => 1,
-		    'position' => 1,
-	
-    },
-    'SummarizedBy' => {
-	to_link => 1, from_link => 1,
-		    'position' => 1,
 	
     },
     'Uses' => {
@@ -1414,9 +1417,9 @@ our $relationship_field_rels = {
     },
     'Annotates' => {
     },
-    'IsAssayedBy' => {
+    'IsAssayOf' => {
     },
-    'IsLocatedOn' => {
+    'IsAssayedBy' => {
     },
     'IsClassFor' => {
     },
@@ -1558,6 +1561,10 @@ our $relationship_field_rels = {
     },
     'Validates' => {
     },
+    'IsSummarizedBy' => {
+    },
+    'Summarizes' => {
+    },
     'IsSuperclassOf' => {
     },
     'IsSubclassOf' => {
@@ -1617,10 +1624,6 @@ our $relationship_field_rels = {
     'Submitted' => {
     },
     'WasSubmittedBy' => {
-    },
-    'Summarizes' => {
-    },
-    'SummarizedBy' => {
     },
     'Uses' => {
     },
@@ -1698,8 +1701,8 @@ our $relationship_entities = {
     'IsARequirementOf' => [ 'Requirement', 'Model' ],
     'IsAnnotatedBy' => [ 'Feature', 'Annotation' ],
     'Annotates' => [ 'Annotation', 'Feature' ],
+    'IsAssayOf' => [ 'Assay', 'StudyExperiment' ],
     'IsAssayedBy' => [ 'StudyExperiment', 'Assay' ],
-    'IsLocatedOn' => [ 'Assay', 'StudyExperiment' ],
     'IsClassFor' => [ 'SubsystemClass', 'Subsystem' ],
     'IsInClass' => [ 'Subsystem', 'SubsystemClass' ],
     'IsCollectionOf' => [ 'OTU', 'Genome' ],
@@ -1770,6 +1773,8 @@ our $relationship_entities = {
     'HasAsSequence' => [ 'Contig', 'ContigSequence' ],
     'IsSubInstanceOf' => [ 'Subsystem', 'Scenario' ],
     'Validates' => [ 'Scenario', 'Subsystem' ],
+    'IsSummarizedBy' => [ 'Contig', 'AlleleFrequency' ],
+    'Summarizes' => [ 'AlleleFrequency', 'Contig' ],
     'IsSuperclassOf' => [ 'SubsystemClass', 'SubsystemClass' ],
     'IsSubclassOf' => [ 'SubsystemClass', 'SubsystemClass' ],
     'IsTargetOf' => [ 'ModelCompartment', 'BiomassCompound' ],
@@ -1800,8 +1805,6 @@ our $relationship_entities = {
     'IsShownOn' => [ 'Compound', 'Diagram' ],
     'Submitted' => [ 'Source', 'Genome' ],
     'WasSubmittedBy' => [ 'Genome', 'Source' ],
-    'Summarizes' => [ 'AlleleFrequency', 'Contig' ],
-    'SummarizedBy' => [ 'Contig', 'AlleleFrequency' ],
     'Uses' => [ 'Genome', 'SSRow' ],
     'IsUsedBy' => [ 'SSRow', 'Genome' ],
 
@@ -2666,11 +2669,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 </pre>
 
@@ -2683,11 +2688,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 
 =end text
@@ -2700,6 +2707,11 @@ An allele frequency represents a summary of the major and minor allele frequenci
 It has the following fields:
 
 =over 4
+
+
+=item source_id
+
+identifier for this allele in the original (source) database
 
 
 =item position
@@ -2725,6 +2737,12 @@ Major allele frequency.  Floating point number less than or equal to 1.0.
 =item major_allele
 
 Text letter representation of the major allele. Valid values are A, C, G, and T.
+
+
+=item obs_unit_count
+
+Number of observational units used to compute the allele frequencies. Indicates
+the quality of the analysis.
 
 
 
@@ -2787,11 +2805,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 </pre>
 
@@ -2807,11 +2827,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 
 =end text
@@ -2877,11 +2899,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 </pre>
 
@@ -2895,11 +2919,13 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_AlleleFrequency
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	position has a value which is an int
 	minor_AF has a value which is a float
-	minor_allele has a value which is a float
+	minor_allele has a value which is a string
 	major_AF has a value which is a float
-	major_allele has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
 
 
 =end text
@@ -3246,6 +3272,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -3260,6 +3287,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -3274,6 +3302,11 @@ An assay is an experimental design for determining alleles at specific chromosom
 It has the following fields:
 
 =over 4
+
+
+=item source_id
+
+identifier for this assay in the original (source) database
 
 
 =item assay_type
@@ -3346,6 +3379,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -3363,6 +3397,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -3430,6 +3465,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -3445,6 +3481,7 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Assay
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -9026,7 +9063,8 @@ revision number of the model
 
 =item type
 
-ask Chris
+string indicating where the model came from
+(e.g. single genome, multiple genome, or community model)
 
 
 =item status
@@ -21102,7 +21140,7 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 =item Description
 
-This relationship associates observational units with the 
+This relationship associates observational units with the
 geographic location where the unit is planted.
 It has the following fields:
 
@@ -21818,7 +21856,7 @@ of zero indicates an insertion.
 
 =item data
 
-Replacement DNA for the variation on the primary chromosome. An 
+Replacement DNA for the variation on the primary chromosome. An
 empty string indicates a deletion. The primary chromosome is chosen
 arbitrarily among the two chromosomes of a plant's chromosome pair
 (one coming from the mother and one from the father).
@@ -22585,7 +22623,7 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 =item Description
 
-This relationship associates observational units with the 
+This relationship associates observational units with the
 experiments that generated the data on them.
 It has the following fields:
 
@@ -23694,6 +23732,122 @@ sub get_relationship_Annotates
 
 
 
+=head2 get_relationship_IsAssayOf
+
+  $return = $obj->get_relationship_IsAssayOf($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Assay
+	1: a fields_IsAssayOf
+	2: a fields_StudyExperiment
+fields_Assay is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	assay_type has a value which is a string
+	assay_type_id has a value which is a string
+fields_IsAssayOf is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_StudyExperiment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_name has a value which is a string
+	design has a value which is a string
+	originator has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Assay
+	1: a fields_IsAssayOf
+	2: a fields_StudyExperiment
+fields_Assay is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	assay_type has a value which is a string
+	assay_type_id has a value which is a string
+fields_IsAssayOf is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_StudyExperiment is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_name has a value which is a string
+	design has a value which is a string
+	originator has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+This relationship associates each assay with the relevant
+experiments.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsAssayOf
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_IsAssayOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAssayOf');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_IsAssayOf
+
+    $return = $self->_get_relationship($ctx, 'IsAssayOf', 'IsAssayOf', 0, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_IsAssayOf
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_IsAssayOf:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsAssayOf');
+    }
+    return($return);
+}
+
+
+
+
 =head2 get_relationship_IsAssayedBy
 
   $return = $obj->get_relationship_IsAssayedBy($ids, $from_fields, $rel_fields, $to_fields)
@@ -23711,17 +23865,18 @@ $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
 	0: a fields_StudyExperiment
-	1: a fields_IsAssayedBy
+	1: a fields_IsAssayOf
 	2: a fields_Assay
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
 	design has a value which is a string
 	originator has a value which is a string
-fields_IsAssayedBy is a reference to a hash where the following keys are defined:
+fields_IsAssayOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -23737,17 +23892,18 @@ $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
 	0: a fields_StudyExperiment
-	1: a fields_IsAssayedBy
+	1: a fields_IsAssayOf
 	2: a fields_Assay
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
 	design has a value which is a string
 	originator has a value which is a string
-fields_IsAssayedBy is a reference to a hash where the following keys are defined:
+fields_IsAssayOf is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	source_id has a value which is a string
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 
@@ -23758,15 +23914,7 @@ fields_Assay is a reference to a hash where the following keys are defined:
 
 =item Description
 
-This relationship associates each assay with the relevant 
-experiments.
-It has the following fields:
 
-=over 4
-
-
-
-=back
 
 =back
 
@@ -23792,7 +23940,7 @@ sub get_relationship_IsAssayedBy
     my($return);
     #BEGIN get_relationship_IsAssayedBy
 
-    $return = $self->_get_relationship($ctx, 'IsAssayedBy', 'IsAssayedBy', 0, $ids, $from_fields, $rel_fields, $to_fields);
+    $return = $self->_get_relationship($ctx, 'IsAssayedBy', 'IsAssayOf', 1, $ids, $from_fields, $rel_fields, $to_fields);
 	
     #END get_relationship_IsAssayedBy
     my @_bad_returns;
@@ -23801,112 +23949,6 @@ sub get_relationship_IsAssayedBy
 	my $msg = "Invalid returns passed to get_relationship_IsAssayedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_IsAssayedBy');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_IsLocatedOn
-
-  $return = $obj->get_relationship_IsLocatedOn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Assay
-	1: a fields_IsAssayedBy
-	2: a fields_StudyExperiment
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	assay_type_id has a value which is a string
-fields_IsAssayedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Assay
-	1: a fields_IsAssayedBy
-	2: a fields_StudyExperiment
-fields_Assay is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	assay_type has a value which is a string
-	assay_type_id has a value which is a string
-fields_IsAssayedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-fields_StudyExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_name has a value which is a string
-	design has a value which is a string
-	originator has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_IsLocatedOn
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_IsLocatedOn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocatedOn');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_IsLocatedOn
-
-    $return = $self->_get_relationship($ctx, 'IsLocatedOn', 'IsAssayedBy', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_IsLocatedOn
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_IsLocatedOn:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_IsLocatedOn');
     }
     return($return);
 }
@@ -30130,8 +30172,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 =item Description
 
-This relationship associates each observational unit with the reference 
-genome that it will be compared to.  All variations will be differences 
+This relationship associates each observational unit with the reference
+genome that it will be compared to.  All variations will be differences
 between the observational unit and the reference.
 It has the following fields:
 
@@ -30845,7 +30887,7 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 =item Description
 
-This relationship associates observational units with a genus, 
+This relationship associates observational units with a genus,
 species, strain, and/or variety that was the source material.
 It has the following fields:
 
@@ -32094,6 +32136,248 @@ sub get_relationship_Validates
 	my $msg = "Invalid returns passed to get_relationship_Validates:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_Validates');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship_IsSummarizedBy
+
+  $return = $obj->get_relationship_IsSummarizedBy($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Contig
+	1: a fields_IsSummarizedBy
+	2: a fields_AlleleFrequency
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	position has a value which is an int
+fields_AlleleFrequency is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	position has a value which is an int
+	minor_AF has a value which is a float
+	minor_allele has a value which is a string
+	major_AF has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Contig
+	1: a fields_IsSummarizedBy
+	2: a fields_AlleleFrequency
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	position has a value which is an int
+fields_AlleleFrequency is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	position has a value which is an int
+	minor_AF has a value which is a float
+	minor_allele has a value which is a string
+	major_AF has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
+
+
+=end text
+
+
+
+=item Description
+
+This relationship describes the statistical frequencies of the
+most common alleles in various positions on the reference contig.
+It has the following fields:
+
+=over 4
+
+
+=item position
+
+Position in the reference contig where the trait
+has an impact.
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsSummarizedBy
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_IsSummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsSummarizedBy');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_IsSummarizedBy
+
+    $return = $self->_get_relationship($ctx, 'IsSummarizedBy', 'IsSummarizedBy', 0, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_IsSummarizedBy
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_IsSummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_IsSummarizedBy');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship_Summarizes
+
+  $return = $obj->get_relationship_Summarizes($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_AlleleFrequency
+	1: a fields_IsSummarizedBy
+	2: a fields_Contig
+fields_AlleleFrequency is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	position has a value which is an int
+	minor_AF has a value which is a float
+	minor_allele has a value which is a string
+	major_AF has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
+fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	position has a value which is an int
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_AlleleFrequency
+	1: a fields_IsSummarizedBy
+	2: a fields_Contig
+fields_AlleleFrequency is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	position has a value which is an int
+	minor_AF has a value which is a float
+	minor_allele has a value which is a string
+	major_AF has a value which is a float
+	major_allele has a value which is a string
+	obs_unit_count has a value which is an int
+fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	position has a value which is an int
+fields_Contig is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_Summarizes
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_Summarizes');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_Summarizes
+
+    $return = $self->_get_relationship($ctx, 'Summarizes', 'IsSummarizedBy', 1, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_Summarizes
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_Summarizes');
     }
     return($return);
 }
@@ -35631,240 +35915,6 @@ sub get_relationship_WasSubmittedBy
 	my $msg = "Invalid returns passed to get_relationship_WasSubmittedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_relationship_WasSubmittedBy');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_Summarizes
-
-  $return = $obj->get_relationship_Summarizes($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_AlleleFrequency
-	1: a fields_Summarizes
-	2: a fields_Contig
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_AlleleFrequency
-	1: a fields_Summarizes
-	2: a fields_Contig
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-This relationship describes the statistical frequencies of the
-most common alleles in various positions on the reference contig.
-It has the following fields:
-
-=over 4
-
-
-=item position
-
-Position in the reference contig where the trait
-has an impact.
-
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_Summarizes
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Summarizes');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_Summarizes
-
-    $return = $self->_get_relationship($ctx, 'Summarizes', 'Summarizes', 0, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_Summarizes
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_Summarizes:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_Summarizes');
-    }
-    return($return);
-}
-
-
-
-
-=head2 get_relationship_SummarizedBy
-
-  $return = $obj->get_relationship_SummarizedBy($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Contig
-	1: a fields_Summarizes
-	2: a fields_AlleleFrequency
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Contig
-	1: a fields_Summarizes
-	2: a fields_AlleleFrequency
-fields_Contig is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	source_id has a value which is a string
-fields_Summarizes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-fields_AlleleFrequency is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	position has a value which is an int
-	minor_AF has a value which is a float
-	minor_allele has a value which is a float
-	major_AF has a value which is a float
-	major_allele has a value which is a float
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_SummarizedBy
-{
-    my $self = shift;
-    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
-    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
-    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_relationship_SummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_SummarizedBy');
-    }
-
-    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
-    my($return);
-    #BEGIN get_relationship_SummarizedBy
-
-    $return = $self->_get_relationship($ctx, 'SummarizedBy', 'Summarizes', 1, $ids, $from_fields, $rel_fields, $to_fields);
-	
-    #END get_relationship_SummarizedBy
-    my @_bad_returns;
-    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_relationship_SummarizedBy:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_relationship_SummarizedBy');
     }
     return($return);
 }
@@ -39468,11 +39518,13 @@ tree_properties has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+source_id has a value which is a string
 position has a value which is an int
 minor_AF has a value which is a float
-minor_allele has a value which is a float
+minor_allele has a value which is a string
 major_AF has a value which is a float
-major_allele has a value which is a float
+major_allele has a value which is a string
+obs_unit_count has a value which is an int
 
 </pre>
 
@@ -39482,11 +39534,13 @@ major_allele has a value which is a float
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+source_id has a value which is a string
 position has a value which is an int
 minor_AF has a value which is a float
-minor_allele has a value which is a float
+minor_allele has a value which is a string
 major_AF has a value which is a float
-major_allele has a value which is a float
+major_allele has a value which is a string
+obs_unit_count has a value which is an int
 
 
 =end text
@@ -39544,6 +39598,7 @@ annotation_time has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+source_id has a value which is a string
 assay_type has a value which is a string
 assay_type_id has a value which is a string
 
@@ -39555,6 +39610,7 @@ assay_type_id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+source_id has a value which is a string
 assay_type has a value which is a string
 assay_type_id has a value which is a string
 
@@ -42205,7 +42261,7 @@ id has a value which is a string
 
 
 
-=head2 fields_IsAssayedBy
+=head2 fields_IsAssayOf
 
 =over 4
 
@@ -43307,6 +43363,38 @@ id has a value which is a string
 
 
 
+=head2 fields_IsSummarizedBy
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+position has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+position has a value which is an int
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_IsSuperclassOf
 
 =over 4
@@ -43763,38 +43851,6 @@ id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Summarizes
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-position has a value which is an int
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-position has a value which is an int
 
 
 =end text

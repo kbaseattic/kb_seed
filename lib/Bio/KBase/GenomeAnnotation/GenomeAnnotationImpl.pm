@@ -946,6 +946,613 @@ sub annotate_genome
 
 
 
+=head2 call_RNAs
+
+  $return = $obj->call_RNAs($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub call_RNAs
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to call_RNAs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_RNAs');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN call_RNAs
+    ##################################################
+    use ANNOserver;
+    my $anno = ANNOserver->new();
+    #
+    # Reformat the contigs for use with the ANNOserver.
+    #
+    my @contigs;
+    foreach my $gctg (@{$genomeTO->{contigs}})
+    {
+	push(@contigs, [$gctg->{id}, undef, $gctg->{dna}]);
+    }
+
+    #
+    # Call RNAs
+    #
+    my($genus, $species, $strain) = split(/\s+/, $genomeTO->{scientific_name}, 3);
+    print STDERR "Call rnas '$genus' '$species' '$strain' '$genomeTO->{domain}'...\n";
+    my $rna_calls = $anno->find_rnas(-input => \@contigs, -genus => $genus, -species => $species,
+				     -domain => $genomeTO->{domain});
+    print STDERR "Call rnas...done\n";
+    my($fasta_rna, $rna_locations) = @$rna_calls;
+
+    my %feature_loc;
+    my %feature_func;
+    my %feature_anno;
+    
+    for my $ent (@$rna_locations)
+    {
+	my($loc_id, $contig, $start, $stop, $func) = @$ent;
+	my $len = abs($stop - $start) + 1;
+	my $strand = ($stop > $start) ? '+' : '-';
+	$feature_loc{$loc_id} = [$contig, $start, $strand, $len];
+	$feature_func{$loc_id} = $func if $func;
+    }
+    my $features = $genomeTO->{features};
+    if (!$features)
+    {
+	$features = [];
+	$genomeTO->{features} = $features;
+    }
+
+    my $id_server = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+
+    #
+    # Create features for RNAs
+    #
+    my $n_rnas = @$rna_locations;
+    my $rna_prefix = "$genomeTO->{id}.rna";
+    my $rna_id_start = $id_server->allocate_id_range($rna_prefix, $n_rnas) + 0;
+    print STDERR "allocated id start $rna_id_start for $n_rnas nras\n";
+
+    my $rna_fh;
+    open($rna_fh, "<", \$fasta_rna) or die "Cannot open the fasta string as a filehandle: $!";
+    my $next_id = $rna_id_start;
+    while (my($id, $def, $seq) = read_next_fasta_seq($rna_fh))
+    {
+	my $loc = $feature_loc{$id};
+	my $kb_id = "$rna_prefix.$next_id";
+	$next_id++;
+	my $feature = {
+	    id => $kb_id,
+	    location => [$loc],
+	    type => 'rna',
+	    $feature_func{$id} ? (function => $feature_func{$id}) : (),
+	    aliases => [],
+	    annotations => [ ['Initial RNA call performed by find_rnas', 'genome annotation service', time] ],
+	};
+	push(@$features, $feature);
+    }
+    $return = $genomeTO;
+
+    #END call_RNAs
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to call_RNAs:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_RNAs');
+    }
+    return($return);
+}
+
+
+
+
+=head2 call_CDSs
+
+  $return = $obj->call_CDSs($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub call_CDSs
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to call_CDSs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_CDSs');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN call_CDSs
+    #END call_CDSs
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to call_CDSs:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_CDSs');
+    }
+    return($return);
+}
+
+
+
+
+=head2 find_close_neighbors
+
+  $return = $obj->find_close_neighbors($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub find_close_neighbors
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to find_close_neighbors:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'find_close_neighbors');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN find_close_neighbors
+    #END find_close_neighbors
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to find_close_neighbors:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'find_close_neighbors');
+    }
+    return($return);
+}
+
+
+
+
+=head2 assign_functions_to_CDSs
+
+  $return = $obj->assign_functions_to_CDSs($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub assign_functions_to_CDSs
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to assign_functions_to_CDSs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'assign_functions_to_CDSs');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN assign_functions_to_CDSs
+    #END assign_functions_to_CDSs
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to assign_functions_to_CDSs:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'assign_functions_to_CDSs');
+    }
+    return($return);
+}
+
+
+
+
 =head2 annotate_proteins
 
   $return = $obj->annotate_proteins($genomeTO)

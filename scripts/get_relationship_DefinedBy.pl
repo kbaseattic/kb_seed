@@ -9,7 +9,7 @@ use Carp;
 
 =head1 get_relationship_DefinedBy
 
-This relationship associates observational units with a genus, 
+This relationship associates observational units with a genus,
 species, strain, and/or variety that was the source material.
 
 Example:

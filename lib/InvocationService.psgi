@@ -27,6 +27,7 @@ my $server = Bio::KBase::InvocationService::Service->new(instance_dispatch => { 
 
 my $dispatch = URI::Dispatch->new();
 $dispatch->add('/', 'handle_service');
+$dispatch->add('/invoke', 'handle_invoke');
 $dispatch->add('/upload', 'handle_upload');
 $dispatch->add('/download/#*', 'handle_download');
 
@@ -127,6 +128,29 @@ $dispatch->add('/download/#*', 'handle_download');
 	return [200, \@origin_hdr, []];
     }
 
+}
+
+{
+    package handle_invoke;
+
+    use strict;
+    use Data::Dumper;
+
+    sub post
+    {
+	my($req) = @_;
+	#
+	# The invoke REST interface expects to get a 3-line header:
+	#
+	#   session-id
+	#   pipeline   
+	#   cwd
+	#
+	# followed by the pipeline input. It emits lines of output
+	# which may have stdout and stderr interleaved; the lines are
+	# prefixed by the characters 'O' for stdout and 'E' for stderr.
+	# 
+    }
 }
 
 {
