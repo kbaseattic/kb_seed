@@ -998,6 +998,580 @@ sub locations_to_fids
 
 
 
+=head2 alleles_to_bp_locs
+
+  $return = $obj->alleles_to_bp_locs($alleles)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$alleles is an alleles
+$return is a reference to a hash where the key is an allele and the value is a bp_loc
+alleles is a reference to a list where each element is an allele
+allele is a string
+bp_loc is a reference to a list containing 2 items:
+	0: a contig
+	1: an int
+contig is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$alleles is an alleles
+$return is a reference to a hash where the key is an allele and the value is a bp_loc
+alleles is a reference to a list where each element is an allele
+allele is a string
+bp_loc is a reference to a list containing 2 items:
+	0: a contig
+	1: an int
+contig is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub alleles_to_bp_locs
+{
+    my $self = shift;
+    my($alleles) = @_;
+
+    my @_bad_arguments;
+    (ref($alleles) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"alleles\" (value was \"$alleles\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to alleles_to_bp_locs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alleles_to_bp_locs');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN alleles_to_bp_locs
+    my $kb = $self->{db};
+    $return = {};
+    my $n = @$alleles;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $allele_constraint = "Summarizes(from_link) IN $targets";
+
+    my @res = $kb->GetAll('Summarizes',
+			  $allele_constraint,
+			  $alleles,
+			  'Summarizes(from_link) Summarizes(to_link) Summarizes(position)');
+
+    foreach my $tuple (@res)
+    {
+	my($allele,$contig,$position) = @$tuple;
+	$return->{$allele} = [$contig,$position];
+    }
+
+    #END alleles_to_bp_locs
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to alleles_to_bp_locs:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alleles_to_bp_locs');
+    }
+    return($return);
+}
+
+
+
+
+=head2 region_to_fids
+
+  $return = $obj->region_to_fids($region_of_dna)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$region_of_dna is a region_of_dna
+$return is a fids
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+fids is a reference to a list where each element is a fid
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$region_of_dna is a region_of_dna
+$return is a fids
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+fids is a reference to a list where each element is a fid
+fid is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub region_to_fids
+{
+    my $self = shift;
+    my($region_of_dna) = @_;
+
+    my @_bad_arguments;
+    (ref($region_of_dna) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"region_of_dna\" (value was \"$region_of_dna\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to region_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'region_to_fids');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN region_to_fids
+    my $kb = $self->{db};
+    my($contig,$beg,$strand,$ln) = @$region_of_dna;
+    my $region = "$contig" . "_" . $beg . $strand . $ln;
+    my @fids = $kb->GenesInRegion($region);
+    $return = \@fids;
+    #END region_to_fids
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to region_to_fids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'region_to_fids');
+    }
+    return($return);
+}
+
+
+
+
+=head2 region_to_alleles
+
+  $return = $obj->region_to_alleles($region_of_dna)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$region_of_dna is a region_of_dna
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: an allele
+	1: an int
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+allele is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$region_of_dna is a region_of_dna
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: an allele
+	1: an int
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig
+	1: a begin
+	2: a strand
+	3: a length
+contig is a string
+begin is an int
+strand is a string
+length is an int
+allele is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub region_to_alleles
+{
+    my $self = shift;
+    my($region_of_dna) = @_;
+
+    my @_bad_arguments;
+    (ref($region_of_dna) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"region_of_dna\" (value was \"$region_of_dna\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to region_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'region_to_alleles');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN region_to_alleles
+    my $kb = $self->{db};
+    my($contig,$beg,$strand,$len) = @$region_of_dna;
+    my $end;
+    if ($strand eq "+")
+    {
+	$end = $beg + $len - 1;
+    }
+    else
+    {
+	($beg,$end) = ($beg - ($len - 1),$beg);
+    }
+    my @res = $kb->GetAll('IsSummarizedBy',
+			  "IsSummarizedBy(from_link) = ? AND IsSummarizedBy(position) >= ? AND IsSummarizedBy(position) <= ?", [$contig,$beg,$end],
+			  ["IsSummarizedBy(to_link)","IsSummarizedBy(position)"]);
+    $return = \@res;
+    #END region_to_alleles
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to region_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'region_to_alleles');
+    }
+    return($return);
+}
+
+
+
+
+=head2 alleles_to_traits
+
+  $return = $obj->alleles_to_traits($alleles)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$alleles is an alleles
+$return is a reference to a hash where the key is an allele and the value is a traits
+alleles is a reference to a list where each element is an allele
+allele is a string
+traits is a reference to a list where each element is a trait
+trait is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$alleles is an alleles
+$return is a reference to a hash where the key is an allele and the value is a traits
+alleles is a reference to a list where each element is an allele
+allele is a string
+traits is a reference to a list where each element is a trait
+trait is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub alleles_to_traits
+{
+    my $self = shift;
+    my($alleles) = @_;
+
+    my @_bad_arguments;
+    (ref($alleles) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"alleles\" (value was \"$alleles\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to alleles_to_traits:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alleles_to_traits');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN alleles_to_traits
+    if (@$alleles < 1)  { return $return }
+
+    my $kb = $self->{db};
+
+    my $n = @$alleles;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $allele_constraint = "Summarizes(from_link) IN $targets";
+
+    my @res = $kb->GetAll('Summarizes Contig IsImpactedBy',
+			  $allele_constraint,
+			  $alleles,
+			  'Summarizes(from_link) IsImpactedBy(to_link)');
+
+    foreach my $tuple (@res)
+    {
+	my($allele,$trait) = @$tuple;
+	push(@{$return->{$allele}},$trait);
+    }
+    #END alleles_to_traits
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to alleles_to_traits:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alleles_to_traits');
+    }
+    return($return);
+}
+
+
+
+
+=head2 traits_to_alleles
+
+  $return = $obj->traits_to_alleles($traits)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$traits is a traits
+$return is a reference to a hash where the key is a trait and the value is an alleles
+traits is a reference to a list where each element is a trait
+trait is a string
+alleles is a reference to a list where each element is an allele
+allele is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$traits is a traits
+$return is a reference to a hash where the key is a trait and the value is an alleles
+traits is a reference to a list where each element is a trait
+trait is a string
+alleles is a reference to a list where each element is an allele
+allele is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub traits_to_alleles
+{
+    my $self = shift;
+    my($traits) = @_;
+
+    my @_bad_arguments;
+    (ref($traits) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"traits\" (value was \"$traits\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to traits_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'traits_to_alleles');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN traits_to_alleles
+    if (@$traits < 1)  { return $return }
+
+    my $kb = $self->{db};
+
+    my $n = @$traits;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $trait_constraint = "Impacts(from_link) IN $targets";
+    my @res = $kb->GetAll('Impacts Contig IsSummarizedBy',
+			  "$trait_constraint AND Impacts(position) = IsSummarizedBy(position)",
+			  $traits,
+			  'Impacts(from_link) IsSummarizedBy(to_link)');
+
+    foreach my $tuple (@res)
+    {
+	my($trait,$allele) = @$tuple;
+	push(@{$return->{$trait}},$allele);
+    }
+    #END traits_to_alleles
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to traits_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'traits_to_alleles');
+    }
+    return($return);
+}
+
+
+
+
+=head2 ous_with_trait
+
+  $return = $obj->ous_with_trait($genome, $trait, $measurement_type, $min_value, $max_value)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genome is a genome
+$trait is a trait
+$measurement_type is a measurement_type
+$min_value is a float
+$max_value is a float
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: an ou
+	1: a measurement_value
+genome is a string
+trait is a string
+measurement_type is a string
+ou is a string
+measurement_value is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$genome is a genome
+$trait is a trait
+$measurement_type is a measurement_type
+$min_value is a float
+$max_value is a float
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: an ou
+	1: a measurement_value
+genome is a string
+trait is a string
+measurement_type is a string
+ou is a string
+measurement_value is a float
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub ous_with_trait
+{
+    my $self = shift;
+    my($genome, $trait, $measurement_type, $min_value, $max_value) = @_;
+
+    my @_bad_arguments;
+    (!ref($genome)) or push(@_bad_arguments, "Invalid type for argument \"genome\" (value was \"$genome\")");
+    (!ref($trait)) or push(@_bad_arguments, "Invalid type for argument \"trait\" (value was \"$trait\")");
+    (!ref($measurement_type)) or push(@_bad_arguments, "Invalid type for argument \"measurement_type\" (value was \"$measurement_type\")");
+    (!ref($min_value)) or push(@_bad_arguments, "Invalid type for argument \"min_value\" (value was \"$min_value\")");
+    (!ref($max_value)) or push(@_bad_arguments, "Invalid type for argument \"max_value\" (value was \"$max_value\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to ous_with_trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'ous_with_trait');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN ous_with_trait
+    my $kb = $self->{db};
+    my @res = $kb->GetAll('Measures ObservationalUnit UsesReference',
+			  'Measures(from_link) = ? AND Measures(value) <= ? AND Measures(value) >= ? AND UsesReference = ?',[$trait,$max_value,$min_value,$genome],
+			  'Measures(to_link) Measures(value)');
+
+    $return = \@res;
+    #END ous_with_trait
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to ous_with_trait:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'ous_with_trait');
+    }
+    return($return);
+}
+
+
+
+
 =head2 locations_to_dna_sequences
 
   $dna_seqs = $obj->locations_to_dna_sequences($locations)
@@ -4480,15 +5054,13 @@ $return is a reference to a hash where the key is a protein and the value is a f
 proteins is a reference to a list where each element is a protein
 protein is a string
 function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
+function_assertion is a reference to a list containing 3 items:
 	0: an id
 	1: a function
 	2: a source
-	3: an expert
 id is a string
 function is a string
 source is a string
-expert is a string
 
 </pre>
 
@@ -4501,15 +5073,13 @@ $return is a reference to a hash where the key is a protein and the value is a f
 proteins is a reference to a list where each element is a protein
 protein is a string
 function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
+function_assertion is a reference to a list containing 3 items:
 	0: an id
 	1: a function
 	2: a source
-	3: an expert
 id is a string
 function is a string
 source is a string
-expert is a string
 
 
 =end text
@@ -8578,6 +9148,260 @@ a reference to a list where each element is a fc_protein_family
 
 
 
+=head2 allele
+
+=over 4
+
+
+
+=item Description
+
+We now have a number of types and functions relating to ObservationalUnits (ous),
+alleles and traits.  We think of a reference genome and a set of ous that
+have measured differences (SNPs) when compared to the reference genome.
+Each allele is associated with a position on a contig of the reference genome.
+Prior analysis has associated traits with the alleles that impact them.
+We are interested in supporting operations that locate genes in the region
+of an allele (i.e., genes of the reference genome that are in a region 
+containining an allele).  Similarly, we wish to locate the alleles that
+impact a trait, map the alleles to regions, loacte the possibly impacted genes,
+relate these to subsystems, etc.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 alleles
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an allele
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an allele
+
+=end text
+
+=back
+
+
+
+=head2 trait
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 traits
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a trait
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a trait
+
+=end text
+
+=back
+
+
+
+=head2 ou
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ous
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ou
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ou
+
+=end text
+
+=back
+
+
+
+=head2 bp_loc
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a contig
+1: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a contig
+1: an int
+
+
+=end text
+
+=back
+
+
+
+=head2 measurement_type
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 measurement_value
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a float
+</pre>
+
+=end html
+
+=begin text
+
+a float
+
+=end text
+
+=back
+
+
+
 =head2 aux
 
 =over 4
@@ -9150,11 +9974,10 @@ a string
 =begin html
 
 <pre>
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 </pre>
 
@@ -9162,11 +9985,10 @@ a reference to a list containing 4 items:
 
 =begin text
 
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 
 =end text
