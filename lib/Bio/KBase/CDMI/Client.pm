@@ -538,6 +538,310 @@ sub locations_to_fids
 
 
 
+=head2 $result = alleles_to_bp_locs(alleles)
+
+
+
+=cut
+
+sub alleles_to_bp_locs
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function alleles_to_bp_locs (received $n, expecting 1)");
+    }
+    {
+	my($alleles) = @args;
+
+	my @_bad_arguments;
+        (ref($alleles) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"alleles\" (value was \"$alleles\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to alleles_to_bp_locs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'alleles_to_bp_locs');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.alleles_to_bp_locs",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'alleles_to_bp_locs',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method alleles_to_bp_locs",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'alleles_to_bp_locs',
+				       );
+    }
+}
+
+
+
+=head2 $result = region_to_fids(region_of_dna)
+
+
+
+=cut
+
+sub region_to_fids
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function region_to_fids (received $n, expecting 1)");
+    }
+    {
+	my($region_of_dna) = @args;
+
+	my @_bad_arguments;
+        (ref($region_of_dna) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"region_of_dna\" (value was \"$region_of_dna\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to region_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'region_to_fids');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.region_to_fids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'region_to_fids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method region_to_fids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'region_to_fids',
+				       );
+    }
+}
+
+
+
+=head2 $result = region_to_alleles(region_of_dna)
+
+
+
+=cut
+
+sub region_to_alleles
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function region_to_alleles (received $n, expecting 1)");
+    }
+    {
+	my($region_of_dna) = @args;
+
+	my @_bad_arguments;
+        (ref($region_of_dna) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"region_of_dna\" (value was \"$region_of_dna\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to region_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'region_to_alleles');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.region_to_alleles",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'region_to_alleles',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method region_to_alleles",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'region_to_alleles',
+				       );
+    }
+}
+
+
+
+=head2 $result = alleles_to_traits(alleles)
+
+
+
+=cut
+
+sub alleles_to_traits
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function alleles_to_traits (received $n, expecting 1)");
+    }
+    {
+	my($alleles) = @args;
+
+	my @_bad_arguments;
+        (ref($alleles) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"alleles\" (value was \"$alleles\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to alleles_to_traits:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'alleles_to_traits');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.alleles_to_traits",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'alleles_to_traits',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method alleles_to_traits",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'alleles_to_traits',
+				       );
+    }
+}
+
+
+
+=head2 $result = traits_to_alleles(traits)
+
+
+
+=cut
+
+sub traits_to_alleles
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function traits_to_alleles (received $n, expecting 1)");
+    }
+    {
+	my($traits) = @args;
+
+	my @_bad_arguments;
+        (ref($traits) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"traits\" (value was \"$traits\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to traits_to_alleles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'traits_to_alleles');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.traits_to_alleles",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'traits_to_alleles',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method traits_to_alleles",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'traits_to_alleles',
+				       );
+    }
+}
+
+
+
+=head2 $result = ous_with_trait(genome, trait, measurement_type, min_value, max_value)
+
+
+
+=cut
+
+sub ous_with_trait
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 5)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function ous_with_trait (received $n, expecting 5)");
+    }
+    {
+	my($genome, $trait, $measurement_type, $min_value, $max_value) = @args;
+
+	my @_bad_arguments;
+        (!ref($genome)) or push(@_bad_arguments, "Invalid type for argument 1 \"genome\" (value was \"$genome\")");
+        (!ref($trait)) or push(@_bad_arguments, "Invalid type for argument 2 \"trait\" (value was \"$trait\")");
+        (!ref($measurement_type)) or push(@_bad_arguments, "Invalid type for argument 3 \"measurement_type\" (value was \"$measurement_type\")");
+        (!ref($min_value)) or push(@_bad_arguments, "Invalid type for argument 4 \"min_value\" (value was \"$min_value\")");
+        (!ref($max_value)) or push(@_bad_arguments, "Invalid type for argument 5 \"max_value\" (value was \"$max_value\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to ous_with_trait:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'ous_with_trait');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.ous_with_trait",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'ous_with_trait',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method ous_with_trait",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'ous_with_trait',
+				       );
+    }
+}
+
+
+
 =head2 $result = locations_to_dna_sequences(locations)
 
 locations_to_dna_sequences takes as input a list of locations (each in the form of

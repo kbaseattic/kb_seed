@@ -37835,6 +37835,260 @@ a reference to a list where each element is a fc_protein_family
 
 
 
+=head2 allele
+
+=over 4
+
+
+
+=item Description
+
+We now have a number of types and functions relating to ObservationalUnits (ous),
+alleles and traits.  We think of a reference genome and a set of ous that
+have measured differences (SNPs) when compared to the reference genome.
+Each allele is associated with a position on a contig of the reference genome.
+Prior analysis has associated traits with the alleles that impact them.
+We are interested in supporting operations that locate genes in the region
+of an allele (i.e., genes of the reference genome that are in a region 
+containining an allele).  Similarly, we wish to locate the alleles that
+impact a trait, map the alleles to regions, loacte the possibly impacted genes,
+relate these to subsystems, etc.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 alleles
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an allele
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an allele
+
+=end text
+
+=back
+
+
+
+=head2 trait
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 traits
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a trait
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a trait
+
+=end text
+
+=back
+
+
+
+=head2 ou
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ous
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ou
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ou
+
+=end text
+
+=back
+
+
+
+=head2 bp_loc
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 2 items:
+0: a contig
+1: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 2 items:
+0: a contig
+1: an int
+
+
+=end text
+
+=back
+
+
+
+=head2 measurement_type
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 measurement_value
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a float
+</pre>
+
+=end html
+
+=begin text
+
+a float
+
+=end text
+
+=back
+
+
+
 =head2 aux
 
 =over 4
@@ -38407,11 +38661,10 @@ a string
 =begin html
 
 <pre>
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 </pre>
 
@@ -38419,11 +38672,10 @@ a reference to a list containing 4 items:
 
 =begin text
 
-a reference to a list containing 4 items:
+a reference to a list containing 3 items:
 0: an id
 1: a function
 2: a source
-3: an expert
 
 
 =end text
