@@ -767,6 +767,8 @@ annotation is a reference to a list containing 3 items:
 
 Given a genome object populated with contig data, perform gene calling
 and functional annotation and return the annotated genome.
+ NOTE: Many of these "transformations" modify the input hash and
+       copy the pointer.  Be warned.
 
 =back
 
@@ -1271,6 +1273,99 @@ sub call_CDSs
     my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
     my($return);
     #BEGIN call_CDSs
+    my $genome = $genomeTO;
+    my $anno = ANNOserver->new();
+
+    #
+    # Reformat the contigs for use with the ANNOserver.
+    #
+    my @contigs;
+    foreach my $gctg (@{$genome->{contigs}})
+    {
+	push(@contigs, [$gctg->{id}, undef, $gctg->{dna}]);
+    }
+
+    #
+    # Call genes.
+    #
+    print STDERR "Call genes...\n";
+    my $peg_calls = $anno->call_genes(-input => \@contigs, -geneticCode => $genome->{genetic_code});
+    print STDERR "Call genes...done\n";
+    my($fasta_proteins, $protein_locations) = @$peg_calls;
+    
+    my %feature_loc;
+    my %feature_func;
+    my %feature_anno;
+    my $features = $genome->{features};
+    if (!$features)
+    {
+	$features = [];
+	$genome->{features} = $features;
+    }
+
+    #
+    # Assign functions for proteins.
+    #
+    my $prot_fh;
+    open($prot_fh, "<", \$fasta_proteins) or die "Cannot open the fasta string as a filehandle: $!";
+    my $handle = $anno->assign_function_to_prot(-input => $prot_fh,
+						-kmer => 8,
+						-scoreThreshold => 3,
+						-seqHitThreshold => 3);
+    while (my $res = $handle->get_next())
+    {
+	my($id, $function, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$res;
+	$feature_func{$id} = $function;
+	$feature_anno{$id} = "Assigned by assign_function_to_prot with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam";
+    }
+    close($prot_fh);
+    
+    for my $ent (@$protein_locations)
+    {
+	my($loc_id, $contig, $start, $stop) = @$ent;
+	my $len = abs($stop - $start) + 1;
+	my $strand = ($stop > $start) ? '+' : '-';
+	$feature_loc{$loc_id} = [$contig, $start, $strand, $len];
+    }
+
+    my $id_server = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+
+    #
+    # Create features for PEGs
+    #
+    my $n_pegs = @$protein_locations;
+    my $protein_prefix = "$genome->{id}.peg";
+    my $peg_id_start = $id_server->allocate_id_range($protein_prefix, $n_pegs) + 0;
+    print STDERR "allocated peg id start $peg_id_start for $n_pegs pegs\n";
+
+    open($prot_fh, "<", \$fasta_proteins) or die "Cannot open the fasta string as a filehandle: $!";
+    my $next_id = $peg_id_start;
+    while (my($id, $def, $seq) = read_next_fasta_seq($prot_fh))
+    {
+	my $loc = $feature_loc{$id};
+	my $kb_id = "$protein_prefix.$next_id";
+	$next_id++;
+	my $annos = [];
+	push(@$annos, ['Initial gene call performed by call_genes', 'genome annotation service', time]);
+	if ($feature_anno{$id})
+	{
+	    push(@$annos, [$feature_anno{$id}, 'genome annotation service', time]);
+	}
+	my $feature = {
+	    id => $kb_id,
+	    location => [$loc],
+	    type => 'peg',
+	    protein_translation => $seq,
+	    aliases => [],
+	    $feature_func{$id} ? (function => $feature_func{$id}) : (),
+	    annotations => $annos,
+	};
+	push(@$features, $feature);
+    }
+    close($prot_fh);
+    $return = $genomeTO;
+#   print STDERR (ref($return), qq(\n), Dumper($return));
+    
     #END call_CDSs
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
@@ -1279,6 +1374,7 @@ sub call_CDSs
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'call_CDSs');
     }
+    
     return($return);
 }
 

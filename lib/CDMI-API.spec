@@ -329,6 +329,33 @@ module CDMI_API : CDMI_API {
 	*/
     funcdef locations_to_fids(region_of_dna_strings) returns (mapping<region_of_dna_string,fids>);
 
+	/* We now have a number of types and functions relating to ObservationalUnits (ous),
+	   alleles and traits.  We think of a reference genome and a set of ous that
+	   have measured differences (SNPs) when compared to the reference genome.
+           Each allele is associated with a position on a contig of the reference genome.
+	   Prior analysis has associated traits with the alleles that impact them.
+	   We are interested in supporting operations that locate genes in the region
+	   of an allele (i.e., genes of the reference genome that are in a region 
+	   containining an allele).  Similarly, we wish to locate the alleles that
+	   impact a trait, map the alleles to regions, loacte the possibly impacted genes,
+	   relate these to subsystems, etc.
+       */
+    typedef string allele;
+    typedef list<allele> alleles;
+    typedef string trait;
+    typedef list<trait> traits;
+    typedef string ou;
+    typedef list<ou> ous;
+    typedef tuple<contig,int position> bp_loc;
+    funcdef alleles_to_bp_locs(alleles) returns (mapping<allele,bp_loc>);
+    funcdef region_to_fids(region_of_dna) returns (fids);
+    funcdef region_to_alleles(region_of_dna) returns (list<tuple<allele,int position>>);
+    funcdef alleles_to_traits(alleles) returns (mapping<allele,traits>);
+    funcdef traits_to_alleles(traits)  returns (mapping<trait,alleles>);	
+    typedef string measurement_type;
+    typedef float measurement_value;
+    funcdef ous_with_trait(genome,trait,measurement_type,float min_value,float max_value) returns (list<tuple<ou,measurement_value>>);
+
 	/* locations_to_dna_sequences takes as input a list of locations (each in the form of
 	   a list of regions).  The routine constructs 2-tuples composed of
 
@@ -662,7 +689,7 @@ module CDMI_API : CDMI_API {
     typedef string expert;
     typedef string source;
     typedef string id;
-    typedef tuple<id,function,source,expert> function_assertion;
+    typedef tuple<id,function,source> function_assertion;
     typedef list<function_assertion> function_assertions;
 
 	/*  Different groups have made assertions of function for numerous protein sequences.

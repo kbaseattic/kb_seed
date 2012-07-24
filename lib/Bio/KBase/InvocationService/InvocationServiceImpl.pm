@@ -23,6 +23,9 @@ use Cwd 'abs_path';
 use File::Path;
 use File::Basename;
 use File::Copy;
+
+#use Bio::KBase::InvocationService::ValidCommands
+
 my @valid_commands = qw(
 	all_roles_used_in_models atomic_regulons_to_fids close_genomes co_occurrence_evidence 
 	complexes_to_complex_data complexes_to_roles contigs_to_lengths contigs_to_md5s 
@@ -41,6 +44,14 @@ my @valid_commands = qw(
 	roles_to_protein_families roles_to_proteins roles_to_subsystems subsystems_to_fids 
 	subsystems_to_genomes subsystems_to_roles subsystems_to_spreadsheets text_search 
 	
+alleles_to_bp_locs
+alleles_to_traits
+ous_with_trait
+region_to_alleles
+region_to_fids
+traits_to_alleles
+
+
 	all_entities_AlignmentTree all_entities_AlleleFrequency all_entities_Annotation 
 	all_entities_Assay all_entities_AtomicRegulon all_entities_Attribute all_entities_Biomass 
 	all_entities_BiomassCompound all_entities_Compartment all_entities_Complex 
@@ -142,12 +153,15 @@ my @valid_commands = qw(
 	query_entity_Reaction query_entity_ReactionRule query_entity_Reagent query_entity_Requirement 
 	query_entity_Role query_entity_SSCell query_entity_SSRow query_entity_Scenario 
 	query_entity_Source query_entity_StudyExperiment query_entity_Subsystem query_entity_SubsystemClass 
-	query_entity_TaxonomicGrouping query_entity_Trait query_entity_Variant query_entity_Variation 
+
+			query_entity_TaxonomicGrouping query_entity_Trait query_entity_Variant query_entity_Variation 
 	
 	annotate_genome fasta_to_genome genomeTO_to_feature_data genomeTO_to_reconstructionTO
 	a_and_b a_not_b rel2tabs tabs2rel cluster_objects cs_to_genome
 	reconstructionTO_to_roles reconstructionTO_to_subsystems
 		      genomeTO_to_html file_to_spreadsheet
+
+	 call_CDSs
 
 			gapfill_fbamodel
 			exchangeFormat_to_gapfillingFormulation  gapfillingFormulation_to_exchangeFormat
