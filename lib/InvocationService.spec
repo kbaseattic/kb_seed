@@ -28,7 +28,18 @@ typedef structure {
 	returns (list<string> output, list<string> errors);
     funcdef exit_session(string session_id) returns ();
 
-    funcdef valid_commands() returns (list<string>);
+    typedef structure {
+	string cmd;
+	string link;
+    } command_desc;
+
+    typedef structure {
+	string name;
+	string title;
+	list<command_desc> items;
+    } command_group_desc;
+
+    funcdef valid_commands() returns (list<command_group_desc>);
 
     funcdef get_tutorial_text(int step) returns(string text, int prev, int next);
 };

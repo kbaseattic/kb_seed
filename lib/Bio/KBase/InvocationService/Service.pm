@@ -26,6 +26,7 @@ our %return_counts = (
         'get_file' => 1,
         'run_pipeline' => 2,
         'exit_session' => 0,
+        'valid_commands' => 1,
         'get_tutorial_text' => 3,
 );
 
@@ -46,6 +47,7 @@ sub _build_valid_methods
         'get_file' => 1,
         'run_pipeline' => 1,
         'exit_session' => 1,
+        'valid_commands' => 1,
         'get_tutorial_text' => 1,
     };
     return $methods;

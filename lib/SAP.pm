@@ -443,7 +443,7 @@ sub get {
         Confess("Object name string not specified.");
     } else {
         # Get the default object name from the object name list.
-        my ($defaultObject) = split /\s+/, $objects, 2;
+        my ($defaultObject) = split m/\s+/, $objects, 2;
         # We'll build the filter elements and the parameter list in
         # these lists. The filter string will be formed by ANDing
         # together the filter elements.
@@ -726,7 +726,7 @@ sub select {
         Confess("Object name string not specified.");
     } else {
         # Get the default object name from the object name list.
-        my ($defaultObject) = split /\s+/, $objects, 2;
+        my ($defaultObject) = split m/\s+/, $objects, 2;
         # We'll build the filter elements and the parameter list in
         # these lists. The filter string will be formed by ANDing
         # together the filter elements.
@@ -750,7 +750,7 @@ sub select {
                 # stash one question mark per value in this list.
                 my @marks;
                 # Process the criterion elements.
-                for (my $i = 1; $i < scalar @$criterion; $i++) {
+                for (my $i = 0; $i < scalar @$criterion; $i++) {
                     push @marks, "?";
                     push @parms, $fieldType->encode($criterion->[$i]);
                 }

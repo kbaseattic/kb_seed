@@ -2,6 +2,9 @@ use strict;
 
 my($f1,$f2);
 my $usage = "usage: a_and_b File1 File2 > intersection";
+
+@ARGV == 2 or die $usage;
+
 (
  ($f1 = shift @ARGV) && (-s $f1) &&
  ($f2 = shift @ARGV) && (-s $f2)

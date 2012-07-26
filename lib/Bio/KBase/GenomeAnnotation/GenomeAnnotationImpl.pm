@@ -1635,6 +1635,37 @@ sub assign_functions_to_CDSs
     my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
     my($return);
     #BEGIN assign_functions_to_CDSs
+    my $features = $genomeTO->{features};
+    my %to;
+    my $i;
+    my @prots;
+    for ($i=0; ($i < @$features); $i++)
+    {
+	$to{$features->[$i]->{id}} = $i;
+	my $fid = $features->[$i];
+	my $translation;
+	if (defined($translation = $fid->{protein_translation}))
+	{
+	    my $id = $fid->{id};
+	    push(@prots,[$id,'',$translation]);
+	}
+    }
+    my $anno = ANNOserver->new();
+    my $handle = $anno->assign_function_to_prot(-input => \@prots,
+						-kmer => 8,
+						-scoreThreshold => 3,
+						-seqHitThreshold => 3);
+    while (my $res = $handle->get_next())
+    {
+	my($id, $function, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$res;
+	$features->[$to{$id}]->{function} = $function;
+	push(@{$features->[$to{$id}]->{annotations}},
+	     ["Assigned by assign_function_to_CDSs with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam",
+	      'genome annotation service',
+	      time
+	     ]);
+    }
+    $return = $genomeTO;
     #END assign_functions_to_CDSs
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");

@@ -113,7 +113,13 @@ $dispatch->add('/download/#*', 'handle_download');
 	}
 	close($fh);
 
-	return [200, [], ['{ "success": true}']];
+	my @hdrs;
+	if ($req->env->{HTTP_ORIGIN})
+	{
+	    push(@hdrs, 'Access-Control-Allow-Origin', $req->env->{HTTP_ORIGIN});
+	}
+
+	return [200, \@hdrs, ['{ "success": true}']];
     }
     sub options
     {

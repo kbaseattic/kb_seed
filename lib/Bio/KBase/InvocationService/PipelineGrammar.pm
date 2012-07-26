@@ -45,7 +45,7 @@ our $LEX = sub {
 
       m{\G(2\>\>|2\>|\>\>|\<|\||\>)}gc and return ($1, $1);
 
-      /\G(\S+)/gc and return ('TERM', $1);
+      /\G([^"']\S*)/gc and return ('TERM', $1);
       /\G"((?:[^\\"]|\\.)*)"/gc and return ('DQSTRING', $1);
       /\G'((?:[^\\']|\\.)*)'/gc and return ('SQSTRING', $1);
 

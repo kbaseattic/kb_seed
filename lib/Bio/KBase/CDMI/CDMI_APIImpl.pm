@@ -1554,9 +1554,8 @@ sub ous_with_trait
     #BEGIN ous_with_trait
     my $kb = $self->{db};
     my @res = $kb->GetAll('Measures ObservationalUnit UsesReference',
-			  'Measures(from_link) = ? AND Measures(value) <= ? AND Measures(value) >= ? AND UsesReference = ?',[$trait,$max_value,$min_value,$genome],
+			  'Measures(from_link) = ? AND Measures(measure_id) = ? AND Measures(value) <= ? AND Measures(value) >= ? AND UsesReference(to_link) = ?',[$trait,$measurement_type,$max_value,$min_value,$genome],
 			  'Measures(to_link) Measures(value)');
-
     $return = \@res;
     #END ous_with_trait
     my @_bad_returns;

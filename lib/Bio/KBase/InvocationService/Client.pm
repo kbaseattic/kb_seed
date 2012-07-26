@@ -709,6 +709,45 @@ sub exit_session
 
 
 
+=head2 $result = valid_commands()
+
+
+
+=cut
+
+sub valid_commands
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 0)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function valid_commands (received $n, expecting 0)");
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "InvocationService.valid_commands",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'valid_commands',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method valid_commands",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'valid_commands',
+				       );
+    }
+}
+
+
+
 =head2 $result = get_tutorial_text(step)
 
 

@@ -24,156 +24,8 @@ use File::Path;
 use File::Basename;
 use File::Copy;
 
-#use Bio::KBase::InvocationService::ValidCommands
+use Bio::KBase::InvocationService::ValidCommands;
 
-my @valid_commands = qw(
-	all_roles_used_in_models atomic_regulons_to_fids close_genomes co_occurrence_evidence 
-	complexes_to_complex_data complexes_to_roles contigs_to_lengths contigs_to_md5s 
-	contigs_to_sequences corresponds equiv_sequence_assertions fids_to_annotations 
-	fids_to_atomic_regulons fids_to_co_occurring_fids fids_to_coexpressed_fids 
-	fids_to_dna_sequences fids_to_feature_data fids_to_functions fids_to_genomes 
-	fids_to_literature fids_to_locations fids_to_protein_families fids_to_protein_sequences 
-	fids_to_proteins fids_to_regulon_data fids_to_roles fids_to_subsystem_data 
-	fids_to_subsystems genomes_to_contigs genomes_to_fids genomes_to_genome_data 
-	genomes_to_md5s genomes_to_subsystems genomes_to_taxonomies locations_to_dna_sequences 
-	locations_to_fids md5s_to_genomes otu_members protein_families_to_co_occurring_families 
-	protein_families_to_fids protein_families_to_functions protein_families_to_proteins 
-	proteins_to_fids proteins_to_functions proteins_to_literature proteins_to_protein_families 
-	proteins_to_roles reaction_strings reactions_to_complexes regulons_to_fids 
-	representative representative_sequences roles_to_complexes roles_to_fids 
-	roles_to_protein_families roles_to_proteins roles_to_subsystems subsystems_to_fids 
-	subsystems_to_genomes subsystems_to_roles subsystems_to_spreadsheets text_search 
-	
-alleles_to_bp_locs
-alleles_to_traits
-ous_with_trait
-region_to_alleles
-region_to_fids
-traits_to_alleles
-
-
-	all_entities_AlignmentTree all_entities_AlleleFrequency all_entities_Annotation 
-	all_entities_Assay all_entities_AtomicRegulon all_entities_Attribute all_entities_Biomass 
-	all_entities_BiomassCompound all_entities_Compartment all_entities_Complex 
-	all_entities_Compound all_entities_Contig all_entities_ContigChunk all_entities_ContigSequence 
-	all_entities_CoregulatedSet all_entities_Diagram all_entities_EcNumber all_entities_Experiment 
-	all_entities_Family all_entities_Feature all_entities_Genome all_entities_Identifier 
-	all_entities_Locality all_entities_Media all_entities_Model all_entities_ModelCompartment 
-	all_entities_OTU all_entities_ObservationalUnit all_entities_PairSet all_entities_Pairing 
-	all_entities_ProbeSet all_entities_ProteinSequence all_entities_Publication 
-	all_entities_Reaction all_entities_ReactionRule all_entities_Reagent all_entities_Requirement 
-	all_entities_Role all_entities_SSCell all_entities_SSRow all_entities_Scenario 
-	all_entities_Source all_entities_StudyExperiment all_entities_Subsystem all_entities_SubsystemClass 
-	all_entities_TaxonomicGrouping all_entities_Trait all_entities_Variant all_entities_Variation 
-	get_entity_AlignmentTree get_entity_AlleleFrequency get_entity_Annotation 
-	get_entity_Assay get_entity_AtomicRegulon get_entity_Attribute get_entity_Biomass 
-	get_entity_BiomassCompound get_entity_Compartment get_entity_Complex get_entity_Compound 
-	get_entity_Contig get_entity_ContigChunk get_entity_ContigSequence get_entity_CoregulatedSet 
-	get_entity_Diagram get_entity_EcNumber get_entity_Experiment get_entity_Family 
-	get_entity_Feature get_entity_Genome get_entity_Identifier get_entity_Locality 
-	get_entity_Media get_entity_Model get_entity_ModelCompartment get_entity_OTU 
-	get_entity_ObservationalUnit get_entity_PairSet get_entity_Pairing get_entity_ProbeSet 
-	get_entity_ProteinSequence get_entity_Publication get_entity_Reaction get_entity_ReactionRule 
-	get_entity_Reagent get_entity_Requirement get_entity_Role get_entity_SSCell 
-	get_entity_SSRow get_entity_Scenario get_entity_Source get_entity_StudyExperiment 
-	get_entity_Subsystem get_entity_SubsystemClass get_entity_TaxonomicGrouping 
-	get_entity_Trait get_entity_Variant get_entity_Variation get_relationship_AffectsLevelOf 
-	get_relationship_Aligns get_relationship_Annotates get_relationship_Asserts 
-	get_relationship_AssertsFunctionFor get_relationship_Comprises get_relationship_Concerns 
-	get_relationship_Contains get_relationship_Controls get_relationship_DefinedBy 
-	get_relationship_Describes get_relationship_Determines get_relationship_DeterminesFunctionOf 
-	get_relationship_Displays get_relationship_Encompasses get_relationship_Formulated 
-	get_relationship_GeneratedLevelsFor get_relationship_HadResultsProducedBy 
-	get_relationship_HasAsExemplar get_relationship_HasAsSequence get_relationship_HasAsTerminus 
-	get_relationship_HasAssertedFunctionFrom get_relationship_HasAssertionFrom 
-	get_relationship_HasCompoundAliasFrom get_relationship_HasCoregulationWith 
-	get_relationship_HasDefaultLocation get_relationship_HasFunctional get_relationship_HasIndicatedSignalFrom 
-	get_relationship_HasLevelsFrom get_relationship_HasMember get_relationship_HasParticipant 
-	get_relationship_HasPresenceOf get_relationship_HasProposedLocationIn get_relationship_HasProteinMember 
-	get_relationship_HasReactionAliasFrom get_relationship_HasRealLocationIn 
-	get_relationship_HasRepresentativeOf get_relationship_HasResultsFor get_relationship_HasResultsIn 
-	get_relationship_HasRole get_relationship_HasSection get_relationship_HasStep 
-	get_relationship_HasTrait get_relationship_HasUnits get_relationship_HasUsage 
-	get_relationship_HasValueFor get_relationship_HasValueIn get_relationship_HasVariant 
-	get_relationship_HasVariation get_relationship_Impacts get_relationship_Implements 
-	get_relationship_Imported get_relationship_Includes get_relationship_IncludesPart 
-	get_relationship_IncludesPartOf get_relationship_IndicatedLevelsFor get_relationship_IndicatesSignalFor 
-	get_relationship_Involves get_relationship_IsARequirementIn get_relationship_IsARequirementOf 
-	get_relationship_IsATopicOf get_relationship_IsAffectedIn get_relationship_IsAlignedBy 
-	get_relationship_IsAlignedIn get_relationship_IsAlignmentFor get_relationship_IsAnnotatedBy 
-	get_relationship_IsBindingSiteFor get_relationship_IsBoundBy get_relationship_IsClassFor 
-	get_relationship_IsCollectedInto get_relationship_IsCollectionOf get_relationship_IsComponentOf 
-	get_relationship_IsComposedOf get_relationship_IsComprisedOf get_relationship_IsConfiguredBy 
-	get_relationship_IsConsistentTo get_relationship_IsConsistentWith get_relationship_IsContainedIn 
-	get_relationship_IsControlledUsing get_relationship_IsCoregulatedWith get_relationship_IsCoupledTo 
-	get_relationship_IsCoupledWith get_relationship_IsDefaultFor get_relationship_IsDefaultLocationOf 
-	get_relationship_IsDescribedBy get_relationship_IsDeterminedBy get_relationship_IsDisplayedOn 
-	get_relationship_IsDividedInto get_relationship_IsDivisionOf get_relationship_IsEncompassedIn 
-	get_relationship_IsExemplarOf get_relationship_IsFamilyFor get_relationship_IsFormedInto 
-	get_relationship_IsFormedOf get_relationship_IsFunctionalIn get_relationship_IsGroupFor 
-	get_relationship_IsImpactedBy get_relationship_IsImplementedBy get_relationship_IsInClass 
-	get_relationship_IsInGroup get_relationship_IsInPair get_relationship_IsInTaxa 
-	get_relationship_IsIncludedIn get_relationship_IsInstanceOf get_relationship_IsInstantiatedBy 
-	get_relationship_IsInvolvedIn get_relationship_IsLocated get_relationship_IsLocatedIn 
-	get_relationship_IsLocatedOn get_relationship_IsLocusFor get_relationship_IsManagedBy 
-	get_relationship_IsMemberOf get_relationship_IsModeledBy get_relationship_IsNamedBy 
-	get_relationship_IsOwnedBy get_relationship_IsOwnerOf get_relationship_IsPairOf 
-	get_relationship_IsPartOf get_relationship_IsParticipationOf get_relationship_IsPresentIn 
-	get_relationship_IsProjectedOnto get_relationship_IsProposedLocationOf get_relationship_IsProteinFor 
-	get_relationship_IsProteinMemberOf get_relationship_IsRealLocationOf get_relationship_IsReferencedBy 
-	get_relationship_IsRegulatedIn get_relationship_IsRegulatedSetOf get_relationship_IsRelevantFor 
-	get_relationship_IsRelevantTo get_relationship_IsRepresentedBy get_relationship_IsRepresentedIn 
-	get_relationship_IsRequiredBy get_relationship_IsRoleFor get_relationship_IsRoleOf 
-	get_relationship_IsRowOf get_relationship_IsSectionOf get_relationship_IsSequenceOf 
-	get_relationship_IsShownOn get_relationship_IsStepOf get_relationship_IsSubInstanceOf 
-	get_relationship_IsSubclassOf get_relationship_IsSuperclassOf get_relationship_IsTargetOf 
-	get_relationship_IsTaxonomyOf get_relationship_IsTerminusFor get_relationship_IsTriggeredBy 
-	get_relationship_IsUsageOf get_relationship_IsUseOf get_relationship_IsUsedAs 
-	get_relationship_IsUsedBy get_relationship_IsUtilizedIn get_relationship_IsVariantOf 
-	get_relationship_Manages get_relationship_Measures get_relationship_Models 
-	get_relationship_Names get_relationship_OperatesIn get_relationship_Overlaps 
-	get_relationship_ParticipatesAs get_relationship_ParticipatesIn get_relationship_ProducedResultsFor 
-	get_relationship_Produces get_relationship_ProjectsOnto get_relationship_Provided 
-	get_relationship_ReflectsStateOf get_relationship_Requires get_relationship_ResultsIn 
-	get_relationship_RunsByDefaultIn get_relationship_Shows get_relationship_Submitted 
-	get_relationship_SummarizedBy get_relationship_Summarizes get_relationship_Targets 
-	get_relationship_Triggers get_relationship_Uses get_relationship_UsesAliasForCompound 
-	get_relationship_UsesAliasForReaction get_relationship_UsesReference get_relationship_Validates 
-	get_relationship_WasDetermiedBy get_relationship_WasFormulatedBy get_relationship_WasGeneratedFrom 
-	get_relationship_WasImportedFrom get_relationship_WasProvidedBy get_relationship_WasSubmittedBy 
-	query_entity_AlignmentTree query_entity_AlleleFrequency query_entity_Annotation 
-	query_entity_Assay query_entity_AtomicRegulon query_entity_Attribute query_entity_Biomass 
-	query_entity_BiomassCompound query_entity_Compartment query_entity_Complex 
-	query_entity_Compound query_entity_Contig query_entity_ContigChunk query_entity_ContigSequence 
-	query_entity_CoregulatedSet query_entity_Diagram query_entity_EcNumber query_entity_Experiment 
-	query_entity_Family query_entity_Feature query_entity_Genome query_entity_Identifier 
-	query_entity_Locality query_entity_Media query_entity_Model query_entity_ModelCompartment 
-	query_entity_OTU query_entity_ObservationalUnit query_entity_PairSet query_entity_Pairing 
-	query_entity_ProbeSet query_entity_ProteinSequence query_entity_Publication 
-	query_entity_Reaction query_entity_ReactionRule query_entity_Reagent query_entity_Requirement 
-	query_entity_Role query_entity_SSCell query_entity_SSRow query_entity_Scenario 
-	query_entity_Source query_entity_StudyExperiment query_entity_Subsystem query_entity_SubsystemClass 
-
-			query_entity_TaxonomicGrouping query_entity_Trait query_entity_Variant query_entity_Variation 
-	
-	annotate_genome fasta_to_genome genomeTO_to_feature_data genomeTO_to_reconstructionTO
-	a_and_b a_not_b rel2tabs tabs2rel cluster_objects cs_to_genome
-	reconstructionTO_to_roles reconstructionTO_to_subsystems
-		      genomeTO_to_html file_to_spreadsheet
-
-	 call_CDSs
-
-			gapfill_fbamodel
-			exchangeFormat_to_gapfillingFormulation  gapfillingFormulation_to_exchangeFormat
-			exchangeformat_to_fbamodel               genome_to_fbamodel
-			fbamodel_to_exchangeformat               get_gapfilling_formulation
-			fbamodel_to_html                         runfba
-			fbamodel_to_sbml
-			
-
-);
-
-my %valid_commands = map { $_ => 1 } @valid_commands;
 my @command_path = ("/kb/deployment/bin", "/home/olson/FIGdisk/FIG/bin", "/kb/deployment/modeling");
 
 my @valid_shell_commands = qw(sort grep cut cat head tail date echo wc diff join uniq);
@@ -190,8 +42,6 @@ sub validate_path
     } else {
         die "Invalid path $ap";
     }
-
-
 }
 
 sub _prepend_cwd
@@ -279,7 +129,7 @@ sub _validate_command
     my($self, $cmd) = @_;
 
     my $path;
-    if ($valid_commands{$cmd})
+    if ($self->{valid_commands}->{$cmd})
     {
 	for my $cpath (@command_path)
 	{
@@ -336,6 +186,9 @@ sub new
 
     $self->{storage_dir} = $storage_dir;
     $self->{count} = 0;
+
+    $self->{valid_commands} = Bio::KBase::InvocationService::ValidCommands::valid_commands();
+    $self->{command_groups} = Bio::KBase::InvocationService::ValidCommands::command_groups();
     
     #END_CONSTRUCTOR
 
@@ -1545,6 +1398,76 @@ sub exit_session
 
 
 
+=head2 valid_commands
+
+  $return = $obj->valid_commands()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$return is a reference to a list where each element is a command_group_desc
+command_group_desc is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	title has a value which is a string
+	items has a value which is a reference to a list where each element is a command_desc
+command_desc is a reference to a hash where the following keys are defined:
+	cmd has a value which is a string
+	link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$return is a reference to a list where each element is a command_group_desc
+command_group_desc is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	title has a value which is a string
+	items has a value which is a reference to a list where each element is a command_desc
+command_desc is a reference to a hash where the following keys are defined:
+	cmd has a value which is a string
+	link has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub valid_commands
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::InvocationService::Service::CallContext;
+    my($return);
+    #BEGIN valid_commands
+    return $self->{command_groups};
+    #END valid_commands
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to valid_commands:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'valid_commands');
+    }
+    return($return);
+}
+
+
+
+
 =head2 get_tutorial_text
 
   $text, $prev, $next = $obj->get_tutorial_text($step)
@@ -1711,6 +1634,72 @@ name has a value which is a string
 full_path has a value which is a string
 mod_date has a value which is a string
 size has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 command_desc
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+cmd has a value which is a string
+link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+cmd has a value which is a string
+link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 command_group_desc
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+title has a value which is a string
+items has a value which is a reference to a list where each element is a command_desc
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+title has a value which is a string
+items has a value which is a reference to a list where each element is a command_desc
 
 
 =end text

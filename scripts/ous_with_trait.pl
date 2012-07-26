@@ -10,7 +10,7 @@ use Carp;
 
 Example:
 
-    ous_with_trait [arguments] < input > output
+    ous_with_trait -g Genome -mtype MeasurementType -min MinVal -max MaxVal < traits_input > output_with_ous
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -84,14 +84,22 @@ measurement_value is a float
 
 This is used only if the column containing the identifier is not the last column.
 
+=item -g genome       [ We are extracting ous for which this is the reference genome ]
+
 =item -i InputFile    [ use InputFile, rather than stdin ]
+
+=item -mtype Type     [ Measurement Type ]
+
+=item -min MinVal     [ Minimum value of measurement ]
+
+=item -max MaxVale    [ maximum value of measurement ]
 
 =back
 
 =head2 Output Format
 
 The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
+file with extra columns added (the measurement vlue and an ou with that value).
 
 Input lines that cannot be extended are written to stderr.
 
@@ -107,9 +115,17 @@ use Bio::KBase::Utilities::ScriptThing;
 my $column;
 
 my $input_file;
+my $genome;
+my $meas_type;
+my $min = 0.0;
+my $max = 100000000.0;
 
 my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
+						       'g=s' => \$genome,
+						       'mtype=s' => \$meas_type,
+						       'min=f' => \$min,
+						       'max=f' => \$max,
+						       'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
 my $ih;
@@ -123,29 +139,16 @@ else
 }
 
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-    my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->ous_with_trait(\@h);
-    for my $tuple (@tuples) {
-        #
-        # Process output here and print.
-        #
-        my ($id, $line) = @$tuple;
-        my $v = $h->{$id};
-
-        if (! defined($v))
-        {
-            print STDERR $line,"\n";
-        }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
-            }
-        }
-        else
-        {
-            print "$line\t$v\n";
-        }
+    foreach my $tuple (@tuples)
+    {
+        my ($trait, $line) = @$tuple;
+	$genome || die "you need to specify a genome";
+	$meas_type  || die "you need to specify a measurement type";
+	my $ous_and_measurements = $kbO->ous_with_trait($genome,$trait,$meas_type,$min,$max);
+	foreach my $_ (@$ous_and_measurements)
+	{
+	    my($ou,$mval) = @$_;
+	    print join("\t",($line,$mval,$ou)),"\n";
+	}
     }
 }
