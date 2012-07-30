@@ -4,22 +4,25 @@ use gjoseqlib;
 use Bio::KBase::GenomeAnnotation::Client;
 use JSON::XS;
 
-use Getopt::Long;
+my $usage = "call_CDSs [--input genome-file] [--output genome-file] [--url service-url] [< genome-file] [> genome-file]";
 
 my $input_file;
 my $output_file;
 my $url = "http://bio-data-1.mcs.anl.gov/services/genome_annotation";
 
-my $rc = GetOptions('url=s'     => \$url,
+use Getopt::Long;
+my $rc = GetOptions('help'      => \$help,
+		    'url=s'     => \$url,
 		    'input=s' 	=> \$input_file,
 		    'output=s'  => \$output_file,
 		    );
 
-my $usage = "call_RNAs [--input genome-file] [--output genome-file] [--url service-url] [< genome-file] [> genome-file]";
+die "Usage: $usage\n" if ($help 
+			  || $rc   == 0 
+			  || @ARGV != 0
+			  );
 
-@ARGV == 0 or die "Usage: $usage\n";
-
-my $anno_server = Bio::KBase::GenomeAnnotation::Client->new($url);
+my $kbase_server = Bio::KBase::GenomeAnnotation::Client->new($url);
 
 my $in_fh;
 if ($input_file)
@@ -50,7 +53,7 @@ my $input_genome;
     $input_genome = $json->decode($input_genome_txt);
 }
 
-my $output_genome = $anno_server->call_CDSs($input_genome);
+my $output_genome = $kbase_server->call_CDSs($input_genome);
 
 $json->pretty(1);
 print $out_fh $json->encode($output_genome);

@@ -87,6 +87,8 @@ module GenomeAnnotation
      *        copy the pointer.  Be warned.
      */
     funcdef annotate_genome(genomeTO) returns (genomeTO);
+    funcdef call_selenoproteins(genomeTO) returns (genomeTO);
+    funcdef call_pyrrolysoproteins(genomeTO) returns (genomeTO);
     funcdef call_RNAs(genomeTO) returns (genomeTO);
     funcdef call_CDSs(genomeTO) returns (genomeTO);
     funcdef find_close_neighbors(genomeTO) returns (genomeTO);

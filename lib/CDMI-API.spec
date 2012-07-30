@@ -535,7 +535,7 @@ module CDMI_API : CDMI_API {
 	*/
     funcdef genomes_to_md5s(genomes) returns (mapping<genome,md5>);
 
-	/* The routine genomes_to_contigs can be used to retrieve the IDs of the contigs
+	/* The routine genomes_to_con`tigs can be used to retrieve the IDs of the contigs
 	   associated with each of a list of input genomes.  The routine constructs a mapping
 	   from genome ID to the list of contigs included in the genome.
 	*/
@@ -822,19 +822,15 @@ module CDMI_API : CDMI_API {
 
 	/* A close_genomes is used to get a set of relatively close genomes (for
 	   each input genome, a set of close genomes is calculated, but the
-           result should be viewed as quite approximate.  "how" is a suggestion
-	   of which algorithm to use:
- 
-		0 - default (same genus)
-		1 - find genomes with the same genus name
-		2 - use the SSU rRNA, if possible
-		3 - use a set of "universal proteins", if you can
-         
+           result should be viewed as quite approximate.  It is quite slow,
+	   using similarities for a universal protein as the basis for the 
+	   assessments.  It produces estimates of degree of similarity for
+	   the universal proteins it samples.
+
            Up to n genomes will be returned for each input genome.
 	*/
 
-     typedef int how;
-     funcdef close_genomes(genomes,how,int n) returns (mapping<genome,genomes>);
+     funcdef close_genomes(genomes,int n) returns (mapping<genome,list<tuple<genome,float ident>>>);
 
      typedef string sequence;
      typedef tuple<id,comment,sequence> seq_triple;

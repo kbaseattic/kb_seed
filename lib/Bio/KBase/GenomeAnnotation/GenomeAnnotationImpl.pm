@@ -857,7 +857,7 @@ sub annotate_genome
     {
 	my($id, $function, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$res;
 	$feature_func{$id} = $function;
-	$feature_anno{$id} = "Assigned by assign_function_to_prot with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam";
+	$feature_anno{$id} = "Set function to\n$function\nby assign_function_to_prot with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam";
     }
     close($prot_fh);
     
@@ -887,7 +887,10 @@ sub annotate_genome
 	my $kb_id = "$protein_prefix.$next_id";
 	$next_id++;
 	my $annos = [];
-	push(@$annos, ['Initial gene call performed by call_genes', 'genome annotation service', time]);
+	push(@$annos, ['Initial gene call performed by call_genes',
+		       'genome annotation service',
+		       time
+		       ]);
 	if ($feature_anno{$id})
 	{
 	    push(@$annos, [$feature_anno{$id}, 'genome annotation service', time]);
@@ -941,6 +944,409 @@ sub annotate_genome
 	my $msg = "Invalid returns passed to annotate_genome:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'annotate_genome');
+    }
+    return($return);
+}
+
+
+
+
+=head2 call_selenoproteins
+
+  $return = $obj->call_selenoproteins($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub call_selenoproteins
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to call_selenoproteins:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_selenoproteins');
+    }
+    
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN call_selenoproteins
+    
+    #
+    #...Find the selenoproteins...
+    #
+    use find_special_proteins;
+    
+    # Reformat the contigs into "Gary-tuples"
+    my @contigs;
+    foreach my $gctg (@{$genomeTO->{contigs}}) {
+	push(@contigs, [$gctg->{id}, undef, $gctg->{dna}]);
+    }
+    
+    my $parms   = { contigs => \@contigs };
+    my @results = &find_special_proteins::find_selenoproteins( $parms );
+    
+    #
+    # Allocate IDs for PEGs
+    #
+    my $n_pegs = @results;
+    my $protein_prefix = "$genomeTO->{id}.peg";
+    my $id_server = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+    my $peg_id_start = $id_server->allocate_id_range($protein_prefix, $n_pegs) + 0;
+    my $next_id = $peg_id_start;
+    print STDERR "allocated peg id start $peg_id_start for $n_pegs pegs\n";
+    
+    #
+    # Create features for PEGs
+    #
+    my $features = $genomeTO->{features};
+    if (!$features)
+    {
+	$features = [];
+	$genomeTO->{features} = $features;
+    }
+    
+    # Reformat result from &find_special_proteins::find_selenoproteins().
+    foreach my $feature (@results) {
+	my $loc  = $feature->{location};
+	my $seq  = $feature->{sequence};
+	my $func = $feature->{reference_def};
+	
+	my ($contig, $start, $stop, $strand) = &SeedUtils::parse_location( $feature->{location} );
+	my $len = abs($stop - $start) + 1;
+	my $strand = ($stop > $start) ? '+' : '-';
+	
+	my $kb_id = "$protein_prefix.$next_id";
+	++$next_id;
+	
+	my $annos = [];
+	push(@$annos, ["Set function to\n$func\nfor initial gene call performed by call_selenoproteins",
+		       'genome annotation service',
+		       time
+		       ]);
+	
+	my $feature = {
+	    id => $kb_id,
+	    location => [[ $contig, $start, $strand, $len ]],
+	    type => 'peg',
+	    protein_translation => $seq,
+	    aliases => [],
+	    $func ? (function => $func) : (),
+	    annotations => $annos,
+	};
+	push(@$features, $feature);
+    }
+    $return = $genomeTO;
+
+    #END call_selenoproteins
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to call_selenoproteins:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_selenoproteins');
+    }
+    return($return);
+}
+
+
+
+
+=head2 call_pyrrolysoproteins
+
+  $return = $obj->call_pyrrolysoproteins($genomeTO)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeTO is a genomeTO
+$return is a genomeTO
+genomeTO is a reference to a hash where the following keys are defined:
+	id has a value which is a genome_id
+	scientific_name has a value which is a string
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	source has a value which is a string
+	source_id has a value which is a string
+	contigs has a value which is a reference to a list where each element is a contig
+	features has a value which is a reference to a list where each element is a feature
+genome_id is a string
+contig is a reference to a hash where the following keys are defined:
+	id has a value which is a contig_id
+	dna has a value which is a string
+contig_id is a string
+feature is a reference to a hash where the following keys are defined:
+	id has a value which is a feature_id
+	location has a value which is a location
+	type has a value which is a feature_type
+	function has a value which is a string
+	protein_translation has a value which is a string
+	aliases has a value which is a reference to a list where each element is a string
+	annotations has a value which is a reference to a list where each element is an annotation
+feature_id is a string
+location is a reference to a list where each element is a region_of_dna
+region_of_dna is a reference to a list containing 4 items:
+	0: a contig_id
+	1: an int
+	2: a string
+	3: an int
+feature_type is a string
+annotation is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub call_pyrrolysoproteins
+{
+    my $self = shift;
+    my($genomeTO) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeTO) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"genomeTO\" (value was \"$genomeTO\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to call_pyrrolysoproteins:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_pyrrolysoproteins');
+    }
+
+    my $ctx = $Bio::KBase::GenomeAnnotation::Service::CallContext;
+    my($return);
+    #BEGIN call_pyrrolysoproteins
+    
+    #
+    #...Find the pyrrolysoproteins...
+    #
+    use find_special_proteins;
+    
+    # Reformat the contigs into "Gary-tuples"
+    my @contigs;
+    foreach my $gctg (@{$genomeTO->{contigs}}) {
+	push(@contigs, [$gctg->{id}, undef, $gctg->{dna}]);
+    }
+    
+    #...Only difference from 'call_selenoproteins' is 'pyrrolysine' flag, and annotations written
+    my $parms   = { contigs => \@contigs, pyrrolysine => 1 };
+    my @results = &find_special_proteins::find_selenoproteins( $parms );
+    
+    #
+    # Allocate IDs for PEGs
+    #
+    my $n_pegs = @results;
+    my $protein_prefix = "$genomeTO->{id}.peg";
+    my $id_server = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+    my $peg_id_start = $id_server->allocate_id_range($protein_prefix, $n_pegs) + 0;
+    my $next_id = $peg_id_start;
+    print STDERR "allocated peg id start $peg_id_start for $n_pegs pegs\n";
+    
+    #
+    # Create features for PEGs
+    #
+    my $features = $genomeTO->{features};
+    if (!$features)
+    {
+	$features = [];
+	$genomeTO->{features} = $features;
+    }
+    
+    # Reformat result from &find_special_proteins::find_selenoproteins({pyrrolysine => 1}).
+    foreach my $feature (@results) {
+	my $loc  = $feature->{location};
+	my $seq  = $feature->{sequence};
+	my $func = $feature->{reference_def};
+	
+	my ($contig, $start, $stop, $strand) = &SeedUtils::parse_location( $feature->{location} );
+	my $len = abs($stop - $start) + 1;
+	my $strand = ($stop > $start) ? '+' : '-';
+	
+	my $kb_id = "$protein_prefix.$next_id";
+	++$next_id;
+	
+	my $annos = [];
+	push(@$annos, ["Set function to\n$func\nfor initial gene call performed by call_pyrrolysoproteins",
+		       'genome annotation service',
+		       time
+		       ]);
+	
+	my $feature = {
+	    id => $kb_id,
+	    location => [[ $contig, $start, $strand, $len ]],
+	    type => 'peg',
+	    protein_translation => $seq,
+	    aliases => [],
+	    $func ? (function => $func) : (),
+	    annotations => $annos,
+	};
+	push(@$features, $feature);
+    }
+    $return = $genomeTO;
+
+    #END call_pyrrolysoproteins
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to call_pyrrolysoproteins:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'call_pyrrolysoproteins');
     }
     return($return);
 }
@@ -1316,7 +1722,7 @@ sub call_CDSs
     {
 	my($id, $function, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$res;
 	$feature_func{$id} = $function;
-	$feature_anno{$id} = "Assigned by assign_function_to_prot with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam";
+	$feature_anno{$id} = "Set function to\n$function\nby assign_function_to_prot with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam";
     }
     close($prot_fh);
     
@@ -1374,7 +1780,6 @@ sub call_CDSs
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'call_CDSs');
     }
-    
     return($return);
 }
 
@@ -1660,7 +2065,7 @@ sub assign_functions_to_CDSs
 	my($id, $function, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$res;
 	$features->[$to{$id}]->{function} = $function;
 	push(@{$features->[$to{$id}]->{annotations}},
-	     ["Assigned by assign_function_to_CDSs with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam",
+	     ["Set function to\n$function\nby assign_function_to_CDSs with otu=$otu score=$score nonoverlap=$nonoverlap_hits hits=$overlap_hits figfam=$fam",
 	      'genome annotation service',
 	      time
 	     ]);

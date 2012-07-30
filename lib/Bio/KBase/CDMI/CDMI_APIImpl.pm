@@ -589,6 +589,8 @@ sub fids_to_roles
                                       "HasFunctional(from_link) = ?", [$id],
 				     'HasFunctional(to_link)');
 	if (@resultRows != 0) {
+	    my %roles = map { $_ => 1 } @resultRows;
+	    my @resultRows = sort keys(%roles);
                 $return->{$id} = \@resultRows;
         }
     }
@@ -1554,7 +1556,8 @@ sub ous_with_trait
     #BEGIN ous_with_trait
     my $kb = $self->{db};
     my @res = $kb->GetAll('Measures ObservationalUnit UsesReference',
-			  'Measures(from_link) = ? AND Measures(measure_id) = ? AND Measures(value) <= ? AND Measures(value) >= ? AND UsesReference(to_link) = ?',[$trait,$measurement_type,$max_value,$min_value,$genome],
+			  'Measures(from_link) = ? AND Measures(measure_id) = ? AND Measures(value) <= ? AND Measures(value) >= ? AND UsesReference(to_link) = ?',
+			  [$trait,$measurement_type,$max_value,$min_value,$genome],
 			  'Measures(to_link) Measures(value)');
     $return = \@res;
     #END ous_with_trait
@@ -3457,7 +3460,7 @@ contig is a string
 
 =item Description
 
-The routine genomes_to_contigs can be used to retrieve the IDs of the contigs
+The routine genomes_to_con`tigs can be used to retrieve the IDs of the contigs
 associated with each of a list of input genomes.  The routine constructs a mapping
 from genome ID to the list of contigs included in the genome.
 
@@ -6994,7 +6997,7 @@ sub corresponds_from_sequences
 
 =head2 close_genomes
 
-  $return = $obj->close_genomes($genomes, $how, $n)
+  $return = $obj->close_genomes($genomes, $n)
 
 =over 4
 
@@ -7004,12 +7007,12 @@ sub corresponds_from_sequences
 
 <pre>
 $genomes is a genomes
-$how is a how
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a genomes
+$return is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a genome
+	1: a float
 genomes is a reference to a list where each element is a genome
 genome is a string
-how is an int
 
 </pre>
 
@@ -7018,12 +7021,12 @@ how is an int
 =begin text
 
 $genomes is a genomes
-$how is a how
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a genomes
+$return is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a genome
+	1: a float
 genomes is a reference to a list where each element is a genome
 genome is a string
-how is an int
 
 
 =end text
@@ -7032,7 +7035,15 @@ how is an int
 
 =item Description
 
+A close_genomes is used to get a set of relatively close genomes (for
+each input genome, a set of close genomes is calculated, but the
+result should be viewed as quite approximate.  It is quite slow,
+using similarities for a universal protein as the basis for the 
+assessments.  It produces estimates of degree of similarity for
+the universal proteins it samples. 
 
+
+Up to n genomes will be returned for each input genome.
 
 =back
 
@@ -7041,11 +7052,10 @@ how is an int
 sub close_genomes
 {
     my $self = shift;
-    my($genomes, $how, $n) = @_;
+    my($genomes, $n) = @_;
 
     my @_bad_arguments;
     (ref($genomes) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomes\" (value was \"$genomes\")");
-    (!ref($how)) or push(@_bad_arguments, "Invalid type for argument \"how\" (value was \"$how\")");
     (!ref($n)) or push(@_bad_arguments, "Invalid type for argument \"n\" (value was \"$n\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to close_genomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
@@ -7057,36 +7067,54 @@ sub close_genomes
     my($return);
     #BEGIN close_genomes
     $return = {};
-    if ($how > 1)
+    use CloseGenomes;
+    foreach my $g (@$genomes)
     {
-	print STDERR "how=$how is not yet supported.  Using default of matching names\n";
-	$how = 0;
-    }
-
-    if (($how == 0) || ($how == 1))
-    {
-	open(ALL,"all_entities_Genome -fields scientific_name|") || die "could nopen open pipe";
-	my @tuples    = map { ($_ =~ /^(\S+)\t(\S.*\S)/) ? [$1,[split(/\s+/,$2)]] : () } <ALL>;
-	my %to_seek   = map { $_ => 1 } @$genomes;
-	my %to_name   = map { ($_->[0] => $_->[1]) } grep { $to_seek{$_->[0]} } @tuples;
-	close(ALL);
-	foreach my $g (@$genomes)
+	my $parms = {};
+	my $contigs;
+	if ($g =~ /^kb\|/)
 	{
-	    my $name = $to_name{$g};
-	    if ($name)
-	    {
-		my @poss = map  { ($_->[1] > 0) ? $_->[0] : () }
-		           sort { ($b->[1] <=> $a->[1]) or ($a->[0] cmp $b->[0]) }
-		           map  { my $i; 
-                                  for ($i=0; 
-                                       ($i < @$name) && ($i < @{$_->[1]}) && ((lc $name->[$i]) eq (lc $_->[1]->[$i])); 
-                                       $i++) {}
-			          [$_->[0],$i] } 
-                           @tuples;
-		if (@poss > $n) { $#poss = $n-1 }
-		$return->{$g} = \@poss;
-	    }
+	    open(CONTIGS,"echo '$g' | genomes_to_contigs | contigs_to_sequences |");
+	    $contigs = &gjoseqlib::read_fasta(\*CONTIGS);
+	    close(CONTIGS);
+	    $parms->{-source} = "KBase";
+	    use Bio::KBase::CDMI::CDMIClient;
+	    use Bio::KBase::Utilities::ScriptThing;
+	    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
 	}
+	elsif (($g =~ /^\d+\.\d+/) && (! -d $g))
+	{
+	    open(CONTIGS,"echo '$g' | svr_contigs_in_genome | svr_dna_seq -fasta 1 |");
+	    $contigs = &gjoseqlib::read_fasta(\*CONTIGS);
+	    close(CONTIGS);
+	    $parms->{-source} = "SEED";
+	    use Bio::KBase::CDMI::CDMIClient;
+	    use Bio::KBase::Utilities::ScriptThing;
+	    use SAPserver;
+	    $parms->{-sapObj} = SAPserver->new();
+	}
+	else
+	{
+	    use JSON::XS;
+	    open(CONTIGS,"<$g") || die "$g is not a file that can be opened";
+	    my $json = JSON::XS->new;
+	    my $input_genome;
+	    local $/;
+	    undef $/;
+	    my $input_genome_txt = <CONTIGS>;
+	    $input_genome = $json->decode($input_genome_txt);
+	    my $tmp = $input_genome->{contigs};
+	    my @raw_contigs = map { [$_->{id},'',$_->{dna}] }  @$tmp;
+	    $contigs = \@raw_contigs;
+	    $parms->{-source} = "KBase";
+	    use Bio::KBase::CDMI::CDMIClient;
+	    use Bio::KBase::Utilities::ScriptThing;
+	    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
+	}
+	my ($close,$coding) = &CloseGenomes::close_genomes_and_hits($contigs, $parms);
+	my @tmp = @$close;
+	if (@tmp > $n) { $#tmp = $n-1 }  # return the $n closest
+	$return->{$g} = \@tmp;
     }
     #END close_genomes
     my @_bad_returns;
@@ -10483,47 +10511,6 @@ e2 has a value which is an int
 ln2 has a value which is an int
 score has a value which is an int
 
-
-=end text
-
-=back
-
-
-
-=head2 how
-
-=over 4
-
-
-
-=item Description
-
-A close_genomes is used to get a set of relatively close genomes (for
-each input genome, a set of close genomes is calculated, but the
-result should be viewed as quite approximate.  "how" is a suggestion
-of which algorithm to use:
- 
-     0 - default (same genus)
-     1 - find genomes with the same genus name
-     2 - use the SSU rRNA, if possible
-     3 - use a set of "universal proteins", if you can
-         
-Up to n genomes will be returned for each input genome.
-
-
-=item Definition
-
-=begin html
-
-<pre>
-an int
-</pre>
-
-=end html
-
-=begin text
-
-an int
 
 =end text
 

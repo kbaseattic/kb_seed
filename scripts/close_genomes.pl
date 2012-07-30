@@ -12,7 +12,21 @@ Example:
 
     close_genomes [arguments] < input > output
 
-The standard input should be a tab-separated table (i.e., each line
+This is a strange command.  It has two quite distinct uses:
+
+    1. it can be used to find genomes close to existing genomes (stored in either
+       the KBase CS or the PubSEED).  
+    2. Alternatively, it can be used to compute close genomes for a new genome
+       encoded in a JSON file.
+
+The second use will be performed iff the 
+
+     -g Encoded_JSON_directory
+
+is used.  In that case, the updated genome directory will be written to STDOUT.
+
+If the input is to be one or more genomes from the CS, then
+the standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
 line would contain the identifer. If another column contains the identifier
 use
@@ -77,20 +91,16 @@ This is used only if the column containing the identifier is not the last column
 
 =item -n N            [ N is the number of close genomes desired ]
 
-=item -how Algorithm  [ optional:  0 -> default,
-                                   1 -> just match scientific names of genomes
-			           2 -> use SSU rRNA (not yet implemented)
-                                   3 -> use "universal proteins" (not yet implemented)
-                      ]
 
 =back
 
 =head2 Output Format
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added (a close genome)
-
-Input lines that cannot be extended are written to stderr.
+If close genomes are being computed for genomes in the CS, then
+the input is a tab-delimited file, and the output will have two
+extra columns: [projected degree of identity,close-genome].
+If the -g option is used, then an updated genome structure will
+be encoded and written to STDOUT.
 
 =cut
 
@@ -105,42 +115,62 @@ my $column;
 
 my $input_file;
 my $n = 5;
-my $how = 0;
+my $genomeF;
 my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
 				                       'i=s' => \$input_file,
 				                       'n=i' => \$n,
-				                       'how=i' => \$how);
+				                       'g=s' => \$genomeF);
 if (! $kbO) { print STDERR $usage; exit }
 
-my $ih;
-if ($input_file)
+if (defined($genomeF))
 {
-    open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+    my $close = $kbO->close_genomes([$genomeF],$n);
+    my $tuples = $close->{$genomeF};
+    my $json = JSON::XS->new;
+    my $genome;
+    local $/;
+    undef $/;
+    open(GENOME,"<$genomeF") || die "could not open $genomeF";
+    my $genome_txt = <GENOME>;
+    close(GENOME);
+    $genome = $json->decode($genome_txt);
+    $genome->{close_genomes} = $tuples;
+    $json->pretty(1);
+    print $json->encode($genome);
 }
 else
 {
-    $ih = \*STDIN;
-}
+    my $ih;
+    if ($input_file)
+    {
+	open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+    }
+    else
+    {
+	$ih = \*STDIN;
+    }
 
-while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-    my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->close_genomes(\@h,$how,$n);
-    for my $tuple (@tuples) {
+    while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
+	my @h = map { $_->[0] } @tuples;
+	my $h = $kbO->close_genomes(\@h,$n);
+	for my $tuple (@tuples) {
         #
         # Process output here and print.
         #
-        my ($id, $line) = @$tuple;
-        my $v = $h->{$id};
+	    my ($id, $line) = @$tuple;
+	    my $v = $h->{$id};
 
-        if (! defined($v))
-        {
-            print STDERR $line,"\n";
-        }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
+	    if (! defined($v))
+	    {
+		print STDERR $line,"\n";
+	    }
+	    elsif (ref($v) eq 'ARRAY')
+	    {
+		foreach $_ (@$v)
+		{
+		    my($g,$sc) = @$_;
+		    print "$line\t$sc\t$g\n";
+		}
             }
         }
     }

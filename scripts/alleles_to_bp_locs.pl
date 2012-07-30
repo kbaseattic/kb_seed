@@ -10,7 +10,7 @@ use Carp;
 
 This command can be used to find the contig and position corresponding to each
 of a set of alleles.  The command takes in a table with a designated column containing
-allele IDs.  It adds two columns: the contig (including genome ID) and the base position.
+allele IDs.  It adds a column containing the location corresponding to the allele
 
 Example:
 
@@ -132,7 +132,7 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         elsif (ref($v) eq 'ARRAY')
         {
 	    my ($contig,$bp) = @$v;
-	    print join("\t",($line,$contig,$bp)),"\n";
+	    print join("\t",($line,"$contig\_$bp+1")),"\n";
         }
     }
 }
