@@ -100,5 +100,5 @@ module GenomeAnnotation
      * genome object.
      */
     funcdef annotate_proteins(genomeTO) returns (genomeTO);
-
+    funcdef call_CDSs_by_projection(genomeTO) returns (genomeTO);
 };

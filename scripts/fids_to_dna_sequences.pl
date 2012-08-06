@@ -84,7 +84,7 @@ It defaults to outputing just a fasta entry.
 
 =head2 Output Format
 
-The standard output is jsut a fasta file with the sequence.  You can also get
+The standard output is just a fasta file with the sequence.  You can also get
 a tab-delimited file by using -fasta=0.  The tab-delimited format consists of the input
 file with an extra column of sequence  added.
 

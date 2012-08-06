@@ -679,7 +679,9 @@ sub fids_to_subsystems
                                       "IsContainedIn(from_link) = ?", [$id],
 				     'IsIncludedIn(to_link)');
 	if (@resultRows != 0) {
-                $return->{$id} = \@resultRows;
+	    my %tmp = map { $_ => 1 } @resultRows;
+	    @resultRows = sort keys(%tmp);
+	    $return->{$id} = \@resultRows;
         }
     }
     #END fids_to_subsystems

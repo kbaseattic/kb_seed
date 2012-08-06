@@ -1,4 +1,21 @@
 
+=head1 annotate_genome
+
+
+This routine takes as input a file containing a JSON-encoded
+genomeTO.  It attempts a basic annotation task.  This involves
+calling protein-encoding genes using Glimmer, assign functions using a Kmer-based strategy,
+calling tRNAs using a tool built by Sean Eddy, calling rRNAs by a tool written by Niels Larsen,
+as well as a set of enhancements that were supplied by Gary Olsen.  In other words, it attempts
+to use a set of common tools to rapidly produce a fairly high-quality initial annotation.
+
+Example:
+
+    annotate_genome < input.genomeTO > output.genomeTO
+
+=cut
+
+
 use strict;
 use gjoseqlib;
 use Bio::KBase::GenomeAnnotation::Client;

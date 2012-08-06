@@ -679,15 +679,16 @@ sub SetUsing {
     my ($self, @tableNames) = @_;
     # Count the tables.
     my $N = $#tableNames;
+    my $q = $self->quote();
     # Declare the return variable.
-    my $retVal = "DELETE FROM $tableNames[$N]";
+    my $retVal = "DELETE FROM $q$tableNames[$N]$q";
     if ($N > 0) {
         if ($self->{_dbms} eq "Pg") {
             # It's PostGres, so pop off the target table's name to keep it
             # out of the USING clause.
             pop @tableNames;
         }
-        $retVal .= " USING " . join(", ", @tableNames);
+        $retVal .= " USING " . join(", ", map { $q . $_ . $q } @tableNames);
     }
     # Return the result.
     return $retVal;

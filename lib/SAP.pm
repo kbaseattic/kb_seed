@@ -1323,13 +1323,14 @@ sub _ids_to_functions_opt1
 {
     my($self, $ids) = @_;
 
+    my $q = $self->{db}->{_dbh}->quote();
     my $out = $self->_memcache_accelerate($ids, "f", sub {
 	my($self, $id_hash, $out, $upd) = @_;
     
 	my @ids = keys %$id_hash;
 	my $qs = join(", ", map { "?" } 0..$#ids);
 	my $res = $self->{db}->{_dbh}->SQL(qq(SELECT id, function
-					      FROM Feature
+					      FROM ${q}Feature$q
 					      WHERE id IN ($qs)), undef, @ids);
 	for my $ent (@$res)
 	{

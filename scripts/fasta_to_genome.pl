@@ -1,4 +1,32 @@
 
+=head1 fasta_to_genome
+
+This command takes as input a file containing contigs for a prokaryotic genome
+and it creates as output a genomeTO
+
+Example:
+
+    fasta_to_genome scientific-name domain genetic-code < contigs > genomeTO
+
+=over 4
+
+=item scientific-name
+
+This is the full name you want associated with the genome (e.g., 'Buchnera aphidicola str. Tuc7 (Acyrthosiphon pisum)')
+
+=item domain
+
+This should be 'Bacteria' or 'Archaea' for prokaryotes.
+
+=item genetic-code
+
+This is normally 11 for prokaryotes, but is 4 for a group including the <i>Mycoplasmas</i>.  Check NCBI
+if you are not sure which to use.
+
+=back
+=cut
+
+
 use strict;
 use gjoseqlib;
 use Bio::KBase::IDServer::Client;
@@ -20,7 +48,7 @@ my $rc = GetOptions('source=s' 	  => \$source,
 		    'output=s'    => \$output_file,
 		    );
 
-my $usage = "fasta_to_genome [--input fasta-file] [--output output-file] [--source source] [--source-id source-id] scientific-name domain genetic-code [< contig-fasta >[ genome-data";
+my $usage = "fasta_to_genome [--input fasta-file] [--output output-file] [--source source] [--source-id source-id] scientific-name domain genetic-code [< contig-fasta] [> genome-data]";
 
 @ARGV == 3 or die "Usage: $usage\n";
 my $scientific_name = shift;

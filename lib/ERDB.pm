@@ -4782,18 +4782,18 @@ sub Delete {
             # Now start the WHERE. The first thing is the ID field from the starting table. That
             # starting table will either be the entity relation or one of the entity's
             # sub-relations.
-            $stmt .= " WHERE $pathTables[0].id = ?";
+            $stmt .= " WHERE $self->{_quote}$pathTables[0]$self->{_quote}.id = ?";
             # Now we run through the remaining entities in the path, connecting them up.
             for (my $i = 1; $i <= $#pathTables; $i += 2) {
                 # Connect the current relationship to the preceding entity.
                 my ($entity, $rel) = @pathTables[$i-1,$i];
                 # The style of connection depends on the direction of the relationship.
-                $stmt .= " AND $entity.id = $rel.$keyName";
+                $stmt .= " AND $self->{_quote}$entity$self->{_quote}.id = $self->{_quote}$rel$self->{_quote}.$keyName";
                 if ($i + 1 <= $#pathTables) {
                     # Here there's a next entity, so connect that to the relationship's
                     # to-link.
                     my $entity2 = $pathTables[$i+1];
-                    $stmt .= " AND $rel.to_link = $entity2.id";
+                    $stmt .= " AND $self->{_quote}$rel$self->{_quote}.to_link = $self->{_quote}$entity2$self->{_quote}.id";
                 }
             }
             # Now we have our desired DELETE statement.

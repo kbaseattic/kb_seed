@@ -1,6 +1,7 @@
 use strict;
 use Data::Dumper;
 use Carp;
+use gjoseqlib;
 
 #
 # This is a SAS Component
@@ -147,7 +148,8 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 		    if (! $fasta_written{$id})
 		    {
 			$fasta_written{$id} = 1;
-			print ">$id\n$_\n";
+			#print ">$id\n$_\n";
+			write_fasta([$id, undef, $_]);
 		    }
 		}
 		else
@@ -163,7 +165,8 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 		if (! $fasta_written{$id})
 		{
 		    $fasta_written{$id} = 1;
-		    print ">$id\n$v\n";
+		    write_fasta([$id, undef, $v]);
+		    #print ">$id\n$v\n";
 		}
 	    }
 	    else
