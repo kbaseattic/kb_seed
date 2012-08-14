@@ -78,42 +78,47 @@ use vars qw($temp_dir $temp_url $image_type $image_suffix);
 #     \%has;
 # }
 
-BEGIN {
-    $temp_dir = "/tmp";
-    $temp_url = "file://localhost/tmp";
-    
-    #
-    # Default to png, fall back to jpeg.  I'm still not sure why the assignment
-    # is in the begin block.
-    #
-    # if ( gd_has_png() )
-    # {
-    #     $image_type   = "png";
-    #     $image_suffix = "png";
-    # }
-    # elsif ( gd_has_jpg() )
-    # {
+use strict;
+
+my $temp_dir     = "/tmp";
+my $temp_url     = "file://localhost/tmp";
+my $imgae_type   = "jpeg";
+my $image_suffix = "jpg";
+
+eval {
+    require FIG;
+    require FIG_Config;
+    $temp_dir = $FIG_Config::temp;
+    $temp_url = &FIG::temp_url;
+
+    my $GD_format = $FIG_Config::GD_format || '';
+    if ( $GD_format =~ m/^png$/i )
+    {
+        $image_type   = "png";
+        $image_suffix = "png";
+    }
+    elsif ( $GD_format =~ m/^jpe?g$/i )
+    {
         $image_type   = "jpeg";
         $image_suffix = "jpg";
-    # }
+    }
+    elsif ( $GD_format =~ m/^gif$/i )
+    {
+        $image_type   = "gif";
+        $image_suffix = "gif";
+    }
+};
 
+BEGIN {
     eval {
-	require FIG;
-	require FIG_Config;
-	$temp_dir = $FIG_Config::temp;
-	$temp_url = &FIG::temp_url;
-    };
-    eval {
-	require Tracer;
-	import Tracer;
+        require Tracer;
+        import Tracer;
     };
     if ($@)
     {
-	sub T {}
+        sub T {}
     }
 }
-
-use strict;
 
 #
 # A GenoGraphics request is a data structure of the form:
