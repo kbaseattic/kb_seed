@@ -15,7 +15,7 @@ SPHINX_HOST = localhost
 
 SERVICE_DIR = $(TARGET)/services/$(SERVICE)
 
-TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
+TPAGE = $(DEPLOY_RUNTIME)/bin/perl $(DEPLOY_RUNTIME)/bin/tpage
 TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE) \
 	--define kb_service_port=$(SERVICE_PORT) --define kb_service_dir=$(SERVICE_DIR) \
 	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST)

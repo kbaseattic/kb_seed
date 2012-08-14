@@ -10,4 +10,4 @@ export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
 
 pid_file=$KB_SERVICE_DIR/service.pid
 
-exec $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/CDMI.psgi
+exec $KB_RUNTIME/bin/perl $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/CDMI.psgi
