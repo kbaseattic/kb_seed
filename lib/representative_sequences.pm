@@ -20,8 +20,10 @@ our @EXPORT = qw( representative_sequences
 
 #===============================================================================
 #  Build or add to a set of representative sequences (if you do not want an
-#  enrichment of sequences around a focus sequence (called the reference), this
-#  is probably the subroutine that you want).
+#  enrichment of sequences around a focus sequence (called the reference),
+#  these are the subroutines that you want). rep_seq() can include diverse
+#  representatives of a group in the blast database, making the clustering
+#  more reliable (i.e., this is probably what you want).
 #
 #    \@reps = rep_seq( \@reps, \@new, \%options );
 #    \@reps = rep_seq(         \@new, \%options );
@@ -41,18 +43,20 @@ our @EXPORT = qw( representative_sequences
 #    ( \@reps, \%representing ) = rep_seq_2( \@reps, \@new, \%options );
 #    ( \@reps, \%representing ) = rep_seq_2(         \@new, \%options );
 #
-#  Construct a representative set of related sequences:
 #
-#    \@repseqs = representative_sequences( $ref, \@seqs, $max_sim, \%options );
+#  Construct a representative set of related sequences, with an enrichment
+#  in representation surrounding the initial reference sequence.
+#
+#    \@reps = representative_sequences( $ref, \@seqs, $max_sim, \%options );
 #
 #  or
 #
-#    ( \@repseqs, \%representing, \@low_sim ) = representative_sequences( $ref,
+#    ( \@reps, \%representing, \@low_sim ) = representative_sequences( $ref,
 #                                                 \@seqs, $max_sim, \%options );
 #
-#  Output:
+#  Outputs:
 #
-#    \@repseqs  Reference to the list of retained (representative subset)
+#    \@reps     Reference to the list of retained (representative subset)
 #               of sequence entries.  Sequence entries have the form
 #               [ $id, $def, $seq ]
 #
@@ -105,6 +109,14 @@ our @EXPORT = qw( representative_sequences
 #                   By default, sequences are analyzed in input order.  This
 #                   option set to true will sort from longest to shortest.
 #
+#        extra_rep  (rep_seq only)
+#                   Filehandle for a file of the sequences included in the
+#                   blast db, but are not themselves representing a group.
+#                   In the case of rep_seq, the database can include diverse
+#                   representatives of a cluster. These data are intended for
+#                   use in continuations of a clustering by inclusion at the
+#                   head of the new data.
+#
 #        logfile    Filehandle for a logfile of the progress.  As each
 #                   sequence is analyzed, its disposition in recorded.
 #                   In representative_sequences(), the id of each new
@@ -134,7 +146,7 @@ our @EXPORT = qw( representative_sequences
 #
 #        n_query    (rep_seq and rep_seq_2 only)
 #                   Blast serveral sequences at a time to decrease process
-#                   creation overhead.  (default = 1)
+#                   creation overhead.  (default = 64)
 #
 #        rep_seq_2  (rep_seq only)
 #                   Use rep_seq_2() behavior (only on representative in the
@@ -328,8 +340,9 @@ sub rep_seq
 
     # ---------------------------------------# Default values for options
 
-    my $n_query   = 64;                    # Blast sequences one-by-one
+    my $n_query   = 64;                    # Blast sequences 64 at a time
     my $by_size   = undef;                 # Analyze sequences in order provided
+    my $extra_rep = undef;                 # File of nonrep sequences in blastdb
     my $max_sim   = 0.80;                  # Retain 80% identity of less
     my $logfile   = undef;                 # Log file of sequences processed
     my $max_e_val = 0.01;                  # Blast E-value to decrease output
@@ -379,7 +392,13 @@ sub rep_seq
         }
         elsif ( m/n_?quer/i )
         {
-            $n_query = $value || 1;
+            $n_query = $value || 64;
+        }
+        elsif ( m/^extra_?rep/i )           #  File of nonrep seqs in blastdb
+        {
+            next if ! ( $value && ref $value eq "GLOB" );
+            $extra_rep = $value;
+            select( ( select( $extra_rep ), $| = 1 )[0] );  #  autoflush on
         }
         elsif ( m/^rep_seq_2$/ )            #  rep_seq_2 behavior
         {
@@ -487,7 +506,7 @@ sub rep_seq
                       -F => 'F',
                       -a =>  2
                     ];
-    push @$blast_opt, qw( -r 1 -q -1 ) if ! $protein;
+    push @$blast_opt, ( -r => 1, -q => -1 ) if ! $protein;
 
     #  List of whom is represented by a sequence:
 
@@ -495,10 +514,10 @@ sub rep_seq
 
     #  Groups can have more than one representative in the blast database:
 
-    my $rep4blast = [ @$reps2 ];                        # initial reps
-    my %group_id  = map { $_->[0] => $_->[0] } @$reps2; # represent self
+    my @new4blast = @$reps2;                                # initial reps
+    my %group_id  = map { $_->[0] => $_->[0] } @$reps2;     # represent self
 
-    #  When we add multiple sequences to blast db at of time, we need to
+    #  When we add multiple sequences to blast db at a time, we need to
     #  know which are really in there as reps of groups.
 
     my %match_ok = map { $_->[0] => 1 } @$reps2;        # hash of blast reps
@@ -506,21 +525,22 @@ sub rep_seq
     #  Search each sequence against the database.
 
     my ( $bpp_max, $sid, $gid );
-    my $newdb = 1;
+    my $offset = 0;                #  Where to start writing in blastdb
 
     while ( @$seqs2 )
     {
         $n_query = @$seqs2 if @$seqs2 < $n_query;  #  Number to blast
         my @queries = splice @$seqs2, 0, $n_query;
 
-        #  Is it time to rebuild a BLAST database?
+        #  Is it time to rebuild a BLAST database? This is now done by appending
+        #  two groups of sequences: permanent additions and temporary additions.
 
-        if ( $newdb || $n_query > 1 )
+        if ( @new4blast || $n_query > 1 )
         {
             my $last = pop @queries;
-            make_blast_db( $db, [ @$rep4blast, @queries ], $protein );
+            ( undef, $offset ) = update_blast_db( $db, \@new4blast, \@queries, $protein, $offset );
             push @queries, $last;
-            $newdb = 0  if $n_query == 1;
+            @new4blast = ();
         }
 
         #  Do the blast analysis.  Returned records are of the form:
@@ -557,10 +577,10 @@ sub rep_seq
 
                 if ( ! $tophit->[2] && ! $rep_seq_2 )
                 {
-                    push @$rep4blast, $entry;
+                    push @new4blast, $entry;
+                    gjoseqlib::write_fasta( $extra_rep, $entry ) if $extra_rep;   # db archive
                     $match_ok{ $qid } = 1;
                     $max_bpp{ $qid } = self_bpp( $db, $entry, $protein, $options ) if $sim_meas =~ /^sc/;
-                    $newdb = 1;
                 }
             }
 
@@ -568,13 +588,12 @@ sub rep_seq
 
             else
             {
-                push @$reps2, $entry;
-                push @$rep4blast, $entry;
+                push @$reps2,    $entry;
+                push @new4blast, $entry;
                 $match_ok{ $qid } = 1;
                 $group{ $qid } = [];
                 $group_id{ $qid } = $qid;   #  represent self
                 $max_bpp{ $qid } = self_bpp( $db, $entry, $protein, $options ) if $sim_meas =~ /^sc/;
-                $newdb = 1;
                 print $logfile "$qid\n" if $logfile;
             }
         }
@@ -592,8 +611,8 @@ sub rep_seq
 
 #===============================================================================
 #  Caluculate sequence similarity according to the requested measure, and return
-#  empty list if lower than max_sim.  Otherwise, return the hit and and
-#  whether the hit is really strong:
+#  empty list if lower than max_sim.  Otherwise, return the hit and whether
+#  the hit is really strong:
 #
 #     [ $score, $hit, $surething ] = in_group( $hit, $max_sim, $measure, $bpp_max )
 #     ()                           = in_group( $hit, $max_sim, $measure, $bpp_max )
@@ -668,7 +687,8 @@ sub rep_seq_2
 #                                                 \@seqs, $max_sim, \%options );
 #
 #===============================================================================
-sub representative_sequences {
+sub representative_sequences
+{
     my $seqs = ( shift @_ || shift @_ );  #  If $ref is undef, shift again
     ref( $seqs ) eq "ARRAY"
         or die "representative_sequences called with bad first argument\n";
@@ -1020,38 +1040,94 @@ sub self_bpp
 
 
 #===============================================================================
-#  Make a blast databse from a set of sequence entries.  The type of database
-#  (protein or nucleic acid) is quessed from the sequence data.
+#  Make or update a blast databse from a set of sequence entries.
 #
-#     make_blast_db( $db_filename, \@seq_entries, $protein )
+#    $status            =  make_blast_db( $dbname, \@seq_entries, $is_prot, $offset )
+#  ( $status, $offset ) =  make_blast_db( $dbname, \@seq_entries, $is_prot, $offset )
 #
 #  Sequence entries have the form: [ $id, $def, $seq ]
+#
+#  If offset is supplied, the new data are appended starting at $offset. If
+#  is desirable to add some sequences permanently and some temporarily,
+#  see update_blast_db().
 #===============================================================================
 
 sub make_blast_db
 {
-    my ( $db, $seqs, $protein ) =  @_;
+    my ( $db, $seqs, $is_prot, $offset ) =  @_;
 
     my $formatdb = &SeedAware::executable_for( 'formatdb' )
         or print STDERR "Could not find exectuable file for 'formatdb'.\n"
-            and return 0;
-
-    $db or print STDERR "Bad database file name '$db'.\n"
-            and return 0;
+            and return wantarray ? ( 0, 0 ) : 0;
 
     $seqs && ref $seqs eq 'ARRAY' && @$seqs
-        or print STDERR "Bad sequences.\n"
-            and return 0;
+        or print STDERR "No sequences.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
 
-    gjoseqlib::print_alignment_as_fasta( $db, $seqs );
-    -f $db or print STDERR "Failed to write sequences to '$db'.\n"
-            and return 0;
+    $db or print STDERR "Bad database file name '$db'.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
 
-    my @param = ( -p => ( $protein ? 'T' : 'F' ),
-                  -i => $db
-                );
+    open( DB, $offset ? '+<' : '>', $db )
+        or print STDERR "Failed to open '$db'.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
 
-    ! system( $formatdb, @param );
+    if ( $offset ) { truncate( DB, $offset ); seek( DB, 0, 2 ) }
+    gjoseqlib::write_fasta( \*DB, $seqs );
+    $offset = tell( DB );
+    close( DB );
+
+    my @param = ( -i => $db, -p => ( $is_prot ? 'T' : 'F' ) );
+
+    my $status = ! system( $formatdb, @param );
+
+    wantarray ? ( $status, $offset ) : $status;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Make or update a blast databse from two sets of sequence entries, the first
+#  of which are considered permanent additions, and the second of which are
+#  considered temporary additions.
+#
+#    $status            = update_blast_db( $dbname, \@perm_entries, \@temp_entries, $is_prot, $offset )
+#  ( $status, $offset ) = update_blast_db( $dbname, \@perm_entries, \@temp_entries, $is_prot, $offset )
+#
+#    $offset denotes the end of the permanent sequences.
+#-------------------------------------------------------------------------------
+
+sub update_blast_db
+{
+    my ( $db, $perm_seqs, $temp_seqs, $is_prot, $offset ) =  @_;
+
+    my $formatdb = &SeedAware::executable_for( 'formatdb' )
+        or print STDERR "Could not find exectuable file for 'formatdb'.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
+
+    $perm_seqs = [] unless ( $perm_seqs && ref $perm_seqs eq 'ARRAY' );
+    $temp_seqs = [] unless ( $temp_seqs && ref $temp_seqs eq 'ARRAY' );
+
+    @$perm_seqs || @$temp_seqs
+        or print STDERR "No sequences.\n"
+            and return wantarray ? ( 0, $offset ) : 0;
+
+    $db or print STDERR "Bad database file name '$db'.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
+
+    open( DB, $offset ? '+<' : '>', $db )
+        or print STDERR "Failed to open '$db'.\n"
+            and return wantarray ? ( 0, 0 ) : 0;
+
+    if ( $offset ) { truncate( DB, $offset ); seek( DB, 0, 2 ) }
+    gjoseqlib::write_fasta( \*DB, $perm_seqs ) if @$perm_seqs;
+    $offset = tell( DB );
+    gjoseqlib::write_fasta( \*DB, $temp_seqs ) if @$temp_seqs;
+    close( DB );
+
+    my @param = ( -i => $db, -p => ( $is_prot ? 'T' : 'F' ) );
+
+    my $status = ! system( $formatdb, @param );
+
+    wantarray ? ( $status, $offset ) : $status;
 }
 
 
@@ -1103,7 +1179,7 @@ sub top_blast_per_subject
 
     my $query_file = &SeedAware::new_file_name( "$tmp_dir/tmp_blast_query", '.seq' );
 
-    gjoseqlib::print_alignment_as_fasta( $query_file, [ $query ] );
+    gjoseqlib::write_fasta( $query_file, [ $query ] );
 
     $blast_opt ||= [];
     my @blast_cmd = ( $blastall,
@@ -1160,7 +1236,7 @@ sub top_blast_per_subject_2
 
     my $query_file = &SeedAware::new_file_name( "$tmp_dir/tmp_blast_query", '.seq' );
 
-    gjoseqlib::print_alignment_as_fasta( $query_file, $queries );
+    gjoseqlib::write_fasta( $query_file, $queries );
 
     $blast_opt ||= [];
     my @cmd = ( $blastall,
@@ -1557,16 +1633,14 @@ sub n_rep_seqs
     return ($repseqs,$representing);
 }
 
-sub add_to_lost {
+sub add_to_lost
+{
     my($lost,$representing) = @_;
 
     foreach my $id (keys(%$representing))
     {
-	my $x = $representing->{$id};
-	foreach my $lost_id (@$x)
-	{
-	    $lost->{$lost_id} = $id;
-	}
+        my $x = $representing->{$id};
+        foreach my $lost_id ( @$x ) { $lost->{$lost_id} = $id }
     }
 }
 

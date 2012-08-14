@@ -135,6 +135,8 @@ package gjoseqlib;
 #  $seq    = pack_seq( $sequence )        # modifies a copy
 #  $seq    = clean_ae_sequence( $seq )
 #
+#  $aa_seq = aa_subseq( $seq, $from, $to )
+#
 #  $aa = translate_seq( $nt, $met_start )
 #  $aa = translate_seq( $nt )
 #  $aa = translate_codon( $triplet );
@@ -248,6 +250,8 @@ our @EXPORT = qw(
         pack_seq
         clean_ae_sequence
 
+        aa_subseq
+
         translate_seq
         translate_codon
         translate_seq_with_user_code
@@ -314,9 +318,9 @@ sub input_filehandle
     {
         my $fh;
         if    ( -f $file                       ) { }
-        elsif (    $file =~ /^>(.+)$/ && -f $1 ) { $file = $1 }
+        elsif (    $file =~ /^<(.+)$/ && -f $1 ) { $file = $1 }
         else { die "Could not find input file '$file'\n" }
-        open( $fh, "<$file" ) || die "Could not open '$file' for input\n";
+        open( $fh, '<', $file ) || die "Could not open '$file' for input\n";
         return ( $fh, $file, 1 );
     }
 
@@ -354,7 +358,7 @@ sub read_fasta_seqs { read_fasta( @_ ) }
 #-----------------------------------------------------------------------------
 sub read_fasta
 {
-    my $dataR = ( $_[0] && ref $_[0] eq 'SCALAR' ) ? shift @_ : slurp( @_ );
+    my $dataR = ( $_[0] && ref $_[0] eq 'SCALAR' ) ?  $_[0] : slurp( @_ );
     $dataR && $$dataR or return wantarray ? () : [];
 
     my $is_fasta = $$dataR =~ m/^[\s\r]*>/;
@@ -386,11 +390,10 @@ sub read_fasta
 #-----------------------------------------------------------------------------
 #  A fast file reader:
 #
-#     $data = slurp( )               #  \*STDIN
-#     $data = slurp( \*FILEHANDLE )  #  an open file handle
-#     $data = slurp(  $filename )    #  a file name
-#     $data = slurp( "<$filename" )  #  file with explicit direction
-#   # $data = slurp( "$command |" )  #  open and read from pipe
+#     $dataR = slurp( )               #  \*STDIN
+#     $dataR = slurp( \*FILEHANDLE )  #  an open file handle
+#     $dataR = slurp(  $filename )    #  a file name
+#     $dataR = slurp( "<$filename" )  #  file with explicit direction
 #
 #  Note:  It is faster to read lines by reading the file and splitting
 #         than by reading the lines sequentially.  If space is not an
@@ -401,18 +404,17 @@ sub read_fasta
 sub slurp
 {
     my ( $fh, $close );
-    if ( ref $_[0] eq 'GLOB' )
+    if ( $_[0] && ref $_[0] eq 'GLOB' )
     {
         $fh = shift;
     }
     elsif ( $_[0] && ! ref $_[0] )
     {
         my $file = shift;
-        if    ( -f $file                       ) { $file = "<$file" }
-        elsif (    $file =~ /^<(.*)$/ && -f $1 ) { }  # Explicit read
-      # elsif (    $file =~ /\S\s*\|$/         ) { }  # Read from a pipe
+        if    ( -f $file                       ) { }
+        elsif (    $file =~ /^<(.*)$/ && -f $1 ) { $file = $1 }  # Explicit read
         else                                     { return undef }
-        open $fh, $file or return undef;
+        open( $fh, '<', $file ) or return undef;
         $close = 1;
     }
     else
@@ -500,11 +502,10 @@ sub read_fasta_0
             else
             {
                 my $file = $_[0];
-                if    ( -f $file                       ) { $file = "<$file" }
-                elsif (    $file =~ /^<(.*)$/ && -f $1 ) { }  # Explicit read
-              # elsif (    $file =~ /\S\s*\|$/         ) { }  # Read from a pipe
+                if    ( -f $file                       ) { }
+                elsif (    $file =~ /^<(.+)$/ && -f $1 ) { $file = $1 }  # Explicit read
                 else                                     { return () }
-                open $fh, $file or return ();
+                open( $fh, '<', $file ) or return ();
                 $close_file{ $fh } = 1;
             }
             $file_handle{ $_[0] } = $fh;
@@ -648,7 +649,7 @@ sub output_filehandle
     #  File name
 
     my $fh;
-    open( $fh, ">$file" ) || die "Could not open output $file\n";
+    open( $fh, '>', $file ) || die "Could not open output $file\n";
     return ( $fh, 1 );
 }
 
@@ -679,12 +680,14 @@ sub print_seq_list_as_fasta { print_alignment_as_fasta( @_ ) }
 #     print_alignment_as_fasta(  $filename,    @seq_entry_list );
 #     print_alignment_as_fasta(  $filename,   \@seq_entry_list );
 #-----------------------------------------------------------------------------
-sub print_alignment_as_fasta {
+sub print_alignment_as_fasta
+{
 
     return &write_fasta(@_);
 }
 
-sub write_fasta {
+sub write_fasta
+{
     my ( $fh, $close, $unused ) = output_filehandle( shift );
     ( unshift @_, $unused ) if $unused;
 
@@ -1219,7 +1222,9 @@ sub pack_sequences
 #  Some simple sequence manipulations:
 #
 #     @entry  = subseq_DNA_entry( @seq_entry, $from, $to [, $fix_id] );
+#    \@entry  = subseq_DNA_entry( @seq_entry, $from, $to [, $fix_id] );
 #     @entry  = subseq_RNA_entry( @seq_entry, $from, $to [, $fix_id] );
+#    \@entry  = subseq_RNA_entry( @seq_entry, $from, $to [, $fix_id] );
 #     @entry  = complement_DNA_entry( @seq_entry [, $fix_id] );
 #     @entry  = complement_RNA_entry( @seq_entry [, $fix_id] );
 #     $DNAseq = complement_DNA_seq( $NA_seq );
@@ -1229,23 +1234,23 @@ sub pack_sequences
 #
 #-----------------------------------------------------------------------------
 
-sub subseq_DNA_entry {
+sub subseq_DNA_entry
+{
     my ($id, $desc, @rest) = @_;
-    wantarray || die "subseq_DNA_entry requires array context\n";
 
     my $seq;
     ($id, $seq) = subseq_nt(1, $id, @rest);  # 1 is for DNA, not RNA
-    return ($id, $desc, $seq);
+    wantarray ? ( $id, $desc, $seq ) : [ $id, $desc, $seq ];
 }
 
 
-sub subseq_RNA_entry {
+sub subseq_RNA_entry
+{
     my ($id, $desc, @rest) = @_;
-    wantarray || die "subseq_RNA_entry requires array context\n";
 
     my $seq;
     ($id, $seq) = subseq_nt(0, $id, @rest);  # 0 is for not DNA, i.e., RNA
-    return ($id, $desc, $seq);
+    wantarray ? ( $id, $desc, $seq ) : [ $id, $desc, $seq ];
 }
 
 
@@ -1314,7 +1319,7 @@ sub DNA_subseq
                      [TGCAAMKYSWRVHDBNtgcaamkyswrvhdbn];
     }
 
-    $subseq
+    $subseq;
 }
 
 
@@ -1343,7 +1348,21 @@ sub RNA_subseq
                      [UGCAAMKYSWRVHDBNugcaamkyswrvhdbn];
     }
 
-    $subseq
+    $subseq;
+}
+
+
+sub aa_subseq
+{
+    my ( $seq, $from, $to ) = @_;
+
+    my $len = ref( $seq ) eq 'SCALAR' ? length( $$seq ) : length(  $seq );
+    $from = $from =~ /(\d+)/ && $1        ? $1 :    1;
+    $to   = $to   =~ /(\d+)/ && $1 < $len ? $1 : $len;
+    return '' if $from > $to;
+
+    ref( $seq ) eq 'SCALAR' ? substr( $$seq, $from-1, $to-$from+1 )
+                            : substr(  $seq, $from-1, $to-$from+1 );
 }
 
 
@@ -2466,21 +2485,28 @@ sub interpret_aa_align
 }
 
 
+#  Remove alignment columns with a nonvalid character or shared gaps
+
 sub useful_aa_align
 {
-    my ( $s1, $s2 ) = map { uc $_ } @_;
-    my $m1 = $s1;
-    $m1 =~ tr/ACDEFGHIKLMNPQRSTUVWY-/\377/;  # Allowed symbols to hex FF byte
-    $m1 =~ tr/\377/\000/c;  # All else to null byte
-    my $m2 = $s2;
-    $m2 =~ tr/ACDEFGHIKLMNPQRSTUVWY-/\377/;  # Allowed symbols to hex FF byte
-    $m2 =~ tr/\377/\000/c;  # All else to null byte
-    $m1 &= $m2;             # Invalid in either sequence becomes null
+    defined( $_[0] ) && defined( $_[1] ) or return ();
+    my $m1 = my $s1 = uc $_[0];
+    my $m2 = my $s2 = uc $_[1];
+    #  Valid characters in seq1 and seq2
+    $m1 =~ tr/ACDEFGHIKLMNPQRSTUVWY-/\377/; $m1 =~ tr/\377/\000/c;
+    $m2 =~ tr/ACDEFGHIKLMNPQRSTUVWY-/\377/; $m2 =~ tr/\377/\000/c;
+    $m1 &= $m2;             # Valid in seq1 and seq2
+    #  Shared gaps
+    my $m3 = $s1; $m3 =~ tr/-/\000/; $m3 =~ tr/\000/\377/c;
+    my $m4 = $s1; $m4 =~ tr/-/\000/; $m4 =~ tr/\000/\377/c;
+    #  Valid and not shared gap;
+    $m1 &= $m3 | $m4;
+
     $s1 &= $m1;             # Apply mask to sequence 1
     $s1 =~ tr/\000//d;      # Delete nulls in sequence 1
     $s2 &= $m1;             # Apply mask to sequence 2
     $s2 =~ tr/\000//d;      # Delete nulls in sequence 2
-    ( $s1, $s2 )
+    ( $s1, $s2 );
 }
 
 

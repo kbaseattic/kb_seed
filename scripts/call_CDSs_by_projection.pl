@@ -4,12 +4,13 @@ use gjoseqlib;
 use Bio::KBase::GenomeAnnotation::Client;
 use JSON::XS;
 
-my $usage = "call_CDSs [--input genome-file] [--output genome-file] [--url service-url] [< genome-file] [> genome-file]";
+my $usage = "call_CDSs_by_projection [--input genome-file] [--output genome-file] [--url service-url] [< genome-file] [> genome-file]";
 
 my $input_file;
 my $output_file;
 my $url = "http://bio-data-1.mcs.anl.gov/services/genome_annotation";
 my $help;
+
 use Getopt::Long;
 my $rc = GetOptions('help'      => \$help,
 		    'url=s'     => \$url,
@@ -53,7 +54,7 @@ my $input_genome;
     $input_genome = $json->decode($input_genome_txt);
 }
 
-my $output_genome = $kbase_server->call_CDSs($input_genome);
+my $output_genome = $kbase_server->call_CDSs_by_projection($input_genome);
 
 $json->pretty(1);
 print $out_fh $json->encode($output_genome);

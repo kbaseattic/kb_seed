@@ -2,10 +2,15 @@
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://bio-macpro-1.mcs.anl.gov/~parrello/FIG/Html/ERDB_DBD.xsd">
   <Title>Knowledge Base Bioinformatics Database</Title>
+  <Notes>This document is used to create the central store for the KBase
+  project. The document itself is called the [i]Central Data Model[/i],
+  and a database created from it is called a [i]Central Data Model
+  Instance[/i]. In addition to the Central Store, private CDMI
+  databases can be created, and these are sometimes referred to as
+  [i]Tiny Stores[/i].</Notes>
   <Regions>
     <Region name="Chemistry">
-      <Notes>The Chemistry region contains data about reactions and subsystem
-      scenarios.</Notes>
+      <Notes>The Chemistry region contains data about reactions, compounds, locations, and media conditions.</Notes>
     </Region>
     <Region name="Annotations">
       <Notes>The Annotations region contains feature annotation history, information
@@ -13,7 +18,7 @@
       assertions.</Notes>
     </Region>
     <Region name="Models">
-      <Notes>The Models region contains data related to genome models.</Notes>
+      <Notes>The Models region contains data related to metabolic flux models.</Notes>
     </Region>
     <Region name="Expression">
       <Notes>The Expression region contains data related to gene expression and
@@ -37,11 +42,11 @@
        <DisplayInfo theme="navy">
          <RegionInfo name="Models" row="1" col="1" caption="Location\nInstance" />
        </DisplayInfo>
-       <Notes>The Location Instance represents a section of a cell
+       <Notes>The Location Instance represents a region of a cell
        (e.g. cell wall, cytoplasm) as it appears in a specific
        model.</Notes>
        <Fields>
-         <Field name="compartment-index" type="int">
+         <Field name="index" type="int">
            <Notes>number used to distinguish between different
            instances of the same type of location in a single
            model. Within a model, any two instances of the same
@@ -53,11 +58,12 @@
            of the same location in a single model</Notes>
          </Field>
          <Field name="pH" type="float">
-           <Notes>pH used to determine proton balance in this
-           location</Notes>
+           <Notes>pH of the cell region, which is used to determine compound
+		   charge and pH gradient across cell membranes</Notes>
          </Field>
          <Field name="potential" type="float">
-           <Notes>ask Chris</Notes>
+           <Notes>electrochemical potential of the cell region, which is used to
+		   determine the electrochemical gradient across cell membranes</Notes>
          </Field>
        </Fields>
     </Entity>
@@ -72,9 +78,21 @@
           <Notes>computed charge based on the location instance pH
           and similar constraints</Notes>
         </Field>
+		<Field name="deltaG" type="float">
+          <Notes>free energy of formation of the compound adjusted
+		  to pH of the containing compartment</Notes>
+        </Field>
+        <Field name="deltaG-error" type="float">
+          <Notes>the uncertainty in the [b]deltaG[/b] value (units are
+		  kcal/mol)</Notes>
+        </Field>
         <Field name="formula" type="string">
           <Notes>computed chemical formula for this compound based
           on the location instance pH and similar constraints</Notes>
+        </Field>
+		<Field name="source-id" type="float">
+          <Notes>ID of the compound instance in the resource from which
+		  it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -123,14 +141,18 @@
           <Notes>number of ATP molecules hydrolized per gram of
           this biomass</Notes>
         </Field>
+		<Field name="source-id" type="float">
+          <Notes>ID of the biomass reaction in the resource from which
+		  it was added</Notes>
+        </Field>
       </Fields>
     </Entity>
     <Entity name="ReactionInstance" keyType="string">
       <DisplayInfo theme="navy" caption="Reaction\nInstance">
         <RegionInfo name="Models" row="5" col="5" />
       </DisplayInfo>
-      <Notes>A reaction instance describes the way a reaction fits
-      into a model.</Notes>
+      <Notes>A reaction instance describes the specific implementation of
+      a reaction in a model.</Notes>
       <Fields>
         <Field name="direction" type="char">
           <Notes>reaction directionality (&gt; for forward, &lt; for
@@ -139,9 +161,13 @@
         <Field name="protons" type="float">
           <Notes>number of protons produced by this reaction when
           proceeding in the forward direction. If this is a transport
-          reaction, these protons end up in the reaction instance's 
+          reaction, these protons end up in the reaction instance's
           main location. If the number is negative, then the protons
           are consumed by the reaction rather than being produced.</Notes>
+        </Field>
+		<Field name="source-id" type="float">
+          <Notes>ID of the reaction instance in the resource from which
+		  it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -176,8 +202,13 @@
         <Field name="compound-count" type="int">
           <Notes>number of compounds in the model</Notes>
         </Field>
-        <Field name="annotation-count" type="int">
-          <Notes>number of annotations used to build the model</Notes>
+        <Field name="feature-count" type="int">
+          <Notes>number of features associated with or more reactions in
+		  the model</Notes>
+        </Field>
+		<Field name="source-id" type="float">
+          <Notes>ID of the model in the resource from which
+		  it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -187,6 +218,7 @@
         <RegionInfo name="Models" row="9" col="3" />
         <RegionInfo name="" row="3" col="5" />
         <RegionInfo name="Subsystem" row="1" col="1" />
+        <RegionInfo name="Alignments" row="1" col="2" />
       </DisplayInfo>
       <Notes>A source is a user or organization that is permitted to
       assign its own identifiers or to submit bioinformatic objects
@@ -231,11 +263,12 @@
         <Field name="name" type="string">
           <Notes>descriptive name of the media</Notes>
         </Field>
-        <Field name="type" type="string">
-          <Notes>type of the medium (aerobic or anaerobic)</Notes>
+        <Field name="description" type="string">
+          <Notes>description of the media condition</Notes>
         </Field>
-        <Field name="is-minimal" type="boolean">
-          <Notes>TRUE if this media condition is considered minimal</Notes>
+        <Field name="is-defined" type="boolean">
+          <Notes>TRUE if this media condition is defined (all components explicitly
+		  known)</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -243,8 +276,8 @@
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" row="3" col="1" />
       </DisplayInfo>
-      <Notes>A location is a place where a reaction's compounds
-      can originate or end up (e.g. cell wall, extracellular,
+      <Notes>A location is a region of the cell where reaction compounds
+      originate from or are transported to (e.g. cell wall, extracellular,
       cytoplasm).</Notes>
       <Fields>
         <Field name="mod-date" type="date">
@@ -254,8 +287,8 @@
         <Field name="name" type="string">
           <Notes>common name for the location</Notes>
         </Field>
-        <Field name="msid" type="string">
-          <Notes>common modeling ID of this location</Notes>
+        <Field name="source-id" type="string">
+          <Notes>ID from the source of this location</Notes>
         </Field>
         <Field name="hierarchy" type="int">
           <Notes>a number indicating where this location occurs
@@ -279,7 +312,7 @@
         <Field name="abbr" type="string">
           <Notes>shortened abbreviation for the compound name</Notes>
         </Field>
-        <Field name="msid" type="string">
+        <Field name="source-id" type="string">
           <Notes>common modeling ID of this compound</Notes>
         </Field>
         <Field name="ubiquitous" type="boolean">
@@ -289,11 +322,24 @@
           <Notes>date and time of the last modification to the
           compound definition</Notes>
         </Field>
-        <Field name="uncharged-formula" type="string">
-          <Notes>a electrically neutral formula for the compound</Notes>
-        </Field>
         <Field name="mass" type="float">
-          <Notes>atomic mass of the compound</Notes>
+          <Notes>pH-neutral atomic mass of the compound</Notes>
+        </Field>
+		<Field name="formula" type="string">
+          <Notes>a pH-neutral formula for the compound</Notes>
+        </Field>
+        <Field name="charge" type="float">
+          <Notes>computed charge of the compound in a pH-neutral
+          solution</Notes>
+        </Field>
+        <Field name="deltaG" type="float">
+          <Notes>the pH 7 reference Gibbs free-energy of formation for this
+		  compound as calculated by the group contribution method (units are
+		  kcal/mol)</Notes>
+        </Field>
+        <Field name="deltaG-error" type="float">
+          <Notes>the uncertainty in the [b]deltaG[/b] value (units are
+		  kcal/mol)</Notes>
         </Field>
       </Fields>
       <Indexes>
@@ -307,7 +353,7 @@
           <Notes>This index allows retrieval by the common
           modeling ID.</Notes>
           <IndexFields>
-            <IndexField name="msid" order="ascending" />
+            <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -327,8 +373,8 @@
         <Field name="name" type="string">
           <Notes>descriptive name of this reaction</Notes>
         </Field>
-        <Field name="msid" type="string">
-          <Notes>common modeling ID of this reaction</Notes>
+        <Field name="source-id" type="string">
+          <Notes>ID of this reaction in the resource from which it was added</Notes>
         </Field>
         <Field name="abbr" type="string">
           <Notes>abbreviated name of this reaction</Notes>
@@ -338,10 +384,11 @@
           &lt; for backward-only, = for bidirectional)</Notes>
         </Field>
         <Field name="deltaG" type="float">
-          <Notes>Gibbs free-energy coefficient for the reaction</Notes>
+          <Notes>Gibbs free-energy change for the reaction calculated using
+		  the group contribution method (units are kcal/mol)</Notes>
         </Field>
         <Field name="deltaG-error" type="float">
-          <Notes>error bounds on the [b]deltaG[/b] value</Notes>
+          <Notes>uncertainty the [b]deltaG[/b] value (units are kcal/mol)</Notes>
         </Field>
         <Field name="thermodynamic-reversibility" type="char">
           <Notes>computed reversibility of this reaction in a
@@ -354,7 +401,7 @@
         <Field name="status" type="string">
           <Notes>string indicating additional information about
           this reaction, generally indicating whether the reaction
-          is balanced and/or accurate</Notes>
+          is balanced and/or lumped</Notes>
         </Field>
       </Fields>
       <Indexes>
@@ -362,7 +409,7 @@
           <Notes>This index allows retrieval by the common
           modeling ID.</Notes>
           <IndexFields>
-            <IndexField name="msid" order="ascending" />
+            <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -378,18 +425,9 @@
       cytoplasmic versions of the compounds; however, a transport
       always uses specifically located compounds.</Notes>
       <Fields>
-        <Field name="formula" type="string">
-          <Notes>a pH-neutral formula for the compound</Notes>
-        </Field>
-        <Field name="default-charge" type="float">
-          <Notes>computed charge of the compound in a pH-neutral
-          solution</Notes>
-        </Field>
-        <Field name="deltaG" type="float">
-          <Notes>Gibbs free-energy coefficient for this compound</Notes>
-        </Field>
-        <Field name="deltaG-error" type="float">
-          <Notes>error bounds on the [b]deltaG[/b] value</Notes>
+	    <Field name="label" type="string">
+          <Notes>primary name of the localized compound, for use in displaying
+          reactions</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -404,8 +442,8 @@
         <Field name="name" type="string" relation="ComplexName">
           <Notes>name of this complex. Not all complexes have names.</Notes>
         </Field>
-        <Field name="msid" type="string">
-          <Notes>common modeling ID of this complex.</Notes>
+        <Field name="source-id" type="string">
+          <Notes>ID of this complex in the source from which it was added.</Notes>
         </Field>
         <Field name="mod-date" type="date">
           <Notes>date and time of the last change to this complex's definition</Notes>
@@ -416,7 +454,7 @@
           <Notes>This index allows retrieval by the common
           modeling ID.</Notes>
           <IndexFields>
-            <IndexField name="msid" order="ascending" />
+            <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -588,7 +626,7 @@ and all genomes implementing a specific variant can easily be accessed.
         <RegionInfo name="" row="3" col="1"/>
         <RegionInfo name="Chemistry" row="7" col="2"/>
         <RegionInfo name="Annotations" row="5" col="1"/>
-        <RegionInfo name="Alignments" col="3" row="1" />
+        <RegionInfo name="Alignments" col="4" row="5" />
       </DisplayInfo>
       <Notes>
 
@@ -856,7 +894,7 @@ genome, but a ContigSequence does not.
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="source-id" in-result="1"/>
+	<FulltextIndex type="field" name="source-id" in_result="1"/>
 	<FulltextIndex type="related_field" path="HasAsSequence">
 	  <UseField name="md5" field="from-link"/>
 	</FulltextIndex>
@@ -877,6 +915,7 @@ genome, but a ContigSequence does not.
     <Entity name="ContigSequence" keyType="string">
       <DisplayInfo theme="red" caption="Contig\nSequence">
         <RegionInfo name="" row="7" col="3"/>
+        <RegionInfo name="Alignments" row="7" col="4" />
       </DisplayInfo>
       <Notes>
 
@@ -1296,6 +1335,10 @@ This includes, for each genome, a list of ever larger taxonomic groups.
         <Field name="major-allele" type="char">
           <Notes>Text letter representation of the major allele. Valid values are A, C, G, and T.</Notes>
         </Field>
+        <Field name="obs-unit-count" type="int">
+          <Notes>Number of observational units used to compute the allele frequencies. Indicates
+          the quality of the analysis.</Notes>
+        </Field>
       </Fields>
     </Entity>
     <Entity name="Attribute" keyType="string">
@@ -1366,12 +1409,12 @@ by a single transcription regulator).
       <Asides>The ID of an atomic regulon is the genome ID, a colon, and the
       atomic regulon sequence number.</Asides>
     </Entity>
-    <Entity name="AlignmentTree" keyType="string">
-      <DisplayInfo theme="purple" caption="Alignment Tree">
-        <RegionInfo name="Alignments" row="5" col="5" />
+    <Entity name="Alignment" keyType="string">
+      <DisplayInfo theme="purple" caption="Alignment">
+        <RegionInfo name="Alignments" row="3" col="2" />
       </DisplayInfo>
       <Notes>
-An alignment arranges a group of protein sequences so that they
+An alignment arranges a group of sequences so that they
 match. Each alignment is associated with a phylogenetic tree that
 describes how the sequences developed and their evolutionary distance.
 The actual tree and alignment FASTA are stored in separate flat files.
@@ -1389,30 +1432,284 @@ Access to the underlying sequences and trees in a form convenient to existing
 tools will be supported.
       </Notes>
       <Fields>
-        <Field name="alignment-method" type="string">
-          <Notes>The name of the program used to produce the alignment.</Notes>
+        <Field name="n-rows" type="int">
+          <Notes>number of rows in the alignment</Notes>
         </Field>
-        <Field name="alignment-parameters" type="text">
-          <Notes>The parameters given to the program when producing the alignment.</Notes>
+        <Field name="n-cols" type="int">
+          <Notes>number of columns in the alignment</Notes>
         </Field>
-        <Field name="alignment-properties" type="text">
-          <Notes>A colon-delimited string of key-value pairs containing additional
-          properties of the alignment.</Notes>
+        <Field name="status" type="string">
+          <Notes>status of the alignment, currently either [i]active[/i],
+          [i]superseded[/i], or [i]bad[/i]</Notes>
         </Field>
-        <Field name="tree-method" type="string">
-          <Notes>The name of the program used to produce the tree.</Notes>
+        <Field name="is-concatenation" type="boolean">
+          <Notes>TRUE if the rows of the alignment map to multiple
+          sequences, FALSE if they map to single sequences</Notes>
         </Field>
-        <Field name="tree-parameters" type="text">
-          <Notes>The parameters given to the program when producing the tree.</Notes>
+        <Field name="sequence-type" type="string">
+          <Notes>type of sequence being aligned, currently either
+          [i]Protein[/i], [i]DNA[/i], [i]RNA[/i], or [i]Mixed[/i]</Notes>
         </Field>
-        <Field name="tree-properties" type="text">
-          <Notes>A colon-delimited string of key-value pairs containing additional
-          properties of the tree.</Notes>
+        <Field name="timestamp" type="date">
+          <Notes>date and time the alignment was loaded</Notes>
+        </Field>
+        <Field name="method" type="string">
+          <Notes>name of the method used to produce the alignment</Notes>
+        </Field>
+        <Field name="parameters" type="long-string">
+          <Notes>free-form string containing the parameters used to
+          produce the alignment</Notes>
+        </Field>
+        <Field name="protocol" type="text">
+          <Notes>description of the protocol used to produce the
+          alignment</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>ID of this alignment in the source database</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="AlignmentAttribute" keyType="string">
+      <DisplayInfo theme="purple" caption="Alignment\nAttribute">
+        <RegionInfo name="Alignments" row="1" col="4" />
+      </DisplayInfo>
+      <Notes>This entity represents an attribute type that can
+      be assigned to an alignment, tree, or node. The attribute
+      values are stored in the relationships to the target. The
+      key is the attribute name.</Notes>
+    </Entity>
+    <Entity name="AlignmentRow" keyType="string">
+      <DisplayInfo theme="purple" caption="Alignment\nRow">
+        <RegionInfo name="Alignments" row="5" col="2" />
+      </DisplayInfo>
+      <Notes>This entity represents a single row of an alignment.
+      In general, this corresponds to a sequence, but in a
+      concatenated alignment multiple sequences may be rebrb. bank callingpresent
+      here.</Notes>
+      <Fields>
+        <Field name="row-number" type="int">
+          <Notes>1-based ordinal number of this row in the alignment</Notes>
+        </Field>
+        <Field name="row-id" type="string">
+          <Notes>identifier for this row in the FASTA file for the alignment</Notes>
+        </Field>
+        <Field name="row-description" type="string">
+          <Notes>description of this row in the FASTA file for the alignment</Notes>
+        </Field>
+        <Field name="n-components" type="int">
+          <Notes>number of components that make up this alignment
+          row; for a single-sequence alignment this is always "1"</Notes>
+        </Field>
+        <Field name="beg-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          sequence row begins</Notes>
+        </Field>
+        <Field name="end-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          sequence row ends</Notes>
+        </Field>
+        <Field name="md5-untapped" type="string">
+          <Notes>the MD5 of this row's sequence after gaps have been
+          removed; for DNA and RNA sequences, the [b]U[/b] codes are also
+          normalized to [b]T[/b] before the MD5 is computed</Notes>
+        </Field>
+        <Field name="sequence" type="long-string">
+          <Notes>sequence for this alignment row (with indels)</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="Tree" keyType="string">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" row="3" col="4"/>
+      </DisplayInfo>
+      <Notes>A tree describes how the sequences in an alignment relate 
+      to each other. Most trees are phylogenetic, but some may be based on
+      taxonomy or gene content.</Notes>
+      <Fields>
+        <Field name="status" type="string">
+          <Notes>status of the tree, currently either [i]active[/i],
+          [i]superseded[/i], or [i]bad[/i]</Notes>
+        </Field>
+        <Field name="data-type" type="string">
+          <Notes>type of data the tree was built from, usually
+          [i]sequence_alignment[/i]</Notes>
+        </Field>
+        <Field name="timestamp" type="date">
+          <Notes>date and time the tree was loaded</Notes>
+        </Field>
+        <Field name="method" type="string">
+          <Notes>name of the method used to produce the tree</Notes>
+        </Field>
+        <Field name="parameters" type="long-string">
+          <Notes>free-form string containing the parameters used to
+          produce the tree</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>ID of this tree in the source database</Notes>
         </Field>
       </Fields>
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="SupersedesAlignment" converse="IsSupersededByAlignment"
+                  arity="1M" from="Alignment" to="Alignment">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" fixed="1" caption="Supersedes\nAlignment"
+                    row="3" col="1"/>
+      </DisplayInfo>
+      <Notes>This relationship connects an alignment to the alignments
+      it replaces.</Notes>
+    </Relationship>
+    <Relationship name="SupersedesTree" converse="IsSupersededByTree"
+                  arity="1M" from="Tree" to="Tree">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Trees" fixed="1" caption="Supersedes\nTree"
+                    row="3" col="5"/>
+      </DisplayInfo>
+      <Notes>This relationship connects a tree to the trees
+      it replaces.</Notes>
+    </Relationship>
+    <Relationship name="IncludesAlignmentRow" converse="IsAlignmentRowIn"
+                  arity="1M" from="Alignment" to="AlignmentRow">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Includes\nAlignment Row"/>        
+      </DisplayInfo>
+      <Notes>This relationship connects an alignment to its component
+      rows.</Notes>
+    </Relationship>
+    <Relationship name="DescribesAlignment" converse="HasAlignmentAttribute"
+                  arity="MM" from="AlignmentAttribute" to="Alignment">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Describes\nAlignment"/>
+      </DisplayInfo>
+      <Notes>This relationship connects an alignment to its free-form
+      attributes.</Notes>
+      <Fields>
+        <Field name="value" type="string">
+          <Notes>value of this attribute</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="DescribesTree" converse="HasTreeAttribute"
+                  arity="MM" from="AlignmentAttribute" to="Tree">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Describes\nTree"/>
+      </DisplayInfo>
+      <Notes>This relationship connects a tree to its free-form
+      attributes.</Notes>
+      <Fields>
+        <Field name="value" type="string">
+          <Notes>value of this attribute</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="DescribesTreeNode" converse="HasNodeAttribute"
+                  arity="MM" from="AlignmentAttribute" to="Tree">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Describes\nTree Node"
+                    fixed="1" row="2" col="5" />
+      </DisplayInfo>
+      <Notes>This relationship connects an tree to the free-form
+      attributes of its nodes.</Notes>
+      <Fields>
+        <Field name="value" type="string">
+          <Notes>value of this attribute</Notes>
+        </Field>
+        <Field name="node-id" type="string">
+          <Notes>ID of the node described by the attribute</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="IsUsedToBuildTree" converse="IsBuiltFromAlignment"
+                  arity="1M" to="Tree" from="Alignment">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Is Used to\nBuild Tree"/>
+      </DisplayInfo>
+      <Notes>This relationship connects each tree to the alignment from
+      which it is built. There is at most one.</Notes>
+    </Relationship>
+    <Relationship name="ContainsAlignedProtein" arity="MM" from="AlignmentRow"
+                  to="ProteinSequence" converse="IsAlignedProteinComponentOf">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Contains\nAligned\nProtein" />
+      </DisplayInfo>
+      <Notes>This relationship connects a protein alignment row to the
+      protein sequences from which its components are formed.</Notes>
+      <Fields>
+        <Field name="index-in-concatenation" type="int">
+          <Notes>1-based ordinal position in the alignment row of this
+          protein sequence</Notes>
+        </Field>
+        <Field name="beg-pos-in-parent" type="int">
+          <Notes>1-based position in the protein sequence of the first
+          amino acid that appears in the alignment</Notes>
+        </Field>
+        <Field name="end-pos-in-parent" type="int">
+          <Notes>1-based position in the protein sequence of the last
+          amino acid that appears in the alignment</Notes>
+        </Field>
+        <Field name="parent-seq-len" type="int">
+          <Notes>length of original sequence</Notes>
+        </Field>
+        <Field name="beg-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          protein sequence begins</Notes>
+        </Field>
+        <Field name="end-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          protein sequence ends</Notes>
+        </Field>
+        <Field name="kb-feature-id" type="string">
+          <Notes>ID of the feature relevant to this protein, or an
+          empty string if the protein is not specific to a genome</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="ContainsAlignedDNA" arity="MM" from="AlignmentRow"
+                  to="ContigSequence" converse="IsAlignedDNAComponentOf">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Contains\nAligned\nDNA" />
+      </DisplayInfo>
+      <Notes>This relationship connects a nucleotide alignment row to the
+      contig sequences from which its components are formed.</Notes>
+      <Fields>
+        <Field name="index-in-concatenation" type="int">
+          <Notes>1-based ordinal position in the alignment row of this
+          nucleotide sequence</Notes>
+        </Field>
+        <Field name="beg-pos-in-parent" type="int">
+          <Notes>1-based position in the contig sequence of the first
+          nucleotide that appears in the alignment</Notes>
+        </Field>
+        <Field name="end-pos-in-parent" type="int">
+          <Notes>1-based position in the contig sequence of the last
+          nucleotide that appears in the alignment</Notes>
+        </Field>
+        <Field name="parent-seq-len" type="int">
+          <Notes>length of original sequence</Notes>
+        </Field>
+        <Field name="beg-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          nucleotide sequence begins</Notes>
+        </Field>
+        <Field name="end-pos-aln" type="int">
+          <Notes>the 1-based column index in the alignment where this
+          nucleotide sequence ends</Notes>
+        </Field>
+        <Field name="kb-feature-id" type="string">
+          <Notes>ID of the feature relevant to this sequence, or an
+          empty string if the sequence is not specific to a genome</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="Aligned" from="Source" to="Alignment"
+                  arity="1M" converse="WasAlignedBy">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Aligned" />
+      </DisplayInfo>
+      <Notes>This relationship connects an alignment to the database
+      from which it was generated.</Notes>
+    </Relationship>
     <Relationship name="HasVariationIn" from="Contig" to="ObservationalUnit" arity="MM" converse="IsVariedIn">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Has\nVariation\nIn" />
@@ -1428,7 +1725,7 @@ tools will be supported.
           of zero indicates an insertion.</Notes>
         </Field>
         <Field name="data" type="string">
-          <Notes>Replacement DNA for the variation on the primary chromosome. An 
+          <Notes>Replacement DNA for the variation on the primary chromosome. An
           empty string indicates a deletion. The primary chromosome is chosen
           arbitrarily among the two chromosomes of a plant's chromosome pair
           (one coming from the mother and one from the father).</Notes>
@@ -1467,10 +1764,10 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="Impacts" from="Trait" to="Contig" arity="MM" converse="IsImpactedBy">
-      <Notes>This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nImpacted\nBy" />
       </DisplayInfo>
+      <Notes>This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.</Notes>
       <Fields>
         <Field name="source-name" type="string">
           <Notes>Name of the study which analyzed the data and determined that a variation has impact on a trait</Notes>
@@ -1495,47 +1792,47 @@ tools will be supported.
       </ToIndex>
     </Relationship>
     <Relationship name="IsAssayOf" from="Assay" to="StudyExperiment" arity="1M" converse="IsAssayedBy">
-      <Notes>This relationship associates each assay with the relevant 
-      experiments.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nAssayed\nBy" />
       </DisplayInfo>
+      <Notes>This relationship associates each assay with the relevant
+      experiments.</Notes>
     </Relationship>
     <Relationship name="HasUnits" from="Locality" to="ObservationalUnit" arity="1M" converse="IsLocated">
-      <Notes>This relationship associates observational units with the 
-      geographic location where the unit is planted.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Has Units" />
       </DisplayInfo>
+      <Notes>This relationship associates observational units with the
+      geographic location where the unit is planted.</Notes>
     </Relationship>
     <Relationship name="IncludesPart" from="StudyExperiment" to="ObservationalUnit" arity="1M" converse="IsPartOf">
-      <Notes>This relationship associates observational units with the 
-      experiments that generated the data on them.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nPart\nOf" />
       </DisplayInfo>
+      <Notes>This relationship associates observational units with the
+      experiments that generated the data on them.</Notes>
     </Relationship>
     <Relationship name="IsReferencedBy" from="Genome" to="ObservationalUnit" arity="1M" converse="UsesReference">
-      <Notes>This relationship associates each observational unit with the reference 
-      genome that it will be compared to.  All variations will be differences 
-      between the observational unit and the reference.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nReferenced\nBy" />
       </DisplayInfo>
+      <Notes>This relationship associates each observational unit with the reference
+      genome that it will be compared to.  All variations will be differences
+      between the observational unit and the reference.</Notes>
     </Relationship>
     <Relationship name="IsRepresentedBy" from="TaxonomicGrouping" to="ObservationalUnit" arity="1M" converse="DefinedBy">
-      <Notes>This relationship associates observational units with a genus, 
-      species, strain, and/or variety that was the source material.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Defined\nBy" />
       </DisplayInfo>
+      <Notes>This relationship associates observational units with a genus,
+      species, strain, and/or variety that was the source material.</Notes>
     </Relationship>
     <Relationship name="IsSummarizedBy" from="Contig" to="AlleleFrequency" arity="1M" converse="Summarizes">
-      <Notes>This relationship describes the statistical frequencies of the
-      most common alleles in various positions on the reference contig.</Notes>
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Summarizes" />
       </DisplayInfo>
+      <Notes>This relationship describes the statistical frequencies of the
+      most common alleles in various positions on the reference contig.</Notes>
       <Fields>
         <Field name="position" type="int">
           <Notes>Position in the reference contig where the trait
@@ -1577,11 +1874,6 @@ tools will be supported.
           <Notes>TRUE if the compound is a cofactor; FALSE if it is a major
           component of the reaction.</Notes>
         </Field>
-        <Field name="is-transport" type="boolean">
-          <Notes>TRUE if the compound is being transported out of or
-          into the reaction's compartment, FALSE if it stays in the same
-          compartment</Notes>
-        </Field>
       </Fields>
     </Relationship>
     <Relationship name="ParticipatesAs" from="Compound" to="LocalizedCompound"
@@ -1589,8 +1881,8 @@ tools will be supported.
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nParticipation\nOf" />
       </DisplayInfo>
-      <Notes>This relationship connects a compound to the reagents
-      that represent its participation in reactions.</Notes>
+      <Notes>This relationship connects a generic compound to a specific compound
+	  where subceullar location has been specified.</Notes>
     </Relationship>
     <Relationship name="IsParticipatingAt" from="Location"
                   to="LocalizedCompound" arity="1M" converse="ParticipatesAt">
@@ -1633,30 +1925,28 @@ tools will be supported.
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nStep\nOf"/>
       </DisplayInfo>
-      <Notes>This relationship connects a complex to the reaction
-      rules for the reactions that work together to make the complex
-      happen.</Notes>
+      <Notes>This relationship connects a complex to the reactions it
+	  catalyzes.</Notes>
     </Relationship>
     <Relationship name="Manages" from="Model" to="Biomass" arity="1M"
                   converse="IsManagedBy">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Manages" />
       </DisplayInfo>
-      <Notes>This relationship connects a model to the biomasses
-      that are monitored to determine whether or not the model
-      is effective.</Notes>
+      <Notes>This relationship connects a model to its associated biomass
+	  composition reactions.</Notes>
     </Relationship>
     <Relationship name="IsComprisedOf" from="Biomass" to="CompoundInstance"
                   arity="MM" converse="Comprises">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nComprised\nOf" />
       </DisplayInfo>
-      <Notes>This relationship connects a biomass to the compound
-      specifications that define it.</Notes>
+      <Notes>This relationship connects a biomass composition reaction to the
+	  compounds specified as contained in the biomass.</Notes>
       <Fields>
         <Field name="coefficient" type="float">
-          <Notes>number of moles per gram cell dry weight of biomass
-          comprising this compound instance</Notes>
+          <Notes>number of millimoles of the compound instance that exists in one
+		  gram cell dry weight of biomass</Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -1665,8 +1955,8 @@ tools will be supported.
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Has\nUsage"/>
       </DisplayInfo>
-      <Notes>This relationship connects a model's compound specification
-      to the localized compounds which it is relevant.</Notes>
+      <Notes>This relationship connects a specific compound in a model to the localized
+      compound to which it corresponds.</Notes>
     </Relationship>
     <Relationship name="IsDividedInto" from="Model" to="LocationInstance"
                   arity="1M" converse="IsDivisionOf">
@@ -1674,14 +1964,14 @@ tools will be supported.
         <RegionInfo name="Models" caption="Is\nDivision\nOf"/>
       </DisplayInfo>
       <Notes>This relationship connects a model to its instances of
-      the locations that participate in the model.</Notes>
+      subcellular locations that participate in the model.</Notes>
     </Relationship>
     <Relationship name="IsInstantiatedBy" from="Location" to="LocationInstance"
                   arity="1M" converse="IsInstanceOf">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nInstance\nOf"/>
       </DisplayInfo>
-      <Notes>This relationship connects a location to the instances
+      <Notes>This relationship connects a subcellular location to the instances
       of that location that occur in models.</Notes>
     </Relationship>
     <Relationship name="IsRealLocationOf" from="LocationInstance" to="CompoundInstance"
@@ -1689,16 +1979,16 @@ tools will be supported.
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is Real\nLocation\nOf"/>
       </DisplayInfo>
-      <Notes>This relationship connects a model's instance of a location
-      to the instances of the compounds found at that location.</Notes>
+      <Notes>This relationship connects a specific instance of a compound in a model
+	  to the specific instance of the model subcellular location where the compound exists.</Notes>
     </Relationship>
     <Relationship name="IsReagentIn" from="CompoundInstance" to="ReactionInstance"
                   arity="MM" converse="Targets">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nReagent\nIn"/>
       </DisplayInfo>
-      <Notes>This relationship connects a compound in a biomass to the
-      reaction instances in which it is supposed to appear.</Notes>
+      <Notes>This relationship connects a compound instance to the reaction instance
+	  in which it is transformed.</Notes>
       <Fields>
         <Field name="coefficient" type="float">
           <Notes>Number of molecules of the compound that participate
@@ -1770,11 +2060,9 @@ tools will be supported.
         <Field name="concentration" type="float">
           <Notes>concentration of the compound in the media</Notes>
         </Field>
-        <Field name="minimum-flux" type="float">
-          <Notes>minimum flux of the compound for this media</Notes>
-        </Field>
-        <Field name="maximum-flux" type="float">
-          <Notes>maximum flux of the compound for this media</Notes>
+        <Field name="concentration-units" type="string">
+          <Notes>The units on the concentration measurement. Acceptable values
+		  are mmol/L or gram/L</Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -1825,8 +2113,7 @@ tools will be supported.
         <RegionInfo name="Chemistry"/>
         <RegionInfo name="Models"/>
       </DisplayInfo>
-      <Notes>A complex can be triggered by many roles. A role can
-      trigger many complexes.</Notes>
+      <Notes>This connects a complex to the roles that work together to form the complex.</Notes>
       <Fields>
         <Field name="optional" type="boolean">
           <Notes>TRUE if the role is not necessarily required to trigger the
@@ -1852,7 +2139,7 @@ tools will be supported.
     <Relationship name="ProjectsOnto" from="ProteinSequence" to="ProteinSequence"
                   arity="MM" converse="IsProjectedOnto">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Projects\nOnto" fixed="1" row="1" col="2" />
+        <RegionInfo name="Alignments" caption="Projects\nOnto" fixed="1" row="5" col="5" />
       </DisplayInfo>
       <Notes>This relationship connects two protein sequences for which a clear
       bidirectional best hit exists in known genomes. The attributes of the
@@ -1872,42 +2159,6 @@ tools will be supported.
           where 1 is the best</Notes>
         </Field>
       </Fields>
-    </Relationship>
-    <Relationship name="Aligns" arity="MM" from="AlignmentTree" to="ProteinSequence"
-                  converse="IsAlignedBy">
-      <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Is\nAligned\nBy" />
-      </DisplayInfo>
-      <Notes>This relationship connects each alignment to its constituent protein
-      sequences. Each alignment contains many protein sequences, and a single
-      sequence can be in many alignments. Parts of a single protein can occur
-      in multiple places in an alignment. The sequence-id field is used to
-      keep these unique, and is the string that represents the sequence in the
-      alignment and tree text.</Notes>
-      <Fields>
-        <Field name="begin" type="counter">
-          <Notes>location within the sequence at which the aligned portion begins</Notes>
-        </Field>
-        <Field name="end" type="counter">
-          <Notes>location within the sequence at which the aligned portion ends</Notes>
-        </Field>
-        <Field name="len" type="counter">
-          <Notes>length of the sequence within the alignment</Notes>
-        </Field>
-        <Field name="sequence-id" type="string">
-          <Notes>identifier for this sequence in the alignment</Notes>
-        </Field>
-        <Field name="properties" type="text">
-          <Notes>additional information about this sequence's participation in the
-          alignment</Notes>
-        </Field>
-      </Fields>
-      <FromIndex>
-        <Notes>This index puts additional fields into the primary key of the table
-        to insure that it is unique if a single protein sequence is used twice by
-        the same alignment.</Notes>
-        <IndexField name="sequence-id" />
-      </FromIndex>
     </Relationship>
     <Relationship name="IsCoupledTo" arity="MM" from="Family" to="Family"
                   converse="IsCoupledWith">
