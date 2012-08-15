@@ -890,7 +890,40 @@ sub alignment_2_html_table
     my $nojavascript = $options{ nojavascript } || ( $tooltip ? 0 : 1 );
 
     my @html;
-    push @html, "<TABLE Col=5 CellPadding=0 CellSpacing=0>\n";
+    push @html, <<'End_of_Style';
+<STYLE>
+TABLE.borderless
+{
+    font-family: inherit;
+    font-size:   inherit;
+    border-width: 0pt;
+    padding:      0pt;
+}
+
+TABLE.borderless CAPTION
+{
+    font-size:    110%;
+    font-weight:  bold;
+    border-width: 0pt;
+    padding:      0pt;
+}
+
+TABLE.borderless TD,TH
+{
+    border-width: 0pt;
+    margin:       0pt;
+    padding:      0pt;
+}
+
+TABLE.borderless TT,PRE
+{
+    font-family: Courier, "Courier New", monospace;
+    font-size:   92%;
+}
+</STYLE>
+End_of_Style
+
+    push @html, "<TABLE Col=5 CellPadding=0 CellSpacing=0 Class=borderless>\n";
     foreach ( @$align )
     {
         if ( $tooltip )
@@ -976,7 +1009,7 @@ sub sequence_2_html
         $txt =~ s/ /&nbsp;/g;  # 2009-03-02 -- Change from <Pre> to <TT> wrapper
         $txt =~ s/-/&#8722;/g; # 2011-08-16 -- Replace hyphen with minus sign
         $clr = $_->[1];
-        push @html, ( $clr ? qq(<span style="background-color: $clr;">$txt</span>)
+        push @html, ( $clr ? qq(<SPAN Style="background-color:$clr">$txt</SPAN>)
                            : $txt
                     )
     }
