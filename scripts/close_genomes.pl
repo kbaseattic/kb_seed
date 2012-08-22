@@ -155,7 +155,7 @@ if (defined($genomeF))
     $json->pretty(1);
     print $json->encode($genomeTO);
 }
-Else
+else
 {
     use Bio::KBase::CDMI::CDMIClient;
     use Bio::KBase::Utilities::ScriptThing;
