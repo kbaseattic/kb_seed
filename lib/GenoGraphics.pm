@@ -26,7 +26,7 @@ use constant  MINPIX  =>  5;
 
 use SeedHTML;
 
-use vars qw($temp_dir $temp_url $image_type $image_suffix);
+use vars qw($temp_dir $temp_url);
 
 # #
 # #  Let's diagnose the working rendering options of GD:
@@ -82,7 +82,7 @@ use strict;
 
 my $temp_dir     = "/tmp";
 my $temp_url     = "file://localhost/tmp";
-my $imgae_type   = "jpeg";
+my $image_type   = "jpeg";
 my $image_suffix = "jpg";
 
 eval {

@@ -541,7 +541,7 @@ module CDMI_API : CDMI_API {
 	*/
     funcdef genomes_to_contigs(genomes) returns (mapping<genome,contigs>);
 
-        /* genomes_to_fids is used to get the fids included in specific genomes.  It
+        /* genomes_to_fids bis used to get the fids included in specific genomes.  It
            is often the case that you want just one or two types of fids -- hence, the
 	   types_of_fids argument. */
     funcdef genomes_to_fids(genomes,types_of_fids) returns (mapping<genome,fids>);
@@ -830,12 +830,12 @@ module CDMI_API : CDMI_API {
            Up to n genomes will be returned for each input genome.
 	*/
 
-     funcdef close_genomes(genomes,int n) returns (mapping<genome,list<tuple<genome,float ident>>>);
-
      typedef string sequence;
      typedef tuple<id,comment,sequence> seq_triple;
      typedef list<seq_triple> seq_set;
      typedef list<id> id_set;
+
+     funcdef close_genomes(seq_set,int n) returns (list<tuple<genome,float ident>>);
 
      typedef structure {
 	     seq_set  existing_reps;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="http://bio-macpro-1.mcs.anl.gov/~parrello/FIG/Html/ERDB_DBD.xsd">
+  xsi:noNamespaceSchemaLocation="http://bio-macpro-1.mcs.anl.gov/~parrello/FIG/Html/ERDB_DBD.xsd">
   <Title>Knowledge Base Bioinformatics Database</Title>
   <Notes>This document is used to create the central store for the KBase
   project. The document itself is called the [i]Central Data Model[/i],
@@ -33,43 +33,50 @@
       subsystem spreadsheets</Notes>
     </Region>
     <Region name="GenoPheno">
-      <Notes>The Genotype to Phenotype contains data about the relationship between experimentally determined alleles in a DNA sequence and observed traits.</Notes>
+      <Notes>The Genotype to Phenotype region contains data about the relationship between experimentally determined alleles in a DNA sequence and observed traits for plants.</Notes>
+    </Region>
+    <Region name="MicrobePheno">
+      <Notes>The Microbial Phenotype region contains data about experiments performed on microbial organisms
+      in order to determine how each one reacts to certain conditions.</Notes>
     </Region>
   </Regions>
-  <Diagram height="800" width="700" ratio="0.7" size="90" fontSize="12" editable="1"/>
+  <Diagram height="800" width="700" ratio="0.7" size="90"
+    fontSize="12" editable="1" />
   <Entities>
     <Entity name="LocationInstance" keyType="string">
-       <DisplayInfo theme="navy">
-         <RegionInfo name="Models" row="1" col="1" caption="Location\nInstance" />
-       </DisplayInfo>
-       <Notes>The Location Instance represents a region of a cell
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Models" row="1" col="1"
+          caption="Location\nInstance" />
+      </DisplayInfo>
+      <Notes>The Location Instance represents a region of a cell
        (e.g. cell wall, cytoplasm) as it appears in a specific
        model.</Notes>
-       <Fields>
-         <Field name="index" type="int">
-           <Notes>number used to distinguish between different
+      <Fields>
+        <Field name="index" type="int">
+          <Notes>number used to distinguish between different
            instances of the same type of location in a single
            model. Within a model, any two instances of the same
            location must have difference compartment index
            values.</Notes>
-         </Field>
-         <Field name="label" type="string" relation="ModelCompartmentLabel">
-           <Notes>description used to differentiate between instances
+        </Field>
+        <Field name="label" type="string" relation="ModelCompartmentLabel">
+          <Notes>description used to differentiate between instances
            of the same location in a single model</Notes>
-         </Field>
-         <Field name="pH" type="float">
-           <Notes>pH of the cell region, which is used to determine compound
-		   charge and pH gradient across cell membranes</Notes>
-         </Field>
-         <Field name="potential" type="float">
-           <Notes>electrochemical potential of the cell region, which is used to
-		   determine the electrochemical gradient across cell membranes</Notes>
-         </Field>
-       </Fields>
+        </Field>
+        <Field name="pH" type="float">
+          <Notes>pH of the cell region, which is used to determine compound
+          charge and pH gradient across cell membranes</Notes>
+        </Field>
+        <Field name="potential" type="float">
+          <Notes>electrochemical potential of the cell region, which is used to
+          determine the electrochemical gradient across cell membranes</Notes>
+        </Field>
+      </Fields>
     </Entity>
     <Entity name="CompoundInstance" keyType="string">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" row="5" col="3" caption="Compound\nInstance"/>
+        <RegionInfo name="Models" row="5" col="3"
+          caption="Compound\nInstance" />
       </DisplayInfo>
       <Notes>A Compound Instance represents the occurrence of a particular
       compound in a location in a model.</Notes>
@@ -78,21 +85,21 @@
           <Notes>computed charge based on the location instance pH
           and similar constraints</Notes>
         </Field>
-		<Field name="deltaG" type="float">
+        <Field name="deltaG" type="float">
           <Notes>free energy of formation of the compound adjusted
-		  to pH of the containing compartment</Notes>
+          to pH of the containing compartment</Notes>
         </Field>
         <Field name="deltaG-error" type="float">
           <Notes>the uncertainty in the [b]deltaG[/b] value (units are
-		  kcal/mol)</Notes>
+          kcal/mol)</Notes>
         </Field>
         <Field name="formula" type="string">
           <Notes>computed chemical formula for this compound based
           on the location instance pH and similar constraints</Notes>
         </Field>
-		<Field name="source-id" type="float">
+        <Field name="source-id" type="float">
           <Notes>ID of the compound instance in the resource from which
-		  it was added</Notes>
+          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -141,9 +148,9 @@
           <Notes>number of ATP molecules hydrolized per gram of
           this biomass</Notes>
         </Field>
-		<Field name="source-id" type="float">
+        <Field name="source-id" type="float">
           <Notes>ID of the biomass reaction in the resource from which
-		  it was added</Notes>
+          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -165,15 +172,15 @@
           main location. If the number is negative, then the protons
           are consumed by the reaction rather than being produced.</Notes>
         </Field>
-		<Field name="source-id" type="float">
+        <Field name="source-id" type="float">
           <Notes>ID of the reaction instance in the resource from which
-		  it was added</Notes>
+          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
     <Entity name="Model" keyType="string">
       <DisplayInfo col="7" row="7" theme="navy">
-        <RegionInfo name="Models" row="1" col="3"/>
+        <RegionInfo name="Models" row="1" col="3" />
       </DisplayInfo>
       <Notes>A model specifies a relationship between sets of features and
       reactions in a cell. It is used to simulate cell growth and gene
@@ -204,17 +211,17 @@
         </Field>
         <Field name="feature-count" type="int">
           <Notes>number of features associated with or more reactions in
-		  the model</Notes>
+          the model</Notes>
         </Field>
-		<Field name="source-id" type="float">
+        <Field name="source-id" type="float">
           <Notes>ID of the model in the resource from which
-		  it was added</Notes>
+          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
     <Entity name="Source" keyType="string">
       <DisplayInfo theme="black">
-        <RegionInfo name="Annotations" row="7" col="1"/>
+        <RegionInfo name="Annotations" row="7" col="1" />
         <RegionInfo name="Models" row="9" col="3" />
         <RegionInfo name="" row="3" col="5" />
         <RegionInfo name="Subsystem" row="1" col="1" />
@@ -226,10 +233,10 @@
     </Entity>
     <Entity name="Role" keyType="string">
       <DisplayInfo theme="green" col="5" row="5">
-        <RegionInfo name="" row="1" col="3"/>
-        <RegionInfo name="Subsystem" row="3" col="3"/>
-        <RegionInfo name="Chemistry" row="5" col="4"/>
-        <RegionInfo name="Models" col="5" row="7"/>
+        <RegionInfo name="" row="1" col="3" />
+        <RegionInfo name="Subsystem" row="3" col="3" />
+        <RegionInfo name="Chemistry" row="5" col="4" />
+        <RegionInfo name="Models" col="5" row="7" />
         <RegionInfo name="Annotations" col="5" row="7" />
       </DisplayInfo>
       <Notes>A role describes a biological function that may be fulfilled
@@ -243,13 +250,14 @@
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="id" in_result="1"/>
+        <FulltextIndex type="field" name="id" in_result="1" />
       </FulltextIndexes>
     </Entity>
     <Entity name="Media" keyType="string">
       <DisplayInfo theme="navy">
         <RegionInfo name="Expression" row="7" col="6" />
         <RegionInfo name="Models" row="9" col="1" />
+        <RegionInfo name="MicrobePheno" row="7" col="4" />
       </DisplayInfo>
       <Notes>A media describes the chemical content of the solution in which cells
       are grown in an experiment or for the purposes of a model. The key is the
@@ -268,7 +276,7 @@
         </Field>
         <Field name="is-defined" type="boolean">
           <Notes>TRUE if this media condition is defined (all components explicitly
-		  known)</Notes>
+          known)</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -298,9 +306,10 @@
       </Fields>
     </Entity>
     <Entity name="Compound" keyType="string">
-      <DisplayInfo theme= "navy">
-        <RegionInfo name="Chemistry" row="1" col="2"/>
-        <RegionInfo name="Models" col="1" row="7"/>
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Chemistry" row="1" col="2" />
+        <RegionInfo name="Models" col="1" row="7" />
+        <RegionInfo name="MicrobePheno" row="7" col="6" />
       </DisplayInfo>
       <Notes>A compound is a chemical that participates in a reaction. Both
       ligands and reaction components are treated as compounds.</Notes>
@@ -325,7 +334,7 @@
         <Field name="mass" type="float">
           <Notes>pH-neutral atomic mass of the compound</Notes>
         </Field>
-		<Field name="formula" type="string">
+        <Field name="formula" type="string">
           <Notes>a pH-neutral formula for the compound</Notes>
         </Field>
         <Field name="charge" type="float">
@@ -334,19 +343,19 @@
         </Field>
         <Field name="deltaG" type="float">
           <Notes>the pH 7 reference Gibbs free-energy of formation for this
-		  compound as calculated by the group contribution method (units are
-		  kcal/mol)</Notes>
+          compound as calculated by the group contribution method (units are
+          kcal/mol)</Notes>
         </Field>
         <Field name="deltaG-error" type="float">
           <Notes>the uncertainty in the [b]deltaG[/b] value (units are
-		  kcal/mol)</Notes>
+          kcal/mol)</Notes>
         </Field>
       </Fields>
       <Indexes>
         <Index>
           <Notes>This index allows searching for compounds by name.</Notes>
           <IndexFields>
-            <IndexField name="label" order="ascending"/>
+            <IndexField name="label" order="ascending" />
           </IndexFields>
         </Index>
         <Index>
@@ -360,8 +369,8 @@
     </Entity>
     <Entity name="Reaction" keyType="string">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Chemistry" row="3" col="2"/>
-        <RegionInfo name="Models" row="7" col="3"/>
+        <RegionInfo name="Chemistry" row="3" col="2" />
+        <RegionInfo name="Models" row="7" col="3" />
       </DisplayInfo>
       <Notes>A reaction is a chemical process that converts one set of
       compounds (substrate) to another set (products).</Notes>
@@ -385,7 +394,7 @@
         </Field>
         <Field name="deltaG" type="float">
           <Notes>Gibbs free-energy change for the reaction calculated using
-		  the group contribution method (units are kcal/mol)</Notes>
+          the group contribution method (units are kcal/mol)</Notes>
         </Field>
         <Field name="deltaG-error" type="float">
           <Notes>uncertainty the [b]deltaG[/b] value (units are kcal/mol)</Notes>
@@ -415,7 +424,8 @@
       </Indexes>
     </Entity>
     <Entity name="LocalizedCompound" keyType="string">
-      <DisplayInfo theme="navy" col="3" row="3" caption="Localized\nCompound">
+      <DisplayInfo theme="navy" col="3" row="3"
+        caption="Localized\nCompound">
         <RegionInfo name="Models" row="5" col="1" />
       </DisplayInfo>
       <Notes>This entity represents a compound occurring in a
@@ -425,7 +435,7 @@
       cytoplasmic versions of the compounds; however, a transport
       always uses specifically located compounds.</Notes>
       <Fields>
-	    <Field name="label" type="string">
+        <Field name="label" type="string">
           <Notes>primary name of the localized compound, for use in displaying
           reactions</Notes>
         </Field>
@@ -433,7 +443,7 @@
     </Entity>
     <Entity name="Complex" keyType="string">
       <DisplayInfo theme="navy" col="3" row="3">
-        <RegionInfo name="Chemistry" row="5" col="2"/>
+        <RegionInfo name="Chemistry" row="5" col="2" />
         <RegionInfo name="Models" row="9" col="5" />
       </DisplayInfo>
       <Notes>A complex is a set of chemical reactions that act in concert to
@@ -461,7 +471,7 @@
     </Entity>
     <Entity name="Diagram" keyType="string">
       <DisplayInfo theme="ivory" col="5" row="3">
-        <RegionInfo name="Chemistry" row="3" col="4"/>
+        <RegionInfo name="Chemistry" row="3" col="4" />
       </DisplayInfo>
       <Notes>A functional diagram describes a network of chemical
       reactions, often comprising a single subsystem.</Notes>
@@ -476,17 +486,13 @@
     </Entity>
     <Entity name="Subsystem" keyType="string">
       <DisplayInfo theme="blue" col="7" row="3">
-        <RegionInfo name="Subsystem" row="1" col="3"/>
-        <RegionInfo name="Chemistry" row="3" col="6"/>
+        <RegionInfo name="Subsystem" row="1" col="3" />
+        <RegionInfo name="Chemistry" row="3" col="6" />
       </DisplayInfo>
-      <Notes>
-
-A subsystem is a set of functional roles that have been annotated simultaneously (e.g.,
-the roles present in a specific pathway), with an associated subsystem spreadsheet
-which encodes the fids in each genome that implement the functional roles in the
-subsystem.
-
-      </Notes>
+      <Notes>A subsystem is a set of functional roles that have been annotated simultaneously (e.g.,
+      the roles present in a specific pathway), with an associated subsystem spreadsheet
+      which encodes the fids in each genome that implement the functional roles in the
+      subsystem.</Notes>
       <Fields>
         <Field name="version" type="int">
           <Notes>version number for the subsystem. This value is
@@ -527,37 +533,41 @@ subsystem.
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="curator" in_result="1"/>
-	<FulltextIndex type="field" name="description"/>
-	<FulltextIndex type="field" name="id" in_result="1"/>
-	<FulltextIndex type="field" name="notes"/>
+        <FulltextIndex type="field" name="curator"
+          in_result="1" />
+        <FulltextIndex type="field" name="description" />
+        <FulltextIndex type="field" name="id" in_result="1" />
+        <FulltextIndex type="field" name="notes" />
       </FulltextIndexes>
-
     </Entity>
     <Entity name="SubsystemClass" keyType="string">
       <DisplayInfo theme="blue" caption="Subsystem Class">
-        <RegionInfo name="Subsystem" row="1" col="5"/>
-        <RegionInfo name="Chemistry" row="5" col="6"/>
+        <RegionInfo name="Subsystem" row="1" col="5" />
+        <RegionInfo name="Chemistry" row="5" col="6" />
       </DisplayInfo>
       <Notes>Subsystem classes impose a hierarchical organization on the
       subsystems.</Notes>
     </Entity>
     <Entity name="Publication" keyType="string">
       <DisplayInfo theme="green">
-        <RegionInfo name="" row="1" col="1"/>
+        <RegionInfo name="" row="1" col="1" />
+        <RegionInfo name="MicrobePheno" row="1" col="6" />
       </DisplayInfo>
-      <Notes>
-Annotators attach publications to ProteinSequences.  The criteria we have used
-to gather such connections is a bit nonstandard.  We have sought to attach publications
-to ProteinSequences when the publication includes an expert asserting a belief or estimate
-of function.  The paper may not be the original characterization.  Further, it may not
-even discuss a sequence protein (much of the literature is very valuable, but reports
-work on proteins in strains that have not yet been sequenced).  On the other hand,
-reports of sequencing regions of a chromosome (with no specific assertion of a
-clear function) should not be attached.  The attached publications give an ID (usually a
-Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it).
-
-      </Notes>
+      <Notes>Experimenters attach publications to experiments and
+      protocols. Annotators attach publications to ProteinSequences.
+      The attached publications give an ID (usually a
+      Pubmed ID),  a URL to the paper (when we have it), and a title
+      (when we have it).</Notes>
+      <Asides>The criteria we have used to gather protein sequence
+      connections is a bit nonstandard.  We have sought to attach publications
+      to ProteinSequences when the publication includes an expert asserting
+      a belief or estimate of function.  The paper may not be the original
+      characterization.  Further, it may not even discuss a sequence
+      protein (much of the literature is very valuable, but reports
+      work on proteins in strains that have not yet been sequenced).
+      On the other hand, reports of sequencing regions of a chromosome
+      (with no specific assertion of a clear function) should not be
+      attached.</Asides>
       <Fields>
         <Field name="title" type="string">
           <Notes>title of the article, or (unknown) if the title is not known</Notes>
@@ -566,11 +576,12 @@ Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it)
           <Notes>URL of the article</Notes>
         </Field>
         <Field name="pubdate" type="date">
-           <Notes>publication date of the article</Notes>
+          <Notes>publication date of the article</Notes>
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="title" in_result="1"/>
+        <FulltextIndex type="field" name="title"
+          in_result="1" />
       </FulltextIndexes>
       <Indexes>
         <Index>
@@ -578,23 +589,20 @@ Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it)
           title. It should only be used for LIKE-style searches, since
           the article titles are encoded together with the URLs.</Notes>
           <IndexFields>
-            <IndexField name="title" order="ascending"/>
+            <IndexField name="title" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
     </Entity>
     <Entity name="Variant" keyType="string">
       <DisplayInfo theme="blue" col="7" row="5">
-        <RegionInfo name="Subsystem" row="3" col="5"/>
+        <RegionInfo name="Subsystem" row="3" col="5" />
       </DisplayInfo>
-      <Notes>
-
-Each subsystem may include the designation of distinct variants.  Thus,
-there may be three closely-related, but distinguishable forms of histidine
-degradation.  Each form would be called a "variant", with an associated code,
-and all genomes implementing a specific variant can easily be accessed.
-
-</Notes>
+      <Notes>Each subsystem may include the designation of distinct
+      variants.  Thus, there may be three closely-related, but
+      distinguishable forms of histidine degradation.  Each form
+      would be called a "variant", with an associated code, and all
+      genomes implementing a specific variant can easily be accessed.</Notes>
       <Asides>The variant code is generally a number with zero or more
       decimal points, similar to what it done with software version numbers
       or legal outline numbers.</Asides>
@@ -622,21 +630,20 @@ and all genomes implementing a specific variant can easily be accessed.
       </Fields>
     </Entity>
     <Entity name="ProteinSequence" keyType="string">
-      <DisplayInfo theme="green" col="3" row="7" caption="Protein Sequence">
-        <RegionInfo name="" row="3" col="1"/>
-        <RegionInfo name="Chemistry" row="7" col="2"/>
-        <RegionInfo name="Annotations" row="5" col="1"/>
+      <DisplayInfo theme="green" col="3" row="7"
+        caption="Protein Sequence">
+        <RegionInfo name="" row="3" col="1" />
+        <RegionInfo name="Chemistry" row="7" col="2" />
+        <RegionInfo name="Annotations" row="5" col="1" />
         <RegionInfo name="Alignments" col="4" row="5" />
       </DisplayInfo>
-      <Notes>
-
-We use the concept of ProteinSequence as an amino acid string with an associated
-MD5 value.  It is easy to access the set of Features that relate to a ProteinSequence.
-While function is still associated with Features (and may be for some time), publications
-are associated with ProteinSequences (and the inferred impact on Features is through
-the relationship connecting ProteinSequences to Features).
-
-      </Notes>
+      <Notes>We use the concept of ProteinSequence as an amino acid
+      string with an associated MD5 value.  It is easy to access the
+      set of Features that relate to a ProteinSequence.  While function
+      is still associated with Features (and may be for some time),
+      publications are associated with ProteinSequences (and the inferred
+      impact on Features is through the relationship connecting
+      ProteinSequences to Features).</Notes>
       <Fields>
         <Field name="sequence" type="text">
           <Notes>The sequence contains the letters corresponding to
@@ -646,31 +653,24 @@ the relationship connecting ProteinSequences to Features).
     </Entity>
     <Entity name="Family" keyType="string">
       <DisplayInfo theme="brown" col="4" row="11">
-        <RegionInfo name="Annotations" row="5" col="5"/>
+        <RegionInfo name="Annotations" row="5" col="5" />
       </DisplayInfo>
-      <Notes>
+      <Notes>The Kbase will support the maintenance of protein families
+      (as sets of Features with associated translations).  We are
+      initially only supporting the notion of a family as composed of
+      a set of isofunctional homologs.  That is, the families we
+      initially support should be thought of as containing
+      protein-encoding genes whose associated sequences all implement
+      the same function (we do understand that the notion of "function"
+      is somewhat ambiguous, so let us sweep this under the rug by
+      calling a functional role a "primitive concept").
 
-The Kbase will support the maintenance of protein families (as sets of Features
-with associated translations).  We are initially only supporting the notion of a family
-as composed of a set of isofunctional homologs.  That is, the families we
-initially support should be thought of as containing protein-encoding genes whose
-associated sequences all implement the same function
-(we do understand that the notion of "function" is somewhat ambiguous, so let
-us sweep this under the rug by calling a functional role a "primitive concept").
-
-We currently support families in which the members are
-translations of features, and we think of Features as
-having an associated function. Identical protein sequences
-as products of translating distinct genes may or may not
-have identical functions, and we allow multiple members of
-the same Family to share identical protein sequences.  This
-may be justified, since in a very, very, very few cases
-identical proteins do, in fact, have distinct functions.
-We would prefer to reach the point where our Families are
-sets of protein sequence, rather than sets of
-protein-encoding Features.
-
-      </Notes>
+      We currently support families in which the members are
+      protein sequences as well. Identical protein sequences
+      as products of translating distinct genes may or may not
+      have identical functions.  This may be justified, since
+      in a very, very, very few cases identical proteins do, in
+      fact, have distinct functions.</Notes>
       <Fields>
         <Field name="type" type="string">
           <Notes>type of protein family (e.g. FIGfam, equivalog)</Notes>
@@ -702,22 +702,18 @@ protein-encoding Features.
     </Entity>
     <Entity name="SSRow" keyType="string">
       <DisplayInfo theme="blue" col="7" row="7" caption="SS Row">
-        <RegionInfo name="Subsystem" row="5" col="5"/>
+        <RegionInfo name="Subsystem" row="5" col="5" />
       </DisplayInfo>
-      <Notes>
-
-An SSRow (that is, a row in a subsystem spreadsheet) represents a collection of
-functional roles present in the Features of a single Genome.  The roles are part
-of a designated subsystem, and the fids associated with each role are included in the row,
-
-That is, a row amounts to an instance of a subsystem as it exists in a specific, designated
-genome.
-
-      </Notes>
+      <Notes>An SSRow (that is, a row in a subsystem spreadsheet)
+      represents a collection of functional roles present in the
+      Features of a single Genome.  The roles are part of a designated
+      subsystem, and the features associated with each role are included
+      in the row. That is, a row amounts to an instance of a subsystem as
+      it exists in a specific, designated genome.</Notes>
       <Asides>It is possible for a single subsystem to occur multiple times
       in a particular genome. If that is the case, then the subsystem will
       have a molecular machine for each occurrence. The region string used
-      in forming the key insures that each machine has a unique ID.</Asides>
+      in forming the key insures that each row has a unique ID.</Asides>
       <Fields>
         <Field name="curated" type="boolean">
           <Notes>This flag is TRUE if the assignment of the molecular
@@ -725,17 +721,17 @@ genome.
           automated program.</Notes>
         </Field>
         <Field name="region" type="string">
-          <Notes>Region in the genome for which the machine is relevant.
+          <Notes>Region in the genome for which the row is relevant.
           Normally, this is an empty string, indicating that the machine
-          covers the whole genome. If a subsystem has multiple machines
+          covers the whole genome. If a subsystem has multiple rows
           for a genome, this contains a location string describing the
-          region occupied by this particular machine.</Notes>
+          region occupied by this particular row.</Notes>
         </Field>
       </Fields>
     </Entity>
     <Entity name="Pairing" keyType="string">
       <DisplayInfo theme="brown">
-        <RegionInfo name="Annotations" row="1" col="5"/>
+        <RegionInfo name="Annotations" row="1" col="5" />
       </DisplayInfo>
       <Notes>A pairing indicates that two features are found
       close together in a genome. Not all possible pairings are stored in
@@ -743,36 +739,33 @@ genome.
       significant for annotation purposes.The key of the pairing is the
       concatenation of the feature IDs in alphabetical order with an
       intervening colon.</Notes>
-      <Asides>Theoretically, the pairing is unordered: (A,B) and (B,A) are the
-      same pairing. It is frequently the case, however, that we need to refer to
-      the "first" or "second" protein in the pairing. When this happens, the
-      first one is always the protein with the alphabetically lesser key. The
-      IsInPair relationship automatically shows the proteins in this
-      order.</Asides>
+      <Asides>Theoretically, the pairing is unordered: (A,B) and (B,A)
+      are the same pairing. It is frequently the case, however, that we
+      need to refer to the "first" or "second" protein in the pairing.
+      When this happens, the first one is always the protein with the
+      alphabetically lesser key. The IsInPair relationship automatically
+      shows the proteins in this order.</Asides>
     </Entity>
     <Entity name="Genome" keyType="string">
       <DisplayInfo theme="red">
-        <RegionInfo name="Annotations" row="3" col="5"/>
-        <RegionInfo name="" row="5" col="5"/>
-        <RegionInfo name="Subsystem" row="7" col="5"/>
+        <RegionInfo name="Annotations" row="3" col="5" />
+        <RegionInfo name="" row="5" col="5" />
+        <RegionInfo name="Subsystem" row="7" col="5" />
         <RegionInfo name="Expression" row="7" col="2" />
-        <RegionInfo name="Models" row="1" col="5"/>
+        <RegionInfo name="Models" row="1" col="5" />
         <RegionInfo name="GenoPheno" row="1" col="4" />
+        <RegionInfo name="MicrobePheno" row="7" col="3" />
       </DisplayInfo>
-      <Notes>
-
-The Kbase houses a large and growing set of genomes.  We often have multiple
-genomes that have identical DNA.  These usually have distinct gene calls and
-annotations, but not always.  We consider the Kbase to be a framework for
-managing hundreds of thousands of genomes and offering the tools needed to
-support compartive analysis on large sets of genomes, some of which are
-virtually identical.
-
-Each genome has an MD5 value computed from the DNA that is associated with the genome.
-Hence, it is easy to recognize when you have identical genomes, perhaps annotated
-by distinct groups.
-
-      </Notes>
+      <Notes>The Kbase houses a large and growing set of genomes.  We
+      often have multiple genomes that have identical DNA.  These usually
+      have distinct gene calls and annotations, but not always.  We
+      consider the Kbase to be a framework for managing hundreds of
+      thousands of genomes and offering the tools needed to
+      support compartive analysis on large sets of genomes,
+      some of which are virtually identical.</Notes>
+      <Asides>Each genome has an MD5 value computed from the DNA that is
+      associated with the genome. Hence, it is easy to recognize when you
+      have identical genomes, perhaps annotated by distinct groups.</Asides>
       <Fields>
         <Field name="pegs" type="int">
           <Notes>Number of protein encoding genes for this genome.</Notes>
@@ -820,24 +813,26 @@ by distinct groups.
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="scientific-name" in_result="1"/>
-	<FulltextIndex type="field" name="domain"/>
-	<FulltextIndex type="field" name="md5" in_result="1"/>
-	<FulltextIndex type="field" name="source-id" in_result="1"/>
+        <FulltextIndex type="field" name="scientific-name"
+          in_result="1" />
+        <FulltextIndex type="field" name="domain" />
+        <FulltextIndex type="field" name="md5" in_result="1" />
+        <FulltextIndex type="field" name="source-id"
+          in_result="1" />
       </FulltextIndexes>
       <Indexes>
         <Index>
           <Notes>This index allows the applications to find all
           genome sequences in lexical order by name.</Notes>
           <IndexFields>
-            <IndexField name="scientific-name" order="ascending"/>
+            <IndexField name="scientific-name" order="ascending" />
           </IndexFields>
         </Index>
         <Index>
           <Notes>This index allows the applications to find all
           genomes with the same genome sequence.</Notes>
           <IndexFields>
-            <IndexField name="md5" order="ascending"/>
+            <IndexField name="md5" order="ascending" />
           </IndexFields>
         </Index>
         <Index>
@@ -845,21 +840,20 @@ by distinct groups.
           genomes by the genome ID from the core (source)
           database.</Notes>
           <IndexFields>
-            <IndexField name="source-id" order="ascending"/>
+            <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
     </Entity>
     <Entity name="Annotation" keyType="string">
       <DisplayInfo col="3" row="11" theme="black">
-        <RegionInfo name="Annotations" row="1" col="1"/>
+        <RegionInfo name="Annotations" row="1" col="1" />
       </DisplayInfo>
-      <Notes>
-An annotation is a comment attached to a feature. Annotations
-are used to track the history of a feature's functional assignments
-and any related issues. The key is the feature ID followed by a
-colon and a complemented ten-digit sequence number.
-      </Notes>
+      <Notes>An annotation is a comment attached to a feature.
+      Annotations are used to track the history of a feature's
+      functional assignments and any related issues. The key is
+      the feature ID followed by a colon and a complemented ten-digit
+      sequence number.</Notes>
       <Asides>The complemented sequence number causes the annotations to
       sort with the most recent one first.</Asides>
       <Fields>
@@ -876,31 +870,32 @@ colon and a complemented ten-digit sequence number.
     </Entity>
     <Entity name="Contig" keyType="string">
       <DisplayInfo theme="red">
-        <RegionInfo name="" row="5" col="3"/>
+        <RegionInfo name="" row="5" col="3" />
         <RegionInfo name="GenoPheno" row="3" col="2" />
       </DisplayInfo>
-      <Notes>
-A contig is thought of as composing a part of the DNA associated with a specific
-genome.  It is represented as an ID (including the genome ID) and a ContigSequence.
-We do not think of strings of DNA from, say, a metgenomic sample as "contigs",
-since there is no associated genome (these would be considered ContigSequences).
-This use of the term "ContigSequence", rather than just "DNA sequence", may turn out
-to be a bad idea.  For now, you should just realize that a Contig has an associated
-genome, but a ContigSequence does not.
-      </Notes>
+      <Notes>A contig is thought of as composing a part of the DNA
+      associated with a specific genome.  It is represented as an ID
+      (including the genome ID) and a ContigSequence. We do not think
+      of strings of DNA from, say, a metgenomic sample as "contigs",
+      since there is no associated genome (these would be considered
+      ContigSequences). This use of the term "ContigSequence", rather
+      than just "DNA sequence", may turn out to be a bad idea.  For now,
+      you should just realize that a Contig has an associated
+      genome, but a ContigSequence does not.</Notes>
       <Fields>
         <Field name="source-id" type="string">
           <Notes>ID of this contig from the core (source) database</Notes>
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="source-id" in_result="1"/>
-	<FulltextIndex type="related_field" path="HasAsSequence">
-	  <UseField name="md5" field="from-link"/>
-	</FulltextIndex>
-	<FulltextIndex type="related_field" path="IsComponentOf">
-	  <UseField name="genome" field="from-link"/>
-	</FulltextIndex>
+        <FulltextIndex type="field" name="source-id"
+          in_result="1" />
+        <FulltextIndex type="related_field" path="HasAsSequence">
+          <UseField name="md5" field="from-link" />
+        </FulltextIndex>
+        <FulltextIndex type="related_field" path="IsComponentOf">
+          <UseField name="genome" field="from-link" />
+        </FulltextIndex>
       </FulltextIndexes>
       <Indexes>
         <Index>
@@ -914,19 +909,17 @@ genome, but a ContigSequence does not.
     </Entity>
     <Entity name="ContigSequence" keyType="string">
       <DisplayInfo theme="red" caption="Contig\nSequence">
-        <RegionInfo name="" row="7" col="3"/>
+        <RegionInfo name="" row="7" col="3" />
         <RegionInfo name="Alignments" row="7" col="4" />
       </DisplayInfo>
-      <Notes>
-
-ContigSequences are strings of DNA.  Contigs have an associated
-genome, but ContigSequences do not..   We can think of random samples of DNA as a set of ContigSequences.
-There are no length constraints imposed on ContigSequences -- they can be either
-very short or very long.  The basic unit of data that is moved to/from the database
-is the ContigChunk, from which ContigSequences are formed. The key
-of a ContigSequence is the sequence's MD5 identifier.
-
-      </Notes>
+      <Notes>ContigSequences are strings of DNA.  Contigs have an
+      associated genome, but ContigSequences do not.  We can think
+      of random samples of DNA as a set of ContigSequences. There
+      are no length constraints imposed on ContigSequences -- they
+      can be either very short or very long.  The basic unit of data
+      that is moved to/from the database is the ContigChunk, from
+      which ContigSequences are formed. The key of a ContigSequence
+      is the sequence's MD5 identifier.</Notes>
       <Fields>
         <Field name="length" type="counter">
           <Notes>number of base pairs in the contig</Notes>
@@ -935,24 +928,22 @@ of a ContigSequence is the sequence's MD5 identifier.
     </Entity>
     <Entity name="ContigChunk" keyType="string">
       <DisplayInfo theme="red">
-        <RegionInfo name="" row="9" col="3" caption="Contig Chunk"/>
+        <RegionInfo name="" row="9" col="3" caption="Contig Chunk" />
       </DisplayInfo>
-      <Notes>
+      <Notes>ContigChunks are strings of DNA thought of as being a
+      string in a 4-character alphabet with an associated ID.  We
+      allow a broader alphabet that includes U (for RNA) and
+      the standard ambiguity characters.</Notes>
+      <Asides>The notion of ContigChunk was introduced to avoid
+      transferring/manipulating huge contigs to access small substrings.
+      A ContigSequence is formed by concatenating a set of one or more
+      ContigChunks.  Thus, ContigChunks are the basic units moved from
+      the database to memory.  Their existence should be hidden from
+      users in most circumstances (users are expected to request
+      substrings of ContigSequences, and the Kbase software locates
+      the appropriate ContigChunks).
 
-ContigChunks are strings of DNA thought of as being a string in a 4-character alphabet
-with an associated ID.  We allow a broader alphabet that includes U (for RNA) and
-the standard ambiguity characters.
-
-The notion of ContigChunk was introduced to avoid transferring/manipulating
-huge contigs to access small substrings.  A ContigSequence is formed by
-concatenating a set of one or more ContigChunks.  Thus, ContigChunks are the
-basic units moved from the database to memory.  Their existence should be
-hidden from users in most circumstances (users are expected to request
-substrings of ContigSequences, and the Kbase software locates the appropriate
-ContigChunks).
-
-      </Notes>
-      <Asides>The maximum length of a chunk is one million bases.
+      The maximum length of a chunk is one million bases.
       The key is the contigID followed by a 7-digit ordinal number. So,
       the first sequence will have an ordinal of 0000000 and contain the base
       pairs from position 1 to position 1,000,000, the second will have an
@@ -967,7 +958,7 @@ ContigChunks).
     </Entity>
     <Entity name="EcNumber" keyType="string">
       <DisplayInfo theme="navy" col="3" row="7" caption="EC\nNumber">
-        <RegionInfo name="Chemistry" row="6" col="2"/>
+        <RegionInfo name="Chemistry" row="6" col="2" />
       </DisplayInfo>
       <Notes>EC numbers are assigned by the Enzyme Commission, and consist
       of four numbers separated by periods, each indicating a successively
@@ -984,7 +975,7 @@ ContigChunks).
     </Entity>
     <Entity name="SSCell" keyType="string">
       <DisplayInfo row="7" col="5" caption="SS Cell" theme="blue">
-        <RegionInfo name="Subsystem" row="5" col="3"/>
+        <RegionInfo name="Subsystem" row="5" col="3" />
       </DisplayInfo>
       <Notes>An SSCell (SpreadSheet Cell) represents a role as it occurs
       in a subsystem spreadsheet row. The key is a colon-delimited triple
@@ -995,7 +986,7 @@ ContigChunks).
     </Entity>
     <Entity name="OTU" keyType="string">
       <DisplayInfo theme="red" caption="OTU">
-        <RegionInfo name="" row="3" col="6"/>
+        <RegionInfo name="" row="3" col="6" />
       </DisplayInfo>
       <Notes>An OTU (Organism Taxonomic Unit) is a named group of related
       genomes.</Notes>
@@ -1006,17 +997,14 @@ ContigChunks).
     </Entity>
     <Entity name="PairSet" keyType="string">
       <DisplayInfo theme="brown" col="5" row="13" caption="Pair Set">
-        <RegionInfo name="Annotations" row="3" col="6.5"/>
+        <RegionInfo name="Annotations" row="3" col="6.5" />
       </DisplayInfo>
-      <Notes>
-
-A PairSet is a precompute set of pairs or genes.  Each pair occurs close to
-one another of the chromosome.  We believe that all of the first members
-of the pairs correspond to one another (are quite similar), as do all of
-the second members of the pairs.  These pairs (from prokaryotic genomes)
-offer on of the most powerful clues relating to uncharacterized genes/peroteins.
-
-      </Notes>
+      <Notes>A PairSet is a precompute set of pairs or genes.  Each
+      pair occurs close to one another of the chromosome.  We believe
+      that all of the first members of the pairs correspond to one another
+      (are quite similar), as do all of the second members of the pairs.
+      These pairs (from prokaryotic genomes) offer one of the most
+      powerful clues relating to uncharacterized genes/peroteins.</Notes>
       <Asides>The pairings for a particular evidence set will contain
       protein sequences that are significantly similar. In other words, if
       (A,B) and (X,Y) are both pairings in a single evidence set, then (A
@@ -1038,24 +1026,22 @@ offer on of the most powerful clues relating to uncharacterized genes/peroteins.
     </Entity>
     <Entity name="Feature" keyType="string">
       <DisplayInfo theme="green">
-        <RegionInfo name="Chemistry" col="4" row="7"/>
-        <RegionInfo name="" col="3" row="3"/>
-        <RegionInfo name="Subsystem" col="3" row="7"/>
-        <RegionInfo name="Annotations" col="3" row="3"/>
+        <RegionInfo name="Chemistry" col="4" row="7" />
+        <RegionInfo name="" col="3" row="3" />
+        <RegionInfo name="Subsystem" col="3" row="7" />
+        <RegionInfo name="Annotations" col="3" row="3" />
         <RegionInfo name="Expression" col="2" row="2" />
+        <RegionInfo name="MicrobePheno" row="7" col="1" />
       </DisplayInfo>
-      <Notes>
-A feature (sometimes also called a gene) is a part of a
-genome that is of special interest. Features may be spread across
-multiple DNA sequences (contigs) of a genome, but never across more
-than one genome. Each feature in the database has a unique
-ID that functions as its ID in this table.
-Normally a Feature is just a single contigous region on a contig.
-Features have types, and an appropriate choice of available types
-allows the support of protein-encoding genes, exons, RNA genes,
-binding sites, pathogenicity islands, or whatever.
-
-      </Notes>
+      <Notes>A feature (sometimes also called a gene) is a part of a
+      genome that is of special interest. Features may be spread across
+      multiple DNA sequences (contigs) of a genome, but never across more
+      than one genome. Each feature in the database has a unique
+      ID that functions as its ID in this table. Normally a Feature is
+      just a single contigous region on a contig. Features have types,
+      and an appropriate choice of available types allows the support
+      of protein-encoding genes, exons, RNA genes, binding sites,
+      pathogenicity islands, or whatever.</Notes>
       <Fields>
         <Field name="feature-type" type="string">
           <Notes>Code indicating the type of this feature. Among the
@@ -1087,16 +1073,20 @@ binding sites, pathogenicity islands, or whatever.
         </Field>
       </Fields>
       <FulltextIndexes>
-	<FulltextIndex type="field" name="feature-type"/>
-	<FulltextIndex type="field" name="source-id"/>
-	<FulltextIndex type="field" name="function" in_result="1"/>
-	<FulltextIndex type="related_field" name="md5" path="Produces">
-	  <UseField name="md5" field="from_link" in_result="1"/>
-	</FulltextIndex>
-	<FulltextIndex type="related_field" name="genome" path="IsOwnedBy Genome">
-	  <UseField name="genome_name" field="scientific-name" in_result="1"/>
-	  <UseField name="source_genome" field="source-id"/>
-	</FulltextIndex>
+        <FulltextIndex type="field" name="feature-type" />
+        <FulltextIndex type="field" name="source-id" />
+        <FulltextIndex type="field" name="function"
+          in_result="1" />
+        <FulltextIndex type="related_field" name="md5"
+          path="Produces">
+          <UseField name="md5" field="from_link" in_result="1" />
+        </FulltextIndex>
+        <FulltextIndex type="related_field" name="genome"
+          path="IsOwnedBy Genome">
+          <UseField name="genome_name" field="scientific-name"
+            in_result="1" />
+          <UseField name="source_genome" field="source-id" />
+        </FulltextIndex>
       </FulltextIndexes>
       <Indexes>
         <Index>
@@ -1115,7 +1105,7 @@ binding sites, pathogenicity islands, or whatever.
     </Entity>
     <Entity name="Scenario" keyType="int">
       <DisplayInfo theme="ivory" col="5" row="1">
-        <RegionInfo name="Chemistry" row="1" col="4"/>
+        <RegionInfo name="Chemistry" row="1" col="4" />
       </DisplayInfo>
       <Notes>A scenario is a partial instance of a subsystem with a
       defined set of reactions. Each scenario converts input compounds to
@@ -1139,16 +1129,16 @@ binding sites, pathogenicity islands, or whatever.
       </Indexes>
     </Entity>
     <Entity name="TaxonomicGrouping" keyType="counter">
-      <DisplayInfo row="8" col="7" caption="Taxonomic\nGrouping" theme="red">
-        <RegionInfo name="" row="7" col="5"/>
+      <DisplayInfo row="8" col="7" caption="Taxonomic\nGrouping"
+        theme="red">
+        <RegionInfo name="" row="7" col="5" />
         <RegionInfo name="GenoPheno" row="3" col="6" />
       </DisplayInfo>
-      <Notes>
-
-We associate with most genomes a "taxonomy" based on the NCBI taxonomy.
-This includes, for each genome, a list of ever larger taxonomic groups.
-
-      </Notes>
+      <Notes>We associate with most genomes a "taxonomy" based on
+      the NCBI taxonomy. This includes, for each genome, a list of
+      ever larger taxonomic groups. The groups are stored as
+      instances of this entity, and chained together by the
+      IsGroupFor relationship.</Notes>
       <Fields>
         <Field name="domain" type="boolean">
           <Notes>TRUE if this is a domain grouping, else FALSE.</Notes>
@@ -1173,7 +1163,7 @@ This includes, for each genome, a list of ever larger taxonomic groups.
           taxonomic grouping by name. Because the scientifc name is
           also an alias, there is no index on scientific name.</Notes>
           <IndexFields>
-            <IndexField name="alias" order="ascending"/>
+            <IndexField name="alias" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -1200,7 +1190,8 @@ This includes, for each genome, a list of ever larger taxonomic groups.
     </Entity>
     <Entity name="StudyExperiment" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" row="7" col="4" caption="Study Experiment" />
+        <RegionInfo name="GenoPheno" row="7" col="4"
+          caption="Study Experiment" />
       </DisplayInfo>
       <Notes>An Experiment is a collection of observational units with one originator that are part of a specific study.  An experiment may be conducted at more than one location and in more than one season or year.</Notes>
       <Asides />
@@ -1254,7 +1245,8 @@ This includes, for each genome, a list of ever larger taxonomic groups.
     </Entity>
     <Entity name="ObservationalUnit" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" row="5" col="4" caption="Observational Unit" />
+        <RegionInfo name="GenoPheno" row="5" col="4"
+          caption="Observational Unit" />
       </DisplayInfo>
       <Notes>An ObservationalUnit is an individual plant that 1) is part of an experiment or study, 2) has measured traits, and 3) is assayed for the purpose of determining alleles.  </Notes>
       <Asides>It is assumed that each observational unit belongs to only one experiment.  If the plant later becomes part of another experiment, a new observational unit record and ID will be created. </Asides>
@@ -1312,7 +1304,8 @@ This includes, for each genome, a list of ever larger taxonomic groups.
     </Entity>
     <Entity name="AlleleFrequency" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="GenoPheno" row="1" col="2" caption="Allele Frequency" />
+        <RegionInfo name="GenoPheno" row="1" col="2"
+          caption="Allele Frequency" />
       </DisplayInfo>
       <Notes>An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.</Notes>
       <Asides />
@@ -1358,23 +1351,19 @@ This includes, for each genome, a list of ever larger taxonomic groups.
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" row="2" col="4" />
       </DisplayInfo>
-      <Notes>
-
-We need to represent sets of genes that are coregulated via some
-regulatory mechanism.  In particular, we wish to represent genes
-that are coregulated using transcription binding sites and
-corresponding transcription regulatory proteins.
-
-We represent a coregulated set (which may, or may not, be considered
-a regulon) using CoregulatedSet.
-
-      </Notes>
+      <Notes>We need to represent sets of genes that are coregulated via
+      some regulatory mechanism.  In particular, we wish to represent
+      genes that are coregulated using transcription binding sites and
+      corresponding transcription regulatory proteins. We represent a
+      coregulated set (which may, or may not, be considered a regulon)
+      using CoregulatedSet.</Notes>
       <Fields>
         <Field name="source-id" type="string">
           <Notes>original ID of this coregulated set in the source (core)
           database</Notes>
         </Field>
-        <Field name="binding-location" type="int" relation="CoregulatedSetBinding">
+        <Field name="binding-location" type="int"
+          relation="CoregulatedSetBinding">
           <Notes>binding location for this set's transcription factor;
           there may be none of these or there may be more than one</Notes>
         </Field>
@@ -1384,53 +1373,47 @@ a regulon) using CoregulatedSet.
       <DisplayInfo theme="cyan" caption="Atomic\nRegulon">
         <RegionInfo name="Expression" row="9" col="2" />
       </DisplayInfo>
-      <Notes>
+      <Notes>An atomic regulon is an indivisible group of coregulated
+      features on a single genome. Atomic regulons are constructed so
+      that a given feature can only belong to one. Because of this, the
+      expression levels for atomic regulons represent in some sense the
+      state of a cell.</Notes>
+      <Asides>An atomicRegulon is a set of protein-encoding genes that
+      are believed to have identical expression profiles (i.e.,
+      they will all be expressed or none will be expressed in the
+      vast majority of conditions).  These are sometimes referred
+      to as "atomic regulons".  Note that there are more common
+      notions of "coregulated set of genes" based on the notion
+      that a single regulatory mechanism impacts an entire set of
+      genes. Since multiple other mechanisms may impact
+      overlapping sets, the genes impacted by a regulatory
+      mechanism need not all share the same expression profile.
+      We use a distinct notion (CoregulatedSet) to reference sets
+      of genes impacted by a single regulatory mechanism (i.e.,
+      by a single transcription regulator).
 
-An atomic regulon is an indivisible group of coregulated features
-on a single genome. Atomic regulons are constructed so that a given feature
-can only belong to one. Because of this, the expression levels for
-atomic regulons represent in some sense the state of a cell.
-
-An atomicRegulon is a set of protein-encoding genes that
-are believed to have identical expression profiles (i.e.,
-they will all be expressed or none will be expressed in the
-vast majority of conditions).  These are sometimes referred
-to as "atomic regulons".  Note that there are more common
-notions of "coregulated set of genes" based on the notion
-that a single regulatory mechanism impacts an entire set of
-genes. Since multiple other mechanisms may impact
-overlapping sets, the genes impacted by a regulatory
-mechanism need not all share the same expression profile.
-We use a distinct notion (CoregulatedSet) to reference sets
-of genes impacted by a single regulatory mechanism (i.e.,
-by a single transcription regulator).
-
-      </Notes>
-      <Asides>The ID of an atomic regulon is the genome ID, a colon, and the
+      The ID of an atomic regulon is the genome ID, a colon, and the
       atomic regulon sequence number.</Asides>
     </Entity>
     <Entity name="Alignment" keyType="string">
       <DisplayInfo theme="purple" caption="Alignment">
         <RegionInfo name="Alignments" row="3" col="2" />
       </DisplayInfo>
-      <Notes>
-An alignment arranges a group of sequences so that they
-match. Each alignment is associated with a phylogenetic tree that
-describes how the sequences developed and their evolutionary distance.
-The actual tree and alignment FASTA are stored in separate flat files.
+      <Notes>An alignment arranges a group of sequences so that they
+      match. Each alignment is associated with a phylogenetic tree that
+      describes how the sequences developed and their evolutionary
+      distance.</Notes>
+      <Asides>The Kbase will maintain a set of alignments and associated
+      trees.  The majority of these will be based on protein sequences.
+      We will not have a comprehensive set, but we will have tens of
+      thousands of such alignments, and we view them as an imporant
+      resource to support annotation.
 
-The Kbase will maintain a set of alignments and associated
-trees.  The majority
-of these will be based on protein sequences.  We will not have a comprehensive set
-but we will have tens of thousands of such alignments, and we view them as an
-imporant resource to support annotation.
+      The alignments/trees will include data on the tools and parameters
+      used to construct them.
 
-The alignments/trees will include the tools and parameters used to construct
-them.
-
-Access to the underlying sequences and trees in a form convenient to existing
-tools will be supported.
-      </Notes>
+      Access to the underlying sequences and trees in a form convenient to existing
+      tools will be supported.</Asides>
       <Fields>
         <Field name="n-rows" type="int">
           <Notes>number of rows in the alignment</Notes>
@@ -1484,7 +1467,7 @@ tools will be supported.
       </DisplayInfo>
       <Notes>This entity represents a single row of an alignment.
       In general, this corresponds to a sequence, but in a
-      concatenated alignment multiple sequences may be rebrb. bank callingpresent
+      concatenated alignment multiple sequences may be represented
       here.</Notes>
       <Fields>
         <Field name="row-number" type="int">
@@ -1508,21 +1491,21 @@ tools will be supported.
           <Notes>the 1-based column index in the alignment where this
           sequence row ends</Notes>
         </Field>
-        <Field name="md5-untapped" type="string">
+        <Field name="md5-of-ungapped-sequence" type="string">
           <Notes>the MD5 of this row's sequence after gaps have been
           removed; for DNA and RNA sequences, the [b]U[/b] codes are also
           normalized to [b]T[/b] before the MD5 is computed</Notes>
         </Field>
-        <Field name="sequence" type="long-string">
+        <Field name="sequence" type="text">
           <Notes>sequence for this alignment row (with indels)</Notes>
         </Field>
       </Fields>
     </Entity>
     <Entity name="Tree" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" row="3" col="4"/>
+        <RegionInfo name="Alignments" row="3" col="4" />
       </DisplayInfo>
-      <Notes>A tree describes how the sequences in an alignment relate 
+      <Notes>A tree describes how the sequences in an alignment relate
       to each other. Most trees are phylogenetic, but some may be based on
       taxonomy or gene content.</Notes>
       <Fields>
@@ -1547,40 +1530,407 @@ tools will be supported.
         <Field name="source-id" type="string">
           <Notes>ID of this tree in the source database</Notes>
         </Field>
+        <Field name="newick" type="text">
+          <Notes>NEWICK format string containing the structure
+          of the tree</Notes>
+        </Field>
       </Fields>
+    </Entity>
+    <Entity name="Strain" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="1" row="5" />
+      </DisplayInfo>
+      <Notes>This entity represents an organism derived from a genome or
+      another organism with one or more modifications to the organism's
+      genome.</Notes>
+      <Fields>
+        <Field name="description" type="string">
+          <Notes>A description of the strain, e.g. knockout/modification
+          methods, resulting phenotypes, etc.</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>Name/ID by which the strain is known at the source.</Notes>
+        </Field>
+        <Field name="aggregateData" type="boolean">
+          <Notes>Denotes whether this entity represents a physical strain
+          (False) or aggregate data calculated from one or more strains
+          (True).</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="ExperimentalUnit" keyType="string">
+      <DisplayInfo theme="gray" caption="Experimental\nUnit">
+        <RegionInfo name="MicrobePheno" col="1" row="3" />
+      </DisplayInfo>
+      <Notes>An ExperimentalUnit is a subset of an experiment consisting of
+      a Strain, an Environment, and one or more Measurements on that
+      strain in the specified environment. ExperimentalUnits belong to a
+      single experiment.</Notes>
+      <Fields>
+        <Field name="source-id" type="string">
+          <Notes>Name/ID by which the experimental unit is known at the
+          source.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="Measurement" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="4" row="3" />
+      </DisplayInfo>
+      <Notes>A Measurement is a value generated by performing a protocol to
+      evaluate a phenotype on an ExperimentalUnit - e.g. a strain in an
+      environment.</Notes>
+      <Fields>
+        <Field name="timeSeries" type="string">
+          <Notes>A string containing time series data in the following
+          format: time1,value1;time2,value2;...timeN,valueN.</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>Name/ID by which the measurment is known at the
+          source.</Notes>
+        </Field>
+        <Field name="value" type="float">
+          <Notes>The value of the measurement.</Notes>
+        </Field>
+        <Field name="mean" type="float">
+          <Notes>The mean of multiple replicates if they are included in the
+          measurement.</Notes>
+        </Field>
+        <Field name="median" type="float">
+          <Notes>The median of multiple replicates if they are included in
+          the measurement.</Notes>
+        </Field>
+        <Field name="stddev" type="float">
+          <Notes>The standard deviation of multiple replicates if they are
+          included in the measurement.</Notes>
+        </Field>
+        <Field name="N" type="float">
+          <Notes>The number of replicates if they are included in the
+          measurement.</Notes>
+        </Field>
+        <Field name="p-value" type="float">
+          <Notes>The p-value of multiple replicates if they are included in
+          the measurement. The exact meaning of the p-value is specified in
+          the Phenotype object for this measurement.</Notes>
+        </Field>
+        <Field name="Z-score" type="float">
+          <Notes>The Z-score of multiple replicates if they are included in
+          the measurement. The exact meaning of the p-value is specified in
+          the Phenotype object for this measurement.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="PhenotypeDescription" keyType="string">
+      <DisplayInfo theme="gray" caption="Phenotype\nDescription">
+        <RegionInfo name="MicrobePheno" col="6" row="5" />
+      </DisplayInfo>
+      <Notes>A Phenotype is a measurable characteristic of an organism.</Notes>
+      <Fields>
+        <Field name="name" type="string">
+          <Notes>The name of the phenotype.</Notes>
+        </Field>
+        <Field name="description" type="string">
+          <Notes>The description of the physical phenotype, how it is
+          measured, and what the measurement statistics mean.</Notes>
+        </Field>
+        <Field name="unitOfMeasure" type="string">
+          <Notes>The units of the measurement of the phenotype.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="PhenotypeExperiment" keyType="string">
+      <DisplayInfo theme="gray" caption="Phenotype\nExperiment">
+        <RegionInfo name="MicrobePheno" col="4" row="1" />
+      </DisplayInfo>
+      <Notes>A PhenotypeExperiment, consisting of (potentially) multiple
+      strains, enviroments, and measurements of phenotypic information on
+      those strains and environments.</Notes>
+      <Fields>
+        <Field name="description" type="string">
+          <Notes> Design of the experiment including the numbers and types of
+          experimental units, phenotypes, replicates, sampling plan, and
+          analyses that are planned.</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>Name/ID by which the experiment is known at the source.</Notes>
+        </Field>
+        <Field name="dateUploaded" type="date">
+          <Notes>The date this experiment was loaded into the database</Notes>
+        </Field>
+        <Field name="metadata" type="string">
+          <Notes>Any data describing the experiment that is not covered by
+          the description field.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="Person" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="1" row="1" />
+      </DisplayInfo>
+      <Notes>A person represents a human affiliated in some way with Kbase.</Notes>
+      <Fields>
+        <Field name="firstName" type="string">
+          <Notes>The given name of the person.</Notes>
+        </Field>
+        <Field name="lastName" type="string">
+          <Notes>The surname of the person.</Notes>
+        </Field>
+        <Field name="contactEmail" type="string">
+          <Notes>Email address of the person.</Notes>
+        </Field>
+        <Field name="institution" type="string">
+          <Notes>The institution where the person works.</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>The ID of the person in the source database.</Notes>
+        </Field>
+      </Fields>
+      <Indexes>
+        <Index>
+          <Notes>This index allows the user to search for a
+          person by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for a person
+          by name.</Notes>
+          <IndexFields>
+            <IndexField name="lastName" order="ascending" />
+            <IndexField name="firstName" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
+    </Entity>
+    <Entity name="Protocol" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="6" row="3" />
+      </DisplayInfo>
+      <Notes>A Protocol is a step by step set of instructions for
+      performing a part of an experiment.</Notes>
+      <Fields>
+        <Field name="name" type="string">
+          <Notes>The name of the protocol.</Notes>
+        </Field>
+        <Field name="description" type="string">
+          <Notes>The step by step instructions for performing the experiment,
+          including measurement details, materials, and equipment. A
+          researcher should be able to reproduce the experimental results
+          with this information.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="Environment" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="4" row="5" />
+      </DisplayInfo>
+      <Notes>An Environment is a set of conditions for microbial growth,
+      including temperature, aerobicity, media, and supplementary
+      conditions.</Notes>
+      <Fields>
+        <Field name="temperature" type="float">
+          <Notes>The temperature in Kelvin.</Notes>
+        </Field>
+        <Field name="anaerobic" type="boolean">
+          <Notes>Whether the environment is anaerobic (True) or aerobic
+          (False).</Notes>
+        </Field>
+        <Field name="pH" type="float">
+          <Notes>The pH of the media used in the environment.</Notes>
+        </Field>
+        <Field name="source-id" type="string">
+          <Notes>The ID of the environment in the source database.</Notes>
+        </Field>
+      </Fields>
+      <Indexes>
+        <Index>
+          <Notes>This index allows the user to search for an
+          environment by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="DerivedFromStrain" from="Strain"
+      to="Strain" arity="1M" converse="StrainParentOf">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" col="2" row="5" fixed="1"
+                    caption="Derived\nFrom Strain" />
+      </DisplayInfo>
+      <Notes>The recursive DerivedFromStrain relationship organizes derived
+      organisms into a tree based on parent/child relationships.</Notes>
+    </Relationship>
+    <Relationship name="GenomeParentOf" from="Genome"
+      to="Strain" arity="1M" converse="DerivedFromGenome">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Derived\nFrom Genome"/>
+      </DisplayInfo>
+      <Notes>The DerivedFromGenome relationship specifies the direct child
+      strains of a specific genome.</Notes>
+    </Relationship>
+    <Relationship name="HasKnockoutIn" from="Strain" to="Feature"
+      arity="MM" converse="KnockedOutIn">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Has\nKnockout\nIn"/>
+      </DisplayInfo>
+      <Notes>The HasKnockoutIn relationship specifies the gene knockouts in
+      a particular strain.</Notes>
+    </Relationship>
+    <Relationship name="BelongsTo" from="Strain" to="ExperimentalUnit"
+      arity="1M" converse="IncludesStrain">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Includes\nStrain"/>
+      </DisplayInfo>
+      <Notes>The BelongsTo relationship specifies the experimental
+      units performed on a particular strain.</Notes>
+    </Relationship>
+    <Relationship name="HasMeasurement" from="ExperimentalUnit"
+      to="Measurement" arity="1M" converse="IsMeasureOf">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Has\nMeasurement"/>
+      </DisplayInfo>
+      <Notes>The HasMeasurement relationship specifies a measurement
+      performed on a particular experimental unit.</Notes>
+    </Relationship>
+    <Relationship name="HasAssociatedMeasurement" from="PhenotypeDescription"
+      to="Measurement" arity="1M" converse="MeasuresPhenotype">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Measures\nPhenotype"/>
+      </DisplayInfo>
+      <Notes>The HasAssociatedMeasurement relationship specifies a measurement that
+      measures a phenotype.</Notes>
+    </Relationship>
+    <Relationship name="HasExperimentalUnit" from="PhenotypeExperiment"
+      to="ExperimentalUnit" arity="1M" converse="IsExperimentalUnitOf">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno"  caption="Has\nExperimental\nUnit"/>
+      </DisplayInfo>
+      <Notes>The HasExperimentalUnit relationship describes which
+      ExperimentalUnits are part of a PhenotypeExperiment.</Notes>
+    </Relationship>
+    <Relationship name="PublishedExperiment" from="Publication"
+      to="PhenotypeExperiment" arity="MM" converse="ExperimentPublishedIn">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Experiment\nPublished In"/>
+      </DisplayInfo>
+      <Notes>The ExperimentPublishedIn relationship describes where a
+      particular experiment was published.</Notes>
+    </Relationship>
+    <Relationship name="IsMeasurementMethodOf" from="Protocol"
+      to="Measurement" arity="1M" converse="WasMeasuredBy">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Was\nMeasured\nBy"/>
+      </DisplayInfo>
+      <Notes>The IsMeasurementMethodOf relationship describes which protocol
+      was used to make a measurement.</Notes>
+    </Relationship>
+    <Relationship name="PublishedProtocol" from="Publication"
+      to="Protocol" arity="1M" converse="ProtocolPublishedIn">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Published\nProtocol"/>
+      </DisplayInfo>
+      <Notes>The ProtocolPublishedIn relationship describes where a
+      particular protocol was published.</Notes>
+    </Relationship>
+    <Relationship name="UsedInExperimentalUnit" from="Environment"
+      to="ExperimentalUnit" arity="1M" converse="HasEnvironment">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Has\nEnvironment"/>
+      </DisplayInfo>
+      <Notes>The HasEnvironment relationship describes the enviroment a
+      subexperiment defined by Experimental unit was performed in.</Notes>
+    </Relationship>
+    <Relationship name="UsedBy" from="Media" to="Environment"
+      arity="1M" converse="UsesMedia">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Uses\nMedia"/>
+      </DisplayInfo>
+      <Notes>The UsesMedia relationship defines which media is used by an
+      Environment.</Notes>
+    </Relationship>
+    <Relationship name="PerformedExperiment" from="Person"
+      to="PhenotypeExperiment" arity="MM" converse="PerformedBy">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Performed\nExperiment"/>
+      </DisplayInfo>
+      <Notes>Denotes that a Person was associated with a
+      PhenotypeExperiment in some role.</Notes>
+      <Fields>
+        <Field name="role" type="string">
+          <Notes>Describes the role the person played in the experiment.
+          Examples are Primary Investigator, Designer, Experimentalist, etc.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="HasPresenceOf" from="Media" to="Compound"
+      arity="MM" converse="IsPresentIn">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Models" caption="Is\nPresent\nIn" />
+        <RegionInfo name="MicrobePheno" caption="Has\nPresence\nOf"/>
+      </DisplayInfo>
+      <Notes>This relationship connects a media to the compounds that
+      occur in it. The intersection data describes how much of each
+      compound can be found.</Notes>
+      <Fields>
+        <Field name="concentration" type="float">
+          <Notes>concentration of the compound in the media</Notes>
+        </Field>
+        <Field name="units" type="string">
+          <Notes>vol%, g/L, or molar (mol/L).</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="IncludesAdditionalCompounds" from="Environment"
+      to="Compound" arity="MM" converse="IncludedIn">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="MicrobePheno" caption="Includes\nAdditional\nCompounds"/>
+      </DisplayInfo>
+      <Notes>This relationship connects a environment to the compounds that
+      occur in it. The intersection data describes how much of each
+      compound can be found.</Notes>
+      <Fields>
+        <Field name="concentration" type="float">
+          <Notes>concentration of the compound in the environment</Notes>
+        </Field>
+        <Field name="units" type="string">
+          <Notes>vol%, g/L, or molar (mol/L).</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
     <Relationship name="SupersedesAlignment" converse="IsSupersededByAlignment"
-                  arity="1M" from="Alignment" to="Alignment">
+      arity="1M" from="Alignment" to="Alignment">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" fixed="1" caption="Supersedes\nAlignment"
-                    row="3" col="1"/>
+        <RegionInfo name="Alignments" fixed="1"
+          caption="Supersedes\nAlignment" row="3" col="1" />
       </DisplayInfo>
       <Notes>This relationship connects an alignment to the alignments
       it replaces.</Notes>
     </Relationship>
     <Relationship name="SupersedesTree" converse="IsSupersededByTree"
-                  arity="1M" from="Tree" to="Tree">
+      arity="1M" from="Tree" to="Tree">
       <DisplayInfo theme="purple">
         <RegionInfo name="Trees" fixed="1" caption="Supersedes\nTree"
-                    row="3" col="5"/>
+          row="3" col="5" />
       </DisplayInfo>
       <Notes>This relationship connects a tree to the trees
       it replaces.</Notes>
     </Relationship>
     <Relationship name="IncludesAlignmentRow" converse="IsAlignmentRowIn"
-                  arity="1M" from="Alignment" to="AlignmentRow">
+      arity="1M" from="Alignment" to="AlignmentRow">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Includes\nAlignment Row"/>        
+        <RegionInfo name="Alignments" caption="Includes\nAlignment Row" />
       </DisplayInfo>
       <Notes>This relationship connects an alignment to its component
       rows.</Notes>
     </Relationship>
     <Relationship name="DescribesAlignment" converse="HasAlignmentAttribute"
-                  arity="MM" from="AlignmentAttribute" to="Alignment">
+      arity="MM" from="AlignmentAttribute" to="Alignment">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Describes\nAlignment"/>
+        <RegionInfo name="Alignments" caption="Describes\nAlignment" />
       </DisplayInfo>
       <Notes>This relationship connects an alignment to its free-form
       attributes.</Notes>
@@ -1591,9 +1941,9 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="DescribesTree" converse="HasTreeAttribute"
-                  arity="MM" from="AlignmentAttribute" to="Tree">
+      arity="MM" from="AlignmentAttribute" to="Tree">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Describes\nTree"/>
+        <RegionInfo name="Alignments" caption="Describes\nTree" />
       </DisplayInfo>
       <Notes>This relationship connects a tree to its free-form
       attributes.</Notes>
@@ -1604,10 +1954,10 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="DescribesTreeNode" converse="HasNodeAttribute"
-                  arity="MM" from="AlignmentAttribute" to="Tree">
+      arity="MM" from="AlignmentAttribute" to="Tree">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Describes\nTree Node"
-                    fixed="1" row="2" col="5" />
+          fixed="1" row="2" col="5" />
       </DisplayInfo>
       <Notes>This relationship connects an tree to the free-form
       attributes of its nodes.</Notes>
@@ -1621,15 +1971,15 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="IsUsedToBuildTree" converse="IsBuiltFromAlignment"
-                  arity="1M" to="Tree" from="Alignment">
+      arity="1M" to="Tree" from="Alignment">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Is Used to\nBuild Tree"/>
+        <RegionInfo name="Alignments" caption="Is Used to\nBuild Tree" />
       </DisplayInfo>
       <Notes>This relationship connects each tree to the alignment from
       which it is built. There is at most one.</Notes>
     </Relationship>
-    <Relationship name="ContainsAlignedProtein" arity="MM" from="AlignmentRow"
-                  to="ProteinSequence" converse="IsAlignedProteinComponentOf">
+    <Relationship name="ContainsAlignedProtein" arity="MM"
+      from="AlignmentRow" to="ProteinSequence" converse="IsAlignedProteinComponentOf">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Contains\nAligned\nProtein" />
       </DisplayInfo>
@@ -1665,8 +2015,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="ContainsAlignedDNA" arity="MM" from="AlignmentRow"
-                  to="ContigSequence" converse="IsAlignedDNAComponentOf">
+    <Relationship name="ContainsAlignedDNA" arity="MM"
+      from="AlignmentRow" to="ContigSequence" converse="IsAlignedDNAComponentOf">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Contains\nAligned\nDNA" />
       </DisplayInfo>
@@ -1703,14 +2053,15 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="Aligned" from="Source" to="Alignment"
-                  arity="1M" converse="WasAlignedBy">
+      arity="1M" converse="WasAlignedBy">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Aligned" />
       </DisplayInfo>
       <Notes>This relationship connects an alignment to the database
       from which it was generated.</Notes>
     </Relationship>
-    <Relationship name="HasVariationIn" from="Contig" to="ObservationalUnit" arity="MM" converse="IsVariedIn">
+    <Relationship name="HasVariationIn" from="Contig"
+      to="ObservationalUnit" arity="MM" converse="IsVariedIn">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Has\nVariation\nIn" />
       </DisplayInfo>
@@ -1742,11 +2093,12 @@ tools will be supported.
         <Notes>This index allows you to look for a variation by contig
         and position.</Notes>
         <IndexFields>
-           <IndexField name="position" order="ascending" />
+          <IndexField name="position" order="ascending" />
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="HasTrait" from="ObservationalUnit" to="Trait" arity="MM" converse="Measures">
+    <Relationship name="HasTrait" from="ObservationalUnit"
+      to="Trait" arity="MM" converse="Measures">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Measures" />
       </DisplayInfo>
@@ -1763,7 +2115,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="Impacts" from="Trait" to="Contig" arity="MM" converse="IsImpactedBy">
+    <Relationship name="Impacts" from="Trait" to="Contig"
+      arity="MM" converse="IsImpactedBy">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nImpacted\nBy" />
       </DisplayInfo>
@@ -1791,28 +2144,32 @@ tools will be supported.
         </IndexFields>
       </ToIndex>
     </Relationship>
-    <Relationship name="IsAssayOf" from="Assay" to="StudyExperiment" arity="1M" converse="IsAssayedBy">
+    <Relationship name="IsAssayOf" from="Assay" to="StudyExperiment"
+      arity="1M" converse="IsAssayedBy">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nAssayed\nBy" />
       </DisplayInfo>
       <Notes>This relationship associates each assay with the relevant
       experiments.</Notes>
     </Relationship>
-    <Relationship name="HasUnits" from="Locality" to="ObservationalUnit" arity="1M" converse="IsLocated">
+    <Relationship name="HasUnits" from="Locality" to="ObservationalUnit"
+      arity="1M" converse="IsLocated">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Has Units" />
       </DisplayInfo>
       <Notes>This relationship associates observational units with the
       geographic location where the unit is planted.</Notes>
     </Relationship>
-    <Relationship name="IncludesPart" from="StudyExperiment" to="ObservationalUnit" arity="1M" converse="IsPartOf">
+    <Relationship name="IncludesPart" from="StudyExperiment"
+      to="ObservationalUnit" arity="1M" converse="IsPartOf">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nPart\nOf" />
       </DisplayInfo>
       <Notes>This relationship associates observational units with the
       experiments that generated the data on them.</Notes>
     </Relationship>
-    <Relationship name="IsReferencedBy" from="Genome" to="ObservationalUnit" arity="1M" converse="UsesReference">
+    <Relationship name="IsReferencedBy" from="Genome"
+      to="ObservationalUnit" arity="1M" converse="UsesReference">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Is\nReferenced\nBy" />
       </DisplayInfo>
@@ -1820,14 +2177,16 @@ tools will be supported.
       genome that it will be compared to.  All variations will be differences
       between the observational unit and the reference.</Notes>
     </Relationship>
-    <Relationship name="IsRepresentedBy" from="TaxonomicGrouping" to="ObservationalUnit" arity="1M" converse="DefinedBy">
+    <Relationship name="IsRepresentedBy" from="TaxonomicGrouping"
+      to="ObservationalUnit" arity="1M" converse="DefinedBy">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Defined\nBy" />
       </DisplayInfo>
       <Notes>This relationship associates observational units with a genus,
       species, strain, and/or variety that was the source material.</Notes>
     </Relationship>
-    <Relationship name="IsSummarizedBy" from="Contig" to="AlleleFrequency" arity="1M" converse="Summarizes">
+    <Relationship name="IsSummarizedBy" from="Contig"
+      to="AlleleFrequency" arity="1M" converse="Summarizes">
       <DisplayInfo theme="purple">
         <RegionInfo name="GenoPheno" caption="Summarizes" />
       </DisplayInfo>
@@ -1848,12 +2207,12 @@ tools will be supported.
       </ToIndex>
     </Relationship>
     <Relationship name="Formulated" from="Source" to="CoregulatedSet"
-                  arity="1M" converse="WasFormulatedBy">
+      arity="1M" converse="WasFormulatedBy">
       <Notes>This relationship connects a coregulated set to the
       source organization that originally computed it.</Notes>
     </Relationship>
     <Relationship name="Involves" from="Reaction" to="LocalizedCompound"
-                  arity="MM" converse="IsInvolvedIn">
+      arity="MM" converse="IsInvolvedIn">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nInvolved\nIn" />
       </DisplayInfo>
@@ -1876,8 +2235,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="ParticipatesAs" from="Compound" to="LocalizedCompound"
-                  arity="1M" converse="IsParticipationOf">
+    <Relationship name="ParticipatesAs" from="Compound"
+      to="LocalizedCompound" arity="1M" converse="IsParticipationOf">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nParticipation\nOf" />
       </DisplayInfo>
@@ -1885,32 +2244,48 @@ tools will be supported.
 	  where subceullar location has been specified.</Notes>
     </Relationship>
     <Relationship name="IsParticipatingAt" from="Location"
-                  to="LocalizedCompound" arity="1M" converse="ParticipatesAt">
+      to="LocalizedCompound" arity="1M" converse="ParticipatesAt">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Participates\nAt" />
       </DisplayInfo>
       <Notes>This relationship connects a localized compound to the
       location in which it occurs during one or more reactions.</Notes>
     </Relationship>
+    <Relationship name="ConsistsOfCompounds" from="Compound"
+      to="Compound" arity="MM" converse="ComponentOf">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="MicrobePheno" caption="Consists Of\nCompounds" 
+                    row="8" col="6" fixed="1"/>
+      </DisplayInfo>
+      <Notes>This relationship defines the subcompounds that make up a
+      compound. For example, CoCl2-6H2O is made up of 1 Co2+, 2 Cl-, and
+      6 H2O.</Notes>
+        <Fields>
+          <Field name="coefficient" type="float">
+          <Notes>Number of molecules of the subcompound that make up
+          the compound.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
     <Relationship name="Controls" from="Feature" to="CoregulatedSet"
-                  arity="MM" converse="IsControlledUsing">
+      arity="MM" converse="IsControlledUsing">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Controls"
-                    fixed="1" row="3" col="3" />
+          fixed="1" row="3" col="3" />
       </DisplayInfo>
       <Notes>This relationship connects a coregulated set to the
       features that are used as its transcription factors.</Notes>
     </Relationship>
-    <Relationship name="Provided" from="Source" to="Subsystem" arity="1M"
-                  converse="WasProvidedBy">
+    <Relationship name="Provided" from="Source" to="Subsystem"
+      arity="1M" converse="WasProvidedBy">
       <DisplayInfo theme="blue">
         <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a source (core) database
       to the subsystems it submitted to the knowledge base.</Notes>
     </Relationship>
-    <Relationship name="IsOwnerOf" from="Genome" to="Feature" arity="1M"
-                  converse="IsOwnedBy">
+    <Relationship name="IsOwnerOf" from="Genome" to="Feature"
+      arity="1M" converse="IsOwnedBy">
       <DisplayInfo theme="green">
         <RegionInfo name="" caption="Is\nOwned\nBy" />
       </DisplayInfo>
@@ -1921,74 +2296,74 @@ tools will be supported.
       genome.</Notes>
     </Relationship>
     <Relationship name="HasStep" from="Complex" to="Reaction"
-                  arity="MM" converse="IsStepOf">
+      arity="MM" converse="IsStepOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is\nStep\nOf"/>
+        <RegionInfo name="Models" caption="Is\nStep\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a complex to the reactions it
-	  catalyzes.</Notes>
+      catalyzes.</Notes>
     </Relationship>
-    <Relationship name="Manages" from="Model" to="Biomass" arity="1M"
-                  converse="IsManagedBy">
+    <Relationship name="Manages" from="Model" to="Biomass"
+      arity="1M" converse="IsManagedBy">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Manages" />
       </DisplayInfo>
       <Notes>This relationship connects a model to its associated biomass
-	  composition reactions.</Notes>
+      composition reactions.</Notes>
     </Relationship>
-    <Relationship name="IsComprisedOf" from="Biomass" to="CompoundInstance"
-                  arity="MM" converse="Comprises">
+    <Relationship name="IsComprisedOf" from="Biomass"
+      to="CompoundInstance" arity="MM" converse="Comprises">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nComprised\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a biomass composition reaction to the
-	  compounds specified as contained in the biomass.</Notes>
+      compounds specified as contained in the biomass.</Notes>
       <Fields>
         <Field name="coefficient" type="float">
           <Notes>number of millimoles of the compound instance that exists in one
-		  gram cell dry weight of biomass</Notes>
+          gram cell dry weight of biomass</Notes>
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="HasUsage" from="LocalizedCompound" to="CompoundInstance"
-                  arity="1M" converse="IsUsageOf">
+    <Relationship name="HasUsage" from="LocalizedCompound"
+      to="CompoundInstance" arity="1M" converse="IsUsageOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Has\nUsage"/>
+        <RegionInfo name="Models" caption="Has\nUsage" />
       </DisplayInfo>
       <Notes>This relationship connects a specific compound in a model to the localized
       compound to which it corresponds.</Notes>
     </Relationship>
-    <Relationship name="IsDividedInto" from="Model" to="LocationInstance"
-                  arity="1M" converse="IsDivisionOf">
+    <Relationship name="IsDividedInto" from="Model"
+      to="LocationInstance" arity="1M" converse="IsDivisionOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is\nDivision\nOf"/>
+        <RegionInfo name="Models" caption="Is\nDivision\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a model to its instances of
       subcellular locations that participate in the model.</Notes>
     </Relationship>
-    <Relationship name="IsInstantiatedBy" from="Location" to="LocationInstance"
-                  arity="1M" converse="IsInstanceOf">
+    <Relationship name="IsInstantiatedBy" from="Location"
+      to="LocationInstance" arity="1M" converse="IsInstanceOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is\nInstance\nOf"/>
+        <RegionInfo name="Models" caption="Is\nInstance\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a subcellular location to the instances
       of that location that occur in models.</Notes>
     </Relationship>
-    <Relationship name="IsRealLocationOf" from="LocationInstance" to="CompoundInstance"
-                  arity="1M" converse="HasRealLocationIn">
+    <Relationship name="IsRealLocationOf" from="LocationInstance"
+      to="CompoundInstance" arity="1M" converse="HasRealLocationIn">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is Real\nLocation\nOf"/>
+        <RegionInfo name="Models" caption="Is Real\nLocation\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a specific instance of a compound in a model
-	  to the specific instance of the model subcellular location where the compound exists.</Notes>
+      to the specific instance of the model subcellular location where the compound exists.</Notes>
     </Relationship>
-    <Relationship name="IsReagentIn" from="CompoundInstance" to="ReactionInstance"
-                  arity="MM" converse="Targets">
+    <Relationship name="IsReagentIn" from="CompoundInstance"
+      to="ReactionInstance" arity="MM" converse="Targets">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is\nReagent\nIn"/>
+        <RegionInfo name="Models" caption="Is\nReagent\nIn" />
       </DisplayInfo>
       <Notes>This relationship connects a compound instance to the reaction instance
-	  in which it is transformed.</Notes>
+      in which it is transformed.</Notes>
       <Fields>
         <Field name="coefficient" type="float">
           <Notes>Number of molecules of the compound that participate
@@ -2003,35 +2378,35 @@ tools will be supported.
       </Fields>
     </Relationship>
     <Relationship name="Submitted" from="Source" to="Genome"
-                  arity="1M" converse="WasSubmittedBy">
+      arity="1M" converse="WasSubmittedBy">
       <DisplayInfo theme="red">
-        <RegionInfo name="" caption="Was\nSubmitted\nBy"/>
+        <RegionInfo name="" caption="Was\nSubmitted\nBy" />
       </DisplayInfo>
       <Notes>This relationship connects a genome to the
       core database from which it was loaded.</Notes>
     </Relationship>
     <Relationship name="IsComposedOf" from="Genome" to="Contig"
-                  arity="1M" converse="IsComponentOf">
+      arity="1M" converse="IsComponentOf">
       <DisplayInfo theme="red">
-        <RegionInfo name="" caption="Is\nComposed\nOf"/>
+        <RegionInfo name="" caption="Is\nComposed\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a genome to its
       constituent contigs. Unlike contig sequences, a
       contig belongs to only one genome.</Notes>
     </Relationship>
     <Relationship name="Encompasses" from="Feature" to="Feature"
-                  arity="MM" converse="IsEncompassedIn">
+      arity="MM" converse="IsEncompassedIn">
       <DisplayInfo theme="green">
         <RegionInfo name="" row="3" col="4" fixed="1"
-                    caption="Encompasses"/>
+          caption="Encompasses" />
       </DisplayInfo>
       <Notes>This relationship connects a feature to a related
       feature; for example, it would connect a gene to its
       constituent splice variants, and the splice variants to their
       exons.</Notes>
     </Relationship>
-    <Relationship name="IsSequenceOf" from="ContigSequence" to="Contig"
-                  converse="HasAsSequence" arity="1M">
+    <Relationship name="IsSequenceOf" from="ContigSequence"
+      to="Contig" converse="HasAsSequence" arity="1M">
       <DisplayInfo theme="red">
         <RegionInfo name="" caption="Has as\nSequence" />
       </DisplayInfo>
@@ -2040,34 +2415,16 @@ tools will be supported.
       DNA base pairs. A contig sequence may represent many contigs,
       but each contig has only one sequence.</Notes>
     </Relationship>
-    <Relationship name="HasRequirementOf" from="Model" to="ReactionInstance"
-                  arity="1M" converse="IsARequirementOf">
+    <Relationship name="HasRequirementOf" from="Model"
+      to="ReactionInstance" arity="1M" converse="IsARequirementOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Has\nRequirement\nOf"/>
+        <RegionInfo name="Models" caption="Has\nRequirement\nOf" />
       </DisplayInfo>
       <Notes>This relationship connects a model to the instances of
       reactions that represent how the reactions occur in the model.</Notes>
     </Relationship>
-    <Relationship name="HasPresenceOf" from="Media" to="Compound" arity="MM"
-                  converse="IsPresentIn">
-      <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Is\nPresent\nIn" />
-      </DisplayInfo>
-      <Notes>This relationship connects a media to the compounds that
-      occur in it. The intersection data describes how much of each
-      compound can be found.</Notes>
-      <Fields>
-        <Field name="concentration" type="float">
-          <Notes>concentration of the compound in the media</Notes>
-        </Field>
-        <Field name="concentration-units" type="string">
-          <Notes>The units on the concentration measurement. Acceptable values
-		  are mmol/L or gram/L</Notes>
-        </Field>
-      </Fields>
-    </Relationship>
-    <Relationship name="HasCompoundAliasFrom" from="Source" to="Compound"
-                  arity="MM" converse="UsesAliasForCompound">
+    <Relationship name="HasCompoundAliasFrom" from="Source"
+      to="Compound" arity="MM" converse="UsesAliasForCompound">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Has Compound\nAlias From" />
       </DisplayInfo>
@@ -2087,8 +2444,8 @@ tools will be supported.
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="HasReactionAliasFrom" from="Source" to="Reaction"
-                  arity="MM" converse="UsesAliasForReaction">
+    <Relationship name="HasReactionAliasFrom" from="Source"
+      to="Reaction" arity="MM" converse="UsesAliasForReaction">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Has Reaction\nAlias From" />
       </DisplayInfo>
@@ -2108,10 +2465,11 @@ tools will be supported.
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="IsTriggeredBy" from="Complex" to="Role" arity="MM" converse="Triggers">
+    <Relationship name="IsTriggeredBy" from="Complex" to="Role"
+      arity="MM" converse="Triggers">
       <DisplayInfo theme="navy" caption="Triggers">
-        <RegionInfo name="Chemistry"/>
-        <RegionInfo name="Models"/>
+        <RegionInfo name="Chemistry" />
+        <RegionInfo name="Models" />
       </DisplayInfo>
       <Notes>This connects a complex to the roles that work together to form the complex.</Notes>
       <Fields>
@@ -2129,17 +2487,19 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsExemplarOf" from="Feature" to="Role" arity="MM" converse="HasAsExemplar">
+    <Relationship name="IsExemplarOf" from="Feature" to="Role"
+      arity="MM" converse="HasAsExemplar">
       <DisplayInfo theme="navy" caption="Has As\nExemplar">
         <RegionInfo name="Chemistry" />
       </DisplayInfo>
       <Notes>This relationship links a role to a feature that provides a typical
       example of how the role is implemented.</Notes>
     </Relationship>
-    <Relationship name="ProjectsOnto" from="ProteinSequence" to="ProteinSequence"
-                  arity="MM" converse="IsProjectedOnto">
+    <Relationship name="ProjectsOnto" from="ProteinSequence"
+      to="ProteinSequence" arity="MM" converse="IsProjectedOnto">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Projects\nOnto" fixed="1" row="5" col="5" />
+        <RegionInfo name="Alignments" caption="Projects\nOnto"
+          fixed="1" row="5" col="5" />
       </DisplayInfo>
       <Notes>This relationship connects two protein sequences for which a clear
       bidirectional best hit exists in known genomes. The attributes of the
@@ -2160,11 +2520,11 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsCoupledTo" arity="MM" from="Family" to="Family"
-                  converse="IsCoupledWith">
+    <Relationship name="IsCoupledTo" arity="MM" from="Family"
+      to="Family" converse="IsCoupledWith">
       <DisplayInfo theme="brown">
-        <RegionInfo name="Annotations" caption="Is\nCoupled\nTo" row="5" col="6"
-                    fixed="1" />
+        <RegionInfo name="Annotations" caption="Is\nCoupled\nTo"
+          row="5" col="6" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship connects two FIGfams that we believe to be related
       either because their members occur in proximity on chromosomes or because
@@ -2183,8 +2543,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="HasRepresentativeOf" arity="MM" from="Genome" to="Family"
-                  converse="IsRepresentedIn">
+    <Relationship name="HasRepresentativeOf" arity="MM"
+      from="Genome" to="Family" converse="IsRepresentedIn">
       <DisplayInfo theme="brown">
         <RegionInfo name="Annotations" caption="Has\nRepresentative\nOf" />
       </DisplayInfo>
@@ -2193,8 +2553,8 @@ tools will be supported.
       from other relationships, but it is provided explicitly to allow fast access
       to a genome's FIGfam profile.</Notes>
     </Relationship>
-    <Relationship name="IndicatedLevelsFor" arity="MM" from="ProbeSet" to="Feature"
-                  converse="HasLevelsFrom">
+    <Relationship name="IndicatedLevelsFor" arity="MM"
+      from="ProbeSet" to="Feature" converse="HasLevelsFrom">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Has\nLevels\nFrom" />
       </DisplayInfo>
@@ -2207,11 +2567,11 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="GeneratedLevelsFor" arity="MM" from="ProbeSet" to="AtomicRegulon"
-                  converse="WasGeneratedFrom">
+    <Relationship name="GeneratedLevelsFor" arity="MM"
+      from="ProbeSet" to="AtomicRegulon" converse="WasGeneratedFrom">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Generated\nLevels For"
-                    col="3" row="7" fixed="1" />
+          col="3" row="7" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship connects an atomic regulon to a probe set from which experimental
       data was produced for its features. It contains a vector of the expression levels.</Notes>
@@ -2222,8 +2582,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="ProducedResultsFor" arity="MM" from="ProbeSet" to="Genome"
-                  converse="HadResultsProducedBy">
+    <Relationship name="ProducedResultsFor" arity="MM"
+      from="ProbeSet" to="Genome" converse="HadResultsProducedBy">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Produced\nResults For" />
       </DisplayInfo>
@@ -2231,8 +2591,8 @@ tools will be supported.
       used to produce experimental results. In general, a probe set is used for
       only one genome and vice versa, but this is not a requirement.</Notes>
     </Relationship>
-    <Relationship name="HasResultsIn" arity="1M" from="ProbeSet" to="Experiment"
-                  converse="HasResultsFor">
+    <Relationship name="HasResultsIn" arity="1M" from="ProbeSet"
+      to="Experiment" converse="HasResultsFor">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Has\nResults\nIn" />
       </DisplayInfo>
@@ -2251,11 +2611,11 @@ tools will be supported.
         </IndexFields>
       </ToIndex>
     </Relationship>
-    <Relationship name="AffectsLevelOf" arity="MM" from="Experiment" to="AtomicRegulon"
-                  converse="IsAffectedIn">
+    <Relationship name="AffectsLevelOf" arity="MM" from="Experiment"
+      to="AtomicRegulon" converse="IsAffectedIn">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Affects\nLevel Of"
-                    col="4" row="9" fixed="1" />
+          col="4" row="9" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship indicates the expression level of an atomic regulon
       for a given experiment.</Notes>
@@ -2266,11 +2626,11 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsCoregulatedWith" arity="MM" from="Feature" to="Feature"
-                  converse="HasCoregulationWith">
+    <Relationship name="IsCoregulatedWith" arity="MM" from="Feature"
+      to="Feature" converse="HasCoregulationWith">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Is\nCoregulated\nWith"
-                    col="1" row="2" fixed="1" />
+          col="1" row="2" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship connects a feature with another feature in the
       same genome with which it appears to be coregulated as a result of
@@ -2281,25 +2641,25 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsFormedOf" arity="1M" from="AtomicRegulon" to="Feature"
-                  converse="IsFormedInto">
+    <Relationship name="IsFormedOf" arity="1M" from="AtomicRegulon"
+      to="Feature" converse="IsFormedInto">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Is Formed\nInto"
-                    col="1" row="6" fixed="1" />
+          col="1" row="6" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship connects each feature to the atomic regulon to
       which it belongs.</Notes>
     </Relationship>
-    <Relationship name="IsConfiguredBy" arity="1M" from="Genome" to="AtomicRegulon"
-                  converse="ReflectsStateOf">
+    <Relationship name="IsConfiguredBy" arity="1M" from="Genome"
+      to="AtomicRegulon" converse="ReflectsStateOf">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Is\nConfigured\nBy" />
       </DisplayInfo>
       <Notes>This relationship connects a genome to the atomic regulons that
       describe its state.</Notes>
     </Relationship>
-    <Relationship name="HasIndicatedSignalFrom" arity="MM" from="Feature" to="Experiment"
-                  converse="IndicatesSignalFor">
+    <Relationship name="HasIndicatedSignalFrom" arity="MM"
+      from="Feature" to="Experiment" converse="IndicatesSignalFor">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Indicates\nSignal For" />
       </DisplayInfo>
@@ -2316,8 +2676,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="HasValueFor" arity="MM" from="Experiment" to="Attribute"
-                  converse="HasValueIn">
+    <Relationship name="HasValueFor" arity="MM" from="Experiment"
+      to="Attribute" converse="HasValueIn">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Has\nValue\nFor" />
       </DisplayInfo>
@@ -2330,54 +2690,56 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="OperatesIn" arity="MM" from="Experiment" to="Media"
-                  converse="IsUtilizedIn">
+    <Relationship name="OperatesIn" arity="MM" from="Experiment"
+      to="Media" converse="IsUtilizedIn">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Operates\nIn" />
       </DisplayInfo>
       <Notes>This relationship connects an experiment to the media in which the
       experiment took place.</Notes>
     </Relationship>
-    <Relationship name="IsRegulatedIn" arity="MM" from="Feature" to="CoregulatedSet"
-                  converse="IsRegulatedSetOf">
+    <Relationship name="IsRegulatedIn" arity="MM" from="Feature"
+      to="CoregulatedSet" converse="IsRegulatedSetOf">
       <DisplayInfo theme="cyan">
         <RegionInfo name="Expression" caption="Is\nRegulated\nIn" />
       </DisplayInfo>
       <Notes>This relationship connects a feature to the set of coregulated features.</Notes>
     </Relationship>
-    <Relationship name="IsFamilyFor" arity="MM" from="Family" to="Role"
-                  converse="DeterminesFunctionOf">
+    <Relationship name="IsFamilyFor" arity="MM" from="Family"
+      to="Role" converse="DeterminesFunctionOf">
       <DisplayInfo theme="brown">
         <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>This relationship connects an isofunctional family to the roles that
       make up its assigned function.</Notes>
     </Relationship>
-    <Relationship name="IsConsistentWith" arity="MM" from="EcNumber" to="Role"
-                  converse="IsConsistentTo">
+    <Relationship name="IsConsistentWith" arity="MM" from="EcNumber"
+      to="Role" converse="IsConsistentTo">
       <DisplayInfo theme="navy" caption="Is\nConsistent\nWith">
-        <RegionInfo name="Chemistry" row="6" col="3" fixed="1"/>
+        <RegionInfo name="Chemistry" row="6" col="3" fixed="1" />
       </DisplayInfo>
       <Notes>This relationship connects a functional role to the EC numbers consistent
       with the chemistry described in the role.</Notes>
     </Relationship>
-    <Relationship name="IsModeledBy" arity="1M" from="Genome" to="Model" converse="Models">
+    <Relationship name="IsModeledBy" arity="1M" from="Genome"
+      to="Model" converse="Models">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Models" caption="Models"/>
+        <RegionInfo name="Models" caption="Models" />
       </DisplayInfo>
       <Notes>A genome can be modeled by many different models, but a model belongs
       to only one genome.</Notes>
     </Relationship>
-    <Relationship name="IsExecutedAs" arity="1M" from="Reaction" to="ReactionInstance"
-                  converse="IsExecutionOf">
+    <Relationship name="IsExecutedAs" arity="1M" from="Reaction"
+      to="ReactionInstance" converse="IsExecutionOf">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nExecution\nOf" />
       </DisplayInfo>
       <Notes>This relationship links a reaction to the way it is used in a model.</Notes>
     </Relationship>
-    <Relationship name="IsTerminusFor" from="Compound" to="Scenario" arity="MM" converse="HasAsTerminus">
+    <Relationship name="IsTerminusFor" from="Compound" to="Scenario"
+      arity="MM" converse="HasAsTerminus">
       <DisplayInfo caption="Has As\nTerminus" theme="ivory">
-        <RegionInfo name="Chemistry"/>
+        <RegionInfo name="Chemistry" />
       </DisplayInfo>
       <Notes>A terminus for a scenario is a compound that acts as its
       input or output. A compound can be the terminus for many scenarios,
@@ -2395,29 +2757,34 @@ tools will be supported.
         <Notes>This index allows the application to view a scenario's
         compounds by group.</Notes>
         <IndexFields>
-          <IndexField name="group-number" order="ascending"/>
+          <IndexField name="group-number" order="ascending" />
         </IndexFields>
       </ToIndex>
     </Relationship>
-    <Relationship name="IsSuperclassOf" arity="1M" from="SubsystemClass" to="SubsystemClass" converse="IsSubclassOf">
-      <DisplayInfo caption="Is\nSuperclass\nOf" theme="blue" col="7" row="1" fixed="1">
-        <RegionInfo name="Subsystem" row="1" col="6"/>
-        <RegionInfo name="Chemistry" row="6" col="6" caption="Is\nSubclass\nOf" />
+    <Relationship name="IsSuperclassOf" arity="1M"
+      from="SubsystemClass" to="SubsystemClass" converse="IsSubclassOf">
+      <DisplayInfo caption="Is\nSuperclass\nOf" theme="blue"
+        col="7" row="1" fixed="1">
+        <RegionInfo name="Subsystem" row="1" col="6" />
+        <RegionInfo name="Chemistry" row="6" col="6"
+          caption="Is\nSubclass\nOf" />
       </DisplayInfo>
       <Notes>This is a recursive relationship that imposes a hierarchy on
       the subsystem classes.</Notes>
     </Relationship>
-    <Relationship name="Describes" from="Subsystem" to="Variant" arity="1M" converse="IsDescribedBy">
+    <Relationship name="Describes" from="Subsystem" to="Variant"
+      arity="1M" converse="IsDescribedBy">
       <DisplayInfo theme="blue">
-        <RegionInfo name="Subsystem"/>
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a subsystem to the individual
       variants used to implement it. Each variant contains a slightly
       different subset of the roles in the parent subsystem.</Notes>
     </Relationship>
-    <Relationship name="Displays" from="Diagram" to="Reaction" arity="MM" converse="IsDisplayedOn">
+    <Relationship name="Displays" from="Diagram" to="Reaction"
+      arity="MM" converse="IsDisplayedOn">
       <DisplayInfo theme="ivory" caption="Is\nDisplayed\nOn">
-        <RegionInfo name="Chemistry"/>
+        <RegionInfo name="Chemistry" />
       </DisplayInfo>
       <Notes>This relationship connects a diagram to its reactions. A
       diagram shows multiple reactions, and a reaction can be on many
@@ -2428,7 +2795,8 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsRelevantFor" from="Diagram" to="Subsystem" arity="MM" converse="IsRelevantTo">
+    <Relationship name="IsRelevantFor" from="Diagram" to="Subsystem"
+      arity="MM" converse="IsRelevantTo">
       <DisplayInfo theme="ivory" caption="Is\nRelevant\nFor">
         <RegionInfo name="Chemistry" />
       </DisplayInfo>
@@ -2436,23 +2804,27 @@ tools will be supported.
       it. Only diagrams which are useful in curating or annotation the subsystem are
       specified in this relationship.</Notes>
     </Relationship>
-    <Relationship name="IsImplementedBy" from="Variant" to="SSRow" arity="1M" converse="Implements">
-      <DisplayInfo theme="blue" caption="Is\nImplemented\nBy" row="6" col="7">
-        <RegionInfo name="Subsystem"/>
+    <Relationship name="IsImplementedBy" from="Variant" to="SSRow"
+      arity="1M" converse="Implements">
+      <DisplayInfo theme="blue" caption="Is\nImplemented\nBy"
+        row="6" col="7">
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a variant to the physical machines
       that implement it in the genomes. A variant is implemented by many
       machines, but a machine belongs to only one variant.</Notes>
     </Relationship>
-    <Relationship name="Uses" from="Genome" to="SSRow" arity="1M" converse="IsUsedBy">
+    <Relationship name="Uses" from="Genome" to="SSRow"
+      arity="1M" converse="IsUsedBy">
       <DisplayInfo theme="blue" caption="Is\nUsed\nBy">
-        <RegionInfo name="Subsystem"/>
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a genome to the machines that form
       its metabolic pathways. A genome can use many machines, but a
       machine is used by exactly one genome.</Notes>
     </Relationship>
-    <Relationship name="Includes" from="Subsystem" to="Role" arity="MM" converse="IsIncludedIn">
+    <Relationship name="Includes" from="Subsystem" to="Role"
+      arity="MM" converse="IsIncludedIn">
       <DisplayInfo theme="blue" caption="Includes">
         <RegionInfo name="Subsystem" />
         <RegionInfo name="Chemistry" />
@@ -2482,13 +2854,14 @@ tools will be supported.
         <Notes>This index insures that the roles of the subsystem are
         presented in sequence order.</Notes>
         <IndexFields>
-          <IndexField name="sequence" order="ascending"/>
+          <IndexField name="sequence" order="ascending" />
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="IsFunctionalIn" from="Role" to="Feature" arity="MM" converse="HasFunctional">
+    <Relationship name="IsFunctionalIn" from="Role" to="Feature"
+      arity="MM" converse="HasFunctional">
       <DisplayInfo theme="green">
-        <RegionInfo name="" caption="Is\nFunctional\nIn"/>
+        <RegionInfo name="" caption="Is\nFunctional\nIn" />
       </DisplayInfo>
       <Notes>This relationship connects a role with the features in which
       it plays a functional part.</Notes>
@@ -2497,9 +2870,11 @@ tools will be supported.
       role is connected by a separate instance
       of this relationship.</Asides>
     </Relationship>
-    <Relationship name="Shows" from="Diagram" to="Compound" arity="MM" converse="IsShownOn">
-      <DisplayInfo theme="ivory" fixed="1" caption="Is\nShown\nOn" row="2" col="3.5">
-        <RegionInfo name="Chemistry" row="2" col="2.5"/>
+    <Relationship name="Shows" from="Diagram" to="Compound"
+      arity="MM" converse="IsShownOn">
+      <DisplayInfo theme="ivory" fixed="1" caption="Is\nShown\nOn"
+        row="2" col="3.5">
+        <RegionInfo name="Chemistry" row="2" col="2.5" />
       </DisplayInfo>
       <Notes>This relationship indicates that a compound appears on a
       particular diagram. The same compound can appear on many diagrams,
@@ -2510,35 +2885,41 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="IsRoleOf" from="Role" to="SSCell" arity="1M" converse="HasRole">
+    <Relationship name="IsRoleOf" from="Role" to="SSCell"
+      arity="1M" converse="HasRole">
       <DisplayInfo caption="Is\nRole\nOf" theme="blue">
-        <RegionInfo name="Subsystem"/>
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a role to the machine roles that
       represent its appearance in a molecular machine. A machine role has
       exactly one associated role, but a role may be represented by many
       machine roles.</Notes>
     </Relationship>
-    <Relationship name="IsSubInstanceOf" from="Subsystem" to="Scenario" arity="1M" converse="Validates">
-      <DisplayInfo theme="ivory" caption="Is Sub-\nInstance\nOf" fixed="1" row="1" col="7">
-        <RegionInfo name="Chemistry" row="1" col="6"/>
+    <Relationship name="IsSubInstanceOf" from="Subsystem"
+      to="Scenario" arity="1M" converse="Validates">
+      <DisplayInfo theme="ivory" caption="Is Sub-\nInstance\nOf"
+        fixed="1" row="1" col="7">
+        <RegionInfo name="Chemistry" row="1" col="6" />
       </DisplayInfo>
       <Notes>This relationship connects a scenario to its subsystem it
       validates. A scenario belongs to exactly one subsystem, but a
       subsystem may have multiple scenarios.</Notes>
     </Relationship>
-    <Relationship name="Overlaps" from="Scenario" to="Diagram" arity="MM" converse="IncludesPartOf">
+    <Relationship name="Overlaps" from="Scenario" to="Diagram"
+      arity="MM" converse="IncludesPartOf">
       <DisplayInfo theme="ivory" fixed="1" row="2" col="5.5">
-        <RegionInfo name="Chemistry" row="2" col="4.5"/>
+        <RegionInfo name="Chemistry" row="2" col="4.5" />
       </DisplayInfo>
       <Notes>A Scenario overlaps a diagram when the diagram displays a
       portion of the reactions that make up the scenario. A scenario may
       overlap many diagrams, and a diagram may be include portions of many
       scenarios.</Notes>
     </Relationship>
-    <Relationship name="HasParticipant" from="Scenario" to="Reaction" arity="MM" converse="ParticipatesIn">
-      <DisplayInfo theme="ivory" caption="Has\nParticipant" row="2" col="4.5" fixed="1">
-        <RegionInfo name="Chemistry" row="2" col="3.5"/>
+    <Relationship name="HasParticipant" from="Scenario" to="Reaction"
+      arity="MM" converse="ParticipatesIn">
+      <DisplayInfo theme="ivory" caption="Has\nParticipant"
+        row="2" col="4.5" fixed="1">
+        <RegionInfo name="Chemistry" row="2" col="3.5" />
       </DisplayInfo>
       <Notes>A scenario consists of many participant reactions that
       convert the input compounds to output compounds. A single reaction
@@ -2556,65 +2937,71 @@ tools will be supported.
         <Notes>This index presents the reactions in the scenario in
         order from most important to least important.</Notes>
         <IndexFields>
-          <IndexField name="type" order="ascending"/>
+          <IndexField name="type" order="ascending" />
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="IsInPair" from="Feature" to="Pairing" arity="MM" converse="IsPairOf">
+    <Relationship name="IsInPair" from="Feature" to="Pairing"
+      arity="MM" converse="IsPairOf">
       <DisplayInfo theme="brown" caption="Is In\nPair">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>A pairing contains exactly two protein sequences. A protein
       sequence can belong to multiple pairings. When going from a protein
       sequence to its pairings, they are presented in alphabetical order
       by sequence key.</Notes>
     </Relationship>
-    <Relationship name="IsTaxonomyOf" from="TaxonomicGrouping" to="Genome" arity="1M" converse="IsInTaxa">
+    <Relationship name="IsTaxonomyOf" from="TaxonomicGrouping"
+      to="Genome" arity="1M" converse="IsInTaxa">
       <DisplayInfo theme="red">
-        <RegionInfo name="" caption="Is In\nTaxa"/>
+        <RegionInfo name="" caption="Is In\nTaxa" />
       </DisplayInfo>
       <Notes>A genome is assigned to a particular point in the taxonomy tree, but not
       necessarily to a leaf node. In some cases, the exact species and strain is
       not available when inserting the genome, so it is placed at the lowest node
       that probably contains the actual genome.</Notes>
     </Relationship>
-    <Relationship name="IsRowOf" from="SSRow" to="SSCell" arity="1M" converse="IsRoleFor">
+    <Relationship name="IsRowOf" from="SSRow" to="SSCell"
+      arity="1M" converse="IsRoleFor">
       <DisplayInfo theme="blue">
-        <RegionInfo name="Subsystem" caption="Is\nRole\nFor"/>
+        <RegionInfo name="Subsystem" caption="Is\nRole\nFor" />
       </DisplayInfo>
       <Notes>This relationship connects a subsystem spreadsheet row to its
       constituent spreadsheet cells.</Notes>
     </Relationship>
-    <Relationship name="IsClassFor" arity="1M" from="SubsystemClass" to="Subsystem" converse="IsInClass">
+    <Relationship name="IsClassFor" arity="1M" from="SubsystemClass"
+      to="Subsystem" converse="IsInClass">
       <DisplayInfo caption="Is In\nClass" theme="blue">
-        <RegionInfo name="Subsystem"/>
-        <RegionInfo name="Chemistry"/>
+        <RegionInfo name="Subsystem" />
+        <RegionInfo name="Chemistry" />
       </DisplayInfo>
       <Notes>This relationship connects each subsystem class with the
       subsystems that belong to it. A class can contain many subsystems,
       but a subsystem is only in one class. Some subsystems are not in any
       class, but this is usually a temporary condition.</Notes>
     </Relationship>
-    <Relationship name="IsAnnotatedBy" from="Feature" to="Annotation" arity="1M" converse="Annotates">
+    <Relationship name="IsAnnotatedBy" from="Feature" to="Annotation"
+      arity="1M" converse="Annotates">
       <DisplayInfo theme="black" caption="Annotates">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>This relationship connects a feature to its annotations. A
       feature may have multiple annotations, but an annotation belongs to
       only one feature.</Notes>
     </Relationship>
-    <Relationship name="HasMember" from="Family" to="Feature" arity="MM" converse="IsMemberOf">
+    <Relationship name="HasMember" from="Family" to="Feature"
+      arity="MM" converse="IsMemberOf">
       <DisplayInfo theme="brown" caption="Is\nMember\nOf">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>This relationship connects each feature family to its
       constituent features. A family always has many features, and a
       single feature can be found in many families.</Notes>
     </Relationship>
-    <Relationship name="HasProteinMember" from="Family" to="ProteinSequence" arity="MM"
-                  converse="IsProteinMemberOf">
+    <Relationship name="HasProteinMember" from="Family"
+      to="ProteinSequence" arity="MM" converse="IsProteinMemberOf">
       <DisplayInfo theme="brown" caption="Is\nProtein Member\nOf">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>This relationship connects each feature family to its
       constituent protein sequences. A family always has many protein sequences,
@@ -2634,16 +3021,18 @@ tools will be supported.
         </IndexFields>
       </FromIndex>
     </Relationship>
-    <Relationship name="Concerns" from="Publication" to="ProteinSequence" arity="MM" converse="IsATopicOf">
+    <Relationship name="Concerns" from="Publication" to="ProteinSequence"
+      arity="MM" converse="IsATopicOf">
       <DisplayInfo theme="green">
-        <RegionInfo name=""/>
+        <RegionInfo name="" />
       </DisplayInfo>
       <Notes>This relationship connects a publication to the protein
       sequences it describes.</Notes>
     </Relationship>
-    <Relationship name="IsCollectionOf" from="OTU" to="Genome" arity="1M" converse="IsCollectedInto">
+    <Relationship name="IsCollectionOf" from="OTU" to="Genome"
+      arity="1M" converse="IsCollectedInto">
       <DisplayInfo theme="red" caption="Is\nCollection\nOf">
-        <RegionInfo name="" row="4" col="6" fixed="1"/>
+        <RegionInfo name="" row="4" col="6" fixed="1" />
       </DisplayInfo>
       <Notes>A genome belongs to only one genome set. For each set, this relationship marks the genome to be used as its representative.</Notes>
       <Fields>
@@ -2652,9 +3041,10 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="AssertsFunctionFor" from="Source" to="ProteinSequence" converse="HasAssertedFunctionFrom" arity="MM">
+    <Relationship name="AssertsFunctionFor" from="Source"
+      to="ProteinSequence" converse="HasAssertedFunctionFrom" arity="MM">
       <DisplayInfo theme="black" caption="Has Asserted\nFunction From">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>Sources (users) can make assertions about protein sequence function.
       The assertion is associated with an external identifier.</Notes>
@@ -2693,9 +3083,10 @@ tools will be supported.
         </Index>
       </Indexes>
     </Relationship>
-    <Relationship name="IsDeterminedBy" from="PairSet" to="Pairing" arity="1M" converse="Determines">
+    <Relationship name="IsDeterminedBy" from="PairSet" to="Pairing"
+      arity="1M" converse="Determines">
       <DisplayInfo theme="brown" caption="Determines">
-        <RegionInfo name="Annotations"/>
+        <RegionInfo name="Annotations" />
       </DisplayInfo>
       <Notes>A functional coupling evidence set exists because it has
       pairings in it, and this relationship connects the evidence set to
@@ -2712,29 +3103,33 @@ tools will be supported.
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="Contains" from="SSCell" to="Feature" arity="MM" converse="IsContainedIn">
-      <DisplayInfo theme="blue" caption="Contains" row="8" col="5">
-        <RegionInfo name="Subsystem"/>
+    <Relationship name="Contains" from="SSCell" to="Feature"
+      arity="MM" converse="IsContainedIn">
+      <DisplayInfo theme="blue" caption="Contains" row="8"
+        col="5">
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship connects a subsystem spreadsheet cell to the features
       that occur in it. A feature may occur in many machine roles and a
       machine role may contain many features. The subsystem annotation
       process is essentially the maintenance of this relationship.</Notes>
     </Relationship>
-    <Relationship name="IsProteinFor" from="ProteinSequence" to="Feature" arity="1M" converse="Produces">
+    <Relationship name="IsProteinFor" from="ProteinSequence"
+      to="Feature" arity="1M" converse="Produces">
       <DisplayInfo caption="Is\nProtein\nFor" theme="green">
-        <RegionInfo name=""/>
-        <RegionInfo name="Annotations"/>
-        <RegionInfo name="Chemistry"/>
+        <RegionInfo name="" />
+        <RegionInfo name="Annotations" />
+        <RegionInfo name="Chemistry" />
       </DisplayInfo>
       <Notes>This relationship connects a peg feature to the protein
       sequence it produces (if any). Only peg features participate in this
       relationship. A single protein sequence will frequently be produced
       by many features.</Notes>
     </Relationship>
-    <Relationship name="IsLocatedIn" from="Feature" to="Contig" arity="MM" converse="IsLocusFor">
+    <Relationship name="IsLocatedIn" from="Feature" to="Contig"
+      arity="MM" converse="IsLocusFor">
       <DisplayInfo theme="green">
-        <RegionInfo name="" caption="Is\nLocated\nIn"/>
+        <RegionInfo name="" caption="Is\nLocated\nIn" />
       </DisplayInfo>
       <Notes>A feature is a set of DNA sequence fragments. Most features
       are a single contiquous fragment, so they are located in only one
@@ -2768,25 +3163,27 @@ tools will be supported.
         <Notes>This index allows the application to find all the
         segments of a feature in the proper order.</Notes>
         <IndexFields>
-          <IndexField name="ordinal" order="ascending"/>
+          <IndexField name="ordinal" order="ascending" />
         </IndexFields>
       </FromIndex>
       <ToIndex>
         <Notes>This index is the one used by applications to find all
         the feature segments that contain a specific residue.</Notes>
         <IndexFields>
-          <IndexField name="begin" order="ascending"/>
+          <IndexField name="begin" order="ascending" />
         </IndexFields>
       </ToIndex>
     </Relationship>
-    <Relationship name="HasSection" from="ContigSequence" to="ContigChunk" arity="1M" converse="IsSectionOf">
+    <Relationship name="HasSection" from="ContigSequence"
+      to="ContigChunk" arity="1M" converse="IsSectionOf">
       <DisplayInfo caption="Has Section" theme="red">
         <RegionInfo name="" />
       </DisplayInfo>
       <Notes>This relationship connects a contig's sequence to its DNA
       sequences.</Notes>
     </Relationship>
-    <Relationship name="IsGroupFor" from="TaxonomicGrouping" to="TaxonomicGrouping" arity="1M" converse="IsInGroup">
+    <Relationship name="IsGroupFor" from="TaxonomicGrouping"
+      to="TaxonomicGrouping" arity="1M" converse="IsInGroup">
       <DisplayInfo theme="red" caption="Is\nGroup\nFor">
         <RegionInfo name="" row="7" col="6" fixed="1" />
       </DisplayInfo>
@@ -2796,9 +3193,10 @@ tools will be supported.
     </Relationship>
   </Relationships>
   <Shapes>
-    <Shape type="diamond" name="BelongsTo" from="Variant" to="Role">
-      <DisplayInfo theme="gray" caption="Belongs To" connected="1">
-        <RegionInfo name="Subsystem"/>
+    <Shape type="diamond" name="BelongsToVariant" from="Role" to="Variant">
+      <DisplayInfo theme="gray" caption="Belongs To\nVariant"
+        connected="1">
+        <RegionInfo name="Subsystem" />
       </DisplayInfo>
       <Notes>This relationship is not physically implemented in the
       database. It is implicit in the data for a variant. A variant

@@ -3551,7 +3551,7 @@ fid is a string
 
 =item Description
 
-genomes_to_fids is used to get the fids included in specific genomes.  It
+genomes_to_fids bis used to get the fids included in specific genomes.  It
 is often the case that you want just one or two types of fids -- hence, the
 types_of_fids argument.
 
@@ -6999,7 +6999,7 @@ sub corresponds_from_sequences
 
 =head2 close_genomes
 
-  $return = $obj->close_genomes($genomes, $n)
+  $return = $obj->close_genomes($seq_set, $n)
 
 =over 4
 
@@ -7008,12 +7008,19 @@ sub corresponds_from_sequences
 =begin html
 
 <pre>
-$genomes is a genomes
+$seq_set is a seq_set
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
+$return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
 	1: a float
-genomes is a reference to a list where each element is a genome
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
 genome is a string
 
 </pre>
@@ -7022,12 +7029,19 @@ genome is a string
 
 =begin text
 
-$genomes is a genomes
+$seq_set is a seq_set
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
+$return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
 	1: a float
-genomes is a reference to a list where each element is a genome
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
 genome is a string
 
 
@@ -7037,15 +7051,7 @@ genome is a string
 
 =item Description
 
-A close_genomes is used to get a set of relatively close genomes (for
-each input genome, a set of close genomes is calculated, but the
-result should be viewed as quite approximate.  It is quite slow,
-using similarities for a universal protein as the basis for the 
-assessments.  It produces estimates of degree of similarity for
-the universal proteins it samples. 
 
-
-Up to n genomes will be returned for each input genome.
 
 =back
 
@@ -7054,10 +7060,10 @@ Up to n genomes will be returned for each input genome.
 sub close_genomes
 {
     my $self = shift;
-    my($genomes, $n) = @_;
+    my($seq_set, $n) = @_;
 
     my @_bad_arguments;
-    (ref($genomes) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomes\" (value was \"$genomes\")");
+    (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seq_set\" (value was \"$seq_set\")");
     (!ref($n)) or push(@_bad_arguments, "Invalid type for argument \"n\" (value was \"$n\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to close_genomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
@@ -7068,59 +7074,20 @@ sub close_genomes
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN close_genomes
-    $return = {};
+    my $contigs = $seq_set;
     use CloseGenomes;
-    foreach my $g (@$genomes)
-    {
-	my $parms = {};
-	my $contigs;
-	if ($g =~ /^kb\|/)
-	{
-	    open(CONTIGS,"echo '$g' | genomes_to_contigs | contigs_to_sequences |");
-	    $contigs = &gjoseqlib::read_fasta(\*CONTIGS);
-	    close(CONTIGS);
-	    $parms->{-source} = "KBase";
-	    use Bio::KBase::CDMI::CDMIClient;
-	    use Bio::KBase::Utilities::ScriptThing;
-	    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
-	}
-	elsif (($g =~ /^\d+\.\d+/) && (! -d $g))
-	{
-	    open(CONTIGS,"echo '$g' | svr_contigs_in_genome | svr_dna_seq -fasta 1 |");
-	    $contigs = &gjoseqlib::read_fasta(\*CONTIGS);
-	    close(CONTIGS);
-	    $parms->{-source} = "SEED";
-	    use Bio::KBase::CDMI::CDMIClient;
-	    use Bio::KBase::Utilities::ScriptThing;
-	    use SAPserver;
-	    $parms->{-sapObj} = SAPserver->new();
-	}
-	else
-	{
-	    use JSON::XS;
-	    open(CONTIGS,"<$g") || die "$g is not a file that can be opened";
-	    my $json = JSON::XS->new;
-	    my $input_genome;
-	    local $/;
-	    undef $/;
-	    my $input_genome_txt = <CONTIGS>;
-	    $input_genome = $json->decode($input_genome_txt);
-	    my $tmp = $input_genome->{contigs};
-	    my @raw_contigs = map { [$_->{id},'',$_->{dna}] }  @$tmp;
-	    $contigs = \@raw_contigs;
-	    $parms->{-source} = "KBase";
-	    use Bio::KBase::CDMI::CDMIClient;
-	    use Bio::KBase::Utilities::ScriptThing;
-	    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
-	}
-	my ($close,$coding) = &CloseGenomes::close_genomes_and_hits($contigs, $parms);
-	my @tmp = @$close;
-	if (@tmp > $n) { $#tmp = $n-1 }  # return the $n closest
-	$return->{$g} = \@tmp;
-    }
+    my $parms = {};
+    $parms->{-source} = "KBase";
+    use Bio::KBase::CDMI::CDMIClient;
+    use Bio::KBase::Utilities::ScriptThing;
+    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
+    my ($close,$coding) = &CloseGenomes::close_genomes_and_hits($contigs, $parms);
+    my @tmp = @$close;
+    if (@tmp > $n) { $#tmp = $n-1 }  # return the $n closest
+    $return = \@tmp;
     #END close_genomes
     my @_bad_returns;
-    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to close_genomes:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -10524,6 +10491,18 @@ score has a value which is an int
 
 =over 4
 
+
+
+=item Description
+
+A close_genomes is used to get a set of relatively close genomes (for
+each input genome, a set of close genomes is calculated, but the
+result should be viewed as quite approximate.  It is quite slow,
+using similarities for a universal protein as the basis for the 
+assessments.  It produces estimates of degree of similarity for
+the universal proteins it samples.
+
+Up to n genomes will be returned for each input genome.
 
 
 =item Definition

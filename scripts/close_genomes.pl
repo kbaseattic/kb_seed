@@ -42,8 +42,7 @@ output is to the standard output.
 
 This script is a wrapper for the CDMI-API call close_genomes. It is documented as follows:
 
-  $return = $obj->close_genomes($genomes, $how, $n)
-
+  $return = $obj->close_genomes($seq_set, $n)
 
 =over 4
 
@@ -52,13 +51,20 @@ This script is a wrapper for the CDMI-API call close_genomes. It is documented a
 =begin html
 
 <pre>
-$genomes is a genomes
-$how is a how
+$seq_set is a seq_set
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a genomes
-genomes is a reference to a list where each element is a genome
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a genome
+	1: a float
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
 genome is a string
-how is an int
 
 </pre>
 
@@ -66,13 +72,20 @@ how is an int
 
 =begin text
 
-$genomes is a genomes
-$how is a how
+$seq_set is a seq_set
 $n is an int
-$return is a reference to a hash where the key is a genome and the value is a genomes
-genomes is a reference to a list where each element is a genome
+$return is a reference to a list where each element is a reference to a list containing 2 items:
+	0: a genome
+	1: a float
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
 genome is a string
-how is an int
 
 
 =end text
@@ -124,22 +137,28 @@ if (! $kbO) { print STDERR $usage; exit }
 
 if (defined($genomeF))
 {
-    my $close = $kbO->close_genomes([$genomeF],$n);
-    my $tuples = $close->{$genomeF};
-    my $json = JSON::XS->new;
-    my $genome;
+    my $in_fh;
+    open($in_fh, "<", $genomeF) or die "Cannot open $genomeF: $!";
+    my $genomeTO;
     local $/;
     undef $/;
-    open(GENOME,"<$genomeF") || die "could not open $genomeF";
-    my $genome_txt = <GENOME>;
-    close(GENOME);
-    $genome = $json->decode($genome_txt);
-    $genome->{close_genomes} = $tuples;
+    my $genomeTO_txt = <$in_fh>;
+    use JSON::XS;
+    my $json = JSON::XS->new;
+    $genomeTO = $json->decode($genomeTO_txt);
+
+    my $tmp = $genomeTO->{contigs};
+    my @raw_contigs = map { [$_->{id},'',$_->{dna}] }  @$tmp;
+    my $contigs = \@raw_contigs;
+    my $tuples = $kbO->close_genomes($contigs,$n);
+    $genomeTO->{close_genomes} = $tuples;
     $json->pretty(1);
-    print $json->encode($genome);
+    print $json->encode($genomeTO);
 }
-else
+Else
 {
+    use Bio::KBase::CDMI::CDMIClient;
+    use Bio::KBase::Utilities::ScriptThing;
     my $ih;
     if ($input_file)
     {
@@ -151,26 +170,23 @@ else
     }
 
     while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-	my @h = map { $_->[0] } @tuples;
-	my $h = $kbO->close_genomes(\@h,$n);
-	for my $tuple (@tuples) {
-        #
-        # Process output here and print.
-        #
-	    my ($id, $line) = @$tuple;
-	    my $v = $h->{$id};
 
-	    if (! defined($v))
+	foreach my $tuple (@tuples)
+	{
+	    my ($g, $line) = @$tuple;
+	    open(CONTIGS,"echo '$g' | genomes_to_contigs | contigs_to_sequences |");
+	    my $contigs = &gjoseqlib::read_fasta(\*CONTIGS);
+	    close(CONTIGS);
+	    my $parms = {};
+	    $parms->{-source} = "KBase";
+	    $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
+	    my ($close,$coding) = &CloseGenomes::close_genomes_and_hits($contigs, $parms);
+	    my @tmp = @$close;
+	    if (@tmp > $n) { $#tmp = $n-1 }  # return the $n closest
+	    foreach my $x (@tmp)
 	    {
-		print STDERR $line,"\n";
-	    }
-	    elsif (ref($v) eq 'ARRAY')
-	    {
-		foreach $_ (@$v)
-		{
-		    my($g,$sc) = @$_;
-		    print "$line\t$sc\t$g\n";
-		}
+		my($close_g,$avg_iden) = @$x;
+		print "$line\t$avg_iden\t$close_g\n";
             }
         }
     }
