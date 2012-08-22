@@ -39178,7 +39178,7 @@ score has a value which is an int
 
 
 
-=head2 how
+=head2 sequence
 
 =over 4
 
@@ -39188,41 +39188,12 @@ score has a value which is an int
 
 A close_genomes is used to get a set of relatively close genomes (for
 each input genome, a set of close genomes is calculated, but the
-result should be viewed as quite approximate.  "how" is a suggestion
-of which algorithm to use:
- 
-     0 - default (same genus)
-     1 - find genomes with the same genus name
-     2 - use the SSU rRNA, if possible
-     3 - use a set of "universal proteins", if you can
-         
+result should be viewed as quite approximate.  It is quite slow,
+using similarities for a universal protein as the basis for the 
+assessments.  It produces estimates of degree of similarity for
+the universal proteins it samples.
+
 Up to n genomes will be returned for each input genome.
-
-
-=item Definition
-
-=begin html
-
-<pre>
-an int
-</pre>
-
-=end html
-
-=begin text
-
-an int
-
-=end text
-
-=back
-
-
-
-=head2 sequence
-
-=over 4
-
 
 
 =item Definition

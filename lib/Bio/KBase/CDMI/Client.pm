@@ -1995,7 +1995,7 @@ sub genomes_to_contigs
 
 =head2 $result = genomes_to_fids(genomes, types_of_fids)
 
-genomes_to_fids is used to get the fids included in specific genomes.  It
+genomes_to_fids bis used to get the fids included in specific genomes.  It
 is often the case that you want just one or two types of fids -- hence, the
 types_of_fids argument.
 
@@ -3635,7 +3635,7 @@ sub corresponds_from_sequences
 
 
 
-=head2 $result = close_genomes(genomes, how, n)
+=head2 $result = close_genomes(seq_set, n)
 
 
 
@@ -3645,18 +3645,17 @@ sub close_genomes
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function close_genomes (received $n, expecting 3)");
+							       "Invalid argument count for function close_genomes (received $n, expecting 2)");
     }
     {
-	my($genomes, $how, $n) = @args;
+	my($seq_set, $n) = @args;
 
 	my @_bad_arguments;
-        (ref($genomes) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"genomes\" (value was \"$genomes\")");
-        (!ref($how)) or push(@_bad_arguments, "Invalid type for argument 2 \"how\" (value was \"$how\")");
-        (!ref($n)) or push(@_bad_arguments, "Invalid type for argument 3 \"n\" (value was \"$n\")");
+        (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seq_set\" (value was \"$seq_set\")");
+        (!ref($n)) or push(@_bad_arguments, "Invalid type for argument 2 \"n\" (value was \"$n\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to close_genomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
