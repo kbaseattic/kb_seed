@@ -59,7 +59,7 @@ sub fill_in_by_walking {
 		    {
 			$parms->{-close_fids}->{&key_of_hit($sorted_hits[$i])} = $close_fids;
 			my($orf_beg,$orf_end,$trans) = &expand_to_orf($contigH{$contig},$hit_beg,$hit_end,$parms);
-			push(@potential_calls,[$contig,$orf_beg,$orf_end,$trans,$close_fids,$newF,$hit_beg,$hit_end]);
+			push(@potential_calls,[$contig,$orf_beg,$orf_end,$trans,$close_fids,$newF,$hit_beg,$hit_end,0]);
 #			print STDERR &Dumper($sorted_hits[$i],$orf_beg,$orf_end,$trans); 
 		    }
 		}
@@ -77,7 +77,7 @@ sub fill_in_by_walking {
 	if ($start)
 	{
 	    my $key_loc = join(":",($contig,$hit_beg,$hit_end));
-	    $calls->{$key_loc} = $new_calls->{$key_loc} = [$start,$orf_end,$trans,$newF,$close_fid];
+	    $calls->{$key_loc} = $new_calls->{$key_loc} = [$start,$orf_end,$trans,$newF,$close_fid,0];
 	}
 	else
 	{
@@ -191,7 +191,7 @@ sub make_calls {
 	    if ($trans)
 	    {
 		$parms->{-close_fids}->{&key_of_hit($hits->[0])} = $close_fids;
-		push(@potential_calls,[$contig,$orf_beg,$orf_end,$trans,$close_fids,$newF,$hit_beg,$hit_end]);
+		push(@potential_calls,[$contig,$orf_beg,$orf_end,$trans,$close_fids,$newF,$hit_beg,$hit_end,$num_kmers]);
 	    }
 	    else
 	    {
@@ -203,13 +203,13 @@ sub make_calls {
     my $existing_transH = &get_existing_trans(\@potential_calls,$close_genomes,$parms);
     foreach my $tuple (@potential_calls)
     {
-	my($contig,$orf_beg,$orf_end,undef,$close_fids,$newF,$hit_beg,$hit_end) = @$tuple;
+	my($contig,$orf_beg,$orf_end,undef,$close_fids,$newF,$hit_beg,$hit_end,$num_kmers) = @$tuple;
 	my $close_fid     = $close_fids->[0];
 	my $close_tran    = $existing_transH->{$close_fid};
 	my($start,$trans) = &good_call($tuple,$close_tran,$contigH,$parms);
 	if ($start)
 	{
-	    $calls->{join(":",($contig,$hit_beg,$hit_end))} = [$start,$orf_end,$trans,$newF,$close_fid];
+	    $calls->{join(":",($contig,$hit_beg,$hit_end))} = [$start,$orf_end,$trans,$newF,$close_fid,$num_kmers];
 	}
 	else
 	{
