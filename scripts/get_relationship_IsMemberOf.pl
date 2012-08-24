@@ -41,20 +41,22 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Family entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Feature entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item type
+=item feature_type
 
-=item release
+=item source_id
 
-=item family_function
+=item sequence_length
 
-=item alignment
+=item function
+
+=item alias
 
 =back    
 
@@ -73,22 +75,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Feature entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Family entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item feature_type
+=item type
 
-=item source_id
+=item release
 
-=item sequence_length
+=item family_function
 
-=item function
-
-=item alias
+=item alignment
 
 =back    
 

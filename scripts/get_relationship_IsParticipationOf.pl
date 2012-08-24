@@ -40,6 +40,38 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
+Choose a set of fields from the Reagent entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item stoichiometry
+
+=item cofactor
+
+=item compartment_index
+
+=item transport_coefficient
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=back    
+
+=item -to field-list
+
 Choose a set of fields from the Compound entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
@@ -62,38 +94,6 @@ strings. The following fields are available:
 =item formula
 
 =item mass
-
-=back    
-
-=item -rel field-list
-
-Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item from_link
-
-=item to_link
-
-=back    
-
-=item -to field-list
-
-Choose a set of fields from the Reagent entity to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item id
-
-=item stoichiometry
-
-=item cofactor
-
-=item compartment_index
-
-=item transport_coefficient
 
 =back    
 

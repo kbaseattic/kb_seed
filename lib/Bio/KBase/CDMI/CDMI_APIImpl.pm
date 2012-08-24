@@ -1,6 +1,9 @@
 package Bio::KBase::CDMI::CDMI_APIImpl;
 use strict;
 use Bio::KBase::Exceptions;
+# Use Semantic Versioning (2.0.0-rc.1)
+# http://semver.org 
+our $VERSION = "0.1.0";
 
 =head1 NAME
 
@@ -3462,7 +3465,7 @@ contig is a string
 
 =item Description
 
-The routine genomes_to_con`tigs can be used to retrieve the IDs of the contigs
+The routine genomes_to_contigs can be used to retrieve the IDs of the contigs
 associated with each of a list of input genomes.  The routine constructs a mapping
 from genome ID to the list of contigs included in the genome.
 
@@ -7491,6 +7494,40 @@ sub align_sequences
 
 
 
+
+=head2 version 
+
+  $return = $obj->version()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$return is a string
+</pre>
+
+=end html
+
+=begin text
+
+$return is a string
+
+=end text
+
+=item Description
+
+Return the module version. This is a Semantic Versioning number.
+
+=back
+
+=cut
+
+sub version {
+    return $VERSION;
+}
 
 =head1 TYPES
 

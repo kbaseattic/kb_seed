@@ -535,7 +535,7 @@ module CDMI_API : CDMI_API {
 	*/
     funcdef genomes_to_md5s(genomes) returns (mapping<genome,md5>);
 
-	/* The routine genomes_to_con`tigs can be used to retrieve the IDs of the contigs
+	/* The routine genomes_to_contigs can be used to retrieve the IDs of the contigs
 	   associated with each of a list of input genomes.  The routine constructs a mapping
 	   from genome ID to the list of contigs included in the genome.
 	*/

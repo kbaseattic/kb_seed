@@ -6,6 +6,11 @@ use Data::Dumper;
 use URI;
 use Bio::KBase::Exceptions;
 
+# Client version should match Impl version
+# This is a Semantic Version number,
+# http://semver.org
+our $VERSION = "0.1.0";
+
 =head1 NAME
 
 Bio::KBase::CDMI::Client
@@ -27,8 +32,9 @@ sub new
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
     $ua->timeout($timeout);
-
-    return bless $self, $class;
+    bless $self, $class;
+    $self->_validate_version();
+    return $self;
 }
 
 
@@ -22680,6 +22686,58 @@ sub get_relationship_IsUsedBy
 
 
 
+sub version {
+    my ($self) = @_;
+    my $result = $self->{client}->call($self->{url}, {
+        method => "CDMI_EntityAPI.version",
+        params => [],
+    });
+    if ($result) {
+        if ($result->is_error) {
+            Bio::KBase::Exceptions::JSONRPC->throw(
+                error => $result->error_message,
+                code => $result->content->{code},
+                method_name => 'get_relationship_IsUsedBy',
+            );
+        } else {
+            return wantarray ? @{$result->result} : $result->result->[0];
+        }
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(
+            error => "Error invoking method get_relationship_IsUsedBy",
+            status_line => $self->{client}->status_line,
+            method_name => 'get_relationship_IsUsedBy',
+        );
+    }
+}
+
+sub _validate_version {
+    my ($self) = @_;
+    my $svr_version = $self->version();
+    my $client_version = $VERSION;
+    my ($cMajor, $cMinor) = split(/\./, $client_version);
+    my ($sMajor, $sMinor) = split(/\./, $svr_version);
+    if ($sMajor != $cMajor) {
+        Bio::KBase::Exceptions::ClientServerIncompatible->throw(
+            error => "Major version numbers differ.",
+            server_version => $svr_version,
+            client_version => $client_version
+        );
+    }
+    if ($sMinor < $cMinor) {
+        Bio::KBase::Exceptions::ClientServerIncompatible->throw(
+            error => "Client minor version greater than Server minor version.",
+            server_version => $svr_version,
+            client_version => $client_version
+        );
+    }
+    if ($sMinor > $cMinor) {
+        warn "New client version available for Bio::KBase::CDMI::Client\n";
+    }
+    if ($sMajor == 0) {
+        warn "Bio::KBase::CDMI::Client version is $svr_version. API subject to change.\n";
+    }
+}
 
 package Bio::KBase::CDMI::Client::RpcClient;
 use base 'JSON::RPC::Client';
@@ -22722,6 +22780,5 @@ sub call {
         return;
     }
 }
-
 
 1;

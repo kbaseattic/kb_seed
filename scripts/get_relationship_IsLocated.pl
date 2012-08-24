@@ -40,6 +40,36 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
+Choose a set of fields from the ObservationalUnit entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item source_name
+
+=item source_name2
+
+=item plant_id
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=back    
+
+=item -to field-list
+
 Choose a set of fields from the Locality entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
@@ -64,36 +94,6 @@ strings. The following fields are available:
 =item longitude
 
 =item lo_accession
-
-=back    
-
-=item -rel field-list
-
-Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item from_link
-
-=item to_link
-
-=back    
-
-=item -to field-list
-
-Choose a set of fields from the ObservationalUnit entity to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item id
-
-=item source_name
-
-=item source_name2
-
-=item plant_id
 
 =back    
 

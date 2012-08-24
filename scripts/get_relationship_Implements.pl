@@ -41,20 +41,16 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Variant entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the SSRow entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item role_rule
+=item curated
 
-=item code
-
-=item type
-
-=item comment
+=item region
 
 =back    
 
@@ -73,16 +69,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the SSRow entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Variant entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item curated
+=item role_rule
 
-=item region
+=item code
+
+=item type
+
+=item comment
 
 =back    
 

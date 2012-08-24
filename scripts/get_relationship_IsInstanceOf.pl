@@ -40,20 +40,20 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ModelCompartment entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item abbr
+=item compartment_index
 
-=item mod_date
+=item label
 
-=item name
+=item pH
 
-=item msid
+=item potential
 
 =back    
 
@@ -72,20 +72,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the ModelCompartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item compartment_index
+=item abbr
 
-=item label
+=item mod_date
 
-=item pH
+=item name
 
-=item potential
+=item msid
 
 =back    
 

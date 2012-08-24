@@ -39,18 +39,20 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the ObservationalUnit entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Trait entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item source_name
+=item trait_name
 
-=item source_name2
+=item unit_of_measure
 
-=item plant_id
+=item TO_ID
+
+=item protocol
 
 =back    
 
@@ -75,20 +77,18 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Trait entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ObservationalUnit entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item trait_name
+=item source_name
 
-=item unit_of_measure
+=item source_name2
 
-=item TO_ID
-
-=item protocol
+=item plant_id
 
 =back    
 

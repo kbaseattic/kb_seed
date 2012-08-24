@@ -42,22 +42,12 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Feature entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Pairing entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
-
-=item feature_type
-
-=item source_id
-
-=item sequence_length
-
-=item function
-
-=item alias
 
 =back    
 
@@ -76,12 +66,22 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Pairing entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Feature entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
+
+=item feature_type
+
+=item source_id
+
+=item sequence_length
+
+=item function
+
+=item alias
 
 =back    
 

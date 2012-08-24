@@ -42,20 +42,16 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ReactionRule entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item abbr
+=item direction
 
-=item mod_date
-
-=item name
-
-=item msid
+=item transproton
 
 =back    
 
@@ -76,16 +72,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the ReactionRule entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item direction
+=item abbr
 
-=item transproton
+=item mod_date
+
+=item name
+
+=item msid
 
 =back    
 

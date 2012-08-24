@@ -1,6 +1,9 @@
 package Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 use strict;
 use Bio::KBase::Exceptions;
+# Use Semantic Versioning (2.0.0-rc.1)
+# http://semver.org 
+our $VERSION = "0.1.0";
 
 =head1 NAME
 
@@ -36182,6 +36185,40 @@ sub get_relationship_IsUsedBy
 
 
 
+
+=head2 version 
+
+  $return = $obj->version()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$return is a string
+</pre>
+
+=end html
+
+=begin text
+
+$return is a string
+
+=end text
+
+=item Description
+
+Return the module version. This is a Semantic Versioning number.
+
+=back
+
+=cut
+
+sub version {
+    return $VERSION;
+}
 
 =head1 TYPES
 

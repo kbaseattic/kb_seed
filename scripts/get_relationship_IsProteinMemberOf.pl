@@ -41,20 +41,14 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Family entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ProteinSequence entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item type
-
-=item release
-
-=item family_function
-
-=item alignment
+=item sequence
 
 =back    
 
@@ -75,14 +69,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the ProteinSequence entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Family entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item sequence
+=item type
+
+=item release
+
+=item family_function
+
+=item alignment
 
 =back    
 

@@ -39,20 +39,14 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Trait entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item trait_name
-
-=item unit_of_measure
-
-=item TO_ID
-
-=item protocol
+=item source_id
 
 =back    
 
@@ -79,14 +73,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Contig entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Trait entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item source_id
+=item trait_name
+
+=item unit_of_measure
+
+=item TO_ID
+
+=item protocol
 
 =back    
 

@@ -41,12 +41,24 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Source entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Reaction entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
+
+=item mod_date
+
+=item name
+
+=item msid
+
+=item abbr
+
+=item equation
+
+=item reversibility
 
 =back    
 
@@ -67,24 +79,12 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Reaction entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Source entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
-
-=item mod_date
-
-=item name
-
-=item msid
-
-=item abbr
-
-=item equation
-
-=item reversibility
 
 =back    
 

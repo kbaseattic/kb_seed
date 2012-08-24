@@ -398,6 +398,7 @@ our %return_counts = (
         'get_relationship_WasSubmittedBy' => 1,
         'get_relationship_Uses' => 1,
         'get_relationship_IsUsedBy' => 1,
+        'version' => 1,
 );
 
 sub _build_valid_methods
@@ -789,6 +790,7 @@ sub _build_valid_methods
         'get_relationship_WasSubmittedBy' => 1,
         'get_relationship_Uses' => 1,
         'get_relationship_IsUsedBy' => 1,
+        'version' => 1,
     };
     return $methods;
 }

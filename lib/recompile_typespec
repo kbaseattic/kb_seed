@@ -11,4 +11,5 @@ dbd=/home/parrello/CdmiData/Published/KSaplingDBD.xml
 	-client Bio::KBase::CDMI::Client \
 	-js CDMI \
 	-py CDMI \
+	-url http://bio-data-1.mcs.anl.gov/services/cdmi_api \
 	CDMI-API.spec CDMI-EntityAPI.spec .

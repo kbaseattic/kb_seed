@@ -41,6 +41,38 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
+Choose a set of fields from the Variant entity to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item id
+
+=item role_rule
+
+=item code
+
+=item type
+
+=item comment
+
+=back    
+
+=item -rel field-list
+
+Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+strings. The following fields are available:
+
+=over 4
+
+=item from_link
+
+=item to_link
+
+=back    
+
+=item -to field-list
+
 Choose a set of fields from the Subsystem entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
@@ -63,38 +95,6 @@ strings. The following fields are available:
 =item cluster_based
 
 =item experimental
-
-=back    
-
-=item -rel field-list
-
-Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item from_link
-
-=item to_link
-
-=back    
-
-=item -to field-list
-
-Choose a set of fields from the Variant entity to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=item id
-
-=item role_rule
-
-=item code
-
-=item type
-
-=item comment
 
 =back    
 

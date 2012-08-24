@@ -44,24 +44,14 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the AlignmentTree entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ProteinSequence entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item alignment_method
-
-=item alignment_parameters
-
-=item alignment_properties
-
-=item tree_method
-
-=item tree_parameters
-
-=item tree_properties
+=item sequence
 
 =back    
 
@@ -90,14 +80,24 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the ProteinSequence entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the AlignmentTree entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item sequence
+=item alignment_method
+
+=item alignment_parameters
+
+=item alignment_properties
+
+=item tree_method
+
+=item tree_parameters
+
+=item tree_properties
 
 =back    
 

@@ -21,6 +21,7 @@
 package SeedUtils;
 use Carp;
 use Fcntl;
+use Data::Dumper;
 
 #
 # In case we are running in a SEED, pull in the FIG_Config
@@ -844,6 +845,37 @@ sub file_head {
     }
 }
 
+
+=head3 flatten_dumper
+
+    FIG::flatten_dumper( $perl_ref_or_object_1, ... );
+
+    $fig->flatten_dumper( $perl_ref_or_object_1, ... );
+
+Takes a list of perl references or objects, and "flattens" their Data::Dumper() output
+so that it can be printed on a single line.
+
+=cut
+
+sub flatten_dumper {
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    my @x = @_;
+    my $x;
+
+    foreach $x (@x)
+    {
+	$x = Dumper($x);
+
+	$x =~ s/\$VAR\d+\s+\=\s+//o;
+	$x =~ s/\n//gso;
+	$x =~ s/\s+/ /go;
+	$x =~ s/\'//go;
+#       $x =~ s/^[^\(\[\{]+//o;
+#       $x =~ s/[^\)\]\}]+$//o;
+    }
+
+    return @x;
+}
 
 
 =head3 genome_of

@@ -40,20 +40,20 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Reagent entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item abbr
+=item stoichiometry
 
-=item mod_date
+=item cofactor
 
-=item name
+=item compartment_index
 
-=item msid
+=item transport_coefficient
 
 =back    
 
@@ -72,20 +72,20 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Reagent entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Compartment entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item stoichiometry
+=item abbr
 
-=item cofactor
+=item mod_date
 
-=item compartment_index
+=item name
 
-=item transport_coefficient
+=item msid
 
 =back    
 
