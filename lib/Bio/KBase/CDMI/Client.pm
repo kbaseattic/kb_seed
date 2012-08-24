@@ -33,7 +33,7 @@ sub new
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
     $ua->timeout($timeout);
     bless $self, $class;
-    $self->_validate_version();
+    #    $self->_validate_version();
     return $self;
 }
 
