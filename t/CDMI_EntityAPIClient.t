@@ -4,25 +4,32 @@ use Test::More;
 use Data::Dumper;
 use Carp;
 use Bio::KBase::CDMI::Client;
+use Cwd;
 
-#  Test 1 - Is the object in the right class?
+#  Test 1 - Can the CDMI_EntityAPIClient be created?
 my $cdmie = Bio::KBase::CDMI::Client->new("http://localhost:7032");
+#my $cdmie = Bio::KBase::CDMI::Client->new("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
 ok( defined $cdmie, "Can the CDMI_EntityAPIClient be created?" );               
+
 #  Test 2 - Is the object in the right class?
-#isa_ok( $cdmie, 'CDMI_EntityAPIClient', "Is it in the right class" );
+isa_ok( $cdmie, 'Bio::KBase::CDMI::Client', "Is it in the right class" );
+
 #Database scheme XML file tests and parsing
 #  Test 3 - Does the database scheme file exist
-print $0."\n";;
-my $path = $0;
+my $path = Cwd::abs_path($0);
 if ($path =~ m/(.+\/)[^\/]+$/) {
 	$path = $1;
 }
-my $schemeFile = $path."../lib/KSaplingDBD.xml";
-print $schemeFile."\n";
+
+my $schemeFile = $path."../lib/KSaplingDBD_Published.xml";
+#print $schemeFile."\n";
 ok( -e $schemeFile, "Does the KBase CDM xml spec exist?" );
+
+# READ the schemeFile and create method to test
 if (!-e $schemeFile) {
 	exit();	
 }
+
 open (INPUT, "<",$schemeFile);
 my $entityMap;
 while (my $Line = <INPUT>) {
@@ -33,7 +40,11 @@ while (my $Line = <INPUT>) {
 	}
 }
 close(INPUT);
+
 #  Test 4 - Do functions exist in the API for every entity and relationship in the database?
+#	The should be an all_entities_ and get_entity_ for every entity and
+#	a get_relationship_ for every relationship in the schemeFile
+note("Test for methods all_entities_, get_entity_ and get_relationship_ ");
 foreach my $entity (keys(%{$entityMap})) {
 	can_ok($cdmie,"all_entities_".$entity);
 	can_ok($cdmie,"get_entity_".$entity);
@@ -51,10 +62,12 @@ foreach my $entity (keys(%{$entityMap})) {
 		$output = $cdmie->$function(0,10,["id"]);
 		return 1;
 	};
-	#  Test 4 - Does the all_entities function run?
+	#  Test - Does the all_entities function run?
 	ok( $result == 1, "Did all_entities_".$entity." successfully run?" );
-	#  Test 5 - Does the all_entities function return results?
+
+	#  Test - Does the all_entities function return results?
 	ok( defined $output, "Does the all_entities_".$entity." call return results?" );
+
 	$entityResults->{$entity}->{count} = keys(%{$output});
 	if ($entityResults->{$entity}->{count} == 0) {
 		print "No objects of type ".$entity." in database. No further tests of this object are possible.\n";
@@ -68,7 +81,7 @@ foreach my $entity (keys(%{$entityMap})) {
 			$output = $cdmie->$function([$object->{id}],["id"]);
 			return 1;
 		};
-		#  Test 7 - Does the get_entity function run?
+		#  Test - Does the get_entity function run?
 		ok( defined($result) && $result == 1, "Did get_entity_".$entity." successfully run?" );
 		ok( defined $output->{$object->{id}}->{id}, "Does get_entity_".$entity." return an id of the first object?" );
 		#  RELATIONSHIP TESTS: Now we test each relationship one at a time;
@@ -79,7 +92,7 @@ foreach my $entity (keys(%{$entityMap})) {
 				$output = $cdmie->$function([$object->{id}],["id"],[],["id"]);
 				return 1;
 			};
-			#  Test 7 - Does the get_entity function run?
+			#  Test - Does the get_entity function run?
 			ok( defined($result) && $result == 1, "Did get_relationship_".$relationship." successfully run?" );
 			ok( defined $output, "Does get_relationship_".$relationship." return a result?" );
 			if (!defined($output->[0])) {
