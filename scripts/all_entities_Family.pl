@@ -11,25 +11,21 @@ use Carp;
 
 Return all instances of the Family entity.
 
-The Kbase will support the maintenance of protein families (as sets of Features
-with associated translations).  We are initially only supporting the notion of a family
-as composed of a set of isofunctional homologs.  That is, the families we
-initially support should be thought of as containing protein-encoding genes whose
-associated sequences all implement the same function
-(we do understand that the notion of "function" is somewhat ambiguous, so let
-us sweep this under the rug by calling a functional role a "primitive concept").
+The Kbase will support the maintenance of protein families
+(as sets of Features with associated translations).  We are
+initially only supporting the notion of a family as composed of
+a set of isofunctional homologs.  That is, the families we
+initially support should be thought of as containing
+protein-encoding genes whose associated sequences all implement
+the same function (we do understand that the notion of "function"
+is somewhat ambiguous, so let us sweep this under the rug by
+calling a functional role a "primitive concept").
 We currently support families in which the members are
-translations of features, and we think of Features as
-having an associated function. Identical protein sequences
+protein sequences as well. Identical protein sequences
 as products of translating distinct genes may or may not
-have identical functions, and we allow multiple members of
-the same Family to share identical protein sequences.  This
-may be justified, since in a very, very, very few cases
-identical proteins do, in fact, have distinct functions.
-We would prefer to reach the point where our Families are
-sets of protein sequence, rather than sets of
-protein-encoding Features.
-
+have identical functions.  This may be justified, since
+in a very, very, very few cases identical proteins do, in
+fact, have distinct functions.
 
 Example:
 

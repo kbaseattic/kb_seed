@@ -226,7 +226,7 @@ member does not exist in the KBase, nothing will be returned.
 
 =cut
 
-sub ResolveFeatureMembers {
+sub ResolveFeatureMember {
     # Get the parameters.
     my ($self, $loader, $memberID) = @_;
     # The return values will be stored in here.

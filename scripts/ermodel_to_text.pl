@@ -26,11 +26,11 @@ If set, convert all entity, relationship, and field names to a decamelized form.
 
 =head2 Output Format
 
-The output is a tab-delimited file. It contains blocks of data delimited by 
+The output is a tab-delimited file. It contains blocks of data delimited by
 lines containing only the string "//".
 
 Each block of data describes either an entity or a relationship. A single line
-defines the entity or relationship name and the associated metadata. The 
+defines the entity or relationship name and the associated metadata. The
 remaining lines in the block define the field data associated with the entity or relationship.
 
 An entity line contains the following fields:
@@ -93,7 +93,7 @@ for my $e ($doc->findnodes('//Entities/Entity'))
 
     my $keytype = $e->getAttribute("keyType");
     $etypes{$name} = $keytype;
-    
+
     print join("\t", "entity", $name_conv), "\n";
     print join("\t", 'id', $keytype, ''), "\n";
     for my $fn ($e->findnodes('Fields/Field'))
@@ -128,7 +128,7 @@ for my $r ($doc->findnodes('//Relationships/Relationship'))
 
     print join("\t", 'from_link', $from_type, ''), "\n";
     print join("\t", 'to_link', $to_type, ''), "\n";
-    
+
     for my $fn ($r->findnodes('Fields/Field'))
     {
 	my $fname = $fn->getAttribute("name");

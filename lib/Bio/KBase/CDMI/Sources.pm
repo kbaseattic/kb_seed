@@ -35,6 +35,18 @@ my @TYPED = qw(
                 MOL
               );
 
+=head3 SEMI-TYPED
+
+This is a list of the sources that are semi-typed. A source is semi-typed
+if it is untyped for contigs, genomes, and features, but typed for
+everything else.
+
+=cut
+
+my @SEMI_TYPED = qw(
+                 EnsemblPlant
+                 );
+
 =head2 Special Methods
 
 =head3 new
@@ -59,8 +71,9 @@ sub new {
     my ($class, $source) = @_;
     # Determine whether or not we're genome-based.
     my $genomeBased = ((grep { $_ eq $source } @NON_GENOME_BASED) ? 0 : 1);
-    # Determine whether or not we're typed.
-    my $typed = ((grep { $_ eq $source } @TYPED) ? 1 : 0);
+    # Determine whether or not we're typed (2), untyped (0), or
+    # semi-typed (1).
+    my $typed = ((grep { $_ eq $source } @TYPED) ? 2 : (grep { $_ eq $source } @SEMI_TYPED) ? 1 : 0);
     # Create the object.
     my $retVal = {
             genomeBased => $genomeBased,

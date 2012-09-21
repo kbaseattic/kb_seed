@@ -85,21 +85,9 @@
           <Notes>computed charge based on the location instance pH
           and similar constraints</Notes>
         </Field>
-        <Field name="deltaG" type="float">
-          <Notes>free energy of formation of the compound adjusted
-          to pH of the containing compartment</Notes>
-        </Field>
-        <Field name="deltaG-error" type="float">
-          <Notes>the uncertainty in the [b]deltaG[/b] value (units are
-          kcal/mol)</Notes>
-        </Field>
         <Field name="formula" type="string">
           <Notes>computed chemical formula for this compound based
           on the location instance pH and similar constraints</Notes>
-        </Field>
-        <Field name="source-id" type="float">
-          <Notes>ID of the compound instance in the resource from which
-          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -123,10 +111,6 @@
           <Notes>portion of a gram of this biomass (expressed as a
           fraction of 1.0) that is DNA</Notes>
         </Field>
-        <Field name="rna" type="float">
-          <Notes>portion of a gram of this biomass (expressed as a
-          fraction of 1.0) that is RNA</Notes>
-        </Field>
         <Field name="protein" type="float">
           <Notes>portion of a gram of this biomass (expressed as a
           fraction of 1.0) that is protein</Notes>
@@ -148,10 +132,6 @@
           <Notes>number of ATP molecules hydrolized per gram of
           this biomass</Notes>
         </Field>
-        <Field name="source-id" type="float">
-          <Notes>ID of the biomass reaction in the resource from which
-          it was added</Notes>
-        </Field>
       </Fields>
     </Entity>
     <Entity name="ReactionInstance" keyType="string">
@@ -171,10 +151,6 @@
           reaction, these protons end up in the reaction instance's
           main location. If the number is negative, then the protons
           are consumed by the reaction rather than being produced.</Notes>
-        </Field>
-        <Field name="source-id" type="float">
-          <Notes>ID of the reaction instance in the resource from which
-          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -209,13 +185,9 @@
         <Field name="compound-count" type="int">
           <Notes>number of compounds in the model</Notes>
         </Field>
-        <Field name="feature-count" type="int">
-          <Notes>number of features associated with or more reactions in
+        <Field name="annotation-count" type="int">
+          <Notes>number of features associated with one or more reactions in
           the model</Notes>
-        </Field>
-        <Field name="source-id" type="float">
-          <Notes>ID of the model in the resource from which
-          it was added</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -225,7 +197,7 @@
         <RegionInfo name="Models" row="9" col="3" />
         <RegionInfo name="" row="3" col="5" />
         <RegionInfo name="Subsystem" row="1" col="1" />
-        <RegionInfo name="Alignments" row="1" col="2" />
+        <RegionInfo name="Alignments" row="1" col="3" />
       </DisplayInfo>
       <Notes>A source is a user or organization that is permitted to
       assign its own identifiers or to submit bioinformatic objects
@@ -271,19 +243,15 @@
         <Field name="name" type="string">
           <Notes>descriptive name of the media</Notes>
         </Field>
-        <Field name="description" type="string">
-          <Notes>description of the media condition</Notes>
+        <Field name="is-minimal" type="boolean">
+          <Notes>TRUE if this is a minimal media, else FALSE</Notes>
         </Field>
-		<Field name="solid" type="boolean">
-          <Notes>Whether the media is solid (True) or liquid (False).</Notes>
+        <Field name="source-id" type="string">
+          <Notes>The ID of the media used by the data source.</Notes>
         </Field>
-        <Field name="is-defined" type="boolean">
-          <Notes>TRUE if this media condition is defined (all components explicitly
-          known)</Notes>
+        <Field name="type" type="string">
+          <Notes>The general category of the media.</Notes>
         </Field>
-		<Field name="source-id" type="string">
-        <Notes>The ID of the media used by the data source.</Notes>
-      </Field>
       </Fields>
     </Entity>
     <Entity name="Location" keyType="string">
@@ -403,9 +371,9 @@
           the group contribution method (units are kcal/mol)</Notes>
         </Field>
         <Field name="deltaG-error" type="float">
-          <Notes>uncertainty the [b]deltaG[/b] value (units are kcal/mol)</Notes>
+          <Notes>uncertainty in the [b]deltaG[/b] value (units are kcal/mol)</Notes>
         </Field>
-        <Field name="thermodynamic-reversibility" type="char">
+        <Field name="thermodynamic-reversibility" type="string">
           <Notes>computed reversibility of this reaction in a
           pH-neutral environment</Notes>
         </Field>
@@ -440,12 +408,6 @@
       location, it will frequently only be represented by the
       cytoplasmic versions of the compounds; however, a transport
       always uses specifically located compounds.</Notes>
-      <Fields>
-        <Field name="label" type="string">
-          <Notes>primary name of the localized compound, for use in displaying
-          reactions</Notes>
-        </Field>
-      </Fields>
     </Entity>
     <Entity name="Complex" keyType="string">
       <DisplayInfo theme="navy" col="3" row="3">
@@ -563,7 +525,8 @@
       protocols. Annotators attach publications to ProteinSequences.
       The attached publications give an ID (usually a
       DOI or Pubmed ID),  a URL to the paper (when we have it), and a title
-      (when we have it).</Notes>
+      (when we have it). Pubmed IDs are given unmodified. DOI IDs
+      are prefixed with [b]doi:[/b], e.g. [i]doi:1002385[/i].</Notes>
       <Asides>The criteria we have used to gather protein sequence
       connections is a bit nonstandard.  We have sought to attach publications
       to ProteinSequences when the publication includes an expert asserting
@@ -583,9 +546,6 @@
         </Field>
         <Field name="pubdate" type="date">
           <Notes>publication date of the article</Notes>
-        </Field>
-		<Field name="source-id" type="string">
-		  <Notes>The ID of the publication used by the data source.</Notes>
         </Field>
       </Fields>
       <FulltextIndexes>
@@ -644,7 +604,7 @@
         <RegionInfo name="" row="3" col="1" />
         <RegionInfo name="Chemistry" row="7" col="2" />
         <RegionInfo name="Annotations" row="5" col="1" />
-        <RegionInfo name="Alignments" col="4" row="5" />
+        <RegionInfo name="Alignments" col="4" row="6" />
       </DisplayInfo>
       <Notes>We use the concept of ProteinSequence as an amino acid
       string with an associated MD5 value.  It is easy to access the
@@ -764,6 +724,7 @@
         <RegionInfo name="Models" row="1" col="5" />
         <RegionInfo name="GenoPheno" row="1" col="4" />
         <RegionInfo name="MicrobePheno" row="7" col="3" />
+        <RegionInfo name="Alignments" row="6" col="6" />
       </DisplayInfo>
       <Notes>The Kbase houses a large and growing set of genomes.  We
       often have multiple genomes that have identical DNA.  These usually
@@ -854,6 +815,36 @@
         </Index>
       </Indexes>
     </Entity>
+    <Entity name="CodonUsage" keyType="string">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" row="8" col="6" 
+        			caption="Codon Usage" />
+      </DisplayInfo>
+      <Notes>This entity contains information about the codon usage
+      frequency in a particular genome with respect to a particular
+      type of analysis (e.g. high-expression genes, modal, mean, 
+      etc.).</Notes>
+      <Fields>
+        <Field name="frequencies" type="long-string">
+          <Notes>A packed-string representation of the codon usage
+          frequencies. These are not global frequencies, but rather
+          frequenicy of use relative to other codons that produce
+          the same amino acid.</Notes>
+        </Field>
+        <Field name="genetic-code" type="int">
+          <Notes>Genetic code used for these codons.</Notes>
+        </Field>
+        <Field name="type" type="string">
+          <Notes>Type of frequency analysis: average, modal,
+          high-expression, or non-native.</Notes>
+        </Field>
+        <Field name="subtype" type="string">
+          <Notes>Specific nature of the codon usage with respect
+          to the given type, generally indicative of how the
+          frequencies were computed.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
     <Entity name="Annotation" keyType="string">
       <DisplayInfo col="3" row="11" theme="black">
         <RegionInfo name="Annotations" row="1" col="1" />
@@ -919,7 +910,7 @@
     <Entity name="ContigSequence" keyType="string">
       <DisplayInfo theme="red" caption="Contig\nSequence">
         <RegionInfo name="" row="7" col="3" />
-        <RegionInfo name="Alignments" row="7" col="4" />
+        <RegionInfo name="Alignments" row="8" col="4" />
       </DisplayInfo>
       <Notes>ContigSequences are strings of DNA.  Contigs have an
       associated genome, but ContigSequences do not.  We can think
@@ -1446,15 +1437,16 @@
           <Notes>date and time the alignment was loaded</Notes>
         </Field>
         <Field name="method" type="string">
-          <Notes>name of the method used to produce the alignment</Notes>
+          <Notes>name of the primary software package or script used
+          to construct the alignment</Notes>
         </Field>
         <Field name="parameters" type="long-string">
-          <Notes>free-form string containing the parameters used to
-          produce the alignment</Notes>
+          <Notes>non-default parameters used as input to the software
+	  package or script indicated in the method attribute</Notes>
         </Field>
         <Field name="protocol" type="text">
-          <Notes>description of the protocol used to produce the
-          alignment</Notes>
+          <Notes>description of the steps taken to construct the alignment,
+          or a reference to an external pipeline</Notes>
         </Field>
         <Field name="source-id" type="string">
           <Notes>ID of this alignment in the source database</Notes>
@@ -1463,16 +1455,34 @@
     </Entity>
     <Entity name="AlignmentAttribute" keyType="string">
       <DisplayInfo theme="purple" caption="Alignment\nAttribute">
+        <RegionInfo name="Alignments" row="1" col="1" />
+      </DisplayInfo>
+      <Notes>This entity represents an attribute type that can
+      be assigned to an alignment. The attribute
+      values are stored in the relationships to the target. The
+      key is the attribute name.</Notes>
+    </Entity>
+    <Entity name="TreeNodeAttribute" keyType="string">
+      <DisplayInfo theme="purple" caption="Tree Node\nAttribute">
+        <RegionInfo name="Alignments" row="1" col="5" />
+      </DisplayInfo>
+      <Notes>This entity represents an attribute type that can
+      be assigned to a node. The attribute
+      values are stored in the relationships to the target. The
+      key is the attribute name.</Notes>
+    </Entity>
+    <Entity name="TreeAttribute" keyType="string">
+      <DisplayInfo theme="purple" caption="Tree\nAttribute">
         <RegionInfo name="Alignments" row="1" col="4" />
       </DisplayInfo>
       <Notes>This entity represents an attribute type that can
-      be assigned to an alignment, tree, or node. The attribute
+      be assigned to a tree. The attribute
       values are stored in the relationships to the target. The
       key is the attribute name.</Notes>
     </Entity>
     <Entity name="AlignmentRow" keyType="string">
       <DisplayInfo theme="purple" caption="Alignment\nRow">
-        <RegionInfo name="Alignments" row="5" col="2" />
+        <RegionInfo name="Alignments" row="7" col="2" />
       </DisplayInfo>
       <Notes>This entity represents a single row of an alignment.
       In general, this corresponds to a sequence, but in a
@@ -1530,11 +1540,16 @@
           <Notes>date and time the tree was loaded</Notes>
         </Field>
         <Field name="method" type="string">
-          <Notes>name of the method used to produce the tree</Notes>
+          <Notes>name of the primary software package or script used
+          to construct the tree</Notes>
         </Field>
         <Field name="parameters" type="long-string">
-          <Notes>free-form string containing the parameters used to
-          produce the tree</Notes>
+          <Notes>non-default parameters used as input to the software
+	  package or script indicated in the method attribute</Notes>
+        </Field>
+        <Field name="protocol" type="text">
+          <Notes>description of the steps taken to construct the tree,
+          or a reference to an external pipeline</Notes>
         </Field>
         <Field name="source-id" type="string">
           <Notes>ID of this tree in the source database</Notes>
@@ -1771,6 +1786,57 @@
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="Treed" from="Source" to="Tree" arity="1M"
+    			  converse="IsTreeFrom">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Treed" />
+      </DisplayInfo>
+      <Notes>This relationship connects a tree to the source database from
+      which it was generated.</Notes>
+    </Relationship>
+    <Relationship name="UsesCodons" from="Genome" to="CodonUsage" arity="1M"
+    			  converse="AreCodonsFor">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" caption="Uses\nCodons" />
+      </DisplayInfo>
+      <Notes>This relationship connects a genome to the various codon usage
+      records for it.</Notes>
+    </Relationship>
+    <Relationship name="IsModifiedToBuildTree" from="Tree"
+      to="Tree" arity="1M" converse="IsModificationOfTree">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" col="4" row="4" fixed="1"
+                    caption="Is Modified\nTo Build\nTree" />
+      </DisplayInfo>
+      <Notes>Relates a tree to other trees built from it.</Notes>
+      <Fields>
+        <Field name="modification-type" type="string">
+          <Notes>description of how the tree was modified (rerooted,
+          annotated, etc.)</Notes>
+        </Field>
+        <Field name="modification-value" type="string">
+          <Notes>description of any parameters used to derive the
+          modification</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="IsModifiedToBuildAlignment" from="Alignment"
+      to="Alignment" arity="1M" converse="IsModificationOfAlignment">
+      <DisplayInfo theme="purple">
+        <RegionInfo name="Alignments" col="3" row="4" fixed="1"
+                    caption="Is Modified\nTo Build\nAlignment" />
+      </DisplayInfo>
+      <Notes>Relates an alignment to other alignments built from it.</Notes>
+      <Fields>
+        <Field name="modification-type" type="string">
+          <Notes>description of how the alignment was modified</Notes>
+        </Field>
+        <Field name="modification-value" type="string">
+          <Notes>description of any parameters used to derive the
+          modification</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
     <Relationship name="DerivedFromStrain" from="Strain"
       to="Strain" arity="1M" converse="StrainParentOf">
       <DisplayInfo theme="gray">
@@ -1895,8 +1961,11 @@
         <Field name="concentration" type="float">
           <Notes>concentration of the compound in the media</Notes>
         </Field>
-        <Field name="units" type="string">
-          <Notes>vol%, g/L, or molar (mol/L).</Notes>
+        <Field name="maximum-flux" type="float">
+          <Notes>maximum allowed increase in this compound</Notes>
+        </Field>
+        <Field name="minimum-flux" type="float">
+          <Notes>maximum allowed decrease in this compound</Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -1925,15 +1994,27 @@
       </DisplayInfo>
       <Notes>This relationship connects an alignment to the alignments
       it replaces.</Notes>
+      <Fields>
+        <Field name="successor-type" type="string">
+          <Notes>Indicates whether sequences were removed or added
+          to create the new alignment.</Notes>
+        </Field>
+      </Fields>
     </Relationship>
     <Relationship name="SupersedesTree" converse="IsSupersededByTree"
       arity="1M" from="Tree" to="Tree">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Trees" fixed="1" caption="Supersedes\nTree"
+        <RegionInfo name="Alignments" fixed="1" caption="Supersedes\nTree"
           row="3" col="5" />
       </DisplayInfo>
       <Notes>This relationship connects a tree to the trees
       it replaces.</Notes>
+      <Fields>
+        <Field name="successor-type" type="string">
+          <Notes>Indicates whether sequences were removed or added
+          to create the new tree.</Notes>
+        </Field>
+      </Fields>
     </Relationship>
     <Relationship name="IncludesAlignmentRow" converse="IsAlignmentRowIn"
       arity="1M" from="Alignment" to="AlignmentRow">
@@ -1957,7 +2038,7 @@
       </Fields>
     </Relationship>
     <Relationship name="DescribesTree" converse="HasTreeAttribute"
-      arity="MM" from="AlignmentAttribute" to="Tree">
+      arity="MM" from="TreeAttribute" to="Tree">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Describes\nTree" />
       </DisplayInfo>
@@ -1970,7 +2051,7 @@
       </Fields>
     </Relationship>
     <Relationship name="DescribesTreeNode" converse="HasNodeAttribute"
-      arity="MM" from="AlignmentAttribute" to="Tree">
+      arity="MM" from="TreeNodeAttribute" to="Tree">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Describes\nTree Node"
           fixed="1" row="2" col="5" />
@@ -2270,16 +2351,18 @@
     <Relationship name="ConsistsOfCompounds" from="Compound"
       to="Compound" arity="MM" converse="ComponentOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="MicrobePheno" caption="Consists Of\nCompounds" 
+        <RegionInfo name="MicrobePheno" caption="Consists Of\nCompounds"
                     row="8" col="6" fixed="1"/>
       </DisplayInfo>
       <Notes>This relationship defines the subcompounds that make up a
       compound. For example, CoCl2-6H2O is made up of 1 Co2+, 2 Cl-, and
       6 H2O.</Notes>
         <Fields>
-          <Field name="coefficient" type="float">
+          <Field name="molar-ratio" type="float">
           <Notes>Number of molecules of the subcompound that make up
-          the compound.</Notes>
+          the compound. A -1 in this field signifies that although
+          the subcompound is present in the compound, the molar
+          ratio is unknown.</Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -2493,8 +2576,8 @@
           <Notes>TRUE if the role is not necessarily required to trigger the
           complex, else FALSE</Notes>
         </Field>
-        <Field name="type" type="char">
-          <Notes>a character code that is used to determine whether a complex
+        <Field name="type" type="string">
+          <Notes>a string code that is used to determine whether a complex
           should be added to a model</Notes>
         </Field>
         <Field name="triggering" type="boolean">
@@ -2510,31 +2593,6 @@
       </DisplayInfo>
       <Notes>This relationship links a role to a feature that provides a typical
       example of how the role is implemented.</Notes>
-    </Relationship>
-    <Relationship name="ProjectsOnto" from="ProteinSequence"
-      to="ProteinSequence" arity="MM" converse="IsProjectedOnto">
-      <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" caption="Projects\nOnto"
-          fixed="1" row="5" col="5" />
-      </DisplayInfo>
-      <Notes>This relationship connects two protein sequences for which a clear
-      bidirectional best hit exists in known genomes. The attributes of the
-      relationship describe how good the relationship is between the proteins.
-      The relationship is bidirectional and symmetric, but is only stored in
-      one direction (lower ID to higher ID).</Notes>
-      <Fields>
-        <Field name="gene-context" type="counter">
-          <Notes>number of homologous genes in the immediate context of the
-          two proteins, up to a maximum of 10</Notes>
-        </Field>
-        <Field name="percent-identity" type="float">
-          <Notes>percent match between the two protein sequences</Notes>
-        </Field>
-        <Field name="score" type="float">
-          <Notes>score describing the strength of the projection, from 0 to 1,
-          where 1 is the best</Notes>
-        </Field>
-      </Fields>
     </Relationship>
     <Relationship name="IsCoupledTo" arity="MM" from="Family"
       to="Family" converse="IsCoupledWith">

@@ -10,17 +10,10 @@ use Carp;
 
 =head1 get_entity_ContigChunk
 
-ContigChunks are strings of DNA thought of as being a string in a 4-character alphabet
-with an associated ID.  We allow a broader alphabet that includes U (for RNA) and
+ContigChunks are strings of DNA thought of as being a
+string in a 4-character alphabet with an associated ID.  We
+allow a broader alphabet that includes U (for RNA) and
 the standard ambiguity characters.
-The notion of ContigChunk was introduced to avoid transferring/manipulating
-huge contigs to access small substrings.  A ContigSequence is formed by
-concatenating a set of one or more ContigChunks.  Thus, ContigChunks are the
-basic units moved from the database to memory.  Their existence should be
-hidden from users in most circumstances (users are expected to request
-substrings of ContigSequences, and the Kbase software locates the appropriate
-ContigChunks).
-
 
 Example:
 

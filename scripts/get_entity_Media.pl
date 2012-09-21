@@ -43,6 +43,8 @@ The Media entity has the following relationship links:
 
 =item IsUtilizedIn Experiment
 
+=item UsedBy Environment
+
 
 =back
 
@@ -69,6 +71,10 @@ strings. The following fields are available:
 
 =item name
 
+=item is_minimal
+
+=item source_id
+
 =item type
 
 =back    
@@ -88,7 +94,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name', 'type' );
+my @all_fields = ( 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Media [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

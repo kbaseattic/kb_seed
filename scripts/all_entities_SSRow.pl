@@ -11,12 +11,12 @@ use Carp;
 
 Return all instances of the SSRow entity.
 
-An SSRow (that is, a row in a subsystem spreadsheet) represents a collection of
-functional roles present in the Features of a single Genome.  The roles are part
-of a designated subsystem, and the fids associated with each role are included in the row,
-That is, a row amounts to an instance of a subsystem as it exists in a specific, designated
-genome.
-
+An SSRow (that is, a row in a subsystem spreadsheet)
+represents a collection of functional roles present in the
+Features of a single Genome.  The roles are part of a designated
+subsystem, and the features associated with each role are included
+in the row. That is, a row amounts to an instance of a subsystem as
+it exists in a specific, designated genome.
 
 Example:
 

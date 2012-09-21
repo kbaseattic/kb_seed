@@ -11,13 +11,14 @@ use Carp;
 
 Return all instances of the ContigSequence entity.
 
-ContigSequences are strings of DNA.  Contigs have an associated
-genome, but ContigSequences do not..   We can think of random samples of DNA as a set of ContigSequences.
-There are no length constraints imposed on ContigSequences -- they can be either
-very short or very long.  The basic unit of data that is moved to/from the database
-is the ContigChunk, from which ContigSequences are formed. The key
-of a ContigSequence is the sequence's MD5 identifier.
-
+ContigSequences are strings of DNA.  Contigs have an
+associated genome, but ContigSequences do not.  We can think
+of random samples of DNA as a set of ContigSequences. There
+are no length constraints imposed on ContigSequences -- they
+can be either very short or very long.  The basic unit of data
+that is moved to/from the database is the ContigChunk, from
+which ContigSequences are formed. The key of a ContigSequence
+is the sequence's MD5 identifier.
 
 Example:
 
@@ -33,6 +34,8 @@ The ContigSequence entity has the following relationship links:
 =over 4
     
 =item HasSection ContigChunk
+
+=item IsAlignedDNAComponentOf AlignmentRow
 
 =item IsSequenceOf Contig
 

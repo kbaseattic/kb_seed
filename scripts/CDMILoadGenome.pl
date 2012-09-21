@@ -44,7 +44,7 @@ A FASTA file containing the DNA sequences for the contigs.
 A tab-delimited file with one line for each feature. The first column
 contains the feature ID, the second contains the feature type,
 the third contains the feature location, the fourth contains an optional
-parent feature ID, and the fifth contains an optional subset ID,
+parent feature ID, the fifth contains an optional subset ID,
 and the remaining columns contain alternate identifiers for the feature.
 
 =item functions.tab
@@ -198,7 +198,9 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 my ($recursive, $newOnly, $clear, $id_server_url);
 # Turn off buffering for progress messages.
 $| = 1;
-
+if ($ENV{LC_ALL} ne 'C') {
+    die "You must set LC_ALL=C in your environment to run this program.\n";
+}
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
         "clear" => \$clear, "idserver=s" => \$id_server_url);
@@ -272,11 +274,7 @@ Load a single genome from the specified genome directory.
 
 =item loader
 
-L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
-
-=item source
-
-Source database the genome came from.
+L<Bio::KBase::CDMI::CDMILoader> object to help manage the load.
 
 =item genomeDirectory
 
@@ -602,10 +600,10 @@ sub LoadFeatures {
     # column, so we sort them and use standard merge logic.
     my $featFileName = $loader->genome_load_file_name($genomeDirectory, 'features.tab');
     my $funcFileName = $loader->genome_load_file_name($genomeDirectory, 'functions.tab');
-    open(my $feath, "sort \"$featFileName\" |") || die "Could not open features file: $!\n";
+    open(my $feath, "sort -k 1,1 \"$featFileName\" |") || die "Could not open features file: $!\n";
     my ($fid1, $type, $locations, $parent, $subset, @aliases) = $loader->GetLine($feath);
     $fidCount++;
-    open(my $funch, "sort \"$funcFileName\" |") || die "Could not open functions file: $!\n";
+    open(my $funch, "sort -k 1,1 \"$funcFileName\" |") || die "Could not open functions file: $!\n";
     $stats->Add(functionLines => 1);
     my ($fid2, $function) = $loader->GetLine($funch);
 
@@ -641,9 +639,17 @@ sub LoadFeatures {
             if (defined $function) {
                 $fidFunction = $function;
             }
-            # Advance the function file to the next entry.
-            ($fid2, $function) = $loader->GetLine($funch);
+            # Advance the function file to the next entry. Due to a bug
+            # in the sort, we discard duplicates. These are generated
+            # by the bug.
+            my $newFid2;
+            ($newFid2, $function) = $loader->GetLine($funch);
+            while (defined $newFid2 && $newFid2 eq $fid2) {
+                ($newFid2, $function) = $loader->GetLine($funch);
+                $stats->Add(dupFuncLine => 1);
+            }
             $stats->Add(functionLines => 1);
+            $fid2 = $newFid2;
         }
         # If this feature has aliases, save them.
         if (@aliases) {
@@ -669,7 +675,7 @@ sub LoadFeatures {
             $batchSize = 0;
         }
         # Get the next feature in the feature file.
-        ($fid1, $type, $locations) = $loader->GetLine($feath);
+        ($fid1, $type, $locations, $parent, $subset, @aliases) = $loader->GetLine($feath);
         $fidCount++;
     }
     # Process the residual batch.

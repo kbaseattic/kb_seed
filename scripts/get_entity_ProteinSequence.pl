@@ -10,12 +10,13 @@ use Carp;
 
 =head1 get_entity_ProteinSequence
 
-We use the concept of ProteinSequence as an amino acid string with an associated
-MD5 value.  It is easy to access the set of Features that relate to a ProteinSequence.
-While function is still associated with Features (and may be for some time), publications
-are associated with ProteinSequences (and the inferred impact on Features is through
-the relationship connecting ProteinSequences to Features).
-
+We use the concept of ProteinSequence as an amino acid
+string with an associated MD5 value.  It is easy to access the
+set of Features that relate to a ProteinSequence.  While function
+is still associated with Features (and may be for some time),
+publications are associated with ProteinSequences (and the inferred
+impact on Features is through the relationship connecting
+ProteinSequences to Features).
 
 Example:
 
@@ -45,15 +46,11 @@ The ProteinSequence entity has the following relationship links:
 
 =item IsATopicOf Publication
 
-=item IsAlignedBy AlignmentTree
-
-=item IsProjectedOnto ProteinSequence
+=item IsAlignedProteinComponentOf AlignmentRow
 
 =item IsProteinFor Feature
 
 =item IsProteinMemberOf Family
-
-=item ProjectsOnto ProteinSequence
 
 
 =back

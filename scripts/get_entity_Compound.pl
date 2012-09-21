@@ -37,7 +37,11 @@ The Compound entity has the following relationship links:
 
 =over 4
     
-=item HasUsage BiomassCompound
+=item ComponentOf Compound
+
+=item ConsistsOfCompounds Compound
+
+=item IncludedIn Environment
 
 =item IsPresentIn Media
 
@@ -45,7 +49,7 @@ The Compound entity has the following relationship links:
 
 =item IsTerminusFor Scenario
 
-=item ParticipatesAs Reagent
+=item ParticipatesAs LocalizedCompound
 
 =item UsesAliasForCompound Source
 
@@ -75,17 +79,21 @@ strings. The following fields are available:
 
 =item abbr
 
-=item msid
+=item source_id
 
 =item ubiquitous
 
 =item mod_date
 
-=item uncharged_formula
+=item mass
 
 =item formula
 
-=item mass
+=item charge
+
+=item deltaG
+
+=item deltaG_error
 
 =back    
 
@@ -104,7 +112,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'label', 'abbr', 'msid', 'ubiquitous', 'mod_date', 'uncharged_formula', 'formula', 'mass' );
+my @all_fields = ( 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Compound [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

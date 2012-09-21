@@ -11,14 +11,15 @@ use Carp;
 
 Query the entity Contig.
 
-A contig is thought of as composing a part of the DNA associated with a specific
-genome.  It is represented as an ID (including the genome ID) and a ContigSequence.
-We do not think of strings of DNA from, say, a metgenomic sample as "contigs",
-since there is no associated genome (these would be considered ContigSequences).
-This use of the term "ContigSequence", rather than just "DNA sequence", may turn out
-to be a bad idea.  For now, you should just realize that a Contig has an associated
+A contig is thought of as composing a part of the DNA
+associated with a specific genome.  It is represented as an ID
+(including the genome ID) and a ContigSequence. We do not think
+of strings of DNA from, say, a metgenomic sample as "contigs",
+since there is no associated genome (these would be considered
+ContigSequences). This use of the term "ContigSequence", rather
+than just "DNA sequence", may turn out to be a bad idea.  For now,
+you should just realize that a Contig has an associated
 genome, but a ContigSequence does not.
-
 
 Example:
 

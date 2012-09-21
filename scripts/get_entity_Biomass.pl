@@ -13,7 +13,8 @@ use Carp;
 A biomass is a collection of compounds in a specific
 ratio and in specific compartments that are necessary for a
 cell to function properly. The prediction of biomasses is key
-to the functioning of the model.
+to the functioning of the model. Each biomass belongs to
+a specific model.
 
 Example:
 
@@ -39,7 +40,7 @@ The Biomass entity has the following relationship links:
 
 =over 4
     
-=item IsComprisedOf BiomassCompound
+=item IsComprisedOf CompoundInstance
 
 =item IsManagedBy Model
 
@@ -69,6 +70,18 @@ strings. The following fields are available:
 
 =item name
 
+=item dna
+
+=item protein
+
+=item cell_wall
+
+=item lipid
+
+=item cofactor
+
+=item energy
+
 =back    
 
 =back
@@ -86,7 +99,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name' );
+my @all_fields = ( 'mod_date', 'name', 'dna', 'protein', 'cell_wall', 'lipid', 'cofactor', 'energy' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Biomass [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

@@ -69,7 +69,7 @@ eval { use Data::Dumper };  # Not in all installations
 #     alignment => \@alignment  #  alignment if not supplied as parameter
 #     colors    => \%colors     #  character colors (html spec.)
 #     literal   => \%literals   #  ids of sequences to be printed literally
-#     pallet    =>  $pallet     #  ale | gde | default
+#     pallet    =>  $pallet     #  ale | gde | none | default
 #     protein   =>  $bool       #  indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
@@ -328,7 +328,7 @@ sub repad_alignment
 #     alignment => \@alignment  #  alignment if not supplied as parameter
 #     colors    => \%colors     #  character colors (html spec.)
 #     literal   => \%literals   #  ids of sequences to be printed literally
-#     pallet    =>  $pallet     #  ale | gde | default
+#     pallet    =>  $pallet     #  ale | gde | none | default
 #     protein   =>  $bool       #  indicates a protein alignment
 #
 #-------------------------------------------------------------------------------
@@ -348,9 +348,9 @@ sub color_alignment_by_residue
     }
 
     my $colors = $data{ color };
-    if ( $colors && ( ref( $colors ) eq 'HASH' ) )
+    if ( $colors && ( ref( $colors ) ne 'HASH' ) )
     {
-        print STDERR "color_alignment_by_residue called without invalid colors hash\n";
+        print STDERR "color_alignment_by_residue called with invalid colors hash\n";
         return ();
     }
 
@@ -1191,6 +1191,10 @@ sub aa_colors
              E  => '#fa8072',  # Salmon
              );
     }
+    elsif ( $pallet =~ /none/i )
+    {
+        %colors = ();
+    }
     else
     {
         %colors = (
@@ -1275,6 +1279,10 @@ sub nt_colors
              T  => '#00ff00',  # Green
              U  => '#00ff00',  # Green
              );
+    }
+    elsif ( $pallet =~ /none/i )
+    {
+        %colors = ();
     }
     else
     {

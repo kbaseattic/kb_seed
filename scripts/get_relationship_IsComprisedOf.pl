@@ -9,8 +9,8 @@ use Carp;
 
 =head1 get_relationship_IsComprisedOf
 
-This relationship connects a biomass to the compound
-specifications that define it.
+This relationship connects a biomass composition reaction to the
+compounds specified as contained in the biomass.
 
 Example:
 
@@ -51,6 +51,18 @@ strings. The following fields are available:
 
 =item name
 
+=item dna
+
+=item protein
+
+=item cell_wall
+
+=item lipid
+
+=item cofactor
+
+=item energy
+
 =back    
 
 =item -rel field-list
@@ -64,18 +76,22 @@ strings. The following fields are available:
 
 =item to_link
 
+=item coefficient
+
 =back    
 
 =item -to field-list
 
-Choose a set of fields from the BiomassCompound entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the CompoundInstance entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item coefficient
+=item charge
+
+=item formula
 
 =back    
 
@@ -94,9 +110,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name' );
-my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'coefficient' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'dna', 'protein', 'cell_wall', 'lipid', 'cofactor', 'energy' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'coefficient' );
+my @all_to_fields = ( 'id', 'charge', 'formula' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

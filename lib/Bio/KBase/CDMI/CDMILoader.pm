@@ -152,7 +152,7 @@ sub ReadFastaRecord {
         # Check for a header.
         if (substr($line,0,1) eq '>') {
             # This is a header line. Save the ID and comment.
-            ($nextID, $nextComment) = split /\s+/, substr($line, 1), 2;
+            ($nextID, $nextComment) = split m/\s+/, substr($line, 1), 2;
         } else {
             # This is a data line. Save the sequence.
             push @lines, $line;
@@ -323,6 +323,67 @@ sub ConvertTime {
     # Return the result.
     return $retVal;
 }
+
+=head3 DoubleIdCheck
+
+    my $actualKBID = Bio::KBase::CDMI::CDMILoader::DoubleIdCheck($stats, $sourceID, $kbID, \%idMap);
+
+or
+
+    my $actualKBID = $loader->DoubleIdCheck($stats, $sourceID, $kbID, \%idMap);
+
+Select the KBase ID from a pair of link fields. In such cases, the first
+field contains the source ID and the second contains a KBase ID. One or
+the other of the IDs may be blank or missing, in which case the other one
+is used. The KBase ID will be prefered if both IDs are present. If only
+the source ID is present, the specified ID map will be used to translate
+it.
+
+=over 4
+
+=item stats
+
+A L<Stats> object that will be updated to indicate how the ID was computed.
+
+=item sourceID (optional)
+
+The source ID of the target object.
+
+=item kbID (optional)
+
+The KBase ID of the target object.
+
+=item idMap
+
+Reference to a hash mapping source IDs to KBase IDs.
+
+=item RETURN
+
+Returns the KBase ID of the target object.
+
+=back
+
+=cut
+
+sub DoubleIdCheck {
+    # Get the parameters. Note we allow for both static and object-oriented
+    # calls.
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    my ($stats, $sourceID, $kbID, $idMap) = @_;
+    # Declare the return variable.
+    my $retVal;
+    # Default to the incoming KBase ID.
+    if ($kbID) {
+        $stats->Add(kbLinkUsed => 1);
+        $retVal = $kbID;
+    } elsif ($sourceID) {
+        $stats->Add(sourceLinkUsed => 1);
+        $retVal = $idMap->{$sourceID};
+    }
+    # Return the result.
+    return $retVal;
+}
+
 
 =head2 Special Methods
 
@@ -541,6 +602,7 @@ sub LoadRelations {
     # Loop through the loaders in the user-specified order, processing
     # one relation at a time.
     for my $relationName (@{$self->{relationList}}) {
+        print "Loading $relationName.\n";
         # Get the relation's file handle and file name.
         my $fh = $relations->{$relationName}[0];
         my $fileName = $fh->filename;
@@ -598,7 +660,7 @@ sub genome_load_file_name {
     # Only Check for a genome-altered file if we have a genome ID.
     if ($genome) {
         # Compute the genome-altered file name.
-        my @parts = split  /\./, $name;
+        my @parts = split  m/\./, $name;
         my $extension = pop @parts;
         my $altName = $directory . "/" . join(".", @parts, $genome, $extension);
         # Check to see if it exists.
@@ -743,14 +805,21 @@ sub InsureEntity {
     my ($self, $entityType, $id, %fields) = @_;
     # Get the database.
     my $cdmi = $self->cdmi;
+    # Get the statistics object.
+    my $stats = $self->stats;
     # Denote we haven't created a new record.
     my $retVal = 0;
-    # It's not found. Check the database.
+    # Check the database.
     if (! $cdmi->Exists($entityType => $id)) {
         # It's not in the database, so create it.
         $cdmi->InsertObject($entityType, id => $id, %fields);
-        $self->stats->Add(insertSupport => 1);
+        $stats->Add(insertSupport => 1);
+        $stats->Add("$entityType-added" => 1);
         $retVal = 1;
+    } else {
+        # It's in the database. Record the stats.
+        $stats->Add(supportFound => 1);
+        $stats->Add("$entityType-found" => 1);
     }
     # Return the insertion indicator.
     return $retVal;
@@ -807,7 +876,7 @@ sub DeleteRelatedRecords {
 
 =head3 ConvertFileRecord
 
-    $loader->ConvertFileRecord($objectName, $source, \@fileRecord,
+    $loader->ConvertFileRecord($objectName, \@fileRecord,
                                \%rules);
 
 Convert a file record to a database record. The parameters specify
@@ -819,10 +888,6 @@ converting them.
 =item objectName
 
 Name of the output object (entity or relationship).
-
-=item source
-
-Source database to be used in constructing KBase IDs.
 
 =item fileRecord
 
@@ -860,20 +925,29 @@ Copy the second half of the value.
 
 =back
 
+As a shorthand, a single number is equivalent to the number, 'copy',
+and an undefined value (no default).
+
 =back
 
 =cut
 
 sub ConvertFileRecord {
     # Get the parameters.
-    my ($self, $objectName, $source, $fileRecord, $rules) = @_;
+    my ($self, $objectName, $fileRecord, $rules) = @_;
     # This will contain the field mapping for the InsertObject call.
     my %fields;
     # Get the CDMI database.
     my $cdmi = $self->cdmi;
     # Loop through the rules.
     for my $fieldName (keys %$rules) {
-        my ($loc, $rule, $default) = @{$rules->{$fieldName}};
+        my $ruleSpec = $rules->{$fieldName};
+        my ($loc, $rule, $default);
+        if (ref $ruleSpec eq 'ARRAY') {
+            ($loc, $rule, $default) = @$ruleSpec;
+        } else {
+            ($loc, $rule) = ($ruleSpec, 'copy');
+        }
         # The output value will be put in here.
         my $outputValue = $default;
         # Get the specified input field. If the input field spec is
@@ -890,7 +964,7 @@ sub ConvertFileRecord {
             } elsif ($rule eq 'timeStamp') {
                 $outputValue = ConvertTime($inputValue);
             } elsif ($rule eq 'kbid') {
-                my $hash = $self->FindKBaseIDs($source, '', [$inputValue]);
+                my $hash = $self->FindKBaseIDs('', [$inputValue]);
                 $outputValue = $hash->{$inputValue};
             } elsif ($rule eq 'copy1') {
                 $outputValue = substr($inputValue, 0, length($inputValue)/2);
@@ -905,6 +979,81 @@ sub ConvertFileRecord {
     }
     # Insert the record.
     $self->InsertObject($objectName, %fields);
+}
+
+=head3 SimpleLoad
+
+    $loader->SimpleLoad($inDirectory, $fileName, $tableName, $instructions, $header);
+
+Load a table from a tab-delimited file according to a set of
+instructions.
+
+=over 4
+
+=item inDirectory
+
+Input directory containing the file.
+
+=item fileName
+
+Name of the file containing the data to load.
+
+=item tableName
+
+Name of the table being loaded.
+
+=item instructions
+
+Instructions for loading a record from the file, in the same format
+as for L</ConvertFileRecord>.
+
+=item header
+
+If TRUE, the first input record is a header that will be skipped.
+
+=item optional
+
+If TRUE, the file is considered optional, and if it is not found, no error
+will be generated.
+
+=back
+
+=cut
+
+sub SimpleLoad {
+    # Get the parameters.
+    my ($self, $inDirectory, $fileName, $tableName, $instructions, $header, $optional) = @_;
+    # Get the statistics object.
+    my $stats = $self->stats;
+    # Do we have an input file?
+    my $fullFileName = "$inDirectory/$fileName";
+    if (! -f $fullFileName) {
+        # No. Is it optional?
+        if ($optional) {
+            # Yes. Write a message.
+            print "File $fullFileName not found: skipped.\n";
+            $stats->Add(fileNotFound => 1);
+        } else {
+            # No. We have an error.
+            die "Required file $fullFileName not found.\n";
+        }
+    } else {
+        # Open the input file.
+        open(my $ih, "<$fullFileName") || die "Could not open $fileName: $!\n";
+        print "Processing $fileName.\n";
+        # Skip the header record, if necessary.
+        if ($header) {
+            $self->GetLine($ih);
+        }
+        # Loop through the data records.
+        while (! eof $ih) {
+            my @fields = $self->GetLine($ih);
+            $stats->Add(($fileName . 'In') => 1);
+            $self->ConvertFileRecord($tableName, \@fields, $instructions);
+            $stats->Add(($tableName . "Out") => 1);
+        }
+        close $ih;
+    }
 }
 
 =head2 KBase ID Services
@@ -944,7 +1093,7 @@ calling for the KBase ID.
 
 =item genome
 
-ID of the genome currently being loaded.
+Original (source) ID of the genome currently being loaded.
 
 =back
 
@@ -955,6 +1104,32 @@ sub SetGenome {
     my ($self, $genome) = @_;
     # Store the proposed genome ID.
     $self->{genome} = $genome;
+}
+
+=head3 LookupGenome
+
+    my $genome = $loader->LookupGenome($genomeID);
+
+Look up the KBase ID of a genome. If the genome is not in the database,
+nothing will be returned.
+
+=over 4
+
+=back
+
+=cut
+
+sub LookupGenome {
+    # Get the parameters.
+    my ($self, $genomeID) = @_;
+    # Get the CDMI database.
+    my $cdmi = $self->cdmi;
+    # Look up the genome using the source ID.
+    my ($retVal) = $cdmi->GetFlat("Submitted Genome",
+            'Submitted(from_link) = ? AND Genome(source_id) = ?',
+            [$self->source, $genomeID], 'Genome(id)');
+    # Return the result (if any).
+    return $retVal;
 }
 
 =head3 FindKBaseIDs
@@ -1131,13 +1306,16 @@ objects of the specified type.
 
 =cut
 
+use constant MAJOR => { Genome => 1, Contig => 1, Feature => 1 };
+
 sub realSource {
     # Get the parameters.
     my ($self, $type) = @_;
     # Start with the source name.
     my $retVal = $self->{sourceData}->name;
     # If we're typed, add the type.
-    if ($self->{sourceData}->typed) {
+    my $typeLevel = $self->{sourceData}->typed;
+    if ($typeLevel == 2 || $typeLevel == 1 && ! MAJOR->{$type}) {
         $retVal .= ":$type";
     }
     # Return the result.

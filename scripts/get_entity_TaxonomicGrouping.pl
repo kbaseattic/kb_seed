@@ -10,9 +10,11 @@ use Carp;
 
 =head1 get_entity_TaxonomicGrouping
 
-We associate with most genomes a "taxonomy" based on the NCBI taxonomy.
-This includes, for each genome, a list of ever larger taxonomic groups.
-
+We associate with most genomes a "taxonomy" based on
+the NCBI taxonomy. This includes, for each genome, a list of
+ever larger taxonomic groups. The groups are stored as
+instances of this entity, and chained together by the
+IsGroupFor relationship.
 
 Example:
 

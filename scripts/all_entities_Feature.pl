@@ -15,12 +15,11 @@ A feature (sometimes also called a gene) is a part of a
 genome that is of special interest. Features may be spread across
 multiple DNA sequences (contigs) of a genome, but never across more
 than one genome. Each feature in the database has a unique
-ID that functions as its ID in this table.
-Normally a Feature is just a single contigous region on a contig.
-Features have types, and an appropriate choice of available types
-allows the support of protein-encoding genes, exons, RNA genes,
-binding sites, pathogenicity islands, or whatever.
-
+ID that functions as its ID in this table. Normally a Feature is
+just a single contigous region on a contig. Features have types,
+and an appropriate choice of available types allows the support
+of protein-encoding genes, exons, RNA genes, binding sites,
+pathogenicity islands, or whatever.
 
 Example:
 
@@ -68,6 +67,8 @@ The Feature entity has the following relationship links:
 =item IsOwnedBy Genome
 
 =item IsRegulatedIn CoregulatedSet
+
+=item KnockedOutIn Strain
 
 =item Produces ProteinSequence
 

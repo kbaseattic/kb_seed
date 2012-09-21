@@ -783,6 +783,7 @@ sub newick_tip_count
 sub newick_tip_ref_list
 {
     my ( $node, $not_root ) = @_;
+    return wantarray ? () : [] if ! node_is_valid( $node );
 
     my $imax = newick_n_desc( $node );
     if ( $imax < 1 ) { return $node }
@@ -821,7 +822,7 @@ sub newick_tip_list
 sub newick_first_tip_ref
 {
     my ( $node, $not_root ) = @_;
-    valid_node( $node ) || return  undef;
+    node_is_valid( $node ) || return ();
 
     #  Arrived at tip, or start of a tip-rooted tree?
     my $n = newick_n_desc( $node );

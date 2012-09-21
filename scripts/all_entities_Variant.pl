@@ -11,11 +11,11 @@ use Carp;
 
 Return all instances of the Variant entity.
 
-Each subsystem may include the designation of distinct variants.  Thus,
-there may be three closely-related, but distinguishable forms of histidine
-degradation.  Each form would be called a "variant", with an associated code,
-and all genomes implementing a specific variant can easily be accessed.
-
+Each subsystem may include the designation of distinct
+variants.  Thus, there may be three closely-related, but
+distinguishable forms of histidine degradation.  Each form
+would be called a "variant", with an associated code, and all
+genomes implementing a specific variant can easily be accessed.
 
 Example:
 

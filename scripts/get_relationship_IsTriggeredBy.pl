@@ -9,8 +9,7 @@ use Carp;
 
 =head1 get_relationship_IsTriggeredBy
 
-A complex can be triggered by many roles. A role can
-trigger many complexes.
+This connects a complex to the roles that work together to form the complex.
 
 Example:
 
@@ -49,7 +48,7 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item mod_date
 
@@ -69,6 +68,8 @@ strings. The following fields are available:
 =item optional
 
 =item type
+
+=item triggering
 
 =back    
 
@@ -100,8 +101,8 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'name', 'msid', 'mod_date' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'optional', 'type' );
+my @all_from_fields = ( 'id', 'name', 'source_id', 'mod_date' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'optional', 'type', 'triggering' );
 my @all_to_fields = ( 'id', 'hypothetical' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;

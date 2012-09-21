@@ -55,17 +55,21 @@ strings. The following fields are available:
 
 =item abbr
 
-=item msid
+=item source_id
 
 =item ubiquitous
 
 =item mod_date
 
-=item uncharged_formula
+=item mass
 
 =item formula
 
-=item mass
+=item charge
+
+=item deltaG
+
+=item deltaG_error
 
 =back    
 
@@ -112,7 +116,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'label', 'abbr', 'msid', 'ubiquitous', 'mod_date', 'uncharged_formula', 'formula', 'mass' );
+my @all_from_fields = ( 'id', 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'group_number' );
 my @all_to_fields = ( 'id', 'common_name' );
 

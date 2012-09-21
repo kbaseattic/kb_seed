@@ -37,17 +37,15 @@ The Reaction entity has the following relationship links:
 
 =over 4
     
-=item Involves Reagent
+=item Involves LocalizedCompound
 
 =item IsDisplayedOn Diagram
 
-=item IsRequiredBy Requirement
+=item IsExecutedAs ReactionInstance
 
-=item IsUsedAs ReactionRule
+=item IsStepOf Complex
 
 =item ParticipatesIn Scenario
-
-=item RunsByDefaultIn Compartment
 
 =item UsesAliasForReaction Source
 
@@ -77,13 +75,21 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item abbr
 
-=item equation
+=item direction
 
-=item reversibility
+=item deltaG
+
+=item deltaG_error
+
+=item thermodynamic_reversibility
+
+=item default_protons
+
+=item status
 
 =back    
 
@@ -102,7 +108,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name', 'msid', 'abbr', 'equation', 'reversibility' );
+my @all_fields = ( 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Reaction [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";

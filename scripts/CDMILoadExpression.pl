@@ -218,9 +218,7 @@ sub LoadExpressionData {
     $loader->SetGenome($genomeID);
     # Convert it to KBase. If it's not in the database, we won't find it
     # and we'll skip it.
-    my ($genome) = $cdmi->GetFlat("Submitted Genome",
-            'Submitted(from_link) = ? AND Genome(source_id) = ?',
-            [$source, $genomeID], 'Genome(id)');
+    my $genome = $loader->LookupGenome($genomeID);
     if (! defined $genome) {
         print "Genome $genomeID not found.\n";
         $stats->Add(genomeNotFound => 1);

@@ -10,16 +10,13 @@ use Carp;
 
 =head1 get_entity_Genome
 
-The Kbase houses a large and growing set of genomes.  We often have multiple
-genomes that have identical DNA.  These usually have distinct gene calls and
-annotations, but not always.  We consider the Kbase to be a framework for
-managing hundreds of thousands of genomes and offering the tools needed to
-support compartive analysis on large sets of genomes, some of which are
-virtually identical.
-Each genome has an MD5 value computed from the DNA that is associated with the genome.
-Hence, it is easy to recognize when you have identical genomes, perhaps annotated
-by distinct groups.
-
+The Kbase houses a large and growing set of genomes.  We
+often have multiple genomes that have identical DNA.  These usually
+have distinct gene calls and annotations, but not always.  We
+consider the Kbase to be a framework for managing hundreds of
+thousands of genomes and offering the tools needed to
+support compartive analysis on large sets of genomes,
+some of which are virtually identical.
 
 Example:
 
@@ -45,6 +42,8 @@ The Genome entity has the following relationship links:
 
 =over 4
     
+=item GenomeParentOf Strain
+
 =item HadResultsProducedBy ProbeSet
 
 =item HasRepresentativeOf Family
@@ -64,6 +63,8 @@ The Genome entity has the following relationship links:
 =item IsReferencedBy ObservationalUnit
 
 =item Uses SSRow
+
+=item UsesCodons CodonUsage
 
 =item WasSubmittedBy Source
 

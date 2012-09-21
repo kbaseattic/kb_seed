@@ -11,13 +11,12 @@ use Carp;
 
 Query the entity CoregulatedSet.
 
-We need to represent sets of genes that are coregulated via some
-regulatory mechanism.  In particular, we wish to represent genes
-that are coregulated using transcription binding sites and
-corresponding transcription regulatory proteins.
-We represent a coregulated set (which may, or may not, be considered
-a regulon) using CoregulatedSet.
-
+We need to represent sets of genes that are coregulated via
+some regulatory mechanism.  In particular, we wish to represent
+genes that are coregulated using transcription binding sites and
+corresponding transcription regulatory proteins. We represent a
+coregulated set (which may, or may not, be considered a regulon)
+using CoregulatedSet.
 
 Example:
 

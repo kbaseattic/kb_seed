@@ -30,6 +30,8 @@ The Media entity has the following relationship links:
 
 =item IsUtilizedIn Experiment
 
+=item UsedBy Environment
+
 
 =back
 
@@ -89,6 +91,10 @@ strings. The following fields are available:
 
 =item name
 
+=item is_minimal
+
+=item source_id
+
 =item type
 
 =back    
@@ -107,7 +113,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name', 'type' );
+my @all_fields = ( 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 my $usage = "usage: query_entity_Media [-is field,value] [-like field,value] [-op operator,field,value] [-show-fields] [-a | -f field list] > entity.data";

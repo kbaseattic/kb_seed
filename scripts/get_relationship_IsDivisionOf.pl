@@ -9,8 +9,8 @@ use Carp;
 
 =head1 get_relationship_IsDivisionOf
 
-This relationship connects a model to the cell compartments
-that participate in the model.
+This relationship connects a model to its instances of
+subcellular locations that participate in the model.
 
 Example:
 
@@ -40,14 +40,14 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the ModelCompartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the LocationInstance entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item compartment_index
+=item index
 
 =item label
 
@@ -112,7 +112,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'compartment_index', 'label', 'pH', 'potential' );
+my @all_from_fields = ( 'id', 'index', 'label', 'pH', 'potential' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'mod_date', 'name', 'version', 'type', 'status', 'reaction_count', 'compound_count', 'annotation_count' );
 

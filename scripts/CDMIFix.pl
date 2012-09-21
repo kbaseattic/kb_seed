@@ -2,45 +2,47 @@
 
 use strict;
 use Bio::KBase::CDMI::CDMI;
+use Bio::KBase::CDMI::CDMILoader;
 use Stats;
+use Data::Dumper;
 
     $| = 1; # Prevent buffering on STDOUT.
     my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
+    # Collect the sources in here.
+    my %sources;
+    # Get a stats object.
     my $stats = Stats->new();
-    # Drop the old assertion tables.
-    my $dbh = $cdmi->{_dbh};
-    my @badTables = qw(Identifier Imported HasAssertionFrom IsNamedBy);
-    for my $table (@badTables) {
-        print "Dropping $table.\n";
-        $dbh->drop_table(tbl => $table);
-        $stats->Add(tablesDropped => 1);
-    }
-    # Create the new tables.
-    $cdmi->CreateTable('FeatureAlias');
-    $cdmi->CreateTable('AssertsFunctionFor');
-    # Loop through all the genomes.
-    my @genomePairs = $cdmi->GetAll('Submitted Genome', '', [], "Submitted(from-link) Genome(id)");
-    print scalar(@genomePairs) . " genomes found in database.\n";
-    for my $genomePair (@genomePairs) {
-        my ($source, $genome) = @$genomePair;
-        $stats->Add($source => 1);
-        $stats->Add(foundGenome => 1);
-        print "Processing $genome from $source.\n";
-        if ($source eq 'MOL') {
-            # If this is an MOL genome, delete it.
-            print "Deleting $genome.\n";
-            my $newStats = $cdmi->Delete(Genome => $genome);
-            $stats->Accumulate($newStats);
-            $stats->Add(deletedGenome => 1);
-        } else {
-            # Otherwise, convert pegs to CDSs.
-            my @fids = $cdmi->GetFlat('Feature', 'Feature(id) LIKE ? AND Feature(feature-type) = ?',
-                ["$genome.%", 'peg'], 'id');
-            print scalar(@fids) . " pegs found in $genome.\n";
-            for my $fid (@fids) {
-                $cdmi->UpdateEntity(Feature => $fid, feature_type => 'CDS');
-                $stats->Add(pegFix => 1);
-            }
+    # Loop through the alias-from relationships.
+    for my $rel (qw(HasCompoundAliasFrom HasReactionAliasFrom)) {
+        print "Processing $rel\n";
+        $stats->Add(rels => 1);
+        my @sources = $cdmi->GetFlat($rel, "", [], 'from-link');
+        print scalar(@sources) . " source records found.\n";
+        for my $source (@sources) {
+            $sources{$source} = 1;
+            $stats->Add(sourceIn => 1);
         }
     }
+    # Delete the bad sources.
+    my @badSources = $cdmi->GetFlat("Source", "Source(id) LIKE ?",
+            ['kb|%'], 'id');
+    print scalar(@badSources) . " bad sources found.\n";
+    print "Deleting bad sources.\n";
+    for my $badSource (@badSources) {
+        $stats->Add(badSource => 1);
+        my $newStats = $cdmi->Delete(Source => $badSource);
+        $stats->Accumulate($newStats);
+    }
+    # Add the good sources.
+    print "Adding good sources.\n";
+    for my $source (sort keys %sources) {
+        if ($cdmi->Exists(Source => $source)) {
+            $stats->Add(sourceFound => 1);
+        } else {
+            $cdmi->InsertObject('Source', id => $source);
+            $stats->Add(sourceAdded => 1);
+        }
+    }
+    # All print.
     print "All done:\n" . $stats->Show();
+

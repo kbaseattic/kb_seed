@@ -352,20 +352,51 @@ feature's DNA.
 sub GetLocations {
     # Get the parameters.
     my ($self, $fid) = @_;
+    # Get this feature's locations.
+    my @locs = $self->GetAll("IsLocatedIn",
+                       'IsLocatedIn(from_link) = ? ORDER BY IsLocatedIn(ordinal)',
+                       [$fid], "to-link begin dir len");
+    # Format them into location strings.
+    my @retVal = FormatLocations(@locs);
+    # Return the result.
+    return @retVal;
+}
+
+=head3 FormatLocations
+
+    my @locStrings = FormatLocations(@locs);
+
+Convert a list of location information read from the database into a list
+of location objects.
+
+=over 4
+
+=item locs
+
+List of 4-tuples for all the location components in a given feature. Each
+4-tuple contains (0) the contig ID, (1) the index of the leftmost base pair
+in the location, (2) the strand identifier (C<+> or C<->), and (3) the number
+of base pairs.
+
+=item RETURN
+
+Returns a list of L<BasicLocation> objects for the contiguous sections of the
+incoming location.
+
+=back
+
+=cut
+
+sub FormatLocations {
+    # Get the parameters.
+    my (@locs) = @_;
     # Declare the return variable.
     my @retVal;
     # This will contain the last location found.
     my $lastLoc;
-    # Get this feature's locations.
-    my $qh = $self->Get("IsLocatedIn",
-                       'IsLocatedIn(from_link) = ? ORDER BY IsLocatedIn(ordinal)',
-                       [$fid]);
-    while (my $resultRow = $qh->Fetch()) {
+    for my $resultRow (@locs) {
         # Compute the contig ID and other information.
-        my $contig = $resultRow->PrimaryValue('to-link');
-        my $begin = $resultRow->PrimaryValue('begin');
-        my $dir = $resultRow->PrimaryValue('dir');
-        my $len = $resultRow->PrimaryValue('len');
+        my ($contig, $begin, $dir, $len) = @$resultRow;
         # Create a location from the location information.
         my $start = ($dir eq '+' ? $begin : $begin + $len - 1);
         my $loc = BasicLocation->new($contig, $start, $dir, $len);

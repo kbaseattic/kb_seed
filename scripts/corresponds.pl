@@ -14,6 +14,11 @@ Example:
 
     corresponds [-a cutoff] genome-1 genome-2
 
+This command produces a correspondence between genes in genome=1 and genome-2.
+It is often the case that you wish to know which gene in genome X "corresponds" to a specific
+gene in genome Y.  Frequently the term "ortholog" is used, although not always accurately.
+Here we offer a basic tool that produces a reasonable estimate for the set of genes that
+form a 1-1 correspondence. 
 
 =head2 Command-Line Options
 
@@ -21,9 +26,9 @@ Example:
 
 =item -a Cutoff
 
-This requests an abbreviated format in which only two columns are added:
+This requests an abbreviated format in which only two columns are written:
 the projection score and the fid in the target genome.  If this is not
-used 10 column are added.  The Cutoff specifies a minimum projection score.
+used 10 column are produced.  The Cutoff specifies a minimum projection score.
 
 =item genome-1
 
@@ -39,10 +44,33 @@ KBase genome IDs.
 
 The standard output is a tab-delimited file. It consists of the input
 file with extra columns added.  If the abbreviated format is requested,
-two columns get added (sc and the fid projected to).  If the abbreviated
-format is not requested, ten columns will be added 
+two columns get written (sc and the fid projected to).  If the abbreviated
+format is not requested, ten columns will be written
 
-[percent-identity,matching-context,b1,e1,ln1,b2,e2,ln2,sc,to-fid]
+    1  - percent-identity: the average percent identity over the
+         range of the match
+
+    2  - the number of genes in the five adjacent genes to the left and
+         the five adjacent genes to the right (i.e., the number of genes in 
+         the "chromosomal context") that correspond to genes in genome-2 which
+         occur within the chromosomal context of id2
+
+    3   - b1, the start of the match in the protein encoded by the gene in genome -1
+
+    4   - e1, the end of the match in the protein encoded by the gene in genome-1
+
+    5   - ln1, the length of the protein encoded by the gene in genome-1
+
+    6   - b2
+
+    7   - e2
+
+    8   - ln2
+
+    9   - a score between 0 and 1 that reflects the reliability of the
+          projection
+
+    10  - id2, the corresponding gene in genome-2
 
 Input lines that cannot be extended are written to stderr.
 

@@ -9,9 +9,8 @@ use Carp;
 
 =head1 get_relationship_IsStepOf
 
-This relationship connects a complex to the reaction
-rules for the reactions that work together to make the complex
-happen.
+This relationship connects a complex to the reactions it
+catalyzes.
 
 Example:
 
@@ -41,16 +40,32 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the ReactionRule entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Reaction entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
+=item mod_date
+
+=item name
+
+=item source_id
+
+=item abbr
+
 =item direction
 
-=item transproton
+=item deltaG
+
+=item deltaG_error
+
+=item thermodynamic_reversibility
+
+=item default_protons
+
+=item status
 
 =back    
 
@@ -78,7 +93,7 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item mod_date
 
@@ -99,9 +114,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'direction', 'transproton' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'name', 'msid', 'mod_date' );
+my @all_to_fields = ( 'id', 'name', 'source_id', 'mod_date' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

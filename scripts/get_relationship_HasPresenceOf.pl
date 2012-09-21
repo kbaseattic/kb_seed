@@ -52,6 +52,10 @@ strings. The following fields are available:
 
 =item name
 
+=item is_minimal
+
+=item source_id
+
 =item type
 
 =back    
@@ -69,9 +73,9 @@ strings. The following fields are available:
 
 =item concentration
 
-=item minimum_flux
-
 =item maximum_flux
+
+=item minimum_flux
 
 =back    
 
@@ -88,17 +92,21 @@ strings. The following fields are available:
 
 =item abbr
 
-=item msid
+=item source_id
 
 =item ubiquitous
 
 =item mod_date
 
-=item uncharged_formula
+=item mass
 
 =item formula
 
-=item mass
+=item charge
+
+=item deltaG
+
+=item deltaG_error
 
 =back    
 
@@ -117,9 +125,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'type' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'minimum_flux', 'maximum_flux' );
-my @all_to_fields = ( 'id', 'label', 'abbr', 'msid', 'ubiquitous', 'mod_date', 'uncharged_formula', 'formula', 'mass' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'maximum_flux', 'minimum_flux' );
+my @all_to_fields = ( 'id', 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

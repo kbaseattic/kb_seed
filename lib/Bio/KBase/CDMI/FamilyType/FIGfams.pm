@@ -89,7 +89,7 @@ Name of the directory containing the load files.
 
 sub ProcessAdditionalFiles {
     # Get the parameters.
-    my ($loader, $directory) = @_;
+    my ($self, $loader, $directory) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Now we process the coupling values.

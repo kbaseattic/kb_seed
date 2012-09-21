@@ -16,7 +16,6 @@ the roles present in a specific pathway), with an associated subsystem spreadshe
 which encodes the fids in each genome that implement the functional roles in the
 subsystem.
 
-
 Example:
 
     query_entity_Subsystem -a 

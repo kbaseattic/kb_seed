@@ -10,16 +10,12 @@ use Carp;
 
 =head1 get_entity_Publication
 
-Annotators attach publications to ProteinSequences.  The criteria we have used
-to gather such connections is a bit nonstandard.  We have sought to attach publications
-to ProteinSequences when the publication includes an expert asserting a belief or estimate
-of function.  The paper may not be the original characterization.  Further, it may not
-even discuss a sequence protein (much of the literature is very valuable, but reports
-work on proteins in strains that have not yet been sequenced).  On the other hand,
-reports of sequencing regions of a chromosome (with no specific assertion of a
-clear function) should not be attached.  The attached publications give an ID (usually a
-Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it).
-
+Experimenters attach publications to experiments and
+protocols. Annotators attach publications to ProteinSequences.
+The attached publications give an ID (usually a
+DOI or Pubmed ID),  a URL to the paper (when we have it), and a title
+(when we have it). Pubmed IDs are given unmodified. DOI IDs
+are prefixed with [b]doi:[/b], e.g. [i]doi:1002385[/i].
 
 Example:
 
@@ -46,6 +42,10 @@ The Publication entity has the following relationship links:
 =over 4
     
 =item Concerns ProteinSequence
+
+=item PublishedExperiment PhenotypeExperiment
+
+=item PublishedProtocol Protocol
 
 
 =back

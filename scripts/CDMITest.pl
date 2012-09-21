@@ -23,6 +23,7 @@
     use Data::Dumper;
     use Bio::KBase::CDMI::CDMI;
     use Bio::KBase::CDMI::CDMILoader;
+    use Bio::KBase::CDMI::CDMI_APIImpl;
 
 =head1 CDMI Test Script
 
@@ -38,13 +39,8 @@ my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    # Get the CDMI loader.
-    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    # Get the plant genome IDs.
-    my @genomes = $cdmi->GetFlat('Submitted', 'Submitted(from-link) = ?',
-            ['EnsemblPlant'], 'to-link');
-    for my $genome (@genomes) {
-        my $stats = $cdmi->Delete(Genome => $genome);
-        print "$genome deleted:\n" . $stats->Show();
-    }
+    my $kb = Bio::KBase::CDMI::CDMI_APIImpl->new($cdmi);
+    my @fids = qw(kb|g.2.peg.0 kb|g.2.peg.1 kb|g.2.peg.2);
+    my $retHash = $kb->fids_to_feature_data(\@fids);
+    Data::Dumper::Dump($retHash);
 }

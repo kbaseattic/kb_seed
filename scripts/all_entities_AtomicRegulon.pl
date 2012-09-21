@@ -11,24 +11,11 @@ use Carp;
 
 Return all instances of the AtomicRegulon entity.
 
-An atomic regulon is an indivisible group of coregulated features
-on a single genome. Atomic regulons are constructed so that a given feature
-can only belong to one. Because of this, the expression levels for
-atomic regulons represent in some sense the state of a cell.
-An atomicRegulon is a set of protein-encoding genes that
-are believed to have identical expression profiles (i.e.,
-they will all be expressed or none will be expressed in the
-vast majority of conditions).  These are sometimes referred
-to as "atomic regulons".  Note that there are more common
-notions of "coregulated set of genes" based on the notion
-that a single regulatory mechanism impacts an entire set of
-genes. Since multiple other mechanisms may impact
-overlapping sets, the genes impacted by a regulatory
-mechanism need not all share the same expression profile.
-We use a distinct notion (CoregulatedSet) to reference sets
-of genes impacted by a single regulatory mechanism (i.e.,
-by a single transcription regulator).
-
+An atomic regulon is an indivisible group of coregulated
+features on a single genome. Atomic regulons are constructed so
+that a given feature can only belong to one. Because of this, the
+expression levels for atomic regulons represent in some sense the
+state of a cell.
 
 Example:
 

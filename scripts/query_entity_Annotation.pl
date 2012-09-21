@@ -11,11 +11,11 @@ use Carp;
 
 Query the entity Annotation.
 
-An annotation is a comment attached to a feature. Annotations
-are used to track the history of a feature's functional assignments
-and any related issues. The key is the feature ID followed by a
-colon and a complemented ten-digit sequence number.
-
+An annotation is a comment attached to a feature.
+Annotations are used to track the history of a feature's
+functional assignments and any related issues. The key is
+the feature ID followed by a colon and a complemented ten-digit
+sequence number.
 
 Example:
 

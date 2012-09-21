@@ -52,13 +52,21 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item abbr
 
-=item equation
+=item direction
 
-=item reversibility
+=item deltaG
+
+=item deltaG_error
+
+=item thermodynamic_reversibility
+
+=item default_protons
+
+=item status
 
 =back    
 
@@ -105,7 +113,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'msid', 'abbr', 'equation', 'reversibility' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'type' );
 my @all_to_fields = ( 'id', 'common_name' );
 

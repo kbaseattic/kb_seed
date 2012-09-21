@@ -38,6 +38,8 @@ The Source entity has the following relationship links:
 
 =over 4
     
+=item Aligned Alignment
+
 =item AssertsFunctionFor ProteinSequence
 
 =item Formulated CoregulatedSet
@@ -49,6 +51,8 @@ The Source entity has the following relationship links:
 =item Provided Subsystem
 
 =item Submitted Genome
+
+=item Treed Tree
 
 
 =back

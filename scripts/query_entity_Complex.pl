@@ -24,7 +24,7 @@ The Complex entity has the following relationship links:
 
 =over 4
     
-=item HasStep ReactionRule
+=item HasStep Reaction
 
 =item IsTriggeredBy Role
 
@@ -85,7 +85,7 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item mod_date
 
@@ -105,7 +105,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'name', 'msid', 'mod_date' );
+my @all_fields = ( 'name', 'source_id', 'mod_date' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 my $usage = "usage: query_entity_Complex [-is field,value] [-like field,value] [-op operator,field,value] [-show-fields] [-a | -f field list] > entity.data";

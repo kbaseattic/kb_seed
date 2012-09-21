@@ -271,7 +271,7 @@ sub CreateSubsystem {
             # Connect to the next class up.
             $i--;
             my $nextClass = $classes[$i];
-            $cdmi->InsertObject('IsSuperClassOf', from_link => $nextClass, to_link => $thisClass);
+            $cdmi->InsertObject('IsSuperclassOf', from_link => $nextClass, to_link => $thisClass);
             # Insure the next class is in the database.
             $createdFlag = $loader->InsureEntity(SubsystemClass => $nextClass);
         }
@@ -353,13 +353,11 @@ sub CreateSubsystem {
     if ($lastClass) {
         $cdmi->InsertObject('IsClassFor', from_link => $lastClass, to_link => $name);
     }
-    # Now we create the subsystem's variants. We need to compute IDs
-    # for them.
+    # Now we create the subsystem's variants.
     print "Creating variants.\n";
-    my @varKeys = map { "$digest:$_" } keys %varHash;
     for my $variant (keys %varHash) {
         # Find the variant's KBase ID.
-        my $varKey = "$name:$variant";
+        my $varKey = "$digest:$variant";
         # Save it in the return hash.
         $retVal{$variant} = $varKey;
         # Connect the variant to the subsystem.
@@ -499,11 +497,9 @@ sub ParseSpreadsheet {
                 $done = 1;
             } elsif ($genome) {
                 # Check for a region string.
-                my ($genomeID, $regionString) = split /:/, $genome;
+                my ($genomeID, $regionString) = split m/:/, $genome;
                 # Insure this genome exists in the database.
-                my ($genomeKBID) = $cdmi->GetFlat("Submitted Genome",
-                    'Submitted(from_link) = ? AND Genome(source_id) = ?',
-                    [$source, $genome], 'Submitted(to_link)');
+                my $genomeKBID = $loader->LookupGenome($genomeID);
                 if (! $genomeKBID) {
                     $stats->Add(genomeNotFound => 1);
                 } else {
@@ -519,6 +515,8 @@ sub ParseSpreadsheet {
                         # must create it.
                         $variantID = "$digest:$realVariant";
                         $varHash->{$realVariant} = $variantID;
+                        $cdmi->InsertObject('Describes', from_link => $subsysID,
+                                to_link => $variantID);
                         $cdmi->InsertObject('Variant', id => $variantID, code => $realVariant,
                                 comment => "", type => "normal");
                         $stats->Add(variantNotInNotes => 1);

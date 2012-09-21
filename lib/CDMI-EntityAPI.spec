@@ -5,64 +5,82 @@ typedef string rectangle;
 
 typedef structure {
 	string id;
-	string alignment_method nullable;
-	string alignment_parameters nullable;
-	string alignment_properties nullable;
-	string tree_method nullable;
-	string tree_parameters nullable;
-	string tree_properties nullable;
-} fields_AlignmentTree ;
+	int n_rows nullable;
+	int n_cols nullable;
+	string status nullable;
+	int is_concatenation nullable;
+	string sequence_type nullable;
+	string timestamp nullable;
+	string method nullable;
+	string parameters nullable;
+	string protocol nullable;
+	string source_id nullable;
+} fields_Alignment ;
 
 /*
-An alignment arranges a group of protein sequences so that they
+An alignment arranges a group of sequences so that they
 match. Each alignment is associated with a phylogenetic tree that
-describes how the sequences developed and their evolutionary distance.
-The actual tree and alignment FASTA are stored in separate flat files.
-The Kbase will maintain a set of alignments and associated
-trees.  The majority
-of these will be based on protein sequences.  We will not have a comprehensive set
-but we will have tens of thousands of such alignments, and we view them as an
-imporant resource to support annotation.
-The alignments/trees will include the tools and parameters used to construct
-them.
-Access to the underlying sequences and trees in a form convenient to existing
-tools will be supported.
-
+describes how the sequences developed and their evolutionary
+distance.
 It has the following fields:
 
 =over 4
 
 
-=item alignment_method
+=item n_rows
 
-The name of the program used to produce the alignment.
-
-
-=item alignment_parameters
-
-The parameters given to the program when producing the alignment.
+number of rows in the alignment
 
 
-=item alignment_properties
+=item n_cols
 
-A colon-delimited string of key-value pairs containing additional
-properties of the alignment.
-
-
-=item tree_method
-
-The name of the program used to produce the tree.
+number of columns in the alignment
 
 
-=item tree_parameters
+=item status
 
-The parameters given to the program when producing the tree.
+status of the alignment, currently either [i]active[/i],
+[i]superseded[/i], or [i]bad[/i]
 
 
-=item tree_properties
+=item is_concatenation
 
-A colon-delimited string of key-value pairs containing additional
-properties of the tree.
+TRUE if the rows of the alignment map to multiple
+sequences, FALSE if they map to single sequences
+
+
+=item sequence_type
+
+type of sequence being aligned, currently either
+[i]Protein[/i], [i]DNA[/i], [i]RNA[/i], or [i]Mixed[/i]
+
+
+=item timestamp
+
+date and time the alignment was loaded
+
+
+=item method
+
+name of the primary software package or script used
+to construct the alignment
+
+
+=item parameters
+
+non-default parameters used as input to the software
+package or script indicated in the method attribute
+
+
+=item protocol
+
+description of the steps taken to construct the alignment,
+or a reference to an external pipeline
+
+
+=item source_id
+
+ID of this alignment in the source database
 
 
 
@@ -70,12 +88,117 @@ properties of the tree.
 
 
 */
-funcdef get_entity_AlignmentTree(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_AlignmentTree>);
-funcdef query_entity_AlignmentTree(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_AlignmentTree>);
-funcdef all_entities_AlignmentTree(int start, int count, list<string> fields)
-	returns(mapping<string, fields_AlignmentTree>);
+funcdef get_entity_Alignment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Alignment>);
+funcdef query_entity_Alignment(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Alignment>);
+funcdef all_entities_Alignment(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Alignment>);
+
+typedef structure {
+	string id;
+} fields_AlignmentAttribute ;
+
+/*
+This entity represents an attribute type that can
+be assigned to an alignment. The attribute
+values are stored in the relationships to the target. The
+key is the attribute name.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_entity_AlignmentAttribute(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_AlignmentAttribute>);
+funcdef query_entity_AlignmentAttribute(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AlignmentAttribute>);
+funcdef all_entities_AlignmentAttribute(int start, int count, list<string> fields)
+	returns(mapping<string, fields_AlignmentAttribute>);
+
+typedef structure {
+	string id;
+	int row_number nullable;
+	string row_id nullable;
+	string row_description nullable;
+	int n_components nullable;
+	int beg_pos_aln nullable;
+	int end_pos_aln nullable;
+	string md5_of_ungapped_sequence nullable;
+	string sequence nullable;
+} fields_AlignmentRow ;
+
+/*
+This entity represents a single row of an alignment.
+In general, this corresponds to a sequence, but in a
+concatenated alignment multiple sequences may be represented
+here.
+It has the following fields:
+
+=over 4
+
+
+=item row_number
+
+1-based ordinal number of this row in the alignment
+
+
+=item row_id
+
+identifier for this row in the FASTA file for the alignment
+
+
+=item row_description
+
+description of this row in the FASTA file for the alignment
+
+
+=item n_components
+
+number of components that make up this alignment
+row; for a single-sequence alignment this is always "1"
+
+
+=item beg_pos_aln
+
+the 1-based column index in the alignment where this
+sequence row begins
+
+
+=item end_pos_aln
+
+the 1-based column index in the alignment where this
+sequence row ends
+
+
+=item md5_of_ungapped_sequence
+
+the MD5 of this row's sequence after gaps have been
+removed; for DNA and RNA sequences, the [b]U[/b] codes are also
+normalized to [b]T[/b] before the MD5 is computed
+
+
+=item sequence
+
+sequence for this alignment row (with indels)
+
+
+
+=back
+
+
+*/
+funcdef get_entity_AlignmentRow(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_AlignmentRow>);
+funcdef query_entity_AlignmentRow(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AlignmentRow>);
+funcdef all_entities_AlignmentRow(int start, int count, list<string> fields)
+	returns(mapping<string, fields_AlignmentRow>);
 
 typedef structure {
 	string id;
@@ -151,11 +274,11 @@ typedef structure {
 } fields_Annotation ;
 
 /*
-An annotation is a comment attached to a feature. Annotations
-are used to track the history of a feature's functional assignments
-and any related issues. The key is the feature ID followed by a
-colon and a complemented ten-digit sequence number.
-
+An annotation is a comment attached to a feature.
+Annotations are used to track the history of a feature's
+functional assignments and any related issues. The key is
+the feature ID followed by a colon and a complemented ten-digit
+sequence number.
 It has the following fields:
 
 =over 4
@@ -234,24 +357,11 @@ typedef structure {
 } fields_AtomicRegulon ;
 
 /*
-An atomic regulon is an indivisible group of coregulated features
-on a single genome. Atomic regulons are constructed so that a given feature
-can only belong to one. Because of this, the expression levels for
-atomic regulons represent in some sense the state of a cell.
-An atomicRegulon is a set of protein-encoding genes that
-are believed to have identical expression profiles (i.e.,
-they will all be expressed or none will be expressed in the
-vast majority of conditions).  These are sometimes referred
-to as "atomic regulons".  Note that there are more common
-notions of "coregulated set of genes" based on the notion
-that a single regulatory mechanism impacts an entire set of
-genes. Since multiple other mechanisms may impact
-overlapping sets, the genes impacted by a regulatory
-mechanism need not all share the same expression profile.
-We use a distinct notion (CoregulatedSet) to reference sets
-of genes impacted by a single regulatory mechanism (i.e.,
-by a single transcription regulator).
-
+An atomic regulon is an indivisible group of coregulated
+features on a single genome. Atomic regulons are constructed so
+that a given feature can only belong to one. Because of this, the
+expression levels for atomic regulons represent in some sense the
+state of a cell.
 It has the following fields:
 
 =over 4
@@ -304,13 +414,20 @@ typedef structure {
 	string id;
 	string mod_date nullable;
 	list<string> name nullable;
+	float dna nullable;
+	float protein nullable;
+	float cell_wall nullable;
+	float lipid nullable;
+	float cofactor nullable;
+	float energy nullable;
 } fields_Biomass ;
 
 /*
 A biomass is a collection of compounds in a specific
 ratio and in specific compartments that are necessary for a
 cell to function properly. The prediction of biomasses is key
-to the functioning of the model.
+to the functioning of the model. Each biomass belongs to
+a specific model.
 It has the following fields:
 
 =over 4
@@ -324,6 +441,43 @@ last modification date of the biomass data
 =item name
 
 descriptive name for this biomass
+
+
+=item dna
+
+portion of a gram of this biomass (expressed as a
+fraction of 1.0) that is DNA
+
+
+=item protein
+
+portion of a gram of this biomass (expressed as a
+fraction of 1.0) that is protein
+
+
+=item cell_wall
+
+portion of a gram of this biomass (expressed as a
+fraction of 1.0) that is cell wall
+
+
+=item lipid
+
+portion of a gram of this biomass (expressed as a
+fraction of 1.0) that is lipid but is not part of the cell
+wall
+
+
+=item cofactor
+
+portion of a gram of this biomass (expressed as a
+fraction of 1.0) that function as cofactors
+
+
+=item energy
+
+number of ATP molecules hydrolized per gram of
+this biomass
 
 
 
@@ -340,21 +494,46 @@ funcdef all_entities_Biomass(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
-	float coefficient nullable;
-} fields_BiomassCompound ;
+	string frequencies nullable;
+	int genetic_code nullable;
+	string type nullable;
+	string subtype nullable;
+} fields_CodonUsage ;
 
 /*
-A Biomass Compound represents the occurrence of a particular
-compound in a biomass.
+This entity contains information about the codon usage
+frequency in a particular genome with respect to a particular
+type of analysis (e.g. high-expression genes, modal, mean, 
+etc.).
 It has the following fields:
 
 =over 4
 
 
-=item coefficient
+=item frequencies
 
-proportion of the biomass in grams per mole that
-contains this compound
+A packed-string representation of the codon usage
+frequencies. These are not global frequencies, but rather
+frequenicy of use relative to other codons that produce
+the same amino acid.
+
+
+=item genetic_code
+
+Genetic code used for these codons.
+
+
+=item type
+
+Type of frequency analysis: average, modal,
+high-expression, or non-native.
+
+
+=item subtype
+
+Specific nature of the codon usage with respect
+to the given type, generally indicative of how the
+frequencies were computed.
 
 
 
@@ -362,68 +541,17 @@ contains this compound
 
 
 */
-funcdef get_entity_BiomassCompound(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_BiomassCompound>);
-funcdef query_entity_BiomassCompound(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_BiomassCompound>);
-funcdef all_entities_BiomassCompound(int start, int count, list<string> fields)
-	returns(mapping<string, fields_BiomassCompound>);
-
-typedef structure {
-	string id;
-	string abbr nullable;
-	string mod_date nullable;
-	string name nullable;
-	string msid nullable;
-} fields_Compartment ;
-
-/*
-A compartment is a section of a single model that represents
-the environment in which a reaction takes place (e.g. cell
-wall).
-It has the following fields:
-
-=over 4
-
-
-=item abbr
-
-short abbreviated name for this compartment (usually
-a single character)
-
-
-=item mod_date
-
-date and time of the last modification to the
-compartment's definition
-
-
-=item name
-
-common name for the compartment
-
-
-=item msid
-
-common modeling ID of this compartment
-
-
-
-=back
-
-
-*/
-funcdef get_entity_Compartment(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_Compartment>);
-funcdef query_entity_Compartment(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_Compartment>);
-funcdef all_entities_Compartment(int start, int count, list<string> fields)
-	returns(mapping<string, fields_Compartment>);
+funcdef get_entity_CodonUsage(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_CodonUsage>);
+funcdef query_entity_CodonUsage(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_CodonUsage>);
+funcdef all_entities_CodonUsage(int start, int count, list<string> fields)
+	returns(mapping<string, fields_CodonUsage>);
 
 typedef structure {
 	string id;
 	list<string> name nullable;
-	string msid nullable;
+	string source_id nullable;
 	string mod_date nullable;
 } fields_Complex ;
 
@@ -440,9 +568,9 @@ It has the following fields:
 name of this complex. Not all complexes have names.
 
 
-=item msid
+=item source_id
 
-common modeling ID of this complex.
+ID of this complex in the source from which it was added.
 
 
 =item mod_date
@@ -466,12 +594,14 @@ typedef structure {
 	string id;
 	string label nullable;
 	string abbr nullable;
-	string msid nullable;
+	string source_id nullable;
 	int ubiquitous nullable;
 	string mod_date nullable;
-	string uncharged_formula nullable;
-	string formula nullable;
 	float mass nullable;
+	string formula nullable;
+	float charge nullable;
+	float deltaG nullable;
+	float deltaG_error nullable;
 } fields_Compound ;
 
 /*
@@ -493,7 +623,7 @@ reactions
 shortened abbreviation for the compound name
 
 
-=item msid
+=item source_id
 
 common modeling ID of this compound
 
@@ -509,9 +639,9 @@ date and time of the last modification to the
 compound definition
 
 
-=item uncharged_formula
+=item mass
 
-a electrically neutral formula for the compound
+pH-neutral atomic mass of the compound
 
 
 =item formula
@@ -519,9 +649,23 @@ a electrically neutral formula for the compound
 a pH-neutral formula for the compound
 
 
-=item mass
+=item charge
 
-atomic mass of the compound
+computed charge of the compound in a pH-neutral
+solution
+
+
+=item deltaG
+
+the pH 7 reference Gibbs free-energy of formation for this
+compound as calculated by the group contribution method (units are
+kcal/mol)
+
+
+=item deltaG_error
+
+the uncertainty in the [b]deltaG[/b] value (units are
+kcal/mol)
 
 
 
@@ -538,18 +682,57 @@ funcdef all_entities_Compound(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	float charge nullable;
+	string formula nullable;
+} fields_CompoundInstance ;
+
+/*
+A Compound Instance represents the occurrence of a particular
+compound in a location in a model.
+It has the following fields:
+
+=over 4
+
+
+=item charge
+
+computed charge based on the location instance pH
+and similar constraints
+
+
+=item formula
+
+computed chemical formula for this compound based
+on the location instance pH and similar constraints
+
+
+
+=back
+
+
+*/
+funcdef get_entity_CompoundInstance(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_CompoundInstance>);
+funcdef query_entity_CompoundInstance(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_CompoundInstance>);
+funcdef all_entities_CompoundInstance(int start, int count, list<string> fields)
+	returns(mapping<string, fields_CompoundInstance>);
+
+typedef structure {
+	string id;
 	string source_id nullable;
 } fields_Contig ;
 
 /*
-A contig is thought of as composing a part of the DNA associated with a specific
-genome.  It is represented as an ID (including the genome ID) and a ContigSequence.
-We do not think of strings of DNA from, say, a metgenomic sample as "contigs",
-since there is no associated genome (these would be considered ContigSequences).
-This use of the term "ContigSequence", rather than just "DNA sequence", may turn out
-to be a bad idea.  For now, you should just realize that a Contig has an associated
+A contig is thought of as composing a part of the DNA
+associated with a specific genome.  It is represented as an ID
+(including the genome ID) and a ContigSequence. We do not think
+of strings of DNA from, say, a metgenomic sample as "contigs",
+since there is no associated genome (these would be considered
+ContigSequences). This use of the term "ContigSequence", rather
+than just "DNA sequence", may turn out to be a bad idea.  For now,
+you should just realize that a Contig has an associated
 genome, but a ContigSequence does not.
-
 It has the following fields:
 
 =over 4
@@ -578,17 +761,10 @@ typedef structure {
 } fields_ContigChunk ;
 
 /*
-ContigChunks are strings of DNA thought of as being a string in a 4-character alphabet
-with an associated ID.  We allow a broader alphabet that includes U (for RNA) and
+ContigChunks are strings of DNA thought of as being a
+string in a 4-character alphabet with an associated ID.  We
+allow a broader alphabet that includes U (for RNA) and
 the standard ambiguity characters.
-The notion of ContigChunk was introduced to avoid transferring/manipulating
-huge contigs to access small substrings.  A ContigSequence is formed by
-concatenating a set of one or more ContigChunks.  Thus, ContigChunks are the
-basic units moved from the database to memory.  Their existence should be
-hidden from users in most circumstances (users are expected to request
-substrings of ContigSequences, and the Kbase software locates the appropriate
-ContigChunks).
-
 It has the following fields:
 
 =over 4
@@ -617,13 +793,14 @@ typedef structure {
 } fields_ContigSequence ;
 
 /*
-ContigSequences are strings of DNA.  Contigs have an associated
-genome, but ContigSequences do not..   We can think of random samples of DNA as a set of ContigSequences.
-There are no length constraints imposed on ContigSequences -- they can be either
-very short or very long.  The basic unit of data that is moved to/from the database
-is the ContigChunk, from which ContigSequences are formed. The key
-of a ContigSequence is the sequence's MD5 identifier.
-
+ContigSequences are strings of DNA.  Contigs have an
+associated genome, but ContigSequences do not.  We can think
+of random samples of DNA as a set of ContigSequences. There
+are no length constraints imposed on ContigSequences -- they
+can be either very short or very long.  The basic unit of data
+that is moved to/from the database is the ContigChunk, from
+which ContigSequences are formed. The key of a ContigSequence
+is the sequence's MD5 identifier.
 It has the following fields:
 
 =over 4
@@ -653,13 +830,12 @@ typedef structure {
 } fields_CoregulatedSet ;
 
 /*
-We need to represent sets of genes that are coregulated via some
-regulatory mechanism.  In particular, we wish to represent genes
-that are coregulated using transcription binding sites and
-corresponding transcription regulatory proteins.
-We represent a coregulated set (which may, or may not, be considered
-a regulon) using CoregulatedSet.
-
+We need to represent sets of genes that are coregulated via
+some regulatory mechanism.  In particular, we wish to represent
+genes that are coregulated using transcription binding sites and
+corresponding transcription regulatory proteins. We represent a
+coregulated set (which may, or may not, be considered a regulon)
+using CoregulatedSet.
 It has the following fields:
 
 =over 4
@@ -765,6 +941,62 @@ funcdef all_entities_EcNumber(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	float temperature nullable;
+	string description nullable;
+	int anaerobic nullable;
+	float pH nullable;
+	string source_id nullable;
+} fields_Environment ;
+
+/*
+An Environment is a set of conditions for microbial growth,
+including temperature, aerobicity, media, and supplementary
+conditions.
+It has the following fields:
+
+=over 4
+
+
+=item temperature
+
+The temperature in Kelvin.
+
+
+=item description
+
+A description of the environment.
+
+
+=item anaerobic
+
+Whether the environment is anaerobic (True) or aerobic
+(False).
+
+
+=item pH
+
+The pH of the media used in the environment.
+
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Environment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Environment>);
+funcdef query_entity_Environment(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Environment>);
+funcdef all_entities_Environment(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Environment>);
+
+typedef structure {
+	string id;
 	string source nullable;
 } fields_Experiment ;
 
@@ -796,6 +1028,38 @@ funcdef all_entities_Experiment(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string source_id nullable;
+} fields_ExperimentalUnit ;
+
+/*
+An ExperimentalUnit is a subset of an experiment consisting of
+a Strain, an Environment, and one or more Measurements on that
+strain in the specified environment. ExperimentalUnits belong to a
+single experiment.
+It has the following fields:
+
+=over 4
+
+
+=item source_id
+
+The ID of the experimental unit used by the data source.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_ExperimentalUnit(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ExperimentalUnit>);
+funcdef query_entity_ExperimentalUnit(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ExperimentalUnit>);
+funcdef all_entities_ExperimentalUnit(int start, int count, list<string> fields)
+	returns(mapping<string, fields_ExperimentalUnit>);
+
+typedef structure {
+	string id;
 	string type nullable;
 	string release nullable;
 	list<string> family_function nullable;
@@ -803,25 +1067,21 @@ typedef structure {
 } fields_Family ;
 
 /*
-The Kbase will support the maintenance of protein families (as sets of Features
-with associated translations).  We are initially only supporting the notion of a family
-as composed of a set of isofunctional homologs.  That is, the families we
-initially support should be thought of as containing protein-encoding genes whose
-associated sequences all implement the same function
-(we do understand that the notion of "function" is somewhat ambiguous, so let
-us sweep this under the rug by calling a functional role a "primitive concept").
+The Kbase will support the maintenance of protein families
+(as sets of Features with associated translations).  We are
+initially only supporting the notion of a family as composed of
+a set of isofunctional homologs.  That is, the families we
+initially support should be thought of as containing
+protein-encoding genes whose associated sequences all implement
+the same function (we do understand that the notion of "function"
+is somewhat ambiguous, so let us sweep this under the rug by
+calling a functional role a "primitive concept").
 We currently support families in which the members are
-translations of features, and we think of Features as
-having an associated function. Identical protein sequences
+protein sequences as well. Identical protein sequences
 as products of translating distinct genes may or may not
-have identical functions, and we allow multiple members of
-the same Family to share identical protein sequences.  This
-may be justified, since in a very, very, very few cases
-identical proteins do, in fact, have distinct functions.
-We would prefer to reach the point where our Families are
-sets of protein sequence, rather than sets of
-protein-encoding Features.
-
+have identical functions.  This may be justified, since
+in a very, very, very few cases identical proteins do, in
+fact, have distinct functions.
 It has the following fields:
 
 =over 4
@@ -876,12 +1136,11 @@ A feature (sometimes also called a gene) is a part of a
 genome that is of special interest. Features may be spread across
 multiple DNA sequences (contigs) of a genome, but never across more
 than one genome. Each feature in the database has a unique
-ID that functions as its ID in this table.
-Normally a Feature is just a single contigous region on a contig.
-Features have types, and an appropriate choice of available types
-allows the support of protein-encoding genes, exons, RNA genes,
-binding sites, pathogenicity islands, or whatever.
-
+ID that functions as its ID in this table. Normally a Feature is
+just a single contigous region on a contig. Features have types,
+and an appropriate choice of available types allows the support
+of protein-encoding genes, exons, RNA genes, binding sites,
+pathogenicity islands, or whatever.
 It has the following fields:
 
 =over 4
@@ -949,16 +1208,13 @@ typedef structure {
 } fields_Genome ;
 
 /*
-The Kbase houses a large and growing set of genomes.  We often have multiple
-genomes that have identical DNA.  These usually have distinct gene calls and
-annotations, but not always.  We consider the Kbase to be a framework for
-managing hundreds of thousands of genomes and offering the tools needed to
-support compartive analysis on large sets of genomes, some of which are
-virtually identical.
-Each genome has an MD5 value computed from the DNA that is associated with the genome.
-Hence, it is easy to recognize when you have identical genomes, perhaps annotated
-by distinct groups.
-
+The Kbase houses a large and growing set of genomes.  We
+often have multiple genomes that have identical DNA.  These usually
+have distinct gene calls and annotations, but not always.  We
+consider the Kbase to be a framework for managing hundreds of
+thousands of genomes and offering the tools needed to
+support compartive analysis on large sets of genomes,
+some of which are virtually identical.
 It has the following fields:
 
 =over 4
@@ -1125,8 +1381,234 @@ funcdef all_entities_Locality(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+} fields_LocalizedCompound ;
+
+/*
+This entity represents a compound occurring in a
+specific location. A reaction always involves localized
+compounds. If a reaction occurs entirely in a single
+location, it will frequently only be represented by the
+cytoplasmic versions of the compounds; however, a transport
+always uses specifically located compounds.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_entity_LocalizedCompound(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_LocalizedCompound>);
+funcdef query_entity_LocalizedCompound(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_LocalizedCompound>);
+funcdef all_entities_LocalizedCompound(int start, int count, list<string> fields)
+	returns(mapping<string, fields_LocalizedCompound>);
+
+typedef structure {
+	string id;
 	string mod_date nullable;
 	string name nullable;
+	string source_id nullable;
+	int hierarchy nullable;
+} fields_Location ;
+
+/*
+A location is a region of the cell where reaction compounds
+originate from or are transported to (e.g. cell wall, extracellular,
+cytoplasm).
+It has the following fields:
+
+=over 4
+
+
+=item mod_date
+
+date and time of the last modification to the
+compartment's definition
+
+
+=item name
+
+common name for the location
+
+
+=item source_id
+
+ID from the source of this location
+
+
+=item hierarchy
+
+a number indicating where this location occurs
+in relation other locations in the cell. Zero indicates
+extra-cellular.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Location(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Location>);
+funcdef query_entity_Location(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Location>);
+funcdef all_entities_Location(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Location>);
+
+typedef structure {
+	string id;
+	int index nullable;
+	list<string> label nullable;
+	float pH nullable;
+	float potential nullable;
+} fields_LocationInstance ;
+
+/*
+The Location Instance represents a region of a cell
+(e.g. cell wall, cytoplasm) as it appears in a specific
+model.
+It has the following fields:
+
+=over 4
+
+
+=item index
+
+number used to distinguish between different
+instances of the same type of location in a single
+model. Within a model, any two instances of the same
+location must have difference compartment index
+values.
+
+
+=item label
+
+description used to differentiate between instances
+of the same location in a single model
+
+
+=item pH
+
+pH of the cell region, which is used to determine compound
+charge and pH gradient across cell membranes
+
+
+=item potential
+
+electrochemical potential of the cell region, which is used to
+determine the electrochemical gradient across cell membranes
+
+
+
+=back
+
+
+*/
+funcdef get_entity_LocationInstance(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_LocationInstance>);
+funcdef query_entity_LocationInstance(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_LocationInstance>);
+funcdef all_entities_LocationInstance(int start, int count, list<string> fields)
+	returns(mapping<string, fields_LocationInstance>);
+
+typedef structure {
+	string id;
+	string timeSeries nullable;
+	string source_id nullable;
+	float value nullable;
+	float mean nullable;
+	float median nullable;
+	float stddev nullable;
+	float N nullable;
+	float p_value nullable;
+	float Z_score nullable;
+} fields_Measurement ;
+
+/*
+A Measurement is a value generated by performing a protocol to
+evaluate a phenotype on an ExperimentalUnit - e.g. a strain in an
+environment.
+It has the following fields:
+
+=over 4
+
+
+=item timeSeries
+
+A string containing time series data in the following
+format: time1,value1;time2,value2;...timeN,valueN.
+
+
+=item source_id
+
+The ID of the measurement used by the data source.
+
+
+=item value
+
+The value of the measurement.
+
+
+=item mean
+
+The mean of multiple replicates if they are included in the
+measurement.
+
+
+=item median
+
+The median of multiple replicates if they are included in
+the measurement.
+
+
+=item stddev
+
+The standard deviation of multiple replicates if they are
+included in the measurement.
+
+
+=item N
+
+The number of replicates if they are included in the
+measurement.
+
+
+=item p_value
+
+The p-value of multiple replicates if they are included in
+the measurement. The exact meaning of the p-value is specified in
+the Phenotype object for this measurement.
+
+
+=item Z_score
+
+The Z-score of multiple replicates if they are included in
+the measurement. The exact meaning of the p-value is specified in
+the Phenotype object for this measurement.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Measurement(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Measurement>);
+funcdef query_entity_Measurement(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Measurement>);
+funcdef all_entities_Measurement(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Measurement>);
+
+typedef structure {
+	string id;
+	string mod_date nullable;
+	string name nullable;
+	int is_minimal nullable;
+	string source_id nullable;
 	string type nullable;
 } fields_Media ;
 
@@ -1151,9 +1633,19 @@ definition
 descriptive name of the media
 
 
+=item is_minimal
+
+TRUE if this is a minimal media, else FALSE
+
+
+=item source_id
+
+The ID of the media used by the data source.
+
+
 =item type
 
-type of the medium (aerobic or anaerobic)
+The general category of the media.
 
 
 
@@ -1228,7 +1720,8 @@ number of compounds in the model
 
 =item annotation_count
 
-number of annotations used to build the model
+number of features associated with one or more reactions in
+the model
 
 
 
@@ -1242,61 +1735,6 @@ funcdef query_entity_Model(list<tuple<string, string, string>> qry, list<string>
 	returns(mapping<string, fields_Model>);
 funcdef all_entities_Model(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Model>);
-
-typedef structure {
-	string id;
-	int compartment_index nullable;
-	list<string> label nullable;
-	float pH nullable;
-	float potential nullable;
-} fields_ModelCompartment ;
-
-/*
-The Model Compartment represents a section of a cell
-(e.g. cell wall, cytoplasm) as it appears in a specific
-model.
-It has the following fields:
-
-=over 4
-
-
-=item compartment_index
-
-number used to distinguish between different
-instances of the same type of compartment in a single
-model. Within a model, any two instances of the same
-compartment must have difference compartment index
-values.
-
-
-=item label
-
-description used to differentiate between instances
-of the same compartment in a single model
-
-
-=item pH
-
-pH used to determine proton balance in this
-compartment
-
-
-=item potential
-
-ask Chris
-
-
-
-=back
-
-
-*/
-funcdef get_entity_ModelCompartment(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_ModelCompartment>);
-funcdef query_entity_ModelCompartment(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_ModelCompartment>);
-funcdef all_entities_ModelCompartment(int start, int count, list<string> fields)
-	returns(mapping<string, fields_ModelCompartment>);
 
 typedef structure {
 	string id;
@@ -1371,12 +1809,12 @@ typedef structure {
 } fields_PairSet ;
 
 /*
-A PairSet is a precompute set of pairs or genes.  Each pair occurs close to
-one another of the chromosome.  We believe that all of the first members
-of the pairs correspond to one another (are quite similar), as do all of
-the second members of the pairs.  These pairs (from prokaryotic genomes)
-offer on of the most powerful clues relating to uncharacterized genes/peroteins.
-
+A PairSet is a precompute set of pairs or genes.  Each
+pair occurs close to one another of the chromosome.  We believe
+that all of the first members of the pairs correspond to one another
+(are quite similar), as do all of the second members of the pairs.
+These pairs (from prokaryotic genomes) offer one of the most
+powerful clues relating to uncharacterized genes/peroteins.
 It has the following fields:
 
 =over 4
@@ -1431,6 +1869,159 @@ funcdef all_entities_Pairing(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string firstName nullable;
+	string lastName nullable;
+	string contactEmail nullable;
+	string institution nullable;
+	string source_id nullable;
+} fields_Person ;
+
+/*
+A person represents a human affiliated in some way with Kbase.
+It has the following fields:
+
+=over 4
+
+
+=item firstName
+
+The given name of the person.
+
+
+=item lastName
+
+The surname of the person.
+
+
+=item contactEmail
+
+Email address of the person.
+
+
+=item institution
+
+The institution where the person works.
+
+
+=item source_id
+
+The ID of the person used by the data source.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Person(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Person>);
+funcdef query_entity_Person(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Person>);
+funcdef all_entities_Person(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Person>);
+
+typedef structure {
+	string id;
+	string name nullable;
+	string description nullable;
+	string unitOfMeasure nullable;
+	string source_id nullable;
+} fields_PhenotypeDescription ;
+
+/*
+A Phenotype is a measurable characteristic of an organism.
+It has the following fields:
+
+=over 4
+
+
+=item name
+
+The name of the phenotype.
+
+
+=item description
+
+The description of the physical phenotype, how it is
+measured, and what the measurement statistics mean.
+
+
+=item unitOfMeasure
+
+The units of the measurement of the phenotype.
+
+
+=item source_id
+
+The ID of the phenotype description used by the data source.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_PhenotypeDescription(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_PhenotypeDescription>);
+funcdef query_entity_PhenotypeDescription(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_PhenotypeDescription>);
+funcdef all_entities_PhenotypeDescription(int start, int count, list<string> fields)
+	returns(mapping<string, fields_PhenotypeDescription>);
+
+typedef structure {
+	string id;
+	string description nullable;
+	string source_id nullable;
+	string dateUploaded nullable;
+	string metadata nullable;
+} fields_PhenotypeExperiment ;
+
+/*
+A PhenotypeExperiment, consisting of (potentially) multiple
+strains, enviroments, and measurements of phenotypic information on
+those strains and environments.
+It has the following fields:
+
+=over 4
+
+
+=item description
+
+Design of the experiment including the numbers and types of
+experimental units, phenotypes, replicates, sampling plan, and
+analyses that are planned.
+
+
+=item source_id
+
+The ID of the phenotype experiment used by the data source.
+
+
+=item dateUploaded
+
+The date this experiment was loaded into the database
+
+
+=item metadata
+
+Any data describing the experiment that is not covered by
+the description field.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_PhenotypeExperiment(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_PhenotypeExperiment>);
+funcdef query_entity_PhenotypeExperiment(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_PhenotypeExperiment>);
+funcdef all_entities_PhenotypeExperiment(int start, int count, list<string> fields)
+	returns(mapping<string, fields_PhenotypeExperiment>);
+
+typedef structure {
+	string id;
 } fields_ProbeSet ;
 
 /*
@@ -1459,12 +2050,13 @@ typedef structure {
 } fields_ProteinSequence ;
 
 /*
-We use the concept of ProteinSequence as an amino acid string with an associated
-MD5 value.  It is easy to access the set of Features that relate to a ProteinSequence.
-While function is still associated with Features (and may be for some time), publications
-are associated with ProteinSequences (and the inferred impact on Features is through
-the relationship connecting ProteinSequences to Features).
-
+We use the concept of ProteinSequence as an amino acid
+string with an associated MD5 value.  It is easy to access the
+set of Features that relate to a ProteinSequence.  While function
+is still associated with Features (and may be for some time),
+publications are associated with ProteinSequences (and the inferred
+impact on Features is through the relationship connecting
+ProteinSequences to Features).
 It has the following fields:
 
 =over 4
@@ -1490,22 +2082,63 @@ funcdef all_entities_ProteinSequence(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string name nullable;
+	string description nullable;
+	string source_id nullable;
+} fields_Protocol ;
+
+/*
+A Protocol is a step by step set of instructions for
+performing a part of an experiment.
+It has the following fields:
+
+=over 4
+
+
+=item name
+
+The name of the protocol.
+
+
+=item description
+
+The step by step instructions for performing the experiment,
+including measurement details, materials, and equipment. A
+researcher should be able to reproduce the experimental results
+with this information.
+
+
+=item source_id
+
+The ID of the protocol used by the data source.
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Protocol(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Protocol>);
+funcdef query_entity_Protocol(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Protocol>);
+funcdef all_entities_Protocol(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Protocol>);
+
+typedef structure {
+	string id;
 	string title nullable;
 	string link nullable;
 	string pubdate nullable;
 } fields_Publication ;
 
 /*
-Annotators attach publications to ProteinSequences.  The criteria we have used
-to gather such connections is a bit nonstandard.  We have sought to attach publications
-to ProteinSequences when the publication includes an expert asserting a belief or estimate
-of function.  The paper may not be the original characterization.  Further, it may not
-even discuss a sequence protein (much of the literature is very valuable, but reports
-work on proteins in strains that have not yet been sequenced).  On the other hand,
-reports of sequencing regions of a chromosome (with no specific assertion of a
-clear function) should not be attached.  The attached publications give an ID (usually a
-Pubmed ID),  a URL to the paper (when we have it), and a title (when we have it).
-
+Experimenters attach publications to experiments and
+protocols. Annotators attach publications to ProteinSequences.
+The attached publications give an ID (usually a
+DOI or Pubmed ID),  a URL to the paper (when we have it), and a title
+(when we have it). Pubmed IDs are given unmodified. DOI IDs
+are prefixed with [b]doi:[/b], e.g. [i]doi:1002385[/i].
 It has the following fields:
 
 =over 4
@@ -1518,7 +2151,7 @@ title of the article, or (unknown) if the title is not known
 
 =item link
 
-URL of the article
+URL of the article, DOI preferred
 
 
 =item pubdate
@@ -1542,10 +2175,14 @@ typedef structure {
 	string id;
 	string mod_date nullable;
 	string name nullable;
-	string msid nullable;
+	string source_id nullable;
 	string abbr nullable;
-	string equation nullable;
-	string reversibility nullable;
+	string direction nullable;
+	float deltaG nullable;
+	float deltaG_error nullable;
+	string thermodynamic_reversibility nullable;
+	float default_protons nullable;
+	string status nullable;
 } fields_Reaction ;
 
 /*
@@ -1567,9 +2204,9 @@ definition
 descriptive name of this reaction
 
 
-=item msid
+=item source_id
 
-common modeling ID of this reaction
+ID of this reaction in the resource from which it was added
 
 
 =item abbr
@@ -1577,15 +2214,40 @@ common modeling ID of this reaction
 abbreviated name of this reaction
 
 
-=item equation
-
-displayable formula for the reaction
-
-
-=item reversibility
+=item direction
 
 direction of this reaction (> for forward-only,
 < for backward-only, = for bidirectional)
+
+
+=item deltaG
+
+Gibbs free-energy change for the reaction calculated using
+the group contribution method (units are kcal/mol)
+
+
+=item deltaG_error
+
+uncertainty in the [b]deltaG[/b] value (units are kcal/mol)
+
+
+=item thermodynamic_reversibility
+
+computed reversibility of this reaction in a
+pH-neutral environment
+
+
+=item default_protons
+
+number of protons absorbed by this reaction in a
+pH-neutral environment
+
+
+=item status
+
+string indicating additional information about
+this reaction, generally indicating whether the reaction
+is balanced and/or lumped
 
 
 
@@ -1603,113 +2265,12 @@ funcdef all_entities_Reaction(int start, int count, list<string> fields)
 typedef structure {
 	string id;
 	string direction nullable;
-	float transproton nullable;
-} fields_ReactionRule ;
+	float protons nullable;
+} fields_ReactionInstance ;
 
 /*
-A reaction rule represents the way a reaction takes place
-within the context of a complex.
-It has the following fields:
-
-=over 4
-
-
-=item direction
-
-reaction directionality (> for forward, < for
-backward, = for bidirectional) with respect to this complex
-
-
-=item transproton
-
-ask Chris
-
-
-
-=back
-
-
-*/
-funcdef get_entity_ReactionRule(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_ReactionRule>);
-funcdef query_entity_ReactionRule(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_ReactionRule>);
-funcdef all_entities_ReactionRule(int start, int count, list<string> fields)
-	returns(mapping<string, fields_ReactionRule>);
-
-typedef structure {
-	string id;
-	float stoichiometry nullable;
-	int cofactor nullable;
-	int compartment_index nullable;
-	float transport_coefficient nullable;
-} fields_Reagent ;
-
-/*
-This entity represents a compound as it is used by
-a specific reaction. A reaction involves many compounds, and a
-compound can be involved in many reactions. The reagent
-describes the use of the compound by a specific reaction.
-It has the following fields:
-
-=over 4
-
-
-=item stoichiometry
-
-Number of molecules of the compound that participate
-in a single instance of the reaction. For example, if a
-reaction produces two water molecules, the stoichiometry of
-water for the reaction would be two. When a reaction is
-written on paper in chemical notation, the stoichiometry is
-the number next to the chemical formula of the
-compound. The value is negative for substrates and positive
-for products.
-
-
-=item cofactor
-
-TRUE if the compound is a cofactor; FALSE if it is a major
-component of the reaction.
-
-
-=item compartment_index
-
-Abstract number that groups this reagent into a
-compartment. Each group can then be assigned to real
-compartments when doing comparative analysis.
-
-
-=item transport_coefficient
-
-Number of reagents of this type transported.
-A positive value implies transport into the reactions
-default compartment; a negative value implies export
-to the reagent's specified compartment.
-
-
-
-=back
-
-
-*/
-funcdef get_entity_Reagent(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_Reagent>);
-funcdef query_entity_Reagent(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_Reagent>);
-funcdef all_entities_Reagent(int start, int count, list<string> fields)
-	returns(mapping<string, fields_Reagent>);
-
-typedef structure {
-	string id;
-	string direction nullable;
-	float transproton nullable;
-	float proton nullable;
-} fields_Requirement ;
-
-/*
-A requirement describes the way a reaction fits
-into a model.
+A reaction instance describes the specific implementation of
+a reaction in a model.
 It has the following fields:
 
 =over 4
@@ -1721,14 +2282,13 @@ reaction directionality (> for forward, < for
 backward, = for bidirectional) with respect to this model
 
 
-=item transproton
+=item protons
 
-ask Chris
-
-
-=item proton
-
-ask Chris
+number of protons produced by this reaction when
+proceeding in the forward direction. If this is a transport
+reaction, these protons end up in the reaction instance's
+main location. If the number is negative, then the protons
+are consumed by the reaction rather than being produced.
 
 
 
@@ -1736,12 +2296,12 @@ ask Chris
 
 
 */
-funcdef get_entity_Requirement(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_Requirement>);
-funcdef query_entity_Requirement(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_Requirement>);
-funcdef all_entities_Requirement(int start, int count, list<string> fields)
-	returns(mapping<string, fields_Requirement>);
+funcdef get_entity_ReactionInstance(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ReactionInstance>);
+funcdef query_entity_ReactionInstance(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ReactionInstance>);
+funcdef all_entities_ReactionInstance(int start, int count, list<string> fields)
+	returns(mapping<string, fields_ReactionInstance>);
 
 typedef structure {
 	string id;
@@ -1809,12 +2369,12 @@ typedef structure {
 } fields_SSRow ;
 
 /*
-An SSRow (that is, a row in a subsystem spreadsheet) represents a collection of
-functional roles present in the Features of a single Genome.  The roles are part
-of a designated subsystem, and the fids associated with each role are included in the row,
-That is, a row amounts to an instance of a subsystem as it exists in a specific, designated
-genome.
-
+An SSRow (that is, a row in a subsystem spreadsheet)
+represents a collection of functional roles present in the
+Features of a single Genome.  The roles are part of a designated
+subsystem, and the features associated with each role are included
+in the row. That is, a row amounts to an instance of a subsystem as
+it exists in a specific, designated genome.
 It has the following fields:
 
 =over 4
@@ -1829,11 +2389,11 @@ automated program.
 
 =item region
 
-Region in the genome for which the machine is relevant.
+Region in the genome for which the row is relevant.
 Normally, this is an empty string, indicating that the machine
-covers the whole genome. If a subsystem has multiple machines
+covers the whole genome. If a subsystem has multiple rows
 for a genome, this contains a location string describing the
-region occupied by this particular machine.
+region occupied by this particular row.
 
 
 
@@ -1910,6 +2470,52 @@ funcdef all_entities_Source(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string description nullable;
+	string source_id nullable;
+	int aggregateData nullable;
+} fields_Strain ;
+
+/*
+This entity represents an organism derived from a genome or
+another organism with one or more modifications to the organism's
+genome.
+It has the following fields:
+
+=over 4
+
+
+=item description
+
+A description of the strain, e.g. knockout/modification
+methods, resulting phenotypes, etc.
+
+
+=item source_id
+
+The ID of the strain used by the data source.
+
+
+=item aggregateData
+
+Denotes whether this entity represents a physical strain
+(False) or aggregate data calculated from one or more strains
+(True).
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Strain(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Strain>);
+funcdef query_entity_Strain(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Strain>);
+funcdef all_entities_Strain(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Strain>);
+
+typedef structure {
+	string id;
 	string source_name nullable;
 	string design nullable;
 	string originator nullable;
@@ -1966,7 +2572,6 @@ A subsystem is a set of functional roles that have been annotated simultaneously
 the roles present in a specific pathway), with an associated subsystem spreadsheet
 which encodes the fids in each genome that implement the functional roles in the
 subsystem.
-
 It has the following fields:
 
 =over 4
@@ -2070,9 +2675,11 @@ typedef structure {
 } fields_TaxonomicGrouping ;
 
 /*
-We associate with most genomes a "taxonomy" based on the NCBI taxonomy.
-This includes, for each genome, a list of ever larger taxonomic groups.
-
+We associate with most genomes a "taxonomy" based on
+the NCBI taxonomy. This includes, for each genome, a list of
+ever larger taxonomic groups. The groups are stored as
+instances of this entity, and chained together by the
+IsGroupFor relationship.
 It has the following fields:
 
 =over 4
@@ -2163,6 +2770,137 @@ funcdef all_entities_Trait(int start, int count, list<string> fields)
 
 typedef structure {
 	string id;
+	string status nullable;
+	string data_type nullable;
+	string timestamp nullable;
+	string method nullable;
+	string parameters nullable;
+	string protocol nullable;
+	string source_id nullable;
+	string newick nullable;
+} fields_Tree ;
+
+/*
+A tree describes how the sequences in an alignment relate
+to each other. Most trees are phylogenetic, but some may be based on
+taxonomy or gene content.
+It has the following fields:
+
+=over 4
+
+
+=item status
+
+status of the tree, currently either [i]active[/i],
+[i]superseded[/i], or [i]bad[/i]
+
+
+=item data_type
+
+type of data the tree was built from, usually
+[i]sequence_alignment[/i]
+
+
+=item timestamp
+
+date and time the tree was loaded
+
+
+=item method
+
+name of the primary software package or script used
+to construct the tree
+
+
+=item parameters
+
+non-default parameters used as input to the software
+package or script indicated in the method attribute
+
+
+=item protocol
+
+description of the steps taken to construct the tree,
+or a reference to an external pipeline
+
+
+=item source_id
+
+ID of this tree in the source database
+
+
+=item newick
+
+NEWICK format string containing the structure
+of the tree
+
+
+
+=back
+
+
+*/
+funcdef get_entity_Tree(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Tree>);
+funcdef query_entity_Tree(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Tree>);
+funcdef all_entities_Tree(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Tree>);
+
+typedef structure {
+	string id;
+} fields_TreeAttribute ;
+
+/*
+This entity represents an attribute type that can
+be assigned to a tree. The attribute
+values are stored in the relationships to the target. The
+key is the attribute name.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_entity_TreeAttribute(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_TreeAttribute>);
+funcdef query_entity_TreeAttribute(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_TreeAttribute>);
+funcdef all_entities_TreeAttribute(int start, int count, list<string> fields)
+	returns(mapping<string, fields_TreeAttribute>);
+
+typedef structure {
+	string id;
+} fields_TreeNodeAttribute ;
+
+/*
+This entity represents an attribute type that can
+be assigned to a node. The attribute
+values are stored in the relationships to the target. The
+key is the attribute name.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_entity_TreeNodeAttribute(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_TreeNodeAttribute>);
+funcdef query_entity_TreeNodeAttribute(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_TreeNodeAttribute>);
+funcdef all_entities_TreeNodeAttribute(int start, int count, list<string> fields)
+	returns(mapping<string, fields_TreeNodeAttribute>);
+
+typedef structure {
+	string id;
 	list<string> role_rule nullable;
 	string code nullable;
 	string type nullable;
@@ -2170,11 +2908,11 @@ typedef structure {
 } fields_Variant ;
 
 /*
-Each subsystem may include the designation of distinct variants.  Thus,
-there may be three closely-related, but distinguishable forms of histidine
-degradation.  Each form would be called a "variant", with an associated code,
-and all genomes implementing a specific variant can easily be accessed.
-
+Each subsystem may include the designation of distinct
+variants.  Thus, there may be three closely-related, but
+distinguishable forms of histidine degradation.  Each form
+would be called a "variant", with an associated code, and all
+genomes implementing a specific variant can easily be accessed.
 It has the following fields:
 
 =over 4
@@ -2251,49 +2989,14 @@ funcdef get_relationship_IsAffectedIn(list<string> ids, list<string> from_fields
 
 typedef structure {
 	string id;
-	int begin nullable;
-	int end nullable;
-	int len nullable;
-	string sequence_id nullable;
-	string properties nullable;
-} fields_Aligns ;
+} fields_Aligned ;
 
 /*
-This relationship connects each alignment to its constituent protein
-sequences. Each alignment contains many protein sequences, and a single
-sequence can be in many alignments. Parts of a single protein can occur
-in multiple places in an alignment. The sequence-id field is used to
-keep these unique, and is the string that represents the sequence in the
-alignment and tree text.
+This relationship connects an alignment to the database
+from which it was generated.
 It has the following fields:
 
 =over 4
-
-
-=item begin
-
-location within the sequence at which the aligned portion begins
-
-
-=item end
-
-location within the sequence at which the aligned portion ends
-
-
-=item len
-
-length of the sequence within the alignment
-
-
-=item sequence_id
-
-identifier for this sequence in the alignment
-
-
-=item properties
-
-additional information about this sequence's participation in the
-alignment
 
 
 
@@ -2301,10 +3004,10 @@ alignment
 
 
 */
-funcdef get_relationship_Aligns(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_AlignmentTree, fields_Aligns, fields_ProteinSequence>>);
-funcdef get_relationship_IsAlignedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ProteinSequence, fields_Aligns, fields_AlignmentTree>>);
+funcdef get_relationship_Aligned(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Source, fields_Aligned, fields_Alignment>>);
+funcdef get_relationship_WasAlignedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_Aligned, fields_Source>>);
 
 typedef structure {
 	string id;
@@ -2363,6 +3066,28 @@ funcdef get_relationship_HasAssertedFunctionFrom(list<string> ids, list<string> 
 
 typedef structure {
 	string id;
+} fields_BelongsTo ;
+
+/*
+The BelongsTo relationship specifies the experimental
+units performed on a particular strain.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_BelongsTo(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Strain, fields_BelongsTo, fields_ExperimentalUnit>>);
+funcdef get_relationship_IncludesStrain(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ExperimentalUnit, fields_BelongsTo, fields_Strain>>);
+
+typedef structure {
+	string id;
 } fields_Concerns ;
 
 /*
@@ -2382,6 +3107,38 @@ funcdef get_relationship_Concerns(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Publication, fields_Concerns, fields_ProteinSequence>>);
 funcdef get_relationship_IsATopicOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_ProteinSequence, fields_Concerns, fields_Publication>>);
+
+typedef structure {
+	string id;
+	float molar_ratio nullable;
+} fields_ConsistsOfCompounds ;
+
+/*
+This relationship defines the subcompounds that make up a
+compound. For example, CoCl2-6H2O is made up of 1 Co2+, 2 Cl-, and
+6 H2O.
+It has the following fields:
+
+=over 4
+
+
+=item molar_ratio
+
+Number of molecules of the subcompound that make up
+the compound. A -1 in this field signifies that although
+the subcompound is present in the compound, the molar
+ratio is unknown.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_ConsistsOfCompounds(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Compound, fields_ConsistsOfCompounds, fields_Compound>>);
+funcdef get_relationship_ComponentOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Compound, fields_ConsistsOfCompounds, fields_Compound>>);
 
 typedef structure {
 	string id;
@@ -2409,6 +3166,146 @@ funcdef get_relationship_IsContainedIn(list<string> ids, list<string> from_field
 
 typedef structure {
 	string id;
+	int index_in_concatenation nullable;
+	int beg_pos_in_parent nullable;
+	int end_pos_in_parent nullable;
+	int parent_seq_len nullable;
+	int beg_pos_aln nullable;
+	int end_pos_aln nullable;
+	string kb_feature_id nullable;
+} fields_ContainsAlignedDNA ;
+
+/*
+This relationship connects a nucleotide alignment row to the
+contig sequences from which its components are formed.
+It has the following fields:
+
+=over 4
+
+
+=item index_in_concatenation
+
+1-based ordinal position in the alignment row of this
+nucleotide sequence
+
+
+=item beg_pos_in_parent
+
+1-based position in the contig sequence of the first
+nucleotide that appears in the alignment
+
+
+=item end_pos_in_parent
+
+1-based position in the contig sequence of the last
+nucleotide that appears in the alignment
+
+
+=item parent_seq_len
+
+length of original sequence
+
+
+=item beg_pos_aln
+
+the 1-based column index in the alignment where this
+nucleotide sequence begins
+
+
+=item end_pos_aln
+
+the 1-based column index in the alignment where this
+nucleotide sequence ends
+
+
+=item kb_feature_id
+
+ID of the feature relevant to this sequence, or an
+empty string if the sequence is not specific to a genome
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_ContainsAlignedDNA(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlignmentRow, fields_ContainsAlignedDNA, fields_ContigSequence>>);
+funcdef get_relationship_IsAlignedDNAComponentOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ContigSequence, fields_ContainsAlignedDNA, fields_AlignmentRow>>);
+
+typedef structure {
+	string id;
+	int index_in_concatenation nullable;
+	int beg_pos_in_parent nullable;
+	int end_pos_in_parent nullable;
+	int parent_seq_len nullable;
+	int beg_pos_aln nullable;
+	int end_pos_aln nullable;
+	string kb_feature_id nullable;
+} fields_ContainsAlignedProtein ;
+
+/*
+This relationship connects a protein alignment row to the
+protein sequences from which its components are formed.
+It has the following fields:
+
+=over 4
+
+
+=item index_in_concatenation
+
+1-based ordinal position in the alignment row of this
+protein sequence
+
+
+=item beg_pos_in_parent
+
+1-based position in the protein sequence of the first
+amino acid that appears in the alignment
+
+
+=item end_pos_in_parent
+
+1-based position in the protein sequence of the last
+amino acid that appears in the alignment
+
+
+=item parent_seq_len
+
+length of original sequence
+
+
+=item beg_pos_aln
+
+the 1-based column index in the alignment where this
+protein sequence begins
+
+
+=item end_pos_aln
+
+the 1-based column index in the alignment where this
+protein sequence ends
+
+
+=item kb_feature_id
+
+ID of the feature relevant to this protein, or an
+empty string if the protein is not specific to a genome
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_ContainsAlignedProtein(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlignmentRow, fields_ContainsAlignedProtein, fields_ProteinSequence>>);
+funcdef get_relationship_IsAlignedProteinComponentOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ProteinSequence, fields_ContainsAlignedProtein, fields_AlignmentRow>>);
+
+typedef structure {
+	string id;
 } fields_Controls ;
 
 /*
@@ -2428,6 +3325,28 @@ funcdef get_relationship_Controls(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Feature, fields_Controls, fields_CoregulatedSet>>);
 funcdef get_relationship_IsControlledUsing(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_CoregulatedSet, fields_Controls, fields_Feature>>);
+
+typedef structure {
+	string id;
+} fields_DerivedFromStrain ;
+
+/*
+The recursive DerivedFromStrain relationship organizes derived
+organisms into a tree based on parent/child relationships.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_DerivedFromStrain(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Strain, fields_DerivedFromStrain, fields_Strain>>);
+funcdef get_relationship_StrainParentOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Strain, fields_DerivedFromStrain, fields_Strain>>);
 
 typedef structure {
 	string id;
@@ -2451,6 +3370,96 @@ funcdef get_relationship_Describes(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Subsystem, fields_Describes, fields_Variant>>);
 funcdef get_relationship_IsDescribedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Variant, fields_Describes, fields_Subsystem>>);
+
+typedef structure {
+	string id;
+	string value nullable;
+} fields_DescribesAlignment ;
+
+/*
+This relationship connects an alignment to its free-form
+attributes.
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+value of this attribute
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_DescribesAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlignmentAttribute, fields_DescribesAlignment, fields_Alignment>>);
+funcdef get_relationship_HasAlignmentAttribute(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_DescribesAlignment, fields_AlignmentAttribute>>);
+
+typedef structure {
+	string id;
+	string value nullable;
+} fields_DescribesTree ;
+
+/*
+This relationship connects a tree to its free-form
+attributes.
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+value of this attribute
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_DescribesTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_TreeAttribute, fields_DescribesTree, fields_Tree>>);
+funcdef get_relationship_HasTreeAttribute(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_DescribesTree, fields_TreeAttribute>>);
+
+typedef structure {
+	string id;
+	string value nullable;
+	string node_id nullable;
+} fields_DescribesTreeNode ;
+
+/*
+This relationship connects an tree to the free-form
+attributes of its nodes.
+It has the following fields:
+
+=over 4
+
+
+=item value
+
+value of this attribute
+
+
+=item node_id
+
+ID of the node described by the attribute
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_DescribesTreeNode(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_TreeNodeAttribute, fields_DescribesTreeNode, fields_Tree>>);
+funcdef get_relationship_HasNodeAttribute(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_DescribesTreeNode, fields_TreeNodeAttribute>>);
 
 typedef structure {
 	string id;
@@ -2558,6 +3567,50 @@ funcdef get_relationship_WasGeneratedFrom(list<string> ids, list<string> from_fi
 
 typedef structure {
 	string id;
+} fields_GenomeParentOf ;
+
+/*
+The DerivedFromGenome relationship specifies the direct child
+strains of a specific genome.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_GenomeParentOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Genome, fields_GenomeParentOf, fields_Strain>>);
+funcdef get_relationship_DerivedFromGenome(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Strain, fields_GenomeParentOf, fields_Genome>>);
+
+typedef structure {
+	string id;
+} fields_HasAssociatedMeasurement ;
+
+/*
+The HasAssociatedMeasurement relationship specifies a measurement that
+measures a phenotype.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasAssociatedMeasurement(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_PhenotypeDescription, fields_HasAssociatedMeasurement, fields_Measurement>>);
+funcdef get_relationship_MeasuresPhenotype(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Measurement, fields_HasAssociatedMeasurement, fields_PhenotypeDescription>>);
+
+typedef structure {
+	string id;
 	string alias nullable;
 } fields_HasCompoundAliasFrom ;
 
@@ -2584,6 +3637,28 @@ funcdef get_relationship_HasCompoundAliasFrom(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Source, fields_HasCompoundAliasFrom, fields_Compound>>);
 funcdef get_relationship_UsesAliasForCompound(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Compound, fields_HasCompoundAliasFrom, fields_Source>>);
+
+typedef structure {
+	string id;
+} fields_HasExperimentalUnit ;
+
+/*
+The HasExperimentalUnit relationship describes which
+ExperimentalUnits are part of a PhenotypeExperiment.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasExperimentalUnit(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_PhenotypeExperiment, fields_HasExperimentalUnit, fields_ExperimentalUnit>>);
+funcdef get_relationship_IsExperimentalUnitOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ExperimentalUnit, fields_HasExperimentalUnit, fields_PhenotypeExperiment>>);
 
 typedef structure {
 	string id;
@@ -2620,6 +3695,50 @@ funcdef get_relationship_HasIndicatedSignalFrom(list<string> ids, list<string> f
 	returns(list<tuple<fields_Feature, fields_HasIndicatedSignalFrom, fields_Experiment>>);
 funcdef get_relationship_IndicatesSignalFor(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Experiment, fields_HasIndicatedSignalFrom, fields_Feature>>);
+
+typedef structure {
+	string id;
+} fields_HasKnockoutIn ;
+
+/*
+The HasKnockoutIn relationship specifies the gene knockouts in
+a particular strain.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasKnockoutIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Strain, fields_HasKnockoutIn, fields_Feature>>);
+funcdef get_relationship_KnockedOutIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Feature, fields_HasKnockoutIn, fields_Strain>>);
+
+typedef structure {
+	string id;
+} fields_HasMeasurement ;
+
+/*
+The HasMeasurement relationship specifies a measurement
+performed on a particular experimental unit.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasMeasurement(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ExperimentalUnit, fields_HasMeasurement, fields_Measurement>>);
+funcdef get_relationship_IsMeasureOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Measurement, fields_HasMeasurement, fields_ExperimentalUnit>>);
 
 typedef structure {
 	string id;
@@ -2680,8 +3799,8 @@ funcdef get_relationship_ParticipatesIn(list<string> ids, list<string> from_fiel
 typedef structure {
 	string id;
 	float concentration nullable;
-	float minimum_flux nullable;
 	float maximum_flux nullable;
+	float minimum_flux nullable;
 } fields_HasPresenceOf ;
 
 /*
@@ -2698,14 +3817,14 @@ It has the following fields:
 concentration of the compound in the media
 
 
-=item minimum_flux
-
-minimum flux of the compound for this media
-
-
 =item maximum_flux
 
-maximum flux of the compound for this media
+maximum allowed increase in this compound
+
+
+=item minimum_flux
+
+maximum allowed decrease in this compound
 
 
 
@@ -2804,6 +3923,28 @@ funcdef get_relationship_IsRepresentedIn(list<string> ids, list<string> from_fie
 
 typedef structure {
 	string id;
+} fields_HasRequirementOf ;
+
+/*
+This relationship connects a model to the instances of
+reactions that represent how the reactions occur in the model.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_HasRequirementOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Model, fields_HasRequirementOf, fields_ReactionInstance>>);
+funcdef get_relationship_IsARequirementOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ReactionInstance, fields_HasRequirementOf, fields_Model>>);
+
+typedef structure {
+	string id;
 	int sequence nullable;
 } fields_HasResultsIn ;
 
@@ -2857,9 +3998,8 @@ typedef structure {
 } fields_HasStep ;
 
 /*
-This relationship connects a complex to the reaction
-rules for the reactions that work together to make the complex
-happen.
+This relationship connects a complex to the reactions it
+catalyzes.
 It has the following fields:
 
 =over 4
@@ -2871,9 +4011,9 @@ It has the following fields:
 
 */
 funcdef get_relationship_HasStep(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Complex, fields_HasStep, fields_ReactionRule>>);
+	returns(list<tuple<fields_Complex, fields_HasStep, fields_Reaction>>);
 funcdef get_relationship_IsStepOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ReactionRule, fields_HasStep, fields_Complex>>);
+	returns(list<tuple<fields_Reaction, fields_HasStep, fields_Complex>>);
 
 typedef structure {
 	string id;
@@ -2941,8 +4081,8 @@ typedef structure {
 } fields_HasUsage ;
 
 /*
-This relationship connects a biomass compound specification
-to the compounds for which it is relevant.
+This relationship connects a specific compound in a model to the localized
+compound to which it corresponds.
 It has the following fields:
 
 =over 4
@@ -2954,9 +4094,9 @@ It has the following fields:
 
 */
 funcdef get_relationship_HasUsage(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compound, fields_HasUsage, fields_BiomassCompound>>);
+	returns(list<tuple<fields_LocalizedCompound, fields_HasUsage, fields_CompoundInstance>>);
 funcdef get_relationship_IsUsageOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_BiomassCompound, fields_HasUsage, fields_Compound>>);
+	returns(list<tuple<fields_CompoundInstance, fields_HasUsage, fields_LocalizedCompound>>);
 
 typedef structure {
 	string id;
@@ -3140,6 +4280,63 @@ funcdef get_relationship_IsIncludedIn(list<string> ids, list<string> from_fields
 
 typedef structure {
 	string id;
+	float concentration nullable;
+	string units nullable;
+} fields_IncludesAdditionalCompounds ;
+
+/*
+This relationship connects a environment to the compounds that
+occur in it. The intersection data describes how much of each
+compound can be found.
+It has the following fields:
+
+=over 4
+
+
+=item concentration
+
+concentration of the compound in the environment
+
+
+=item units
+
+vol%, g/L, or molar (mol/L).
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IncludesAdditionalCompounds(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Environment, fields_IncludesAdditionalCompounds, fields_Compound>>);
+funcdef get_relationship_IncludedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Compound, fields_IncludesAdditionalCompounds, fields_Environment>>);
+
+typedef structure {
+	string id;
+} fields_IncludesAlignmentRow ;
+
+/*
+This relationship connects an alignment to its component
+rows.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IncludesAlignmentRow(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_IncludesAlignmentRow, fields_AlignmentRow>>);
+funcdef get_relationship_IsAlignmentRowIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_AlignmentRow, fields_IncludesAlignmentRow, fields_Alignment>>);
+
+typedef structure {
+	string id;
 } fields_IncludesPart ;
 
 /*
@@ -3191,14 +4388,34 @@ funcdef get_relationship_HasLevelsFrom(list<string> ids, list<string> from_field
 
 typedef structure {
 	string id;
+	float coefficient nullable;
+	int cofactor nullable;
 } fields_Involves ;
 
 /*
 This relationship connects a reaction to the
-reagents representing the compounds that participate in it.
+specific localized compounds that participate in it.
 It has the following fields:
 
 =over 4
+
+
+=item coefficient
+
+Number of molecules of the compound that participate
+in a single instance of the reaction. For example, if a
+reaction produces two water molecules, the stoichiometry of
+water for the reaction would be two. When a reaction is
+written on paper in chemical notation, the stoichiometry is
+the number next to the chemical formula of the
+compound. The value is negative for substrates and positive
+for products.
+
+
+=item cofactor
+
+TRUE if the compound is a cofactor; FALSE if it is a major
+component of the reaction.
 
 
 
@@ -3207,31 +4424,9 @@ It has the following fields:
 
 */
 funcdef get_relationship_Involves(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reaction, fields_Involves, fields_Reagent>>);
+	returns(list<tuple<fields_Reaction, fields_Involves, fields_LocalizedCompound>>);
 funcdef get_relationship_IsInvolvedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reagent, fields_Involves, fields_Reaction>>);
-
-typedef structure {
-	string id;
-} fields_IsARequirementIn ;
-
-/*
-This relationship connects a model to its requirements.
-A requirement represents the use of a reaction in a single model.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsARequirementIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Model, fields_IsARequirementIn, fields_Requirement>>);
-funcdef get_relationship_IsARequirementOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Requirement, fields_IsARequirementIn, fields_Model>>);
+	returns(list<tuple<fields_LocalizedCompound, fields_Involves, fields_Reaction>>);
 
 typedef structure {
 	string id;
@@ -3354,14 +4549,21 @@ funcdef get_relationship_IsComponentOf(list<string> ids, list<string> from_field
 
 typedef structure {
 	string id;
+	float coefficient nullable;
 } fields_IsComprisedOf ;
 
 /*
-This relationship connects a biomass to the compound
-specifications that define it.
+This relationship connects a biomass composition reaction to the
+compounds specified as contained in the biomass.
 It has the following fields:
 
 =over 4
+
+
+=item coefficient
+
+number of millimoles of the compound instance that exists in one
+gram cell dry weight of biomass
 
 
 
@@ -3370,9 +4572,9 @@ It has the following fields:
 
 */
 funcdef get_relationship_IsComprisedOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Biomass, fields_IsComprisedOf, fields_BiomassCompound>>);
+	returns(list<tuple<fields_Biomass, fields_IsComprisedOf, fields_CompoundInstance>>);
 funcdef get_relationship_Comprises(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_BiomassCompound, fields_IsComprisedOf, fields_Biomass>>);
+	returns(list<tuple<fields_CompoundInstance, fields_IsComprisedOf, fields_Biomass>>);
 
 typedef structure {
 	string id;
@@ -3489,50 +4691,6 @@ funcdef get_relationship_IsCoupledWith(list<string> ids, list<string> from_field
 
 typedef structure {
 	string id;
-} fields_IsDefaultFor ;
-
-/*
-This relationship connects a reaction to the compartment
-in which it runs by default.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsDefaultFor(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compartment, fields_IsDefaultFor, fields_Reaction>>);
-funcdef get_relationship_RunsByDefaultIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reaction, fields_IsDefaultFor, fields_Compartment>>);
-
-typedef structure {
-	string id;
-} fields_IsDefaultLocationOf ;
-
-/*
-This relationship connects a reagent to the compartment
-which is its default location during the reaction.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsDefaultLocationOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compartment, fields_IsDefaultLocationOf, fields_Reagent>>);
-funcdef get_relationship_HasDefaultLocation(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reagent, fields_IsDefaultLocationOf, fields_Compartment>>);
-
-typedef structure {
-	string id;
 	int inverted nullable;
 } fields_IsDeterminedBy ;
 
@@ -3571,8 +4729,8 @@ typedef structure {
 } fields_IsDividedInto ;
 
 /*
-This relationship connects a model to the cell compartments
-that participate in the model.
+This relationship connects a model to its instances of
+subcellular locations that participate in the model.
 It has the following fields:
 
 =over 4
@@ -3584,9 +4742,30 @@ It has the following fields:
 
 */
 funcdef get_relationship_IsDividedInto(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Model, fields_IsDividedInto, fields_ModelCompartment>>);
+	returns(list<tuple<fields_Model, fields_IsDividedInto, fields_LocationInstance>>);
 funcdef get_relationship_IsDivisionOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ModelCompartment, fields_IsDividedInto, fields_Model>>);
+	returns(list<tuple<fields_LocationInstance, fields_IsDividedInto, fields_Model>>);
+
+typedef structure {
+	string id;
+} fields_IsExecutedAs ;
+
+/*
+This relationship links a reaction to the way it is used in a model.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsExecutedAs(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Reaction, fields_IsExecutedAs, fields_ReactionInstance>>);
+funcdef get_relationship_IsExecutionOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ReactionInstance, fields_IsExecutedAs, fields_Reaction>>);
 
 typedef structure {
 	string id;
@@ -3751,8 +4930,8 @@ typedef structure {
 } fields_IsInstantiatedBy ;
 
 /*
-This relationship connects a compartment to the instances
-of that compartment that occur in models.
+This relationship connects a subcellular location to the instances
+of that location that occur in models.
 It has the following fields:
 
 =over 4
@@ -3764,9 +4943,9 @@ It has the following fields:
 
 */
 funcdef get_relationship_IsInstantiatedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compartment, fields_IsInstantiatedBy, fields_ModelCompartment>>);
+	returns(list<tuple<fields_Location, fields_IsInstantiatedBy, fields_LocationInstance>>);
 funcdef get_relationship_IsInstanceOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ModelCompartment, fields_IsInstantiatedBy, fields_Compartment>>);
+	returns(list<tuple<fields_LocationInstance, fields_IsInstantiatedBy, fields_Location>>);
 
 typedef structure {
 	string id;
@@ -3825,6 +5004,28 @@ funcdef get_relationship_IsLocusFor(list<string> ids, list<string> from_fields, 
 
 typedef structure {
 	string id;
+} fields_IsMeasurementMethodOf ;
+
+/*
+The IsMeasurementMethodOf relationship describes which protocol
+was used to make a measurement.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsMeasurementMethodOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Protocol, fields_IsMeasurementMethodOf, fields_Measurement>>);
+funcdef get_relationship_WasMeasuredBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Measurement, fields_IsMeasurementMethodOf, fields_Protocol>>);
+
+typedef structure {
+	string id;
 } fields_IsModeledBy ;
 
 /*
@@ -3844,6 +5045,75 @@ funcdef get_relationship_IsModeledBy(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Genome, fields_IsModeledBy, fields_Model>>);
 funcdef get_relationship_Models(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Model, fields_IsModeledBy, fields_Genome>>);
+
+typedef structure {
+	string id;
+	string modification_type nullable;
+	string modification_value nullable;
+} fields_IsModifiedToBuildAlignment ;
+
+/*
+Relates an alignment to other alignments built from it.
+It has the following fields:
+
+=over 4
+
+
+=item modification_type
+
+description of how the alignment was modified
+
+
+=item modification_value
+
+description of any parameters used to derive the
+modification
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsModifiedToBuildAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_IsModifiedToBuildAlignment, fields_Alignment>>);
+funcdef get_relationship_IsModificationOfAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_IsModifiedToBuildAlignment, fields_Alignment>>);
+
+typedef structure {
+	string id;
+	string modification_type nullable;
+	string modification_value nullable;
+} fields_IsModifiedToBuildTree ;
+
+/*
+Relates a tree to other trees built from it.
+It has the following fields:
+
+=over 4
+
+
+=item modification_type
+
+description of how the tree was modified (rerooted,
+annotated, etc.)
+
+
+=item modification_value
+
+description of any parameters used to derive the
+modification
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsModifiedToBuildTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_IsModifiedToBuildTree, fields_Tree>>);
+funcdef get_relationship_IsModificationOfTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_IsModifiedToBuildTree, fields_Tree>>);
 
 typedef structure {
 	string id;
@@ -3872,25 +5142,14 @@ funcdef get_relationship_IsOwnedBy(list<string> ids, list<string> from_fields, l
 
 typedef structure {
 	string id;
-	string type nullable;
-} fields_IsProposedLocationOf ;
+} fields_IsParticipatingAt ;
 
 /*
-This relationship connects a reaction as it is used in
-a complex to the compartments in which it usually takes place.
-Most reactions take place in a single compartment. Transporters
-take place in two compartments.
+This relationship connects a localized compound to the
+location in which it occurs during one or more reactions.
 It has the following fields:
 
 =over 4
-
-
-=item type
-
-role of the compartment in the reaction: 'primary'
-if it is the sole or starting compartment, 'secondary' if
-it is the ending compartment in a multi-compartmental
-reaction
 
 
 
@@ -3898,10 +5157,10 @@ reaction
 
 
 */
-funcdef get_relationship_IsProposedLocationOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compartment, fields_IsProposedLocationOf, fields_ReactionRule>>);
-funcdef get_relationship_HasProposedLocationIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ReactionRule, fields_IsProposedLocationOf, fields_Compartment>>);
+funcdef get_relationship_IsParticipatingAt(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Location, fields_IsParticipatingAt, fields_LocalizedCompound>>);
+funcdef get_relationship_ParticipatesAt(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_LocalizedCompound, fields_IsParticipatingAt, fields_Location>>);
 
 typedef structure {
 	string id;
@@ -3929,24 +5188,49 @@ funcdef get_relationship_Produces(list<string> ids, list<string> from_fields, li
 
 typedef structure {
 	string id;
-	string type nullable;
-} fields_IsRealLocationOf ;
+	float coefficient nullable;
+} fields_IsReagentIn ;
 
 /*
-This relationship connects a model's instance of a reaction
-to the compartments in which it takes place. Most instances
-take place in a single compartment. Transporters use two compartments.
+This relationship connects a compound instance to the reaction instance
+in which it is transformed.
 It has the following fields:
 
 =over 4
 
 
-=item type
+=item coefficient
 
-role of the compartment in the reaction: 'primary'
-if it is the sole or starting compartment, 'secondary' if
-it is the ending compartment in a multi-compartmental
-reaction
+Number of molecules of the compound that participate
+in a single instance of the reaction. For example, if a
+reaction produces two water molecules, the stoichiometry of
+water for the reaction would be two. When a reaction is
+written on paper in chemical notation, the stoichiometry is
+the number next to the chemical formula of the
+compound. The value is negative for substrates and positive
+for products.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_IsReagentIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_CompoundInstance, fields_IsReagentIn, fields_ReactionInstance>>);
+funcdef get_relationship_Targets(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ReactionInstance, fields_IsReagentIn, fields_CompoundInstance>>);
+
+typedef structure {
+	string id;
+} fields_IsRealLocationOf ;
+
+/*
+This relationship connects a specific instance of a compound in a model
+to the specific instance of the model subcellular location where the compound exists.
+It has the following fields:
+
+=over 4
 
 
 
@@ -3955,9 +5239,9 @@ reaction
 
 */
 funcdef get_relationship_IsRealLocationOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ModelCompartment, fields_IsRealLocationOf, fields_Requirement>>);
+	returns(list<tuple<fields_LocationInstance, fields_IsRealLocationOf, fields_CompoundInstance>>);
 funcdef get_relationship_HasRealLocationIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Requirement, fields_IsRealLocationOf, fields_ModelCompartment>>);
+	returns(list<tuple<fields_CompoundInstance, fields_IsRealLocationOf, fields_LocationInstance>>);
 
 typedef structure {
 	string id;
@@ -4047,27 +5331,6 @@ funcdef get_relationship_IsRepresentedBy(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_TaxonomicGrouping, fields_IsRepresentedBy, fields_ObservationalUnit>>);
 funcdef get_relationship_DefinedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_ObservationalUnit, fields_IsRepresentedBy, fields_TaxonomicGrouping>>);
-
-typedef structure {
-	string id;
-} fields_IsRequiredBy ;
-
-/*
-This relationship links a reaction to the way it is used in a model.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsRequiredBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reaction, fields_IsRequiredBy, fields_Requirement>>);
-funcdef get_relationship_Requires(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Requirement, fields_IsRequiredBy, fields_Reaction>>);
 
 typedef structure {
 	string id;
@@ -4215,28 +5478,6 @@ funcdef get_relationship_IsSubclassOf(list<string> ids, list<string> from_fields
 
 typedef structure {
 	string id;
-} fields_IsTargetOf ;
-
-/*
-This relationship connects a compound in a biomass to the
-compartment in which it is supposed to appear.
-It has the following fields:
-
-=over 4
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_IsTargetOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ModelCompartment, fields_IsTargetOf, fields_BiomassCompound>>);
-funcdef get_relationship_Targets(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_BiomassCompound, fields_IsTargetOf, fields_ModelCompartment>>);
-
-typedef structure {
-	string id;
 } fields_IsTaxonomyOf ;
 
 /*
@@ -4296,11 +5537,11 @@ typedef structure {
 	string id;
 	int optional nullable;
 	string type nullable;
+	int triggering nullable;
 } fields_IsTriggeredBy ;
 
 /*
-A complex can be triggered by many roles. A role can
-trigger many complexes.
+This connects a complex to the roles that work together to form the complex.
 It has the following fields:
 
 =over 4
@@ -4314,7 +5555,14 @@ complex, else FALSE
 
 =item type
 
-ask Chris
+a string code that is used to determine whether a complex
+should be added to a model
+
+
+=item triggering
+
+TRUE if the presence of the role requires including the
+complex in the model, else FALSE
 
 
 
@@ -4329,11 +5577,11 @@ funcdef get_relationship_Triggers(list<string> ids, list<string> from_fields, li
 
 typedef structure {
 	string id;
-} fields_IsUsedAs ;
+} fields_IsUsedToBuildTree ;
 
 /*
-This relationship connects a reaction to its usage in
-specific complexes.
+This relationship connects each tree to the alignment from
+which it is built. There is at most one.
 It has the following fields:
 
 =over 4
@@ -4344,19 +5592,18 @@ It has the following fields:
 
 
 */
-funcdef get_relationship_IsUsedAs(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reaction, fields_IsUsedAs, fields_ReactionRule>>);
-funcdef get_relationship_IsUseOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ReactionRule, fields_IsUsedAs, fields_Reaction>>);
+funcdef get_relationship_IsUsedToBuildTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_IsUsedToBuildTree, fields_Tree>>);
+funcdef get_relationship_IsBuiltFromAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_IsUsedToBuildTree, fields_Alignment>>);
 
 typedef structure {
 	string id;
 } fields_Manages ;
 
 /*
-This relationship connects a model to the biomasses
-that are monitored to determine whether or not the model
-is effective.
+This relationship connects a model to its associated biomass
+composition reactions.
 It has the following fields:
 
 =over 4
@@ -4423,8 +5670,8 @@ typedef structure {
 } fields_ParticipatesAs ;
 
 /*
-This relationship connects a compound to the reagents
-that represent its participation in reactions.
+This relationship connects a generic compound to a specific compound
+where subceullar location has been specified.
 It has the following fields:
 
 =over 4
@@ -4436,9 +5683,38 @@ It has the following fields:
 
 */
 funcdef get_relationship_ParticipatesAs(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Compound, fields_ParticipatesAs, fields_Reagent>>);
+	returns(list<tuple<fields_Compound, fields_ParticipatesAs, fields_LocalizedCompound>>);
 funcdef get_relationship_IsParticipationOf(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_Reagent, fields_ParticipatesAs, fields_Compound>>);
+	returns(list<tuple<fields_LocalizedCompound, fields_ParticipatesAs, fields_Compound>>);
+
+typedef structure {
+	string id;
+	string role nullable;
+} fields_PerformedExperiment ;
+
+/*
+Denotes that a Person was associated with a
+PhenotypeExperiment in some role.
+It has the following fields:
+
+=over 4
+
+
+=item role
+
+Describes the role the person played in the experiment.
+Examples are Primary Investigator, Designer, Experimentalist, etc.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_PerformedExperiment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Person, fields_PerformedExperiment, fields_PhenotypeExperiment>>);
+funcdef get_relationship_PerformedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_PhenotypeExperiment, fields_PerformedExperiment, fields_Person>>);
 
 typedef structure {
 	string id;
@@ -4465,51 +5741,6 @@ funcdef get_relationship_HadResultsProducedBy(list<string> ids, list<string> fro
 
 typedef structure {
 	string id;
-	int gene_context nullable;
-	float percent_identity nullable;
-	float score nullable;
-} fields_ProjectsOnto ;
-
-/*
-This relationship connects two protein sequences for which a clear
-bidirectional best hit exists in known genomes. The attributes of the
-relationship describe how good the relationship is between the proteins.
-The relationship is bidirectional and symmetric, but is only stored in
-one direction (lower ID to higher ID).
-It has the following fields:
-
-=over 4
-
-
-=item gene_context
-
-number of homologous genes in the immediate context of the
-two proteins, up to a maximum of 10
-
-
-=item percent_identity
-
-percent match between the two protein sequences
-
-
-=item score
-
-score describing the strength of the projection, from 0 to 1,
-where 1 is the best
-
-
-
-=back
-
-
-*/
-funcdef get_relationship_ProjectsOnto(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ProteinSequence, fields_ProjectsOnto, fields_ProteinSequence>>);
-funcdef get_relationship_IsProjectedOnto(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
-	returns(list<tuple<fields_ProteinSequence, fields_ProjectsOnto, fields_ProteinSequence>>);
-
-typedef structure {
-	string id;
 } fields_Provided ;
 
 /*
@@ -4529,6 +5760,50 @@ funcdef get_relationship_Provided(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Source, fields_Provided, fields_Subsystem>>);
 funcdef get_relationship_WasProvidedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_Subsystem, fields_Provided, fields_Source>>);
+
+typedef structure {
+	string id;
+} fields_PublishedExperiment ;
+
+/*
+The ExperimentPublishedIn relationship describes where a
+particular experiment was published.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_PublishedExperiment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Publication, fields_PublishedExperiment, fields_PhenotypeExperiment>>);
+funcdef get_relationship_ExperimentPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_PhenotypeExperiment, fields_PublishedExperiment, fields_Publication>>);
+
+typedef structure {
+	string id;
+} fields_PublishedProtocol ;
+
+/*
+The ProtocolPublishedIn relationship describes where a
+particular protocol was published.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_PublishedProtocol(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Publication, fields_PublishedProtocol, fields_Protocol>>);
+funcdef get_relationship_ProtocolPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Protocol, fields_PublishedProtocol, fields_Publication>>);
 
 typedef structure {
 	string id;
@@ -4583,6 +5858,130 @@ funcdef get_relationship_WasSubmittedBy(list<string> ids, list<string> from_fiel
 
 typedef structure {
 	string id;
+	string successor_type nullable;
+} fields_SupersedesAlignment ;
+
+/*
+This relationship connects an alignment to the alignments
+it replaces.
+It has the following fields:
+
+=over 4
+
+
+=item successor_type
+
+Indicates whether sequences were removed or added
+to create the new alignment.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_SupersedesAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_SupersedesAlignment, fields_Alignment>>);
+funcdef get_relationship_IsSupersededByAlignment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Alignment, fields_SupersedesAlignment, fields_Alignment>>);
+
+typedef structure {
+	string id;
+	string successor_type nullable;
+} fields_SupersedesTree ;
+
+/*
+This relationship connects a tree to the trees
+it replaces.
+It has the following fields:
+
+=over 4
+
+
+=item successor_type
+
+Indicates whether sequences were removed or added
+to create the new tree.
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_SupersedesTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_SupersedesTree, fields_Tree>>);
+funcdef get_relationship_IsSupersededByTree(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_SupersedesTree, fields_Tree>>);
+
+typedef structure {
+	string id;
+} fields_Treed ;
+
+/*
+This relationship connects a tree to the source database from
+which it was generated.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_Treed(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Source, fields_Treed, fields_Tree>>);
+funcdef get_relationship_IsTreeFrom(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Tree, fields_Treed, fields_Source>>);
+
+typedef structure {
+	string id;
+} fields_UsedBy ;
+
+/*
+The UsesMedia relationship defines which media is used by an
+Environment.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_UsedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Media, fields_UsedBy, fields_Environment>>);
+funcdef get_relationship_UsesMedia(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Environment, fields_UsedBy, fields_Media>>);
+
+typedef structure {
+	string id;
+} fields_UsedInExperimentalUnit ;
+
+/*
+The HasEnvironment relationship describes the enviroment a
+subexperiment defined by Experimental unit was performed in.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_UsedInExperimentalUnit(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Environment, fields_UsedInExperimentalUnit, fields_ExperimentalUnit>>);
+funcdef get_relationship_HasEnvironment(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ExperimentalUnit, fields_UsedInExperimentalUnit, fields_Environment>>);
+
+typedef structure {
+	string id;
 } fields_Uses ;
 
 /*
@@ -4603,5 +6002,27 @@ funcdef get_relationship_Uses(list<string> ids, list<string> from_fields, list<s
 	returns(list<tuple<fields_Genome, fields_Uses, fields_SSRow>>);
 funcdef get_relationship_IsUsedBy(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
 	returns(list<tuple<fields_SSRow, fields_Uses, fields_Genome>>);
+
+typedef structure {
+	string id;
+} fields_UsesCodons ;
+
+/*
+This relationship connects a genome to the various codon usage
+records for it.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_UsesCodons(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Genome, fields_UsesCodons, fields_CodonUsage>>);
+funcdef get_relationship_AreCodonsFor(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_CodonUsage, fields_UsesCodons, fields_Genome>>);
 
 };

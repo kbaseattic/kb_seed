@@ -10,12 +10,12 @@ use Carp;
 
 =head1 get_entity_PairSet
 
-A PairSet is a precompute set of pairs or genes.  Each pair occurs close to
-one another of the chromosome.  We believe that all of the first members
-of the pairs correspond to one another (are quite similar), as do all of
-the second members of the pairs.  These pairs (from prokaryotic genomes)
-offer on of the most powerful clues relating to uncharacterized genes/peroteins.
-
+A PairSet is a precompute set of pairs or genes.  Each
+pair occurs close to one another of the chromosome.  We believe
+that all of the first members of the pairs correspond to one another
+(are quite similar), as do all of the second members of the pairs.
+These pairs (from prokaryotic genomes) offer one of the most
+powerful clues relating to uncharacterized genes/peroteins.
 
 Example:
 

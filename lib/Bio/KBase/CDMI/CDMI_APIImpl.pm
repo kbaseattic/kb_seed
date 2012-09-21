@@ -4983,52 +4983,53 @@ sub fids_to_feature_data
     my %publications;
     my %location;
     my @locs = $kb->GetAll('IsLocatedIn',
-			  $loc_constraint,
-			  $fids,
-			  'IsLocatedIn(from-link) IsLocatedIn(to-link) IsLocatedIn(begin) IsLocatedIn(dir) IsLocatedIn(len) IsLocatedIn(ordinal)'
-			  );
+                          $loc_constraint,
+                          $fids,
+                          'IsLocatedIn(from-link) IsLocatedIn(to-link) IsLocatedIn(begin) IsLocatedIn(dir) IsLocatedIn(len) IsLocatedIn(ordinal)'
+                          );
     foreach my $tuple (sort { ($a->[0] cmp $b->[0]) or ($a->[5] <=> $b->[5]) } @locs)
     {
-	my($fid,$contig,$begin,$dir,$len) = @$tuple;
-	push(@{$location{$fid}},[$contig,$begin,$dir,$len]);
+        my($fid,$contig,$begin,$dir,$len) = @$tuple;
+        push(@{$location{$fid}},[$contig,$begin,$dir,$len]);
     }
 
     my @res = $kb->GetAll('Feature IsOwnedBy Genome',
-			  $fid_constraint,
-			  $fids,
-			  'Feature(id) Genome(scientific_name) Feature(function) Feature(sequence_length)'
-			  );
+                          $fid_constraint,
+                          $fids,
+                          'Feature(id) Genome(scientific_name) Feature(function) Feature(sequence_length)'
+                          );
 
     foreach my $tuple (@res)
     {
-	my($fid,$genome_name,$function,$length) = @$tuple;
-	$genome{$fid}      = $genome_name;
-	$function{$fid}    = $function;
-	$len{$fid}         = $length;
+        my($fid,$genome_name,$function,$length) = @$tuple;
+        $genome{$fid}      = $genome_name;
+        $function{$fid}    = $function;
+        $len{$fid}         = $length;
     }
 
     @res = $kb->GetAll('Feature Produces ProteinSequence IsATopicOf Publication',
-			  $produces_constraint,
-			  $fids,
-			  'Feature(id) IsATopicOf(to_link) Publication(link) Publication(title)'
-			  );
+                          $produces_constraint,
+                          $fids,
+                          'Feature(id) IsATopicOf(to_link) Publication(link) Publication(title)'
+                          );
     foreach my $tuple (@res)
     {
-	my($fid,$pubid,$link,$title) = @$tuple;
-	push(@{$publications{$fid}},[$pubid,$link,$title]);
+        my($fid,$pubid,$link,$title) = @$tuple;
+        push(@{$publications{$fid}},[$pubid,$link,$title]);
     }
     foreach my $fid (@$fids)
     {
-	my $function = $function{$fid}     || '';
-	my $pubrefs  = $publications{$fid} || [];
-	my $loc      = $location{$fid} || [];
-	$return->{$fid} = { feature_id 		 => $fid,
-			    genome_name 	 => $genome{$fid},
-			    feature_function 	 => $function,
-			    feature_length 	 => $len{$fid},
-			    feature_publications => $pubrefs,
-			    feature_location     => $loc
-			   };
+        my $function = $function{$fid}     || '';
+        my $pubrefs  = $publications{$fid} || [];
+        my $loc      = $location{$fid} || [];
+        my @locO     = map { [$_->Contig, $_->Begin, $_->Dir, $_->Length] } Bio::KBase::CDMI::CDMI::FormatLocations(@$loc);
+        $return->{$fid} = { feature_id           => $fid,
+                            genome_name          => $genome{$fid},
+                            feature_function     => $function,
+                            feature_length       => $len{$fid},
+                            feature_publications => $pubrefs,
+                            feature_location     => \@locO
+                           };
     }
     return($return);
     #END fids_to_feature_data
@@ -6755,10 +6756,10 @@ sub corresponds
     my $fids_to = $gH->{$genome};
     my $loc2H   = $self->fids_to_locations($fids_to);
     my $seq2H   = $self->fids_to_protein_sequences($fids_to);
-    my @seqs2   = map { my $loc2 = $loc2H->{$_}; 
+    my @seqs2   = map { my $loc2 = $loc2H->{$_};
 			my $seq2 = $seq2H->{$_};
 			($seq2 && $loc2) ? [$_,'',$seq2] : () } @$fids_to;
-    my @locs2   = map { my $loc2 = $loc2H->{$_}; 
+    my @locs2   = map { my $loc2 = $loc2H->{$_};
 			my $seq2 = $seq2H->{$_};
 			($seq2 && $loc2) ? [$_,$loc2] : () } @$fids_to;
     my %genomes_to_fids;
@@ -6777,10 +6778,10 @@ sub corresponds
 
 	my $loc1H     = $self->fids_to_locations($fids_from_all);
 	my $seq1H     = $self->fids_to_protein_sequences($fids_from_all);
-	my @seqs1     = map { my $loc1 = $loc1H->{$_}; 
+	my @seqs1     = map { my $loc1 = $loc1H->{$_};
 			      my $seq1 = $seq1H->{$_};
 			      ($seq1 && $loc1) ? [$_,'',$seq1] : () } @$fids_from_all;
-	my @locs1     = map { my $loc1 = $loc1H->{$_}; 
+	my @locs1     = map { my $loc1 = $loc1H->{$_};
 			      my $seq1 = $seq1H->{$_};
 			      ($seq1 && $loc1) ? [$_,$loc1] : () } @$fids_from_all;
 	my($corr,$reps2,$reps1) = &Corresponds::correspondence_of_reps(\@seqs1,
@@ -6958,10 +6959,10 @@ sub corresponds_from_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN corresponds_from_sequences
-    
+
     use Corresponds;
     $return = {};
-    
+
     my($corr,$reps2,$reps1) = &Corresponds::correspondence_of_reps([map { [$_->[0], undef, $_->[1]] } @$g1_sequences],
 								   $g1_locations,
 								   [map { [$_->[0], undef, $_->[1]] } @$g2_sequences],
@@ -6971,7 +6972,7 @@ sub corresponds_from_sequences
     foreach my $x (@$corr)
     {
 	my($id1,$iden,$ncontext,$b1,$e1,$ln1,$b2,$e2,$ln2,$score,$to) = @$x;
-	
+
 	$return->{$id1} = { to       => $to,
 				iden     => $iden,
 				ncontext => $ncontext,
@@ -6984,8 +6985,8 @@ sub corresponds_from_sequences
 				score    => $score
 				};
     }
-    
-    
+
+
     #END corresponds_from_sequences
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
@@ -7194,7 +7195,7 @@ sub representative_sequences
     my $options = {};
     use gjoseqlib;
     use representative_sequences;
-    
+
     local $_;
     my($rep,$reping);
     if ($rep_seq_parms->{order}) { $options->{by_size} = $rep_seq_parms->{order} }
@@ -7214,7 +7215,7 @@ sub representative_sequences
 	($rep,$reping) = &representative_sequences::rep_seq(@args);
     }
     $return_1 = [map { $_->[0] } @$rep];
-    $return_2 = [ map { [ $_, @{ $reping->{ $_ } } ] } @$return_1 ]; 
+    $return_2 = [ map { [ $_, @{ $reping->{ $_ } } ] } @$return_1 ];
     #END representative_sequences
     my @_bad_returns;
     (ref($return_1) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return_1\" (value was \"$return_1\")");
@@ -7481,6 +7482,15 @@ sub align_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN align_sequences
+    use AlignTree;
+
+    my %muscle_parms = $align_seq_parms->{muscle_parms} ? %{$align_seq_parms->{muscle_parms}} : { };
+    my %mafft_parms  = $align_seq_parms->{mafft_parms}  ? %{$align_seq_parms->{mafft_parms}}  : { };
+    my %opts = (%muscle_parms, %mafft_parms, %$align_seq_parms);
+    $opts{clustal_ends} = $align_seq_parms->{align_ends_with_clustal};
+
+    $return = AlignTree::align_sequences($seq_set, \%opts);
+
     #END align_sequences
     my @_bad_returns;
     (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");

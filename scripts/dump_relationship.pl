@@ -43,7 +43,7 @@ if ($camelize)
 {
     $relname = camelize($relname);
 }
-			
+
 
 my $cdmi = Bio::KBase::CDMI::CDMI->new;
 

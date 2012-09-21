@@ -28,9 +28,9 @@ The Model entity has the following relationship links:
 
 =over 4
     
-=item IsARequirementIn Requirement
+=item HasRequirementOf ReactionInstance
 
-=item IsDividedInto ModelCompartment
+=item IsDividedInto LocationInstance
 
 =item Manages Biomass
 

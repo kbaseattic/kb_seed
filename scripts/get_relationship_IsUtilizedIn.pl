@@ -51,6 +51,10 @@ strings. The following fields are available:
 
 =item name
 
+=item is_minimal
+
+=item source_id
+
 =item type
 
 =back    
@@ -96,7 +100,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'type' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'source' );
 

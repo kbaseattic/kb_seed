@@ -10,7 +10,7 @@ use Carp;
 =head1 get_relationship_Involves
 
 This relationship connects a reaction to the
-reagents representing the compounds that participate in it.
+specific localized compounds that participate in it.
 
 Example:
 
@@ -51,13 +51,21 @@ strings. The following fields are available:
 
 =item name
 
-=item msid
+=item source_id
 
 =item abbr
 
-=item equation
+=item direction
 
-=item reversibility
+=item deltaG
+
+=item deltaG_error
+
+=item thermodynamic_reversibility
+
+=item default_protons
+
+=item status
 
 =back    
 
@@ -72,24 +80,20 @@ strings. The following fields are available:
 
 =item to_link
 
+=item coefficient
+
+=item cofactor
+
 =back    
 
 =item -to field-list
 
-Choose a set of fields from the Reagent entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the LocalizedCompound entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
-
-=item stoichiometry
-
-=item cofactor
-
-=item compartment_index
-
-=item transport_coefficient
 
 =back    
 
@@ -108,9 +112,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'msid', 'abbr', 'equation', 'reversibility' );
-my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'stoichiometry', 'cofactor', 'compartment_index', 'transport_coefficient' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'coefficient', 'cofactor' );
+my @all_to_fields = ( 'id',  );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

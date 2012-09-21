@@ -9,9 +9,8 @@ use Carp;
 
 =head1 get_relationship_HasRealLocationIn
 
-This relationship connects a model's instance of a reaction
-to the compartments in which it takes place. Most instances
-take place in a single compartment. Transporters use two compartments.
+This relationship connects a specific instance of a compound in a model
+to the specific instance of the model subcellular location where the compound exists.
 
 Example:
 
@@ -41,18 +40,16 @@ This is used only if the column containing id is not the last.
 
 =item -from field-list
 
-Choose a set of fields from the Requirement entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the CompoundInstance entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item direction
+=item charge
 
-=item transproton
-
-=item proton
+=item formula
 
 =back    
 
@@ -67,20 +64,18 @@ strings. The following fields are available:
 
 =item to_link
 
-=item type
-
 =back    
 
 =item -to field-list
 
-Choose a set of fields from the ModelCompartment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the LocationInstance entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item compartment_index
+=item index
 
 =item label
 
@@ -105,9 +100,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'direction', 'transproton', 'proton' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'type' );
-my @all_to_fields = ( 'id', 'compartment_index', 'label', 'pH', 'potential' );
+my @all_from_fields = ( 'id', 'charge', 'formula' );
+my @all_rel_fields = ( 'from_link', 'to_link',  );
+my @all_to_fields = ( 'id', 'index', 'label', 'pH', 'potential' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;

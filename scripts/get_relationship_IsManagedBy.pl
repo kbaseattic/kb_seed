@@ -9,9 +9,8 @@ use Carp;
 
 =head1 get_relationship_IsManagedBy
 
-This relationship connects a model to the biomasses
-that are monitored to determine whether or not the model
-is effective.
+This relationship connects a model to its associated biomass
+composition reactions.
 
 Example:
 
@@ -51,6 +50,18 @@ strings. The following fields are available:
 =item mod_date
 
 =item name
+
+=item dna
+
+=item protein
+
+=item cell_wall
+
+=item lipid
+
+=item cofactor
+
+=item energy
 
 =back    
 
@@ -109,7 +120,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'dna', 'protein', 'cell_wall', 'lipid', 'cofactor', 'energy' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'mod_date', 'name', 'version', 'type', 'status', 'reaction_count', 'compound_count', 'annotation_count' );
 
