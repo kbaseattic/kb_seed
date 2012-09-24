@@ -72,10 +72,12 @@ sub align_sequences {
 
     my $program;
 
-    $opts->{tool} ||= 'mafft';
-
-    $opts->{muscle} = "/home/fangfang/bin/muscle" if -x "/home/fangfang/bin/muscle";
-    $opts->{mafft}  = "/home/fangfang/bin/mafft"  if -x "/home/fangfang/bin/mafft";
+    $opts->{tool}  ||= 'mafft';
+    $opts->{reorder} = 1 if $opts->{tool} =~ /mafft/i;
+        
+    $opts->{muscle}   = "/home/fangfang/bin/muscle" if -x "/home/fangfang/bin/muscle";
+    $opts->{mafft}    = "/home/fangfang/bin/mafft"  if -x "/home/fangfang/bin/mafft";
+    $opts->{clustalw} = "/home/fangfang/bin/mafft"  if -x "/home/fangfang/bin/clustalw";
 
     if    ($opts->{tool} =~ /muscle/i)  { $program = \&gjoalignment::align_with_muscle  }
     elsif ($opts->{tool} =~ /mafft/i)   { $program = \&gjoalignment::align_with_mafft   }
@@ -1231,6 +1233,159 @@ sub print_pfam {
 
     print join("\n", @lines). "\n";
     # wantarray ? @lines : join("\n", @lines). "\n";
+}
+
+
+#-------------------------------------------------------------------------------
+#   @signatures = signature_columns_in_ali( \@align, \@g1, \@g2, \%opts )
+#   @signatures = signature_columns_in_ali( \@align, \%opts )
+#  \@signatures = signature_columns_in_ali( \@align, \@g1, \@g2, \%opts )
+#  \@signatures = signature_columns_in_ali( \@align, \%opts )
+# 
+#  Options:
+#
+#    nogap   => BOOL      # return regions sort by conservation 
+#    thresh  => disc      # threshold discrimimitive value for calling signatures (D = 0.75)
+#    g1      => \@group1  # group 1 seq IDs 
+#    g2      => \@group2  # group 2 seq IDs
+#    use_gid => BOOL      # seq IDs supplied in SEED genome ID format
+#                          gids associated with multiple seqs will be removed
+#
+#-------------------------------------------------------------------------------
+
+sub signature_columns_in_ali {
+    my ($ali, $opts) = ffxtree::process_input_args_w_ali(@_);
+    
+    my ($g1, $g2);
+    shift @_;
+    for (@_) {
+        if    (ref $_ eq 'HASH')  { $opts = $_ }
+        elsif (ref $_ eq 'ARRAY') { !$g1 and $g1 = $_ or $g2 ||= $_ }
+    }
+    $g1 ||= $opts->{g1};
+    $g2 ||= $opts->{g2};
+
+    my $nogap   = $opts->{nogap};
+    my $thresh  = $opts->{thresh} || 0.75;
+    my $use_gid = $opts->{use_gid};
+    
+    my (@ids1, @ids2);
+    my (%gid_cnt, %sid_hash);
+    if ($use_gid) {
+        my @sids = map { $_->[0] } @$ali;
+        for (@sids) {
+            if (/fig\|(\d+\.\d+)\./) {
+                $gid_cnt{$1}++;
+                $sid_hash{$1} = $_;
+            }
+        }
+        # print STDERR '\%gid_cnt = '. Dumper(\%gid_cnt);
+        # print STDERR '\%sid_hsh = '. Dumper(\%sid_hash);
+        
+        @ids1 = map { $gid_cnt{$_} == 1 ? $sid_hash{$_} : () } @$g1;
+        @ids2 = map { $gid_cnt{$_} == 1 ? $sid_hash{$_} : () } @$g2;
+        # print STDERR '\@ids1 = '. Dumper(\@ids1);
+        # print STDERR '\@ids2 = '. Dumper(\@ids2);
+        
+    } else {
+        @ids1 = @$g1;
+        @ids2 = @$g2;
+    }
+
+    # print STDERR '$g1, $g2 = '. Dumper($g1, $g2);
+    print STDERR '\@ids1, \@ids2 = '. Dumper(\@ids1, \@ids2);
+    # print STDERR '#seqs = '. scalar@$ali."\n";
+    # print STDERR '$opts = '. Dumper($opts);
+    # print STDERR '$ali = '. Dumper($ali);
+    # my $conserv = residue_conserv_scores($ali);
+}
+
+
+#-------------------------------------------------------------------------------
+#
+#  Support routines for signature analysis
+#
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#
+# This code arose when Ross asked Sergei Kovbassa to consider the following problem:
+# 
+#      1.  You have an alignment.  Suppose that it is an rRNA alignment (which it was).
+# 
+#      2.  You have a tree.  A subtree contains a set of genomes (which correspond
+#          to rows in the alignment) which we call the "in group".
+# 
+#      3.  The genomes that occur around the nested "in group" we call the "out group".
+# 
+#      4.  The question then becomes "Which columns in the alignment best distinguish
+#          the "in group" from the "out group".
+# 
+# Sergei answered this question in a publication "Sugnature Analysis of Images of a Nucleotide
+# Sequence (I)" published in Pattern Recognition and Image Analysis, vol 5, no 2, 1995, pp 294-298.
+# 
+# The alignment contains characters in any of several alphabets. If we are discussing
+# nucleotides, then one could think of each character as a 4-tuple: 
+# 
+# 	     (probability of A,
+# 	      probability of C,
+# 	      probability of G,
+# 	      probability of T)
+# 
+# Thus, a character S (meaning C or G) would be (0,0.5,0.5,0) and an indel would be
+# (0,0,0,0).  The variable $xin is a vector which is the sum of the probability vectors
+# for the characters in the column from the "in group".  Similarly, the variable $xout
+# is the sum of the probability vectors for the "out group". 
+# 
+# It should be noted that Sergei (along with L. M. Lazebnaya and I. L. Laptev) wrote
+# a sequel "Signature Analysis of Images of Nucleotide Sequences (II)"
+# published in Pattern Recognition and Image Analysis, vol 5, no 3, 1995, pp 472-476.
+# I believe that this paper related to rapid construction of approximate phylogenetic
+# trees, was based on the first paper, but did not alter the basic issue of locating
+# columns that act as signatures.
+#
+# ---------------------
+# my $xin   = [1,2,0,0];  # These test data should produce a score of $din+$dout = 0.016 
+# my $xout  = [1,3,0,0];
+#
+# $din and $dout have a range of [0, 1]
+#
+#-------------------------------------------------------------------------------
+
+sub discriminates {
+    my($xin, $xout) = @_;
+
+    my $sx    = vector_sum($xin);
+    my $sy    = vector_sum($xout);
+    my $xy    = scalar_product($xin, $xout);
+    my $xx    = scalar_product($xin, $xin);
+    my $yy    = scalar_product($xout, $xout);
+
+    my $din   = (($sx != 0) && ($yy != 0)) ? (1 - (($sy * $xy) / ($sx * $yy))) : 0;
+    my $dout  = (($sy != 0) && ($xx != 0)) ? (1 - (($sx * $xy) / ($sy * $xx))) : 0;
+
+    return ($din,$dout);
+}
+
+sub vector_sum {
+    my ($v) = @_;
+    my $sum = 0;
+    $sum += $_ for @$v;
+    return $sum;
+}
+
+sub scalar_product {
+    my ($x,$y) = @_;
+    
+    if (@$x != @$y) {
+	print STDERR Dumper($x,$y);
+        die "Incompatible vectors:\n";
+    }
+    my $sum = 0;
+    for (my $i=0; $i < @$x; $i++) {
+	$sum += $x->[$i] * $y->[$i];
+    }
+    return $sum;
 }
 
 

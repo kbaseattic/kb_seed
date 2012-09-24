@@ -300,9 +300,10 @@ if (! $kbO) { print STDERR $usage; exit }
 my $seqs = gjoseqlib::read_fasta();
 my $opts = process_prog_args(\@prog_args);
 
-if    ($mafft)  { $tool   = "mafft"   }
-elsif ($muscle) { $tool   = "muscle"  }
-else            { $tool ||= "clustal" }
+if    ($clustal) { $tool   = "clustal" }
+elsif ($muscle)  { $tool   = "muscle" }
+else             { $tool ||= "mafft" }
+
 
 $opts->{tool}         = $tool;
 $opts->{clustal_ends} = 1 if $zero;
