@@ -217,7 +217,7 @@ sub validate_exchange
 
     push @load_recipes, [ $dir, 'CodonUsage.tab', 'CodonUsage',
                           { id => 0, frequencies => 1, genetic_code => 2, type => 3,
-                            subtype => [ 3, 'copy', '' ] } ];
+                            subtype => [ 4, 'copy', '' ] } ];
 
     # Input: UsesCodons.tab
     # Table: UsesCodons

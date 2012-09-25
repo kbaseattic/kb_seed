@@ -953,4 +953,19 @@ module CDMI_API : CDMI_API {
              
      funcdef align_sequences(seq_set,align_seq_parms) returns (seq_set);
 
+     typedef string newick_tree;
+
+     typedef structure {
+	 string bootstrap;
+	 string model;
+	 string nclasses;
+	 string nproc;
+	 string rate;
+	 string search;
+	 string tool;
+         string tool_params;
+     } build_tree_parms;
+
+     funcdef build_tree(seq_set, build_tree_parms) returns (newick_tree);
+
 };

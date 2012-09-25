@@ -17,7 +17,7 @@ AskKB
 
 #BEGIN_HEADER
 use Bio::KBase::InvocationService::Client;
-use YAML qw(LoadFile DumpFile);
+use YAML::XS qw(LoadFile DumpFile);
 use Cmd2HTML;
 use Data::Dumper;
 #END_HEADER
@@ -168,6 +168,8 @@ sub askKB
     print STDERR Dumper $return_1;
     print STDERR Dumper $return_2;
 
+    
+    DumpFile("$userD/last", $ret);
     DumpFile("$userD/aliases", $aliases);
     #return $html;
     #END askKB
@@ -180,6 +182,103 @@ sub askKB
 							       method_name => 'askKB');
     }
     return($return_1, $return_2);
+}
+
+
+
+
+=head2 save
+
+  $obj->save($session_id, $cwd, $filename)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$session_id is a session_id
+$cwd is a cwd
+$filename is a string
+session_id is a string
+cwd is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$session_id is a session_id
+$cwd is a cwd
+$filename is a string
+session_id is a string
+cwd is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub save
+{
+    my $self = shift;
+    my($session_id, $cwd, $filename) = @_;
+
+    my @_bad_arguments;
+    (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument \"session_id\" (value was \"$session_id\")");
+    (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument \"cwd\" (value was \"$cwd\")");
+    (!ref($filename)) or push(@_bad_arguments, "Invalid type for argument \"filename\" (value was \"$filename\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to save:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'save');
+    }
+
+    my $ctx = $Bio::KBase::AskKB::Service::CallContext;
+    #BEGIN save
+    my $ask_storage = $self->{ask_storage_dir};
+    my $invoc = $self->{invoc};
+    my $userD = "$ask_storage/User/$session_id";
+    my $ret = LoadFile("$userD/last");
+    #print STDERR "SAVE ", Dumper $ret;
+    my $type = $ret->[0];
+    my $retH = $ret->[1];
+    my $file;
+    if ($type eq 'table') {
+            my $data = $retH->{data};
+            foreach my $line (@$data) {
+                    $file .= join("\t", @$line);
+                    $file .= "\n";
+            }
+        $invoc->put_file($session_id, $filename, $file, $cwd);
+    }
+    if ($type eq 'Fasta File') {
+            my $data = $retH->{data};
+            $file = join("\n", $data);
+            $invoc->put_file($session_id, $filename, $file, $cwd);
+    }
+    if ($type eq 'html') {
+            my $data = $retH->{data};
+            $invoc->put_file($session_id, $filename, $data, $cwd);
+    }
+
+            
+
+    
+
+
+    #END save
+    return();
 }
 
 

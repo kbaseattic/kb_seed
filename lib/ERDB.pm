@@ -4155,8 +4155,11 @@ sub CreateIndex {
             } elsif ($mod) {
                 # Here we have an indexed field that requires a modification in order
                 # to work. This means we need to insert it between the
-                # field name and the ordering suffix. The cool thing here
-                # is that the join works even if $suffix is undefined.
+                # field name and the ordering suffix. Note we make sure the
+                # suffix is defined.
+                if (! defined $suffix) {
+                	$suffix = "";
+                }
                 $rawFields[$i] =  join(" ", $dbh->index_mod($self->{_quote} .
                     $field . $self->{_quote}, $mod), $suffix);
             } else {
@@ -6698,7 +6701,7 @@ sub _AddIndex {
         # Create a string containing the field name.
         my $fieldString = $field->{name};
         # Add the ordering token if needed.
-        if ($field->{order} eq "descending") {
+        if ($field->{order} && $field->{order} eq "descending") {
             $fieldString .= " DESC";
         }
         # Push the result onto the field list.

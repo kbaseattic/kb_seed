@@ -7505,6 +7505,117 @@ sub align_sequences
 
 
 
+=head2 build_tree
+
+  $return = $obj->build_tree($seq_set, $build_tree_parms)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seq_set is a seq_set
+$build_tree_parms is a build_tree_parms
+$return is a newick_tree
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+build_tree_parms is a reference to a hash where the following keys are defined:
+	bootstrap has a value which is a string
+	model has a value which is a string
+	nclasses has a value which is a string
+	nproc has a value which is a string
+	rate has a value which is a string
+	search has a value which is a string
+	tool has a value which is a string
+	tool_params has a value which is a string
+newick_tree is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seq_set is a seq_set
+$build_tree_parms is a build_tree_parms
+$return is a newick_tree
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+build_tree_parms is a reference to a hash where the following keys are defined:
+	bootstrap has a value which is a string
+	model has a value which is a string
+	nclasses has a value which is a string
+	nproc has a value which is a string
+	rate has a value which is a string
+	search has a value which is a string
+	tool has a value which is a string
+	tool_params has a value which is a string
+newick_tree is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub build_tree
+{
+    my $self = shift;
+    my($seq_set, $build_tree_parms) = @_;
+
+    my @_bad_arguments;
+    (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seq_set\" (value was \"$seq_set\")");
+    (ref($build_tree_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"build_tree_parms\" (value was \"$build_tree_parms\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'build_tree');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN build_tree
+    use AlignTree;
+    use gjonewicklib;
+    
+    my $tree = AlignTree::make_tree($seq_set, $build_tree_parms);
+    $return  = gjonewicklib::strNewickTree($tree);    
+
+    #END build_tree
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'build_tree');
+    }
+    return($return);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -10956,6 +11067,76 @@ muscle_parms has a value which is a muscle_parms_t
 mafft_parms has a value which is a mafft_parms_t
 tool has a value which is a string
 align_ends_with_clustal has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 newick_tree
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 build_tree_parms
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+bootstrap has a value which is a string
+model has a value which is a string
+nclasses has a value which is a string
+nproc has a value which is a string
+rate has a value which is a string
+search has a value which is a string
+tool has a value which is a string
+tool_params has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+bootstrap has a value which is a string
+model has a value which is a string
+nclasses has a value which is a string
+nproc has a value which is a string
+rate has a value which is a string
+search has a value which is a string
+tool has a value which is a string
+tool_params has a value which is a string
 
 
 =end text

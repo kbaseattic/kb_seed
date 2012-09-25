@@ -316,7 +316,7 @@ Name of the directory containing the model data files.
                     Location Compound ParticipatesAs HasPresenceOf
                     HasCompoundAliasFrom LocalizedCompound
                     LocationInstance HasRequirementOf
-                    HasUsage CompoundInstance
+                    HasUsage CompoundInstance IsRealLocationOf
                     IsComprisedOf IsReagentIn Model IsModeledBy
                     Reaction IsDividedInto IsInstantiatedBy
                     IsParticipatingAt ReactionInstance
@@ -332,7 +332,7 @@ Name of the directory containing the model data files.
     } else {
         # We aren't clearing, so make a pass through the models to
         # delete the existing ones.
-        open(my $ih, '<Model.dtx') || die "Could not open model file: $!\n";
+        open(my $ih, '<$inDirectory/Model.dtx') || die "Could not open model file: $!\n";
         while (! eof $ih) {
             my (undef, undef, $id) = $loader->GetLine($ih);
             my $delStats = $cdmi->Delete(Model => $id);
@@ -408,7 +408,7 @@ Name of the directory containing the model data files.
     $loader->SimpleLoad($inDirectory, 'IsReagentIn.dtx', 'IsReagentIn',
         { from_link => 1, to_link => 2, coefficient => 0 }, 1);
     $loader->SimpleLoad($inDirectory, 'IsModeledBy.dtx', 'IsModeledBy',
-        { from_link => 0, to_link => 1 }, 1);
+        { from_link => 1, to_link => 0 }, 1);
     $loader->SimpleLoad($inDirectory, 'IsParticipatingAt.dtx',
         'IsParticipatingAt', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'HasRequirementOf.dtx',

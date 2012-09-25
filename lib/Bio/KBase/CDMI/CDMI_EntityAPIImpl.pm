@@ -50236,6 +50236,76 @@ align_ends_with_clustal has a value which is an int
 
 
 
+=head2 newick_tree
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 build_tree_parms
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+bootstrap has a value which is a string
+model has a value which is a string
+nclasses has a value which is a string
+nproc has a value which is a string
+rate has a value which is a string
+search has a value which is a string
+tool has a value which is a string
+tool_params has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+bootstrap has a value which is a string
+model has a value which is a string
+nclasses has a value which is a string
+nproc has a value which is a string
+rate has a value which is a string
+search has a value which is a string
+tool has a value which is a string
+tool_params has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 diamond
 
 =over 4

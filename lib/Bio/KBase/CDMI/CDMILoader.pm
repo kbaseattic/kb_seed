@@ -606,8 +606,9 @@ sub LoadRelations {
         # Get the relation's file handle and file name.
         my $fh = $relations->{$relationName}[0];
         my $fileName = $fh->filename;
-        # Close the handle to make the file available for reading.
+        # Close the handle and change the permissions to make the file available for reading.
         close $fh;
+        chmod 0664, $fileName;
         # Load the file into the relation and roll up the statistics.
         my $stats2 = $cdmi->LoadTable($fileName, $relationName, partial => 1,
             );
