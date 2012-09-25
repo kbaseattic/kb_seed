@@ -521,7 +521,7 @@ sub SetRelations {
     for my $relationName (@relationNames) {
         # Create the output file.
         my $fh = File::Temp->new(TEMPLATE => "loader_rel_$relationName.XXXXXXXX",
-                SUFFIX => '.dtx', UNLINK => 1, DIR => File::Spec->tmpdir());
+                SUFFIX => '.dtx', UNLINK => 0, DIR => File::Spec->tmpdir());
         # Get the list of fields in the relation.
         my $relData = $cdmi->FindRelation($relationName);
         my @fields = map { $_->{name} } @{$relData->{Fields}};
@@ -582,17 +582,25 @@ sub InsertObject {
 
 =head3 LoadRelations
 
-    $loader->LoadRelations();
+    $loader->LoadRelations($keep);
 
 Unspool all the relation loaders into the database. Each load file will
 be closed and then a B<LOAD DATA INFILE> command will be used to load it.
 A statistical object (L<Stat>) will be returned.
 
+=over 4
+
+=item keep
+
+If TRUE, the temporary files will not be deleted.
+
+=back
+
 =cut
 
 sub LoadRelations {
     # Get the parameters.
-    my ($self) = @_;
+    my ($self, $keep) = @_;
     # Get our statistics object.
     my $stats = $self->stats;
     # Get the database.
@@ -615,6 +623,10 @@ sub LoadRelations {
         $stats->Accumulate($stats2);
         # Remove the loader.
         delete $relations->{$relationName};
+        # Remove the temporary file if necessary.
+        if (! $keep) {
+        	unlink $fileName;
+        }
     }
 }
 

@@ -3134,7 +3134,7 @@ sub CheckObjectNames {
     # Declare the return variable.
     my @retVal;
     # Separate the string into pieces.
-    my @objectNames = split /\s+/, $objectNameString;
+    my @objectNames = split m/\s+/, $objectNameString;
     # Start in a blank state.
     my $currentObject;
     # Get the alias table.
@@ -3342,7 +3342,7 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode});
+                               style => $options{mode}, local => 'LOCAL');
     };
     if (!defined $rv) {
         $retVal->AddMessage($@) if ($@);
@@ -4146,6 +4146,7 @@ sub CreateIndex {
         for (my $i = 0; $i <= $#rawFields; $i++) {
             # Split the ordering suffix from the field name.
             my ($field, $suffix) = split(/\s+/, $rawFields[$i]);
+            $suffix = "" if ! defined $suffix;
             # Get the field type.
             my $type = $types{$field};
             # Ask if it requires using prefix notation for the index.
@@ -4157,9 +4158,6 @@ sub CreateIndex {
                 # to work. This means we need to insert it between the
                 # field name and the ordering suffix. Note we make sure the
                 # suffix is defined.
-                if (! defined $suffix) {
-                	$suffix = "";
-                }
                 $rawFields[$i] =  join(" ", $dbh->index_mod($self->{_quote} .
                     $field . $self->{_quote}, $mod), $suffix);
             } else {
@@ -4812,7 +4810,7 @@ sub Delete {
                 # Accumulate the statistics for this delete. The only rows deleted
                 # are from the target table, so we use its name to record the
                 # statistic.
-                $retVal->Add($target, $rv);
+                $retVal->Add("delete-$target", $rv);
             }
         }
     }

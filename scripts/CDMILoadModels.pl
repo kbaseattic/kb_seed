@@ -282,6 +282,11 @@ If this option is not specified, errors may occur if chemistry data
 already present in the database is loaded. If chemistry data is being
 replaced, it should be done using a different script.
 
+=item keepTemp
+
+Keep temporary files. Normally, temporary load files are deleted before termination.
+If this option is specified, they will be kept and must be deleted manually.
+
 =head2 Positional Parameters
 
 =over 4
@@ -293,10 +298,10 @@ Name of the directory containing the model data files.
 =back
 
 =cut
-    my ($clear);
+    my ($clear, $keep);
     # Connect to the CDMI and create the loader object.
     print "Connecting to database.\n";
-    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear);
+    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear, keep => \$keep);
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
     # Get the directories.
     my ($inDirectory) = @ARGV;
@@ -332,7 +337,7 @@ Name of the directory containing the model data files.
     } else {
         # We aren't clearing, so make a pass through the models to
         # delete the existing ones.
-        open(my $ih, '<$inDirectory/Model.dtx') || die "Could not open model file: $!\n";
+        open(my $ih, "<$inDirectory/Model.dtx") || die "Could not open model file: $!\n";
         while (! eof $ih) {
             my (undef, undef, $id) = $loader->GetLine($ih);
             my $delStats = $cdmi->Delete(Model => $id);
@@ -415,7 +420,7 @@ Name of the directory containing the model data files.
         'HasRequirementOf', { from_link => 0, to_link => 1 }, 1);
     # Unspool the relation loaders.
     print "Loading database relations.\n";
-    $loader->LoadRelations();
+    $loader->LoadRelations($keep);
     # Insure all the sources are present.
     for my $source (%sources) {
         $stats->Add(sourcesFound => 1);

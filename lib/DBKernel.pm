@@ -1036,7 +1036,8 @@ sub load_table {
     my $delim    = $arg{delim};
     my $dbh  = $self->{_dbh};
     my $dbms = $self->{_dbms};
-    my $style = $arg{style} || $FIG_Config::load_mode;
+    my $style = $arg{style} || '';
+    my $local = $arg{local} || $FIG_Config::load_mode || '';
     my $rv;
     # Convert "normal" load mode to null.
     if ($style eq 'normal') {
@@ -1046,11 +1047,11 @@ sub load_table {
         if ($dbms eq "mysql") {
             # We need to determine whether or not we have to use a special line
             # terminator string.
-            my $lineEnd = ($FIG_Config::arch eq "win" ? "\\r\\n" : "\\n");
+            #my $lineEnd = ($FIG_Config::arch eq "win" ? "\\r\\n" : "\\n");
             Trace("Loading $tbl into MySQL using file $file and style $style.") if T(2);
             # Decide whether this is a local file or a server file.
             my $place = ($self->{_host} ne "localhost" ? "LOCAL" : "");
-	    my $sql = "LOAD DATA $style $place INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
+	    my $sql = "LOAD DATA $style $local $place INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
 	    Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         } elsif ($dbms eq "Pg") {
