@@ -101,6 +101,7 @@ use Data::Dumper;
 use Carp;
 use Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 use Sphinx::Search;
+use Config::Simple;
 
 our $AUTOLOAD;
 sub AUTOLOAD
@@ -128,7 +129,26 @@ sub new
 
     my($cdmi) = @args;
     if (! $cdmi) {
-        $cdmi = Bio::KBase::CDMI::CDMI->new();
+
+	my %params;
+	if (my $e = $ENV{KB_DEPLOYMENT_CONFIG})
+	{
+	    my $service = $ENV{KB_SERVICE_NAME};
+	    my $c = Config::Simple->new();
+	    $c->read($e);
+	    my @params = qw(DBD dbName sock userData dbhost port dbms develop);
+	    for my $p (@params)
+	    {
+		my $v = $c->param("$service.$p");
+		if ($v)
+		{
+		    $params{$p} = $v;
+		}
+	    }
+	}
+	print "build with params " . Dumper(\%params);
+	
+        $cdmi = Bio::KBase::CDMI::CDMI->new(%params);
     }
     $self->{db} = $cdmi;
 
