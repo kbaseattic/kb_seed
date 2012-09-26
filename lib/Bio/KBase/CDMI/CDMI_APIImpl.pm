@@ -146,8 +146,6 @@ sub new
 		}
 	    }
 	}
-	print "build with params " . Dumper(\%params);
-	
         $cdmi = Bio::KBase::CDMI::CDMI->new(%params);
     }
     $self->{db} = $cdmi;
