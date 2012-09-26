@@ -3430,6 +3430,56 @@ sub otu_members
 
 
 
+=head2 $result = otus_to_representatives(otus)
+
+
+
+=cut
+
+sub otus_to_representatives
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function otus_to_representatives (received $n, expecting 1)");
+    }
+    {
+	my($otus) = @args;
+
+	my @_bad_arguments;
+        (ref($otus) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"otus\" (value was \"$otus\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to otus_to_representatives:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'otus_to_representatives');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.otus_to_representatives",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'otus_to_representatives',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method otus_to_representatives",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'otus_to_representatives',
+				       );
+    }
+}
+
+
+
 =head2 $result = fids_to_genomes(fids)
 
 
@@ -3790,6 +3840,57 @@ sub align_sequences
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method align_sequences",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'align_sequences',
+				       );
+    }
+}
+
+
+
+=head2 $result = build_tree(seq_set, build_tree_parms)
+
+
+
+=cut
+
+sub build_tree
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function build_tree (received $n, expecting 2)");
+    }
+    {
+	my($seq_set, $build_tree_parms) = @args;
+
+	my @_bad_arguments;
+        (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seq_set\" (value was \"$seq_set\")");
+        (ref($build_tree_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 2 \"build_tree_parms\" (value was \"$build_tree_parms\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'build_tree');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.build_tree",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'build_tree',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method build_tree",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'build_tree',
 				       );
     }
 }

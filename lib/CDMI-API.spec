@@ -777,6 +777,7 @@ module CDMI_API : CDMI_API {
 
     typedef string genome_name;
     funcdef otu_members(genomes) returns (mapping<genome,mapping<genome,genome_name>>);	
+    funcdef otus_to_representatives(list<int> otus) returns (mapping<int, genome>);
     funcdef fids_to_genomes(fids) returns (mapping<fid,genome>);
 
     typedef string entity_name;    

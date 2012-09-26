@@ -6478,6 +6478,92 @@ sub otu_members
 
 
 
+=head2 otus_to_representatives
+
+  $return = $obj->otus_to_representatives($otus)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$otus is a reference to a list where each element is an int
+$return is a reference to a hash where the key is an int and the value is a genome
+genome is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$otus is a reference to a list where each element is an int
+$return is a reference to a hash where the key is an int and the value is a genome
+genome is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub otus_to_representatives
+{
+    my $self = shift;
+    my($otus) = @_;
+
+    my @_bad_arguments;
+    (ref($otus) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"otus\" (value was \"$otus\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to otus_to_representatives:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'otus_to_representatives');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN otus_to_representatives
+
+    my $kb = $self->{db};
+    $return = {};
+
+    my $n = @$otus;
+    my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
+    my $otu_constraint = "IsCollectionOf(from_link) IN $targets AND representative = 1";
+
+    my @res = $kb->GetAll("IsCollectionOf",
+			  $otu_constraint,
+			  $otus,
+			  "IsCollectionOf(from_link) IsCollectionOf(to_link)");
+    for my $ent (@res)
+    {
+	my($otu,$g) = @$ent;
+	$return->{$otu} = $g;
+    }
+
+    #END otus_to_representatives
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to otus_to_representatives:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'otus_to_representatives');
+    }
+    return($return);
+}
+
+
+
+
 =head2 fids_to_genomes
 
   $return = $obj->fids_to_genomes($fids)
