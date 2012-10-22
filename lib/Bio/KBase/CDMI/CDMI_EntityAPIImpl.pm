@@ -239,7 +239,7 @@ our $entity_field_defs = {
 		    'mod_date' => 1,
 		    'name' => 1,
 		    'source_id' => 1,
-		    'hierarchy' => 1,
+		    'abbr' => 1,
 	
     },
     'LocationInstance' => {
@@ -5581,7 +5581,7 @@ fields_CodonUsage is a reference to a hash where the following keys are defined:
 
 This entity contains information about the codon usage
 frequency in a particular genome with respect to a particular
-type of analysis (e.g. high-expression genes, modal, mean, 
+type of analysis (e.g. high-expression genes, modal, mean,
 etc.).
 It has the following fields:
 
@@ -10777,7 +10777,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 </pre>
 
@@ -10793,7 +10793,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 
 =end text
@@ -10826,11 +10826,10 @@ common name for the location
 ID from the source of this location
 
 
-=item hierarchy
+=item abbr
 
-a number indicating where this location occurs
-in relation other locations in the cell. Zero indicates
-extra-cellular.
+an abbreviation (usually a single letter) for the
+location.
 
 
 
@@ -10896,7 +10895,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 </pre>
 
@@ -10915,7 +10914,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 
 =end text
@@ -10984,7 +10983,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 </pre>
 
@@ -11001,7 +11000,7 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 
 =end text
@@ -16760,7 +16759,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -16773,7 +16772,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -16859,7 +16858,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -16875,7 +16874,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -16941,7 +16940,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -16955,7 +16954,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -18419,7 +18418,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -18435,7 +18434,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -18541,7 +18540,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -18560,7 +18559,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -18629,7 +18628,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -18646,7 +18645,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -20145,7 +20144,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_AffectsLevelOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level has a value which is an int
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -20168,7 +20168,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_AffectsLevelOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level has a value which is an int
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -20258,7 +20259,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_AffectsLevelOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -20281,7 +20283,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_AffectsLevelOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -20358,7 +20361,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -20389,7 +20393,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -20492,7 +20497,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -20523,7 +20529,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -20598,7 +20605,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	function has a value which is a string
 	external_id has a value which is a string
 	organism has a value which is a string
@@ -20625,7 +20633,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	function has a value which is a string
 	external_id has a value which is a string
 	organism has a value which is a string
@@ -20743,7 +20752,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	function has a value which is a string
 	external_id has a value which is a string
 	organism has a value which is a string
@@ -20770,7 +20780,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	function has a value which is a string
 	external_id has a value which is a string
 	organism has a value which is a string
@@ -20853,7 +20864,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_BelongsTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -20878,7 +20890,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_BelongsTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -20963,7 +20976,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_BelongsTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -20988,7 +21002,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_BelongsTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -21069,7 +21084,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_Concerns is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -21094,7 +21110,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_Concerns is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -21179,7 +21196,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_Concerns is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -21204,7 +21222,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_Concerns is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -21292,7 +21311,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ConsistsOfCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	molar_ratio has a value which is a float
 
 </pre>
@@ -21322,7 +21342,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ConsistsOfCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	molar_ratio has a value which is a float
 
 
@@ -21423,7 +21444,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ConsistsOfCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	molar_ratio has a value which is a float
 
 </pre>
@@ -21453,7 +21475,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ConsistsOfCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	molar_ratio has a value which is a float
 
 
@@ -21527,7 +21550,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Contains is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -21553,7 +21577,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Contains is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -21648,7 +21673,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Contains is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -21674,7 +21700,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Contains is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -21757,7 +21784,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedDNA is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -21794,7 +21822,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedDNA is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -21927,7 +21956,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_ContainsAlignedDNA is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -21964,7 +21994,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_ContainsAlignedDNA is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -22062,7 +22093,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedProtein is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -22099,7 +22131,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedProtein is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -22232,7 +22265,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedProtein is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -22269,7 +22303,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_ContainsAlignedProtein is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	index_in_concatenation has a value which is an int
 	beg_pos_in_parent has a value which is an int
 	end_pos_in_parent has a value which is an int
@@ -22364,7 +22399,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Controls is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -22392,7 +22428,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Controls is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -22479,7 +22516,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_Controls is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -22507,7 +22545,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_Controls is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -22590,7 +22629,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_DerivedFromStrain is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -22612,7 +22652,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_DerivedFromStrain is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -22696,7 +22737,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_DerivedFromStrain is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -22718,7 +22760,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_DerivedFromStrain is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -22799,7 +22842,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Describes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	role_rule has a value which is a reference to a list where each element is a string
@@ -22832,7 +22876,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Describes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	role_rule has a value which is a reference to a list where each element is a string
@@ -22924,7 +22969,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	comment has a value which is a string
 fields_Describes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -22957,7 +23003,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	comment has a value which is a string
 fields_Describes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -23040,7 +23087,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AlignmentAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23072,7 +23120,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AlignmentAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23181,7 +23230,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_DescribesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_AlignmentAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23213,7 +23263,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_DescribesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_AlignmentAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23289,7 +23340,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_TreeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23319,7 +23371,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_TreeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23424,7 +23477,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_DescribesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_TreeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23454,7 +23508,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_DescribesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_TreeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -23530,7 +23585,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_TreeNodeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesTreeNode is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 	node_id has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
@@ -23561,7 +23617,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_TreeNodeAttribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_DescribesTreeNode is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 	node_id has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
@@ -23672,7 +23729,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_DescribesTreeNode is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 	node_id has a value which is a string
 fields_TreeNodeAttribute is a reference to a hash where the following keys are defined:
@@ -23703,7 +23761,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_DescribesTreeNode is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 	node_id has a value which is a string
 fields_TreeNodeAttribute is a reference to a hash where the following keys are defined:
@@ -23782,7 +23841,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Displays is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -23817,7 +23877,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Displays is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -23928,7 +23989,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_Displays is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
@@ -23963,7 +24025,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_Displays is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
@@ -24047,7 +24110,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Encompasses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -24071,7 +24135,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Encompasses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -24159,7 +24224,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Encompasses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -24183,7 +24249,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_Encompasses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -24256,7 +24323,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Formulated is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -24279,7 +24347,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Formulated is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -24366,7 +24435,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_Formulated is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -24389,7 +24459,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_Formulated is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -24464,7 +24535,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_GeneratedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
@@ -24487,7 +24559,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_GeneratedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
@@ -24578,7 +24651,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_GeneratedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
@@ -24601,7 +24675,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_GeneratedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
@@ -24691,7 +24766,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_GenomeParentOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -24728,7 +24804,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_GenomeParentOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -24817,7 +24894,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_GenomeParentOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -24854,7 +24932,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_GenomeParentOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -24946,7 +25025,8 @@ fields_PhenotypeDescription is a reference to a hash where the following keys ar
 	unitOfMeasure has a value which is a string
 	source_id has a value which is a string
 fields_HasAssociatedMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -24980,7 +25060,8 @@ fields_PhenotypeDescription is a reference to a hash where the following keys ar
 	unitOfMeasure has a value which is a string
 	source_id has a value which is a string
 fields_HasAssociatedMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -25081,7 +25162,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_HasAssociatedMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeDescription is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -25115,7 +25197,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_HasAssociatedMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeDescription is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -25194,7 +25277,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -25226,7 +25310,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -25336,7 +25421,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -25368,7 +25454,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -25448,7 +25535,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_HasExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -25474,7 +25562,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_HasExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -25559,7 +25648,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -25585,7 +25675,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -25669,7 +25760,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasIndicatedSignalFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	rma_value has a value which is a float
 	level has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
@@ -25698,7 +25790,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasIndicatedSignalFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	rma_value has a value which is a float
 	level has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
@@ -25797,7 +25890,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasIndicatedSignalFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	rma_value has a value which is a float
 	level has a value which is an int
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -25826,7 +25920,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasIndicatedSignalFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	rma_value has a value which is a float
 	level has a value which is an int
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -25911,7 +26006,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_HasKnockoutIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -25940,7 +26036,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	aggregateData has a value which is an int
 fields_HasKnockoutIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -26033,7 +26130,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasKnockoutIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -26062,7 +26160,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasKnockoutIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Strain is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -26141,7 +26240,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -26172,7 +26272,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -26273,7 +26374,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_HasMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -26304,7 +26406,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_HasMeasurement is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -26384,7 +26487,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -26414,7 +26518,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -26508,7 +26613,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -26538,7 +26644,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_HasMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -26615,10 +26722,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_HasParticipant
 	2: a fields_Reaction
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 	type has a value which is an int
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -26648,10 +26756,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_HasParticipant
 	2: a fields_Reaction
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 	type has a value which is an int
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -26765,10 +26874,11 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 	type has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -26798,10 +26908,11 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 	type has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -26880,7 +26991,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	maximum_flux has a value which is a float
 	minimum_flux has a value which is a float
@@ -26919,7 +27031,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	maximum_flux has a value which is a float
 	minimum_flux has a value which is a float
@@ -27041,7 +27154,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	maximum_flux has a value which is a float
 	minimum_flux has a value which is a float
@@ -27080,7 +27194,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	maximum_flux has a value which is a float
 	minimum_flux has a value which is a float
@@ -27167,7 +27282,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_id has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27194,7 +27310,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_id has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27288,7 +27405,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_id has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27315,7 +27433,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_HasProteinMember is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_id has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27395,7 +27514,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27427,7 +27547,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27537,7 +27658,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27569,7 +27691,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -27658,7 +27781,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -27696,7 +27820,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -27789,7 +27914,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -27827,7 +27953,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_HasRepresentativeOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -27923,7 +28050,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_HasRequirementOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	direction has a value which is a string
@@ -27954,7 +28082,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_HasRequirementOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	direction has a value which is a string
@@ -28041,7 +28170,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_HasRequirementOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -28072,7 +28202,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_HasRequirementOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -28155,7 +28286,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -28178,7 +28310,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -28269,7 +28402,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -28292,7 +28426,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasResultsIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -28369,7 +28504,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_HasSection is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigChunk is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -28392,7 +28528,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_HasSection is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigChunk is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -28477,7 +28614,8 @@ fields_ContigChunk is a reference to a hash where the following keys are defined
 	id has a value which is a string
 	sequence has a value which is a string
 fields_HasSection is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	length has a value which is an int
@@ -28500,7 +28638,8 @@ fields_ContigChunk is a reference to a hash where the following keys are defined
 	id has a value which is a string
 	sequence has a value which is a string
 fields_HasSection is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	length has a value which is an int
@@ -28579,7 +28718,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	mod_date has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -28613,7 +28753,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	mod_date has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -28716,7 +28857,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a reference to a list where each element is a string
@@ -28750,7 +28892,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_HasStep is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Complex is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a reference to a list where each element is a string
@@ -28831,7 +28974,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a float
 	statistic_type has a value which is a string
 	measure_id has a value which is a string
@@ -28862,7 +29006,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a float
 	statistic_type has a value which is a string
 	measure_id has a value which is a string
@@ -28970,7 +29115,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 	TO_ID has a value which is a string
 	protocol has a value which is a string
 fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a float
 	statistic_type has a value which is a string
 	measure_id has a value which is a string
@@ -29001,7 +29147,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 	TO_ID has a value which is a string
 	protocol has a value which is a string
 fields_HasTrait is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a float
 	statistic_type has a value which is a string
 	measure_id has a value which is a string
@@ -29091,7 +29238,8 @@ fields_Locality is a reference to a hash where the following keys are defined:
 	longitude has a value which is an int
 	lo_accession has a value which is a string
 fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -29124,7 +29272,8 @@ fields_Locality is a reference to a hash where the following keys are defined:
 	longitude has a value which is an int
 	lo_accession has a value which is a string
 fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -29213,7 +29362,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Locality is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -29246,7 +29396,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasUnits is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Locality is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -29330,7 +29481,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasUsage is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	charge has a value which is a float
@@ -29353,7 +29505,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_HasUsage is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	charge has a value which is a float
@@ -29440,7 +29593,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_HasUsage is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -29463,7 +29617,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_HasUsage is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -29539,7 +29694,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasValueFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Attribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -29563,7 +29719,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_HasValueFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Attribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -29655,7 +29812,8 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 fields_HasValueFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -29679,7 +29837,8 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 fields_HasValueFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	value has a value which is a string
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -29757,7 +29916,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasVariationIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 	len has a value which is an int
 	data has a value which is a string
@@ -29787,7 +29947,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_HasVariationIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 	len has a value which is an int
 	data has a value which is a string
@@ -29911,7 +30072,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasVariationIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 	len has a value which is an int
 	data has a value which is a string
@@ -29941,7 +30103,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_HasVariationIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 	len has a value which is an int
 	data has a value which is a string
@@ -30026,7 +30189,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 	TO_ID has a value which is a string
 	protocol has a value which is a string
 fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_name has a value which is a string
 	rank has a value which is an int
 	pvalue has a value which is a float
@@ -30056,7 +30220,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 	TO_ID has a value which is a string
 	protocol has a value which is a string
 fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_name has a value which is a string
 	rank has a value which is an int
 	pvalue has a value which is a float
@@ -30165,7 +30330,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_name has a value which is a string
 	rank has a value which is an int
 	pvalue has a value which is a float
@@ -30195,7 +30361,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_Impacts is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	source_name has a value which is a string
 	rank has a value which is an int
 	pvalue has a value which is a float
@@ -30286,7 +30453,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Includes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 	abbreviation has a value which is a string
 	auxiliary has a value which is an int
@@ -30319,7 +30487,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Includes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 	abbreviation has a value which is a string
 	auxiliary has a value which is an int
@@ -30430,7 +30599,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_Includes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 	abbreviation has a value which is a string
 	auxiliary has a value which is an int
@@ -30463,7 +30633,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_Includes is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	sequence has a value which is an int
 	abbreviation has a value which is a string
 	auxiliary has a value which is an int
@@ -30554,7 +30725,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_IncludesAdditionalCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	units has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
@@ -30592,7 +30764,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_IncludesAdditionalCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	units has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
@@ -30708,7 +30881,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_IncludesAdditionalCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	units has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
@@ -30746,7 +30920,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_IncludesAdditionalCompounds is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	concentration has a value which is a float
 	units has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
@@ -30838,7 +31013,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IncludesAlignmentRow is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AlignmentRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	row_number has a value which is an int
@@ -30877,7 +31053,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IncludesAlignmentRow is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AlignmentRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	row_number has a value which is an int
@@ -30976,7 +31153,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_IncludesAlignmentRow is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -31015,7 +31193,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 	md5_of_ungapped_sequence has a value which is a string
 	sequence has a value which is a string
 fields_IncludesAlignmentRow is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -31103,7 +31282,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 	design has a value which is a string
 	originator has a value which is a string
 fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -31130,7 +31310,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 	design has a value which is a string
 	originator has a value which is a string
 fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -31219,7 +31400,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -31246,7 +31428,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IncludesPart is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -31324,7 +31507,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IndicatedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -31352,7 +31536,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IndicatedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_Feature is a reference to a hash where the following keys are defined:
@@ -31453,7 +31638,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IndicatedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
@@ -31481,7 +31667,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IndicatedLevelsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	level_vector has a value which is a countVector
 countVector is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
@@ -31568,7 +31755,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_Involves is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 	cofactor has a value which is an int
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
@@ -31601,7 +31789,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_Involves is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 	cofactor has a value which is an int
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
@@ -31704,7 +31893,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Involves is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 	cofactor has a value which is an int
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -31737,7 +31927,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Involves is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 	cofactor has a value which is an int
 fields_Reaction is a reference to a hash where the following keys are defined:
@@ -31829,7 +32020,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsAnnotatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Annotation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	annotator has a value which is a string
@@ -31858,7 +32050,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsAnnotatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Annotation is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	annotator has a value which is a string
@@ -31948,7 +32141,8 @@ fields_Annotation is a reference to a hash where the following keys are defined:
 	comment has a value which is a string
 	annotation_time has a value which is a string
 fields_IsAnnotatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -31977,7 +32171,8 @@ fields_Annotation is a reference to a hash where the following keys are defined:
 	comment has a value which is a string
 	annotation_time has a value which is a string
 fields_IsAnnotatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -32060,7 +32255,8 @@ fields_Assay is a reference to a hash where the following keys are defined:
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 fields_IsAssayOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -32087,7 +32283,8 @@ fields_Assay is a reference to a hash where the following keys are defined:
 	assay_type has a value which is a string
 	assay_type_id has a value which is a string
 fields_IsAssayOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_StudyExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -32176,7 +32373,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 	design has a value which is a string
 	originator has a value which is a string
 fields_IsAssayOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -32203,7 +32401,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 	design has a value which is a string
 	originator has a value which is a string
 fields_IsAssayOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Assay is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -32281,7 +32480,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsClassFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -32310,7 +32510,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsClassFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -32411,7 +32612,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsClassFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -32440,7 +32642,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsClassFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -32515,7 +32718,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_OTU is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	representative has a value which is an int
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -32550,7 +32754,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_OTU is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	representative has a value which is an int
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -32664,7 +32869,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	representative has a value which is an int
 fields_OTU is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -32699,7 +32905,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsCollectionOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	representative has a value which is an int
 fields_OTU is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -32788,7 +32995,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -32823,7 +33031,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -32909,7 +33118,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -32944,7 +33154,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsComposedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -33040,7 +33251,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 	cofactor has a value which is a float
 	energy has a value which is a float
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -33072,7 +33284,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 	cofactor has a value which is a float
 	energy has a value which is a float
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -33166,7 +33379,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -33198,7 +33412,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsComprisedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -33295,7 +33510,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -33329,7 +33545,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -33412,7 +33629,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -33446,7 +33664,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsConfiguredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -33536,7 +33755,8 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 	obsolete has a value which is an int
 	replacedby has a value which is a string
 fields_IsConsistentWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -33560,7 +33780,8 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 	obsolete has a value which is an int
 	replacedby has a value which is a string
 fields_IsConsistentWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -33645,7 +33866,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsConsistentWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_EcNumber is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	obsolete has a value which is an int
@@ -33669,7 +33891,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsConsistentWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_EcNumber is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	obsolete has a value which is an int
@@ -33751,7 +33974,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsCoregulatedWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 
 </pre>
@@ -33776,7 +34000,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsCoregulatedWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 
 
@@ -33869,7 +34094,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsCoregulatedWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 
 </pre>
@@ -33894,7 +34120,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsCoregulatedWith is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 
 
@@ -33972,7 +34199,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	co_occurrence_evidence has a value which is an int
 	co_expression_evidence has a value which is an int
 
@@ -33997,7 +34225,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	co_occurrence_evidence has a value which is an int
 	co_expression_evidence has a value which is an int
 
@@ -34100,7 +34329,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	co_occurrence_evidence has a value which is an int
 	co_expression_evidence has a value which is an int
 
@@ -34125,7 +34355,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsCoupledTo is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	co_occurrence_evidence has a value which is an int
 	co_expression_evidence has a value which is an int
 
@@ -34201,7 +34432,8 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	score has a value which is an int
 fields_IsDeterminedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	inverted has a value which is an int
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -34224,7 +34456,8 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	score has a value which is an int
 fields_IsDeterminedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	inverted has a value which is an int
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -34320,7 +34553,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsDeterminedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	inverted has a value which is an int
 fields_PairSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -34343,7 +34577,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsDeterminedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	inverted has a value which is an int
 fields_PairSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -34428,7 +34663,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -34461,7 +34697,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -34552,7 +34789,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -34585,7 +34823,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsDividedInto is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -34678,7 +34917,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_IsExecutedAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	direction has a value which is a string
@@ -34711,7 +34951,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 	default_protons has a value which is a float
 	status has a value which is a string
 fields_IsExecutedAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	direction has a value which is a string
@@ -34797,7 +35038,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_IsExecutedAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -34830,7 +35072,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_IsExecutedAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Reaction is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -34920,7 +35163,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsExemplarOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -34947,7 +35191,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsExemplarOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -35032,7 +35277,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsExemplarOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35059,7 +35305,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsExemplarOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35143,7 +35390,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -35169,7 +35417,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 	family_function has a value which is a reference to a list where each element is a string
 	alignment has a value which is a reference to a list where each element is a string
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -35254,7 +35503,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -35280,7 +35530,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsFamilyFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Family is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
@@ -35359,7 +35610,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsFormedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35385,7 +35637,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsFormedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35478,7 +35731,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsFormedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -35504,7 +35758,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsFormedOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_AtomicRegulon is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -35580,7 +35835,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsFunctionalIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35607,7 +35863,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsFunctionalIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -35700,7 +35957,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsFunctionalIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -35727,7 +35985,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsFunctionalIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -35801,13 +36060,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is an int
 
 </pre>
 
@@ -35824,13 +36084,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is an int
 
 
 =end text
@@ -35910,13 +36171,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is an int
 
 </pre>
 
@@ -35933,13 +36195,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsGroupFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is an int
 
 
 =end text
@@ -36016,7 +36279,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	comment has a value which is a string
 fields_IsImplementedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -36043,7 +36307,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	comment has a value which is a string
 fields_IsImplementedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -36131,7 +36396,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_IsImplementedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	role_rule has a value which is a reference to a list where each element is a string
@@ -36158,7 +36424,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_IsImplementedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Variant is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	role_rule has a value which is a reference to a list where each element is a string
@@ -36242,7 +36509,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsInPair is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -36268,7 +36536,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsInPair is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -36353,7 +36622,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsInPair is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -36379,7 +36649,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Pairing is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsInPair is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -36461,9 +36732,10 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -36490,9 +36762,10 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -36583,13 +36856,14 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Location is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 </pre>
 
@@ -36612,13 +36886,14 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsInstantiatedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Location is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 
 =end text
@@ -36696,7 +36971,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsLocatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	ordinal has a value which is an int
 	begin has a value which is an int
 	len has a value which is an int
@@ -36727,7 +37003,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsLocatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	ordinal has a value which is an int
 	begin has a value which is an int
 	len has a value which is an int
@@ -36845,7 +37122,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsLocatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	ordinal has a value which is an int
 	begin has a value which is an int
 	len has a value which is an int
@@ -36876,7 +37154,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsLocatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	ordinal has a value which is an int
 	begin has a value which is an int
 	len has a value which is an int
@@ -36963,7 +37242,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 	description has a value which is a string
 	source_id has a value which is a string
 fields_IsMeasurementMethodOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -36996,7 +37276,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 	description has a value which is a string
 	source_id has a value which is a string
 fields_IsMeasurementMethodOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Measurement is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	timeSeries has a value which is a string
@@ -37097,7 +37378,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_IsMeasurementMethodOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Protocol is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -37130,7 +37412,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 	p_value has a value which is a float
 	Z_score has a value which is a float
 fields_IsMeasurementMethodOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Protocol is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -37221,7 +37504,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -37263,7 +37547,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -37362,7 +37647,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -37404,7 +37690,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_IsModeledBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -37502,7 +37789,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsModifiedToBuildAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37533,7 +37821,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsModifiedToBuildAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37636,7 +37925,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsModifiedToBuildAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37667,7 +37957,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsModifiedToBuildAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37750,7 +38041,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsModifiedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37779,7 +38071,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsModifiedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37881,7 +38174,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsModifiedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37910,7 +38204,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsModifiedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	modification_type has a value which is a string
 	modification_value has a value which is a string
 
@@ -37998,7 +38293,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -38037,7 +38333,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -38133,7 +38430,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -38172,7 +38470,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsOwnerOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -38262,9 +38561,10 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 fields_IsParticipatingAt is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -38287,9 +38587,10 @@ fields_Location is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 fields_IsParticipatingAt is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -38372,13 +38673,14 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsParticipatingAt is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Location is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 </pre>
 
@@ -38397,13 +38699,14 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsParticipatingAt is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Location is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	source_id has a value which is a string
-	hierarchy has a value which is an int
+	abbr has a value which is an int
 
 
 =end text
@@ -38477,7 +38780,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_IsProteinFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -38504,7 +38808,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 	id has a value which is a string
 	sequence has a value which is a string
 fields_IsProteinFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -38599,7 +38904,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsProteinFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -38626,7 +38932,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsProteinFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProteinSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	sequence has a value which is a string
@@ -38704,7 +39011,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsReagentIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -38730,7 +39038,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsReagentIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_ReactionInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -38830,7 +39139,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_IsReagentIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -38856,7 +39166,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 	direction has a value which is a string
 	protons has a value which is a float
 fields_IsReagentIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	coefficient has a value which is a float
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -38938,7 +39249,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	charge has a value which is a float
@@ -38965,7 +39277,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 	pH has a value which is a float
 	potential has a value which is a float
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CompoundInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	charge has a value which is a float
@@ -39052,7 +39365,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -39079,7 +39393,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 	charge has a value which is a float
 	formula has a value which is a string
 fields_IsRealLocationOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocationInstance is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	index has a value which is an int
@@ -39171,7 +39486,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -39208,7 +39524,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -39298,7 +39615,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -39335,7 +39653,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IsReferencedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -39428,7 +39747,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsRegulatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -39456,7 +39776,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 	function has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsRegulatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CoregulatedSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -39542,7 +39863,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_IsRegulatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -39570,7 +39892,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 	source_id has a value which is a string
 	binding_location has a value which is a reference to a list where each element is an int
 fields_IsRegulatedIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Feature is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	feature_type has a value which is a string
@@ -39652,7 +39975,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -39683,7 +40007,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -39783,7 +40108,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -39814,7 +40140,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsRelevantFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -39889,13 +40216,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsRepresentedBy
 	2: a fields_ObservationalUnit
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -39917,13 +40245,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsRepresentedBy
 	2: a fields_ObservationalUnit
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_ObservationalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_name has a value which is a string
@@ -40012,9 +40341,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -40040,9 +40370,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 	source_name2 has a value which is a reference to a list where each element is a string
 	plant_id has a value which is a string
 fields_IsRepresentedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -40120,7 +40451,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsRoleOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -40142,7 +40474,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsRoleOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -40227,7 +40560,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsRoleOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -40249,7 +40583,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsRoleOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
@@ -40327,7 +40662,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_IsRowOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -40350,7 +40686,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_IsRowOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -40433,7 +40770,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsRowOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -40456,7 +40794,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SSCell is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsRowOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -40534,7 +40873,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_IsSequenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -40557,7 +40897,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 	id has a value which is a string
 	length has a value which is an int
 fields_IsSequenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -40644,7 +40985,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsSequenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	length has a value which is an int
@@ -40667,7 +41009,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsSequenceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ContigSequence is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	length has a value which is an int
@@ -40751,9 +41094,10 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -40781,9 +41125,10 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -40864,10 +41209,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsSubInstanceOf
 	2: a fields_Subsystem
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -40894,10 +41240,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsSubInstanceOf
 	2: a fields_Subsystem
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -40981,7 +41328,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41011,7 +41359,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
 fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 fields_AlleleFrequency is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41115,7 +41464,8 @@ fields_AlleleFrequency is a reference to a hash where the following keys are def
 	major_allele has a value which is a string
 	obs_unit_count has a value which is an int
 fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41145,7 +41495,8 @@ fields_AlleleFrequency is a reference to a hash where the following keys are def
 	major_allele has a value which is a string
 	obs_unit_count has a value which is an int
 fields_IsSummarizedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	position has a value which is an int
 fields_Contig is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41222,7 +41573,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsSuperclassOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -41241,7 +41593,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsSuperclassOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -41322,7 +41675,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsSuperclassOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 </pre>
 
@@ -41341,7 +41695,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_SubsystemClass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_IsSuperclassOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 
 
 =end text
@@ -41412,13 +41767,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTaxonomyOf
 	2: a fields_Genome
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -41450,13 +41806,14 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTaxonomyOf
 	2: a fields_Genome
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
 	alias has a value which is a reference to a list where each element is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -41567,9 +41924,10 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -41605,9 +41963,10 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_IsTaxonomyOf is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -41694,10 +42053,11 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -41727,10 +42087,11 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -41820,10 +42181,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTerminusFor
 	2: a fields_Compound
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41853,10 +42215,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTerminusFor
 	2: a fields_Compound
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -41945,7 +42308,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	mod_date has a value which is a string
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	optional has a value which is an int
 	type has a value which is a string
 	triggering has a value which is an int
@@ -41973,7 +42337,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	mod_date has a value which is a string
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	optional has a value which is an int
 	type has a value which is a string
 	triggering has a value which is an int
@@ -42078,7 +42443,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	optional has a value which is an int
 	type has a value which is a string
 	triggering has a value which is an int
@@ -42106,7 +42472,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	hypothetical has a value which is an int
 fields_IsTriggeredBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	optional has a value which is an int
 	type has a value which is a string
 	triggering has a value which is an int
@@ -42197,7 +42564,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsUsedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	status has a value which is a string
@@ -42236,7 +42604,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_IsUsedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	status has a value which is a string
@@ -42335,7 +42704,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsUsedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -42374,7 +42744,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_IsUsedToBuildTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Alignment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	n_rows has a value which is an int
@@ -42467,7 +42838,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_Manages is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42504,7 +42876,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 	compound_count has a value which is an int
 	annotation_count has a value which is an int
 fields_Manages is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Biomass is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42603,7 +42976,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 	cofactor has a value which is a float
 	energy has a value which is a float
 fields_Manages is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42640,7 +43014,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 	cofactor has a value which is a float
 	energy has a value which is a float
 fields_Manages is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Model is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42724,7 +43099,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42751,7 +43127,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -42844,7 +43221,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
@@ -42871,7 +43249,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Experiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source has a value which is a string
@@ -42945,10 +43324,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_Overlaps
 	2: a fields_Diagram
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -42969,10 +43349,11 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_Overlaps
 	2: a fields_Diagram
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -43061,9 +43442,10 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 </pre>
@@ -43085,9 +43467,10 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is an int
+	to_link has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	id has a value which is an int
 	common_name has a value which is a string
 
 
@@ -43171,7 +43554,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ParticipatesAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -43202,7 +43586,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_ParticipatesAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -43285,7 +43670,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ParticipatesAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	label has a value which is a string
@@ -43316,7 +43702,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_LocalizedCompound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ParticipatesAs is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	label has a value which is a string
@@ -43406,7 +43793,8 @@ fields_Person is a reference to a hash where the following keys are defined:
 	institution has a value which is a string
 	source_id has a value which is a string
 fields_PerformedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	role has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -43437,7 +43825,8 @@ fields_Person is a reference to a hash where the following keys are defined:
 	institution has a value which is a string
 	source_id has a value which is a string
 fields_PerformedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	role has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -43535,7 +43924,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_PerformedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	role has a value which is a string
 fields_Person is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -43566,7 +43956,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_PerformedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	role has a value which is a string
 fields_Person is a reference to a hash where the following keys are defined:
 	id has a value which is a string
@@ -43647,7 +44038,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -43681,7 +44073,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -43791,7 +44184,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -43825,7 +44219,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_ProducedResultsFor is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ProbeSet is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -43900,7 +44295,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Provided is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -43929,7 +44325,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Provided is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Subsystem is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	version has a value which is an int
@@ -44028,7 +44425,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Provided is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -44057,7 +44455,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 	cluster_based has a value which is an int
 	experimental has a value which is an int
 fields_Provided is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -44135,7 +44534,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_PublishedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -44163,7 +44563,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_PublishedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_PhenotypeExperiment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
@@ -44254,7 +44655,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_PublishedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -44282,7 +44684,8 @@ fields_PhenotypeExperiment is a reference to a hash where the following keys are
 	dateUploaded has a value which is a string
 	metadata has a value which is a string
 fields_PublishedExperiment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -44363,7 +44766,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_PublishedProtocol is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Protocol is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -44390,7 +44794,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 	link has a value which is a string
 	pubdate has a value which is a string
 fields_PublishedProtocol is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Protocol is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -44479,7 +44884,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 	description has a value which is a string
 	source_id has a value which is a string
 fields_PublishedProtocol is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -44506,7 +44912,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 	description has a value which is a string
 	source_id has a value which is a string
 fields_PublishedProtocol is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Publication is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	title has a value which is a string
@@ -44586,7 +44993,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Shows is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Compound is a reference to a hash where the following keys are defined:
@@ -44621,7 +45029,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	content has a value which is a reference to a list where each element is a string
 fields_Shows is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Compound is a reference to a hash where the following keys are defined:
@@ -44732,7 +45141,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_Shows is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
@@ -44767,7 +45177,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 	deltaG has a value which is a float
 	deltaG_error has a value which is a float
 fields_Shows is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	location has a value which is a rectangle
 rectangle is a string
 fields_Diagram is a reference to a hash where the following keys are defined:
@@ -44846,7 +45257,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -44880,7 +45292,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -44989,7 +45402,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -45023,7 +45437,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -45108,7 +45523,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_SupersedesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 </pre>
@@ -45138,7 +45554,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_SupersedesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 
@@ -45236,7 +45653,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_SupersedesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 </pre>
@@ -45266,7 +45684,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 	protocol has a value which is a string
 	source_id has a value which is a string
 fields_SupersedesAlignment is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 
@@ -45348,7 +45767,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_SupersedesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 </pre>
@@ -45376,7 +45796,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_SupersedesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 
@@ -45472,7 +45893,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_SupersedesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 </pre>
@@ -45500,7 +45922,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_SupersedesTree is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 	successor_type has a value which is a string
 
 
@@ -45574,7 +45997,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	status has a value which is a string
@@ -45603,7 +46027,8 @@ $return is a reference to a list where each element is a reference to a list con
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Tree is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	status has a value which is a string
@@ -45702,7 +46127,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -45731,7 +46157,8 @@ fields_Tree is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	newick has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 
@@ -45811,7 +46238,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_UsedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	temperature has a value which is a float
@@ -45842,7 +46270,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 	source_id has a value which is a string
 	type has a value which is a string
 fields_UsedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	temperature has a value which is a float
@@ -45935,7 +46364,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_UsedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -45966,7 +46396,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_UsedBy is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
@@ -46051,7 +46482,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_UsedInExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -46078,7 +46510,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 	pH has a value which is a float
 	source_id has a value which is a string
 fields_UsedInExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	source_id has a value which is a string
@@ -46163,7 +46596,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_UsedInExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	temperature has a value which is a float
@@ -46190,7 +46624,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 	id has a value which is a string
 	source_id has a value which is a string
 fields_UsedInExperimentalUnit is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Environment is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	temperature has a value which is a float
@@ -46283,7 +46718,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -46319,7 +46755,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_SSRow is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	curated has a value which is an int
@@ -46407,7 +46844,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -46443,7 +46881,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 	curated has a value which is an int
 	region has a value which is a string
 fields_Uses is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -46544,7 +46983,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_UsesCodons is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CodonUsage is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	frequencies has a value which is a string
@@ -46582,7 +47022,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 	md5 has a value which is a string
 	source_id has a value which is a string
 fields_UsesCodons is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_CodonUsage is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	frequencies has a value which is a string
@@ -46673,7 +47114,8 @@ fields_CodonUsage is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	subtype has a value which is a string
 fields_UsesCodons is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -46711,7 +47153,8 @@ fields_CodonUsage is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	subtype has a value which is a string
 fields_UsesCodons is a reference to a hash where the following keys are defined:
-	id has a value which is a string
+	from_link has a value which is a string
+	to_link has a value which is a string
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -49526,6 +49969,58 @@ a string
 
 
 
+=head2 alias
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 aliases
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an alias
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an alias
+
+=end text
+
+=back
+
+
+
 =head2 name_parameter
 
 =over 4
@@ -49930,6 +50425,32 @@ a reference to a list where each element is an id
 
 
 
+=head2 alignment
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a seq_set
+</pre>
+
+=end html
+
+=begin text
+
+a seq_set
+
+=end text
+
+=back
+
+
+
 =head2 rep_seq_parms
 
 =over 4
@@ -50299,6 +50820,58 @@ search has a value which is a string
 tool has a value which is a string
 tool_params has a value which is a string
 
+
+=end text
+
+=back
+
+
+
+=head2 aln_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 tree_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
 
 =end text
 
@@ -51422,7 +51995,7 @@ id has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
 source_id has a value which is a string
-hierarchy has a value which is an int
+abbr has a value which is an int
 
 </pre>
 
@@ -51435,7 +52008,7 @@ id has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
 source_id has a value which is a string
-hierarchy has a value which is an int
+abbr has a value which is an int
 
 
 =end text
@@ -52186,7 +52759,7 @@ region has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+id has a value which is an int
 common_name has a value which is a string
 
 </pre>
@@ -52196,7 +52769,7 @@ common_name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+id has a value which is an int
 common_name has a value which is a string
 
 
@@ -52396,7 +52969,7 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+id has a value which is an int
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
@@ -52409,7 +52982,7 @@ alias has a value which is a reference to a list where each element is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+id has a value which is an int
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
@@ -52616,7 +53189,8 @@ comment has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level has a value which is an int
 
 </pre>
@@ -52626,7 +53200,8 @@ level has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level has a value which is an int
 
 
@@ -52648,7 +53223,8 @@ level has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52657,7 +53233,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52678,7 +53255,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 function has a value which is a string
 external_id has a value which is a string
 organism has a value which is a string
@@ -52692,7 +53270,8 @@ release_date has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 function has a value which is a string
 external_id has a value which is a string
 organism has a value which is a string
@@ -52718,7 +53297,8 @@ release_date has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52727,7 +53307,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52748,7 +53329,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52757,7 +53339,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52778,7 +53361,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 molar_ratio has a value which is a float
 
 </pre>
@@ -52788,7 +53372,8 @@ molar_ratio has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 molar_ratio has a value which is a float
 
 
@@ -52810,7 +53395,8 @@ molar_ratio has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52819,7 +53405,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52840,7 +53427,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 index_in_concatenation has a value which is an int
 beg_pos_in_parent has a value which is an int
 end_pos_in_parent has a value which is an int
@@ -52856,7 +53444,8 @@ kb_feature_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 index_in_concatenation has a value which is an int
 beg_pos_in_parent has a value which is an int
 end_pos_in_parent has a value which is an int
@@ -52884,7 +53473,8 @@ kb_feature_id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 index_in_concatenation has a value which is an int
 beg_pos_in_parent has a value which is an int
 end_pos_in_parent has a value which is an int
@@ -52900,7 +53490,8 @@ kb_feature_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 index_in_concatenation has a value which is an int
 beg_pos_in_parent has a value which is an int
 end_pos_in_parent has a value which is an int
@@ -52928,7 +53519,8 @@ kb_feature_id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52937,7 +53529,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52958,7 +53551,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52967,7 +53561,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -52988,7 +53583,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -52997,7 +53593,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53018,7 +53615,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 </pre>
@@ -53028,7 +53626,8 @@ value has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 
@@ -53050,7 +53649,8 @@ value has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 </pre>
@@ -53060,7 +53660,8 @@ value has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 
@@ -53082,7 +53683,8 @@ value has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 node_id has a value which is a string
 
@@ -53093,7 +53695,8 @@ node_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 node_id has a value which is a string
 
@@ -53116,7 +53719,8 @@ node_id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 location has a value which is a rectangle
 
 </pre>
@@ -53126,7 +53730,8 @@ location has a value which is a rectangle
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 location has a value which is a rectangle
 
 
@@ -53148,7 +53753,8 @@ location has a value which is a rectangle
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53157,7 +53763,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53178,7 +53785,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53187,7 +53795,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53208,7 +53817,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level_vector has a value which is a countVector
 
 </pre>
@@ -53218,7 +53828,8 @@ level_vector has a value which is a countVector
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level_vector has a value which is a countVector
 
 
@@ -53240,7 +53851,8 @@ level_vector has a value which is a countVector
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53249,7 +53861,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53270,7 +53883,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53279,7 +53893,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53300,7 +53915,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 alias has a value which is a string
 
 </pre>
@@ -53310,7 +53926,8 @@ alias has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 alias has a value which is a string
 
 
@@ -53332,7 +53949,8 @@ alias has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53341,7 +53959,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53362,7 +53981,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 rma_value has a value which is a float
 level has a value which is an int
 
@@ -53373,7 +53993,8 @@ level has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 rma_value has a value which is a float
 level has a value which is an int
 
@@ -53396,7 +54017,8 @@ level has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53405,7 +54027,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53426,7 +54049,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53435,7 +54059,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53456,7 +54081,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53465,7 +54091,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53486,7 +54113,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 type has a value which is an int
 
 </pre>
@@ -53496,7 +54124,8 @@ type has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 type has a value which is an int
 
 
@@ -53518,7 +54147,8 @@ type has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 concentration has a value which is a float
 maximum_flux has a value which is a float
 minimum_flux has a value which is a float
@@ -53530,7 +54160,8 @@ minimum_flux has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 concentration has a value which is a float
 maximum_flux has a value which is a float
 minimum_flux has a value which is a float
@@ -53554,7 +54185,8 @@ minimum_flux has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 source_id has a value which is a string
 
 </pre>
@@ -53564,7 +54196,8 @@ source_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 source_id has a value which is a string
 
 
@@ -53586,7 +54219,8 @@ source_id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 alias has a value which is a string
 
 </pre>
@@ -53596,7 +54230,8 @@ alias has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 alias has a value which is a string
 
 
@@ -53618,7 +54253,8 @@ alias has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53627,7 +54263,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53648,7 +54285,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53657,7 +54295,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53678,7 +54317,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 sequence has a value which is an int
 
 </pre>
@@ -53688,7 +54328,8 @@ sequence has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 sequence has a value which is an int
 
 
@@ -53710,7 +54351,8 @@ sequence has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53719,7 +54361,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53740,7 +54383,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53749,7 +54393,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53770,7 +54415,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a float
 statistic_type has a value which is a string
 measure_id has a value which is a string
@@ -53782,7 +54428,8 @@ measure_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a float
 statistic_type has a value which is a string
 measure_id has a value which is a string
@@ -53806,7 +54453,8 @@ measure_id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53815,7 +54463,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53836,7 +54485,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -53845,7 +54495,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -53866,7 +54517,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 </pre>
@@ -53876,7 +54528,8 @@ value has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 value has a value which is a string
 
 
@@ -53898,7 +54551,8 @@ value has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 position has a value which is an int
 len has a value which is an int
 data has a value which is a string
@@ -53912,7 +54566,8 @@ quality has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 position has a value which is an int
 len has a value which is an int
 data has a value which is a string
@@ -53938,7 +54593,8 @@ quality has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 source_name has a value which is a string
 rank has a value which is an int
 pvalue has a value which is a float
@@ -53951,7 +54607,8 @@ position has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 source_name has a value which is a string
 rank has a value which is an int
 pvalue has a value which is a float
@@ -53976,7 +54633,8 @@ position has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 sequence has a value which is an int
 abbreviation has a value which is a string
 auxiliary has a value which is an int
@@ -53988,7 +54646,8 @@ auxiliary has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 sequence has a value which is an int
 abbreviation has a value which is a string
 auxiliary has a value which is an int
@@ -54012,7 +54671,8 @@ auxiliary has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 concentration has a value which is a float
 units has a value which is a string
 
@@ -54023,7 +54683,8 @@ units has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 concentration has a value which is a float
 units has a value which is a string
 
@@ -54046,7 +54707,8 @@ units has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54055,7 +54717,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54076,7 +54739,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54085,7 +54749,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54106,7 +54771,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level_vector has a value which is a countVector
 
 </pre>
@@ -54116,7 +54782,8 @@ level_vector has a value which is a countVector
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 level_vector has a value which is a countVector
 
 
@@ -54138,7 +54805,8 @@ level_vector has a value which is a countVector
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 cofactor has a value which is an int
 
@@ -54149,7 +54817,8 @@ cofactor has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 cofactor has a value which is an int
 
@@ -54172,7 +54841,8 @@ cofactor has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54181,7 +54851,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54202,7 +54873,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54211,7 +54883,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54232,7 +54905,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54241,7 +54915,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54262,7 +54937,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 representative has a value which is an int
 
 </pre>
@@ -54272,7 +54948,8 @@ representative has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 representative has a value which is an int
 
 
@@ -54294,7 +54971,8 @@ representative has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54303,7 +54981,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54324,7 +55003,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 </pre>
@@ -54334,7 +55014,8 @@ coefficient has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 
@@ -54356,7 +55037,8 @@ coefficient has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54365,7 +55047,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54386,7 +55069,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54395,7 +55079,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54416,7 +55101,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 </pre>
@@ -54426,7 +55112,8 @@ coefficient has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 
@@ -54448,7 +55135,8 @@ coefficient has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 co_occurrence_evidence has a value which is an int
 co_expression_evidence has a value which is an int
 
@@ -54459,7 +55147,8 @@ co_expression_evidence has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 co_occurrence_evidence has a value which is an int
 co_expression_evidence has a value which is an int
 
@@ -54482,7 +55171,8 @@ co_expression_evidence has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 inverted has a value which is an int
 
 </pre>
@@ -54492,7 +55182,8 @@ inverted has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 inverted has a value which is an int
 
 
@@ -54514,7 +55205,8 @@ inverted has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54523,7 +55215,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54544,7 +55237,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54553,7 +55247,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54574,7 +55269,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54583,7 +55279,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54604,7 +55301,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54613,7 +55311,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54634,7 +55333,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54643,7 +55343,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54664,7 +55365,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54673,7 +55375,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54694,7 +55397,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is an int
 
 </pre>
 
@@ -54703,7 +55407,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is an int
 
 
 =end text
@@ -54724,7 +55429,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54733,7 +55439,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54754,7 +55461,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54763,7 +55471,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54784,7 +55493,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54793,7 +55503,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54814,7 +55525,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 ordinal has a value which is an int
 begin has a value which is an int
 len has a value which is an int
@@ -54827,7 +55539,8 @@ dir has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 ordinal has a value which is an int
 begin has a value which is an int
 len has a value which is an int
@@ -54852,7 +55565,8 @@ dir has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54861,7 +55575,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54882,7 +55597,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54891,7 +55607,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -54912,7 +55629,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 modification_type has a value which is a string
 modification_value has a value which is a string
 
@@ -54923,7 +55641,8 @@ modification_value has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 modification_type has a value which is a string
 modification_value has a value which is a string
 
@@ -54946,7 +55665,8 @@ modification_value has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 modification_type has a value which is a string
 modification_value has a value which is a string
 
@@ -54957,7 +55677,8 @@ modification_value has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 modification_type has a value which is a string
 modification_value has a value which is a string
 
@@ -54980,7 +55701,8 @@ modification_value has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -54989,7 +55711,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55010,7 +55733,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55019,7 +55743,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55040,7 +55765,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55049,7 +55775,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55070,7 +55797,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 </pre>
@@ -55080,7 +55808,8 @@ coefficient has a value which is a float
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 coefficient has a value which is a float
 
 
@@ -55102,7 +55831,8 @@ coefficient has a value which is a float
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55111,7 +55841,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55132,7 +55863,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55141,7 +55873,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55162,7 +55895,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55171,7 +55905,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55192,7 +55927,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55201,7 +55937,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55222,7 +55959,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 </pre>
 
@@ -55231,7 +55969,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 
 =end text
@@ -55252,7 +55991,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55261,7 +56001,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55282,7 +56023,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55291,7 +56033,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55312,7 +56055,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55321,7 +56065,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55342,7 +56087,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is an int
 
 </pre>
 
@@ -55351,7 +56097,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is an int
 
 
 =end text
@@ -55372,7 +56119,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 position has a value which is an int
 
 </pre>
@@ -55382,7 +56130,8 @@ position has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 position has a value which is an int
 
 
@@ -55404,7 +56153,8 @@ position has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55413,7 +56163,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55434,7 +56185,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 </pre>
 
@@ -55443,7 +56195,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 
 =end text
@@ -55464,7 +56217,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is an int
 group_number has a value which is an int
 
 </pre>
@@ -55474,7 +56228,8 @@ group_number has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is an int
 group_number has a value which is an int
 
 
@@ -55496,7 +56251,8 @@ group_number has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 optional has a value which is an int
 type has a value which is a string
 triggering has a value which is an int
@@ -55508,7 +56264,8 @@ triggering has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 optional has a value which is an int
 type has a value which is a string
 triggering has a value which is an int
@@ -55532,7 +56289,8 @@ triggering has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55541,7 +56299,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55562,7 +56321,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55571,7 +56331,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55592,7 +56353,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55601,7 +56363,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55622,7 +56385,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 </pre>
 
@@ -55631,7 +56395,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is an int
+to_link has a value which is a string
 
 
 =end text
@@ -55652,7 +56417,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55661,7 +56427,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55682,7 +56449,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 role has a value which is a string
 
 </pre>
@@ -55692,7 +56460,8 @@ role has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 role has a value which is a string
 
 
@@ -55714,7 +56483,8 @@ role has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55723,7 +56493,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55744,7 +56515,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55753,7 +56525,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55774,7 +56547,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55783,7 +56557,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55804,7 +56579,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55813,7 +56589,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55834,7 +56611,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 location has a value which is a rectangle
 
 </pre>
@@ -55844,7 +56622,8 @@ location has a value which is a rectangle
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 location has a value which is a rectangle
 
 
@@ -55866,7 +56645,8 @@ location has a value which is a rectangle
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55875,7 +56655,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55896,7 +56677,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 successor_type has a value which is a string
 
 </pre>
@@ -55906,7 +56688,8 @@ successor_type has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 successor_type has a value which is a string
 
 
@@ -55928,7 +56711,8 @@ successor_type has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 successor_type has a value which is a string
 
 </pre>
@@ -55938,7 +56722,8 @@ successor_type has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 successor_type has a value which is a string
 
 
@@ -55960,7 +56745,8 @@ successor_type has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55969,7 +56755,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -55990,7 +56777,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -55999,7 +56787,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -56020,7 +56809,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -56029,7 +56819,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -56050,7 +56841,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -56059,7 +56851,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -56080,7 +56873,8 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 </pre>
 
@@ -56089,7 +56883,8 @@ id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a string
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text

@@ -272,10 +272,9 @@
         <Field name="source-id" type="string">
           <Notes>ID from the source of this location</Notes>
         </Field>
-        <Field name="hierarchy" type="int">
-          <Notes>a number indicating where this location occurs
-          in relation other locations in the cell. Zero indicates
-          extra-cellular.</Notes>
+        <Field name="abbr" type="int">
+          <Notes>an abbreviation (usually a single letter) for the
+          location.</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -817,12 +816,12 @@
     </Entity>
     <Entity name="CodonUsage" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" row="8" col="6" 
+        <RegionInfo name="Alignments" row="8" col="6"
         			caption="Codon Usage" />
       </DisplayInfo>
       <Notes>This entity contains information about the codon usage
       frequency in a particular genome with respect to a particular
-      type of analysis (e.g. high-expression genes, modal, mean, 
+      type of analysis (e.g. high-expression genes, modal, mean,
       etc.).</Notes>
       <Fields>
         <Field name="frequencies" type="long-string">

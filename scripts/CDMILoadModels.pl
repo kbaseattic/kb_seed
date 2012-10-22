@@ -298,6 +298,8 @@ Name of the directory containing the model data files.
 =back
 
 =cut
+
+    $| = 1;
     my ($clear, $keep);
     # Connect to the CDMI and create the loader object.
     print "Connecting to database.\n";
@@ -317,12 +319,13 @@ Name of the directory containing the model data files.
     # Alias sources will be cached in here.
     my %sources;
     # This is the list of tables.
-    my @tables = qw(Biomass BiomassName Complex ComplexName Media
+    my @tables = qw(Model IsModeledBy
+                    Biomass BiomassName Complex ComplexName Media
                     Location Compound ParticipatesAs HasPresenceOf
                     HasCompoundAliasFrom LocalizedCompound
                     LocationInstance HasRequirementOf
                     HasUsage CompoundInstance IsRealLocationOf
-                    IsComprisedOf IsReagentIn Model IsModeledBy
+                    IsComprisedOf IsReagentIn
                     Reaction IsDividedInto IsInstantiatedBy
                     IsParticipatingAt ReactionInstance
                     IsExecutedAs HasReactionAliasFrom HasStep
@@ -354,14 +357,14 @@ Name of the directory containing the model data files.
     $loader->SimpleLoad($inDirectory, 'BiomassName.dtx', 'BiomassName', { id => 0,
         name => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'complex.dtx', 'Complex', { id => 0,
-        mod_date => [1, 'timeStamp', 0], source_id => 2 });
+        mod_date => [1, 'timeStamp', 0], source_id => 2 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'complexName.dtx', 'ComplexName', { id => 0,
-        name => 1 }, 1);
+        name => 1 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'compound.dtx', 'Compound', { abbr => 0,
         charge => 1, deltaG => [2, 'copy', 0], deltaG_error => [3, 'copy', 0],
         formula => [4, 'copy', ''], id => 5, label => [6, 'copy', ''],
         mass => [7, 'copy', 0], mod_date => [8, 'timeStamp', 0], source_id => 9,
-        ubiquitous => [10, 'copy', 0] }, 1);
+        ubiquitous => [10, 'copy', 0] }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'CompoundInstance.dtx', 'CompoundInstance',
         { charge => 0, formula => [1, 'copy', ''], id => 2 });
     LoadAliasTable($loader, $inDirectory, 'hasCompoundAliasFrom.dtx',
@@ -372,12 +375,12 @@ Name of the directory containing the model data files.
     LoadAliasTable($loader, $inDirectory, 'hasReactionAliasFrom.dtx',
         'HasReactionAliasFrom', \%sources);
     $loader->SimpleLoad($inDirectory, 'hasStep.dtx', 'HasStep',
-        { from_link => 0, to_link => 1 }, 1);
+        { from_link => 0, to_link => 1 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'HasUsage.dtx', 'HasUsage',
         { from_link => 0, to_link => 1}, 1);
     $loader->SimpleLoad($inDirectory, 'Involves.dtx', 'Involves',
         { coefficient => 0, cofactor => 1, from_link => 2,
-          to_link => 3 }, 1);
+          to_link => 3 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'IsComprisedOf.dtx', 'IsComprisedOf',
         { coefficient => 0, from_link => 1, to_link => 2 }, 1);
     $loader->SimpleLoad($inDirectory, 'IsDividedInto.dtx', 'IsDividedInto',
@@ -390,24 +393,29 @@ Name of the directory containing the model data files.
         { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'isTriggeredBy.dtx', 'IsTriggeredBy',
         { from_link => 0, optional => 1, to_link => 2, triggering => 3,
-          type => 4 }, 1);
+          type => 4 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'LocalizedCompound.dtx', 'LocalizedCompound',
         { id => 0 }, 1);
+    $loader->SimpleLoad($inDirectory, 'LocationInstance.dtx', 'LocationInstance',
+        { id => 1, compartment_index => 0, label => 2, pH => 3, potential => [4, 'copy', 0],
+          'index' => [5, 'copy', 0] }, 1);
+    $loader->SimpleLoad($inDirectory, 'location.dtx', 'Location',
+        { id => 1, abbr => 0, mod_date => 2, name => 3, source_id => 4 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'Manages.dtx', 'Manages',
         { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'media.dtx', 'Media', { id => 0,
           is_minimal => 1, mod_date => [2, 'timeStamp', 0], source_id => 3,
-          name => 4, type => 5 }, 1);
+          name => 4, type => 5 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'Model.dtx', 'Model',
         { annotation_count => 0, compound_count => 1, id => 2,
           mod_date => [3, 'timeStamp', 0], name => 4, reaction_count => 5,
           status => 6, type => 7, version => 8 }, 1);
     $loader->SimpleLoad($inDirectory, 'ParticipatesAs.dtx', 'ParticipatesAs',
-        { from_link => 0, to_link => 1 }, 1);
+        { from_link => 0, to_link => 1 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'reaction.dtx', 'Reaction', { abbr => [0, 'copy', ''],
           default_protons => 1, deltaG => [2, 'copy', 1000000], deltaG_error => [3, 'copy', 1000000],
           direction => 4, id => 5, mod_date => [6, 'timeStamp', 0], name => 7, source_id => 8,
-          status => 9, thermodynamic_reversibility => [10, 'copy', '<=>'] }, 1);
+          status => 9, thermodynamic_reversibility => [10, 'copy', '<=>'] }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'ReactionInstance.dtx', 'ReactionInstance',
         { direction => 0, id => 1, protons => [2, 'copy', 0] }, 1);
     $loader->SimpleLoad($inDirectory, 'IsReagentIn.dtx', 'IsReagentIn',

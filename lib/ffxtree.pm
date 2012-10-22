@@ -1624,6 +1624,15 @@ sub css_top_colors {
     @all[0..$n-1];
 }
 
+sub css_top_hex_colors {
+    my $n = $_[0] || 20;
+    my @all = qw(#0000FF #008000 #FF0000 #008B8B #6A5ACD
+                 #800080 #9F7A0A #9932CC #4169E1 #FF8C00
+                 #0000CD #5C3317 #008080 #42426F #2F4F2F
+                 #856363 #C9960C #800000 #666C3F #DA70D6);
+    @all[0..$n-1];
+}
+
 sub span_css {
     my ($text, $class) = @_;
     return $class ? "<span class=\"$class\">$text</span>" : $text;

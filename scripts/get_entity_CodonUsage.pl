@@ -12,7 +12,7 @@ use Carp;
 
 This entity contains information about the codon usage
 frequency in a particular genome with respect to a particular
-type of analysis (e.g. high-expression genes, modal, mean, 
+type of analysis (e.g. high-expression genes, modal, mean,
 etc.).
 
 Example:

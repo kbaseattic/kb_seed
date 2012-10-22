@@ -90,7 +90,7 @@ strings. The following fields are available:
 
 =item source_id
 
-=item hierarchy
+=item abbr
 
 =back    
    
@@ -108,7 +108,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name', 'source_id', 'hierarchy' );
+my @all_fields = ( 'mod_date', 'name', 'source_id', 'abbr' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 my $usage = "usage: query_entity_Location [-is field,value] [-like field,value] [-op operator,field,value] [-show-fields] [-a | -f field list] > entity.data";

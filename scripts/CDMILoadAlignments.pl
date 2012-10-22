@@ -665,16 +665,16 @@ sub validate_exchange
 
     # Verify the kb_aln_ids are registered with KBase
 
-    my @kb_aln_ids     = unique_fields_in_file("$dir/Alignment.tab", 0);
-    my $extern_aln_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_aln_ids);
+    # my @kb_aln_ids     = unique_fields_in_file("$dir/Alignment.tab", 0);
+    # my $extern_aln_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_aln_ids);
 
-    my @bad_aln_ids = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
+    # my @bad_aln_ids = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
 
-    if (@bad_aln_ids) {
-        print MESSAGE "ERROR: Alignment.tab: found unregistered KBase alignment IDs: \n";
-        print MESSAGE map { "    $_\n" } @bad_aln_ids;
-        $success = 0;
-    }
+    # if (@bad_aln_ids) {
+    #     print MESSAGE "ERROR: Alignment.tab: found unregistered KBase alignment IDs: \n";
+    #     print MESSAGE map { "    $_\n" } @bad_aln_ids;
+    #     $success = 0;
+    # }
 
     push @load_recipes, [ $dir, 'Alignment.tab', 'Alignment',
                           { id => 0, n_rows => 1, n_cols => 2, status => 3,
@@ -692,29 +692,29 @@ sub validate_exchange
 
     # Verify the kb_tree_ids are registered with KBase
     
-    my @kb_tree_ids     = unique_fields_in_file("$dir/Tree.tab", 0);
-    my $extern_tree_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_tree_ids);
+    # my @kb_tree_ids     = unique_fields_in_file("$dir/Tree.tab", 0);
+    # my $extern_tree_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_tree_ids);
     
-    my @bad_tree_ids = grep { !$extern_tree_ids->{$_} } @kb_tree_ids;
+    # my @bad_tree_ids = grep { !$extern_tree_ids->{$_} } @kb_tree_ids;
 
-    if (@bad_tree_ids) {
-        print MESSAGE "ERROR: Tree.tab: found unregistered KBase tree IDs: \n";
-        print MESSAGE map { "    $_\n" } @bad_tree_ids;
-        $success = 0;
-    }
+    # if (@bad_tree_ids) {
+    #     print MESSAGE "ERROR: Tree.tab: found unregistered KBase tree IDs: \n";
+    #     print MESSAGE map { "    $_\n" } @bad_tree_ids;
+    #     $success = 0;
+    # }
 
     # Verify the kb_aln_ids in the tree file are registered with KBase
 
-    @kb_aln_ids     = unique_fields_in_file("$dir/Tree.tab", 1);
-    @kb_aln_ids     = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
-    $extern_aln_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_aln_ids);
-    @bad_aln_ids    = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
+    # @kb_aln_ids     = unique_fields_in_file("$dir/Tree.tab", 1);
+    # @kb_aln_ids     = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
+    # $extern_aln_ids = $IDserverO->kbase_ids_to_external_ids(\@kb_aln_ids);
+    # @bad_aln_ids    = grep { !$extern_aln_ids->{$_} } @kb_aln_ids;
 
-    if (@bad_aln_ids) {
-        print MESSAGE "ERROR: Alignment.tab: found unregistered KBase alignment IDs: \n";
-        print MESSAGE map { "    $_\n" } @bad_aln_ids;
-        $success = 0;
-    }
+    # if (@bad_aln_ids) {
+    #     print MESSAGE "ERROR: Alignment.tab: found unregistered KBase alignment IDs: \n";
+    #     print MESSAGE map { "    $_\n" } @bad_aln_ids;
+    #     $success = 0;
+    # }
 
     my $fname = "Tree.tab";
     my $tmpfile = "Tree.tmp";

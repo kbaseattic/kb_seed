@@ -3120,6 +3120,56 @@ sub reactions_to_complexes
 
 
 
+=head2 $result = aliases_to_fids(aliases)
+
+
+
+=cut
+
+sub aliases_to_fids
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function aliases_to_fids (received $n, expecting 1)");
+    }
+    {
+	my($aliases) = @args;
+
+	my @_bad_arguments;
+        (ref($aliases) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"aliases\" (value was \"$aliases\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to aliases_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'aliases_to_fids');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.aliases_to_fids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'aliases_to_fids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method aliases_to_fids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'aliases_to_fids',
+				       );
+    }
+}
+
+
+
 =head2 $result = reaction_strings(reactions, name_parameter)
 
 Reaction_strings are text strings that represent (albeit crudely)
@@ -3846,7 +3896,7 @@ sub align_sequences
 
 
 
-=head2 $result = build_tree(seq_set, build_tree_parms)
+=head2 $result = build_tree(alignment, build_tree_parms)
 
 
 
@@ -3862,10 +3912,10 @@ sub build_tree
 							       "Invalid argument count for function build_tree (received $n, expecting 2)");
     }
     {
-	my($seq_set, $build_tree_parms) = @args;
+	my($alignment, $build_tree_parms) = @args;
 
 	my @_bad_arguments;
-        (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seq_set\" (value was \"$seq_set\")");
+        (ref($alignment) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"alignment\" (value was \"$alignment\")");
         (ref($build_tree_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 2 \"build_tree_parms\" (value was \"$build_tree_parms\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_arguments);
@@ -3891,6 +3941,106 @@ sub build_tree
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method build_tree",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'build_tree',
+				       );
+    }
+}
+
+
+
+=head2 $result = alignment_by_id(aln_id)
+
+
+
+=cut
+
+sub alignment_by_id
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function alignment_by_id (received $n, expecting 1)");
+    }
+    {
+	my($aln_id) = @args;
+
+	my @_bad_arguments;
+        (!ref($aln_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"aln_id\" (value was \"$aln_id\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to alignment_by_id:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'alignment_by_id');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.alignment_by_id",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'alignment_by_id',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method alignment_by_id",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'alignment_by_id',
+				       );
+    }
+}
+
+
+
+=head2 $result = tree_by_id(tree_id)
+
+
+
+=cut
+
+sub tree_by_id
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function tree_by_id (received $n, expecting 1)");
+    }
+    {
+	my($tree_id) = @args;
+
+	my @_bad_arguments;
+        (!ref($tree_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"tree_id\" (value was \"$tree_id\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to tree_by_id:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'tree_by_id');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.tree_by_id",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'tree_by_id',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method tree_by_id",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'tree_by_id',
 				       );
     }
 }
@@ -5594,7 +5744,7 @@ sub all_entities_Biomass
 
 This entity contains information about the codon usage
 frequency in a particular genome with respect to a particular
-type of analysis (e.g. high-expression genes, modal, mean, 
+type of analysis (e.g. high-expression genes, modal, mean,
 etc.).
 It has the following fields:
 
@@ -8949,11 +9099,10 @@ common name for the location
 ID from the source of this location
 
 
-=item hierarchy
+=item abbr
 
-a number indicating where this location occurs
-in relation other locations in the cell. Zero indicates
-extra-cellular.
+an abbreviation (usually a single letter) for the
+location.
 
 
 

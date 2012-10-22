@@ -10,9 +10,10 @@ use Data::Dumper;
 my @groups;
 
 my @dirs = ([modeling_scripts => 'Modeling scripts'],
-	    [scripts => 'CDMI Scripts'],
+	    [tree_scripts => 'Alignments and Trees scripts'],
+            [scripts => 'CDMI Scripts'],
 	    [anno_scripts => 'Annotation service scripts'],
-	    [er_scripts => 'Entity Relationship Scripts'],
+	    [er_scripts => 'Entity Relationship scripts'],
 #	    [iscripts => 'Iris Scripts'],
 	    );
 

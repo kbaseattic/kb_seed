@@ -53,7 +53,7 @@ strings. The following fields are available:
 
 =item source_id
 
-=item hierarchy
+=item abbr
 
 =back    
 
@@ -104,7 +104,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'hierarchy' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'abbr' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'index', 'label', 'pH', 'potential' );
 

@@ -101,7 +101,12 @@ use Data::Dumper;
 use Carp;
 use Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 use Sphinx::Search;
+
+use AlignTree ();
+use gjonewicklib;
+
 use Config::Simple;
+
 
 our $AUTOLOAD;
 sub AUTOLOAD
@@ -240,7 +245,7 @@ sub fids_to_annotations
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN fids_to_annotations
-                    my $kb = $self->{db};
+    my $kb = $self->{db};
     $return = {};
 
     for my $id (@$fids) {
@@ -5856,6 +5861,108 @@ sub reactions_to_complexes
 
 
 
+=head2 aliases_to_fids
+
+  $return = $obj->aliases_to_fids($aliases)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$aliases is an aliases
+$return is a reference to a hash where the key is an alias and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$aliases is an aliases
+$return is a reference to a hash where the key is an alias and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub aliases_to_fids
+{
+    my $self = shift;
+    my($aliases) = @_;
+
+    my @_bad_arguments;
+    (ref($aliases) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"aliases\" (value was \"$aliases\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to aliases_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'aliases_to_fids');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN aliases_to_fids
+
+    my $kb = $self->{db};
+    $return = {};
+    if ((! $aliases) || (@$aliases == 0)) { return $return }
+
+    my $n = @$aliases;
+    my %aliases;
+    $aliases{$_} = 1 foreach @$aliases;
+
+    my $alist = "(" . ('?,' x $n);
+    chop $alist;
+    $alist .= ")";
+
+    my @result = $kb->GetAll("Feature",
+			     "Feature(alias) IN $alist",
+			     $aliases,
+			     "Feature(id) Feature(alias)");
+    for my $row (@result)
+    {
+	my($fid, @aliases) = @$row;
+	for my $a (@aliases)
+	{
+	    if ($aliases{$a})
+	    {
+		push(@{$return->{$a}}, $fid);
+		last;
+	    }
+	}
+    }
+
+    #END aliases_to_fids
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to aliases_to_fids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'aliases_to_fids');
+    }
+    return($return);
+}
+
+
+
+
 =head2 reaction_strings
 
   $return = $obj->reaction_strings($reactions, $name_parameter)
@@ -7348,7 +7455,7 @@ sub representative_sequences
 <pre>
 $seq_set is a seq_set
 $align_seq_parms is an align_seq_parms
-$return is a seq_set
+$return is an alignment
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -7447,6 +7554,7 @@ mafft_parms_t is a reference to a hash where the following keys are defined:
 	thread has a value which is a string
 	tm has a value which is a string
 	weighti has a value which is a string
+alignment is a seq_set
 
 </pre>
 
@@ -7456,7 +7564,7 @@ mafft_parms_t is a reference to a hash where the following keys are defined:
 
 $seq_set is a seq_set
 $align_seq_parms is an align_seq_parms
-$return is a seq_set
+$return is an alignment
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -7555,6 +7663,7 @@ mafft_parms_t is a reference to a hash where the following keys are defined:
 	thread has a value which is a string
 	tm has a value which is a string
 	weighti has a value which is a string
+alignment is a seq_set
 
 
 =end text
@@ -7586,7 +7695,6 @@ sub align_sequences
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN align_sequences
-    use AlignTree;
 
     my %muscle_parms = $align_seq_parms->{muscle_parms} ? %{$align_seq_parms->{muscle_parms}} : { };
     my %mafft_parms  = $align_seq_parms->{mafft_parms}  ? %{$align_seq_parms->{mafft_parms}}  : { };
@@ -7611,7 +7719,7 @@ sub align_sequences
 
 =head2 build_tree
 
-  $return = $obj->build_tree($seq_set, $build_tree_parms)
+  $return = $obj->build_tree($alignment, $build_tree_parms)
 
 =over 4
 
@@ -7620,9 +7728,10 @@ sub align_sequences
 =begin html
 
 <pre>
-$seq_set is a seq_set
+$alignment is an alignment
 $build_tree_parms is a build_tree_parms
 $return is a newick_tree
+alignment is a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -7648,9 +7757,10 @@ newick_tree is a string
 
 =begin text
 
-$seq_set is a seq_set
+$alignment is an alignment
 $build_tree_parms is a build_tree_parms
 $return is a newick_tree
+alignment is a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -7686,10 +7796,10 @@ newick_tree is a string
 sub build_tree
 {
     my $self = shift;
-    my($seq_set, $build_tree_parms) = @_;
+    my($alignment, $build_tree_parms) = @_;
 
     my @_bad_arguments;
-    (ref($seq_set) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seq_set\" (value was \"$seq_set\")");
+    (ref($alignment) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"alignment\" (value was \"$alignment\")");
     (ref($build_tree_parms) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"build_tree_parms\" (value was \"$build_tree_parms\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_arguments);
@@ -7700,10 +7810,8 @@ sub build_tree
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN build_tree
-    use AlignTree;
-    use gjonewicklib;
     
-    my $tree = AlignTree::make_tree($seq_set, $build_tree_parms);
+    my $tree = AlignTree::make_tree($alignment, $build_tree_parms);
     $return  = gjonewicklib::strNewickTree($tree);    
 
     #END build_tree
@@ -7713,6 +7821,177 @@ sub build_tree
 	my $msg = "Invalid returns passed to build_tree:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'build_tree');
+    }
+    return($return);
+}
+
+
+
+
+=head2 alignment_by_id
+
+  $return = $obj->alignment_by_id($aln_id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$aln_id is an aln_id
+$return is an alignment
+aln_id is a string
+alignment is a seq_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$aln_id is an aln_id
+$return is an alignment
+aln_id is a string
+alignment is a seq_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub alignment_by_id
+{
+    my $self = shift;
+    my($aln_id) = @_;
+
+    my @_bad_arguments;
+    (!ref($aln_id)) or push(@_bad_arguments, "Invalid type for argument \"aln_id\" (value was \"$aln_id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to alignment_by_id:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alignment_by_id');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN alignment_by_id
+
+    my $kb = $self->{db};
+    my @rows = $kb->GetAll('IncludesAlignmentRow AlignmentRow',
+                           'IncludesAlignmentRow(from-link) = ?', [$aln_id],
+                           [qw(AlignmentRow(row_id)
+                               AlignmentRow(row_description)
+                               AlignmentRow(sequence))]);
+    $return = \@rows;
+
+    #END alignment_by_id
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to alignment_by_id:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'alignment_by_id');
+    }
+    return($return);
+}
+
+
+
+
+=head2 tree_by_id
+
+  $return = $obj->tree_by_id($tree_id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$tree_id is a tree_id
+$return is a newick_tree
+tree_id is a string
+newick_tree is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$tree_id is a tree_id
+$return is a newick_tree
+tree_id is a string
+newick_tree is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub tree_by_id
+{
+    my $self = shift;
+    my($tree_id) = @_;
+
+    my @_bad_arguments;
+    (!ref($tree_id)) or push(@_bad_arguments, "Invalid type for argument \"tree_id\" (value was \"$tree_id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to tree_by_id:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'tree_by_id');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN tree_by_id
+
+    my $kb = $self->{db};
+    my ($tree) = $kb->GetEntityValues('Tree', $tree_id, [qw(newick)]);
+
+    $return = $tree;
+
+    #END tree_by_id
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to tree_by_id:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'tree_by_id');
     }
     return($return);
 }
@@ -10469,6 +10748,58 @@ a string
 
 
 
+=head2 alias
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 aliases
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an alias
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an alias
+
+=end text
+
+=back
+
+
+
 =head2 name_parameter
 
 =over 4
@@ -10873,6 +11204,32 @@ a reference to a list where each element is an id
 
 
 
+=head2 alignment
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a seq_set
+</pre>
+
+=end html
+
+=begin text
+
+a seq_set
+
+=end text
+
+=back
+
+
+
 =head2 rep_seq_parms
 
 =over 4
@@ -11242,6 +11599,58 @@ search has a value which is a string
 tool has a value which is a string
 tool_params has a value which is a string
 
+
+=end text
+
+=back
+
+
+
+=head2 aln_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 tree_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
 
 =end text
 

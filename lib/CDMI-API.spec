@@ -751,6 +751,10 @@ module CDMI_API : CDMI_API {
     funcdef reactions_to_complexes(reactions) returns (mapping<reaction,complexes_with_flags>);
 
 
+    typedef string alias;
+    typedef list<alias> aliases;
+    funcdef aliases_to_fids(aliases) returns (mapping<alias, fid>);
+
     typedef string name_parameter;
 
 	/* Reaction_strings are text strings that represent (albeit crudely)
@@ -835,6 +839,7 @@ module CDMI_API : CDMI_API {
      typedef tuple<id,comment,sequence> seq_triple;
      typedef list<seq_triple> seq_set;
      typedef list<id> id_set;
+     typedef seq_set alignment;
 
      funcdef close_genomes(seq_set,int n) returns (list<tuple<genome,float ident>>);
 
@@ -952,7 +957,7 @@ module CDMI_API : CDMI_API {
 	int            align_ends_with_clustal;	
      } align_seq_parms;
              
-     funcdef align_sequences(seq_set,align_seq_parms) returns (seq_set);
+     funcdef align_sequences(seq_set, align_seq_parms) returns (alignment);
 
      typedef string newick_tree;
 
@@ -967,6 +972,12 @@ module CDMI_API : CDMI_API {
          string tool_params;
      } build_tree_parms;
 
-     funcdef build_tree(seq_set, build_tree_parms) returns (newick_tree);
+     funcdef build_tree(alignment, build_tree_parms) returns (newick_tree);
+
+     typedef string aln_id;
+     typedef string tree_id;
+
+     funcdef alignment_by_id(aln_id) returns (alignment);
+     funcdef tree_by_id(tree_id) returns (newick_tree);
 
 };

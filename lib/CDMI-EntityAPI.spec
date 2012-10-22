@@ -503,7 +503,7 @@ typedef structure {
 /*
 This entity contains information about the codon usage
 frequency in a particular genome with respect to a particular
-type of analysis (e.g. high-expression genes, modal, mean, 
+type of analysis (e.g. high-expression genes, modal, mean,
 etc.).
 It has the following fields:
 
@@ -1412,7 +1412,7 @@ typedef structure {
 	string mod_date nullable;
 	string name nullable;
 	string source_id nullable;
-	int hierarchy nullable;
+	int abbr nullable;
 } fields_Location ;
 
 /*
@@ -1440,11 +1440,10 @@ common name for the location
 ID from the source of this location
 
 
-=item hierarchy
+=item abbr
 
-a number indicating where this location occurs
-in relation other locations in the cell. Zero indicates
-extra-cellular.
+an abbreviation (usually a single letter) for the
+location.
 
 
 
@@ -2409,7 +2408,7 @@ funcdef all_entities_SSRow(int start, int count, list<string> fields)
 	returns(mapping<string, fields_SSRow>);
 
 typedef structure {
-	string id;
+	int id;
 	string common_name nullable;
 } fields_Scenario ;
 
@@ -2667,7 +2666,7 @@ funcdef all_entities_SubsystemClass(int start, int count, list<string> fields)
 	returns(mapping<string, fields_SubsystemClass>);
 
 typedef structure {
-	string id;
+	int id;
 	int domain nullable;
 	int hidden nullable;
 	string scientific_name nullable;
@@ -2959,7 +2958,8 @@ funcdef all_entities_Variant(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Variant>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int level nullable;
 } fields_AffectsLevelOf ;
 
@@ -2988,7 +2988,8 @@ funcdef get_relationship_IsAffectedIn(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_AtomicRegulon, fields_AffectsLevelOf, fields_Experiment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Aligned ;
 
 /*
@@ -3010,7 +3011,8 @@ funcdef get_relationship_WasAlignedBy(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Alignment, fields_Aligned, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string function nullable;
 	string external_id nullable;
 	string organism nullable;
@@ -3065,7 +3067,8 @@ funcdef get_relationship_HasAssertedFunctionFrom(list<string> ids, list<string> 
 	returns(list<tuple<fields_ProteinSequence, fields_AssertsFunctionFor, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_BelongsTo ;
 
 /*
@@ -3087,7 +3090,8 @@ funcdef get_relationship_IncludesStrain(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_ExperimentalUnit, fields_BelongsTo, fields_Strain>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Concerns ;
 
 /*
@@ -3109,7 +3113,8 @@ funcdef get_relationship_IsATopicOf(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_ProteinSequence, fields_Concerns, fields_Publication>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float molar_ratio nullable;
 } fields_ConsistsOfCompounds ;
 
@@ -3141,7 +3146,8 @@ funcdef get_relationship_ComponentOf(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Compound, fields_ConsistsOfCompounds, fields_Compound>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Contains ;
 
 /*
@@ -3165,7 +3171,8 @@ funcdef get_relationship_IsContainedIn(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Feature, fields_Contains, fields_SSCell>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int index_in_concatenation nullable;
 	int beg_pos_in_parent nullable;
 	int end_pos_in_parent nullable;
@@ -3235,7 +3242,8 @@ funcdef get_relationship_IsAlignedDNAComponentOf(list<string> ids, list<string> 
 	returns(list<tuple<fields_ContigSequence, fields_ContainsAlignedDNA, fields_AlignmentRow>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int index_in_concatenation nullable;
 	int beg_pos_in_parent nullable;
 	int end_pos_in_parent nullable;
@@ -3305,7 +3313,8 @@ funcdef get_relationship_IsAlignedProteinComponentOf(list<string> ids, list<stri
 	returns(list<tuple<fields_ProteinSequence, fields_ContainsAlignedProtein, fields_AlignmentRow>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Controls ;
 
 /*
@@ -3327,7 +3336,8 @@ funcdef get_relationship_IsControlledUsing(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_CoregulatedSet, fields_Controls, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_DerivedFromStrain ;
 
 /*
@@ -3349,7 +3359,8 @@ funcdef get_relationship_StrainParentOf(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_Strain, fields_DerivedFromStrain, fields_Strain>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Describes ;
 
 /*
@@ -3372,7 +3383,8 @@ funcdef get_relationship_IsDescribedBy(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Variant, fields_Describes, fields_Subsystem>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string value nullable;
 } fields_DescribesAlignment ;
 
@@ -3400,7 +3412,8 @@ funcdef get_relationship_HasAlignmentAttribute(list<string> ids, list<string> fr
 	returns(list<tuple<fields_Alignment, fields_DescribesAlignment, fields_AlignmentAttribute>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string value nullable;
 } fields_DescribesTree ;
 
@@ -3428,7 +3441,8 @@ funcdef get_relationship_HasTreeAttribute(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_Tree, fields_DescribesTree, fields_TreeAttribute>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string value nullable;
 	string node_id nullable;
 } fields_DescribesTreeNode ;
@@ -3462,7 +3476,8 @@ funcdef get_relationship_HasNodeAttribute(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_Tree, fields_DescribesTreeNode, fields_TreeNodeAttribute>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	rectangle location nullable;
 } fields_Displays ;
 
@@ -3491,7 +3506,8 @@ funcdef get_relationship_IsDisplayedOn(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Reaction, fields_Displays, fields_Diagram>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Encompasses ;
 
 /*
@@ -3515,7 +3531,8 @@ funcdef get_relationship_IsEncompassedIn(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_Feature, fields_Encompasses, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Formulated ;
 
 /*
@@ -3537,7 +3554,8 @@ funcdef get_relationship_WasFormulatedBy(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_CoregulatedSet, fields_Formulated, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	countVector level_vector nullable;
 } fields_GeneratedLevelsFor ;
 
@@ -3566,7 +3584,8 @@ funcdef get_relationship_WasGeneratedFrom(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_AtomicRegulon, fields_GeneratedLevelsFor, fields_ProbeSet>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_GenomeParentOf ;
 
 /*
@@ -3588,7 +3607,8 @@ funcdef get_relationship_DerivedFromGenome(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_Strain, fields_GenomeParentOf, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasAssociatedMeasurement ;
 
 /*
@@ -3610,7 +3630,8 @@ funcdef get_relationship_MeasuresPhenotype(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_Measurement, fields_HasAssociatedMeasurement, fields_PhenotypeDescription>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string alias nullable;
 } fields_HasCompoundAliasFrom ;
 
@@ -3639,7 +3660,8 @@ funcdef get_relationship_UsesAliasForCompound(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Compound, fields_HasCompoundAliasFrom, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasExperimentalUnit ;
 
 /*
@@ -3661,7 +3683,8 @@ funcdef get_relationship_IsExperimentalUnitOf(list<string> ids, list<string> fro
 	returns(list<tuple<fields_ExperimentalUnit, fields_HasExperimentalUnit, fields_PhenotypeExperiment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float rma_value nullable;
 	int level nullable;
 } fields_HasIndicatedSignalFrom ;
@@ -3697,7 +3720,8 @@ funcdef get_relationship_IndicatesSignalFor(list<string> ids, list<string> from_
 	returns(list<tuple<fields_Experiment, fields_HasIndicatedSignalFrom, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasKnockoutIn ;
 
 /*
@@ -3719,7 +3743,8 @@ funcdef get_relationship_KnockedOutIn(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Feature, fields_HasKnockoutIn, fields_Strain>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasMeasurement ;
 
 /*
@@ -3741,7 +3766,8 @@ funcdef get_relationship_IsMeasureOf(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Measurement, fields_HasMeasurement, fields_ExperimentalUnit>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasMember ;
 
 /*
@@ -3764,7 +3790,8 @@ funcdef get_relationship_IsMemberOf(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Feature, fields_HasMember, fields_Family>>);
 
 typedef structure {
-	string id;
+	int from_link;
+	string to_link;
 	int type nullable;
 } fields_HasParticipant ;
 
@@ -3797,7 +3824,8 @@ funcdef get_relationship_ParticipatesIn(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_Reaction, fields_HasParticipant, fields_Scenario>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float concentration nullable;
 	float maximum_flux nullable;
 	float minimum_flux nullable;
@@ -3838,7 +3866,8 @@ funcdef get_relationship_IsPresentIn(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Compound, fields_HasPresenceOf, fields_Media>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string source_id nullable;
 } fields_HasProteinMember ;
 
@@ -3869,7 +3898,8 @@ funcdef get_relationship_IsProteinMemberOf(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_ProteinSequence, fields_HasProteinMember, fields_Family>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string alias nullable;
 } fields_HasReactionAliasFrom ;
 
@@ -3898,7 +3928,8 @@ funcdef get_relationship_UsesAliasForReaction(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Reaction, fields_HasReactionAliasFrom, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasRepresentativeOf ;
 
 /*
@@ -3922,7 +3953,8 @@ funcdef get_relationship_IsRepresentedIn(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_Family, fields_HasRepresentativeOf, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasRequirementOf ;
 
 /*
@@ -3944,7 +3976,8 @@ funcdef get_relationship_IsARequirementOf(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_ReactionInstance, fields_HasRequirementOf, fields_Model>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int sequence nullable;
 } fields_HasResultsIn ;
 
@@ -3972,7 +4005,8 @@ funcdef get_relationship_HasResultsFor(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Experiment, fields_HasResultsIn, fields_ProbeSet>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasSection ;
 
 /*
@@ -3994,7 +4028,8 @@ funcdef get_relationship_IsSectionOf(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_ContigChunk, fields_HasSection, fields_ContigSequence>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasStep ;
 
 /*
@@ -4016,7 +4051,8 @@ funcdef get_relationship_IsStepOf(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Reaction, fields_HasStep, fields_Complex>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float value nullable;
 	string statistic_type nullable;
 	string measure_id nullable;
@@ -4055,7 +4091,8 @@ funcdef get_relationship_Measures(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Trait, fields_HasTrait, fields_ObservationalUnit>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasUnits ;
 
 /*
@@ -4077,7 +4114,8 @@ funcdef get_relationship_IsLocated(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_ObservationalUnit, fields_HasUnits, fields_Locality>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_HasUsage ;
 
 /*
@@ -4099,7 +4137,8 @@ funcdef get_relationship_IsUsageOf(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_CompoundInstance, fields_HasUsage, fields_LocalizedCompound>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string value nullable;
 } fields_HasValueFor ;
 
@@ -4128,7 +4167,8 @@ funcdef get_relationship_HasValueIn(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Attribute, fields_HasValueFor, fields_Experiment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int position nullable;
 	int len nullable;
 	string data nullable;
@@ -4185,7 +4225,8 @@ funcdef get_relationship_IsVariedIn(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_ObservationalUnit, fields_HasVariationIn, fields_Contig>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string source_name nullable;
 	int rank nullable;
 	float pvalue nullable;
@@ -4231,7 +4272,8 @@ funcdef get_relationship_IsImpactedBy(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Contig, fields_Impacts, fields_Trait>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int sequence nullable;
 	string abbreviation nullable;
 	int auxiliary nullable;
@@ -4279,7 +4321,8 @@ funcdef get_relationship_IsIncludedIn(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Role, fields_Includes, fields_Subsystem>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float concentration nullable;
 	string units nullable;
 } fields_IncludesAdditionalCompounds ;
@@ -4314,7 +4357,8 @@ funcdef get_relationship_IncludedIn(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Compound, fields_IncludesAdditionalCompounds, fields_Environment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IncludesAlignmentRow ;
 
 /*
@@ -4336,7 +4380,8 @@ funcdef get_relationship_IsAlignmentRowIn(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_AlignmentRow, fields_IncludesAlignmentRow, fields_Alignment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IncludesPart ;
 
 /*
@@ -4358,7 +4403,8 @@ funcdef get_relationship_IsPartOf(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_ObservationalUnit, fields_IncludesPart, fields_StudyExperiment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	countVector level_vector nullable;
 } fields_IndicatedLevelsFor ;
 
@@ -4387,7 +4433,8 @@ funcdef get_relationship_HasLevelsFrom(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Feature, fields_IndicatedLevelsFor, fields_ProbeSet>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float coefficient nullable;
 	int cofactor nullable;
 } fields_Involves ;
@@ -4429,7 +4476,8 @@ funcdef get_relationship_IsInvolvedIn(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_LocalizedCompound, fields_Involves, fields_Reaction>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsAnnotatedBy ;
 
 /*
@@ -4452,7 +4500,8 @@ funcdef get_relationship_Annotates(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Annotation, fields_IsAnnotatedBy, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsAssayOf ;
 
 /*
@@ -4474,7 +4523,8 @@ funcdef get_relationship_IsAssayedBy(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_StudyExperiment, fields_IsAssayOf, fields_Assay>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsClassFor ;
 
 /*
@@ -4498,7 +4548,8 @@ funcdef get_relationship_IsInClass(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Subsystem, fields_IsClassFor, fields_SubsystemClass>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int representative nullable;
 } fields_IsCollectionOf ;
 
@@ -4525,7 +4576,8 @@ funcdef get_relationship_IsCollectedInto(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_Genome, fields_IsCollectionOf, fields_OTU>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsComposedOf ;
 
 /*
@@ -4548,7 +4600,8 @@ funcdef get_relationship_IsComponentOf(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Contig, fields_IsComposedOf, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float coefficient nullable;
 } fields_IsComprisedOf ;
 
@@ -4577,7 +4630,8 @@ funcdef get_relationship_Comprises(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_CompoundInstance, fields_IsComprisedOf, fields_Biomass>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsConfiguredBy ;
 
 /*
@@ -4599,7 +4653,8 @@ funcdef get_relationship_ReflectsStateOf(list<string> ids, list<string> from_fie
 	returns(list<tuple<fields_AtomicRegulon, fields_IsConfiguredBy, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsConsistentWith ;
 
 /*
@@ -4621,7 +4676,8 @@ funcdef get_relationship_IsConsistentTo(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_Role, fields_IsConsistentWith, fields_EcNumber>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float coefficient nullable;
 } fields_IsCoregulatedWith ;
 
@@ -4650,7 +4706,8 @@ funcdef get_relationship_HasCoregulationWith(list<string> ids, list<string> from
 	returns(list<tuple<fields_Feature, fields_IsCoregulatedWith, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int co_occurrence_evidence nullable;
 	int co_expression_evidence nullable;
 } fields_IsCoupledTo ;
@@ -4690,7 +4747,8 @@ funcdef get_relationship_IsCoupledWith(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Family, fields_IsCoupledTo, fields_Family>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int inverted nullable;
 } fields_IsDeterminedBy ;
 
@@ -4725,7 +4783,8 @@ funcdef get_relationship_Determines(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Pairing, fields_IsDeterminedBy, fields_PairSet>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsDividedInto ;
 
 /*
@@ -4747,7 +4806,8 @@ funcdef get_relationship_IsDivisionOf(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_LocationInstance, fields_IsDividedInto, fields_Model>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsExecutedAs ;
 
 /*
@@ -4768,7 +4828,8 @@ funcdef get_relationship_IsExecutionOf(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_ReactionInstance, fields_IsExecutedAs, fields_Reaction>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsExemplarOf ;
 
 /*
@@ -4790,7 +4851,8 @@ funcdef get_relationship_HasAsExemplar(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Role, fields_IsExemplarOf, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsFamilyFor ;
 
 /*
@@ -4812,7 +4874,8 @@ funcdef get_relationship_DeterminesFunctionOf(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Role, fields_IsFamilyFor, fields_Family>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsFormedOf ;
 
 /*
@@ -4834,7 +4897,8 @@ funcdef get_relationship_IsFormedInto(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Feature, fields_IsFormedOf, fields_AtomicRegulon>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsFunctionalIn ;
 
 /*
@@ -4856,7 +4920,8 @@ funcdef get_relationship_HasFunctional(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Feature, fields_IsFunctionalIn, fields_Role>>);
 
 typedef structure {
-	string id;
+	int from_link;
+	int to_link;
 } fields_IsGroupFor ;
 
 /*
@@ -4879,7 +4944,8 @@ funcdef get_relationship_IsInGroup(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_TaxonomicGrouping, fields_IsGroupFor, fields_TaxonomicGrouping>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsImplementedBy ;
 
 /*
@@ -4902,7 +4968,8 @@ funcdef get_relationship_Implements(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_SSRow, fields_IsImplementedBy, fields_Variant>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsInPair ;
 
 /*
@@ -4926,7 +4993,8 @@ funcdef get_relationship_IsPairOf(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Pairing, fields_IsInPair, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsInstantiatedBy ;
 
 /*
@@ -4948,7 +5016,8 @@ funcdef get_relationship_IsInstanceOf(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_LocationInstance, fields_IsInstantiatedBy, fields_Location>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int ordinal nullable;
 	int begin nullable;
 	int len nullable;
@@ -5003,7 +5072,8 @@ funcdef get_relationship_IsLocusFor(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Contig, fields_IsLocatedIn, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsMeasurementMethodOf ;
 
 /*
@@ -5025,7 +5095,8 @@ funcdef get_relationship_WasMeasuredBy(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Measurement, fields_IsMeasurementMethodOf, fields_Protocol>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsModeledBy ;
 
 /*
@@ -5047,7 +5118,8 @@ funcdef get_relationship_Models(list<string> ids, list<string> from_fields, list
 	returns(list<tuple<fields_Model, fields_IsModeledBy, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string modification_type nullable;
 	string modification_value nullable;
 } fields_IsModifiedToBuildAlignment ;
@@ -5081,7 +5153,8 @@ funcdef get_relationship_IsModificationOfAlignment(list<string> ids, list<string
 	returns(list<tuple<fields_Alignment, fields_IsModifiedToBuildAlignment, fields_Alignment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string modification_type nullable;
 	string modification_value nullable;
 } fields_IsModifiedToBuildTree ;
@@ -5116,7 +5189,8 @@ funcdef get_relationship_IsModificationOfTree(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Tree, fields_IsModifiedToBuildTree, fields_Tree>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsOwnerOf ;
 
 /*
@@ -5141,7 +5215,8 @@ funcdef get_relationship_IsOwnedBy(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Feature, fields_IsOwnerOf, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsParticipatingAt ;
 
 /*
@@ -5163,7 +5238,8 @@ funcdef get_relationship_ParticipatesAt(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_LocalizedCompound, fields_IsParticipatingAt, fields_Location>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsProteinFor ;
 
 /*
@@ -5187,7 +5263,8 @@ funcdef get_relationship_Produces(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Feature, fields_IsProteinFor, fields_ProteinSequence>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	float coefficient nullable;
 } fields_IsReagentIn ;
 
@@ -5222,7 +5299,8 @@ funcdef get_relationship_Targets(list<string> ids, list<string> from_fields, lis
 	returns(list<tuple<fields_ReactionInstance, fields_IsReagentIn, fields_CompoundInstance>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsRealLocationOf ;
 
 /*
@@ -5244,7 +5322,8 @@ funcdef get_relationship_HasRealLocationIn(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_CompoundInstance, fields_IsRealLocationOf, fields_LocationInstance>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsReferencedBy ;
 
 /*
@@ -5267,7 +5346,8 @@ funcdef get_relationship_UsesReference(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_ObservationalUnit, fields_IsReferencedBy, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsRegulatedIn ;
 
 /*
@@ -5288,7 +5368,8 @@ funcdef get_relationship_IsRegulatedSetOf(list<string> ids, list<string> from_fi
 	returns(list<tuple<fields_CoregulatedSet, fields_IsRegulatedIn, fields_Feature>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsRelevantFor ;
 
 /*
@@ -5311,7 +5392,8 @@ funcdef get_relationship_IsRelevantTo(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Subsystem, fields_IsRelevantFor, fields_Diagram>>);
 
 typedef structure {
-	string id;
+	int from_link;
+	string to_link;
 } fields_IsRepresentedBy ;
 
 /*
@@ -5333,7 +5415,8 @@ funcdef get_relationship_DefinedBy(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_ObservationalUnit, fields_IsRepresentedBy, fields_TaxonomicGrouping>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsRoleOf ;
 
 /*
@@ -5357,7 +5440,8 @@ funcdef get_relationship_HasRole(list<string> ids, list<string> from_fields, lis
 	returns(list<tuple<fields_SSCell, fields_IsRoleOf, fields_Role>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsRowOf ;
 
 /*
@@ -5379,7 +5463,8 @@ funcdef get_relationship_IsRoleFor(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_SSCell, fields_IsRowOf, fields_SSRow>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsSequenceOf ;
 
 /*
@@ -5403,7 +5488,8 @@ funcdef get_relationship_HasAsSequence(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Contig, fields_IsSequenceOf, fields_ContigSequence>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	int to_link;
 } fields_IsSubInstanceOf ;
 
 /*
@@ -5426,7 +5512,8 @@ funcdef get_relationship_Validates(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Scenario, fields_IsSubInstanceOf, fields_Subsystem>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int position nullable;
 } fields_IsSummarizedBy ;
 
@@ -5455,7 +5542,8 @@ funcdef get_relationship_Summarizes(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_AlleleFrequency, fields_IsSummarizedBy, fields_Contig>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsSuperclassOf ;
 
 /*
@@ -5477,7 +5565,8 @@ funcdef get_relationship_IsSubclassOf(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_SubsystemClass, fields_IsSuperclassOf, fields_SubsystemClass>>);
 
 typedef structure {
-	string id;
+	int from_link;
+	string to_link;
 } fields_IsTaxonomyOf ;
 
 /*
@@ -5501,7 +5590,8 @@ funcdef get_relationship_IsInTaxa(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Genome, fields_IsTaxonomyOf, fields_TaxonomicGrouping>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	int to_link;
 	int group_number nullable;
 } fields_IsTerminusFor ;
 
@@ -5534,7 +5624,8 @@ funcdef get_relationship_HasAsTerminus(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Scenario, fields_IsTerminusFor, fields_Compound>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	int optional nullable;
 	string type nullable;
 	int triggering nullable;
@@ -5576,7 +5667,8 @@ funcdef get_relationship_Triggers(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_Role, fields_IsTriggeredBy, fields_Complex>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_IsUsedToBuildTree ;
 
 /*
@@ -5598,7 +5690,8 @@ funcdef get_relationship_IsBuiltFromAlignment(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Tree, fields_IsUsedToBuildTree, fields_Alignment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Manages ;
 
 /*
@@ -5620,7 +5713,8 @@ funcdef get_relationship_IsManagedBy(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_Biomass, fields_Manages, fields_Model>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_OperatesIn ;
 
 /*
@@ -5642,7 +5736,8 @@ funcdef get_relationship_IsUtilizedIn(list<string> ids, list<string> from_fields
 	returns(list<tuple<fields_Media, fields_OperatesIn, fields_Experiment>>);
 
 typedef structure {
-	string id;
+	int from_link;
+	string to_link;
 } fields_Overlaps ;
 
 /*
@@ -5666,7 +5761,8 @@ funcdef get_relationship_IncludesPartOf(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_Diagram, fields_Overlaps, fields_Scenario>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_ParticipatesAs ;
 
 /*
@@ -5688,7 +5784,8 @@ funcdef get_relationship_IsParticipationOf(list<string> ids, list<string> from_f
 	returns(list<tuple<fields_LocalizedCompound, fields_ParticipatesAs, fields_Compound>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string role nullable;
 } fields_PerformedExperiment ;
 
@@ -5717,7 +5814,8 @@ funcdef get_relationship_PerformedBy(list<string> ids, list<string> from_fields,
 	returns(list<tuple<fields_PhenotypeExperiment, fields_PerformedExperiment, fields_Person>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_ProducedResultsFor ;
 
 /*
@@ -5740,7 +5838,8 @@ funcdef get_relationship_HadResultsProducedBy(list<string> ids, list<string> fro
 	returns(list<tuple<fields_Genome, fields_ProducedResultsFor, fields_ProbeSet>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Provided ;
 
 /*
@@ -5762,7 +5861,8 @@ funcdef get_relationship_WasProvidedBy(list<string> ids, list<string> from_field
 	returns(list<tuple<fields_Subsystem, fields_Provided, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_PublishedExperiment ;
 
 /*
@@ -5784,7 +5884,8 @@ funcdef get_relationship_ExperimentPublishedIn(list<string> ids, list<string> fr
 	returns(list<tuple<fields_PhenotypeExperiment, fields_PublishedExperiment, fields_Publication>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_PublishedProtocol ;
 
 /*
@@ -5806,7 +5907,8 @@ funcdef get_relationship_ProtocolPublishedIn(list<string> ids, list<string> from
 	returns(list<tuple<fields_Protocol, fields_PublishedProtocol, fields_Publication>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	rectangle location nullable;
 } fields_Shows ;
 
@@ -5835,7 +5937,8 @@ funcdef get_relationship_IsShownOn(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Compound, fields_Shows, fields_Diagram>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Submitted ;
 
 /*
@@ -5857,7 +5960,8 @@ funcdef get_relationship_WasSubmittedBy(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_Genome, fields_Submitted, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string successor_type nullable;
 } fields_SupersedesAlignment ;
 
@@ -5886,7 +5990,8 @@ funcdef get_relationship_IsSupersededByAlignment(list<string> ids, list<string> 
 	returns(list<tuple<fields_Alignment, fields_SupersedesAlignment, fields_Alignment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 	string successor_type nullable;
 } fields_SupersedesTree ;
 
@@ -5915,7 +6020,8 @@ funcdef get_relationship_IsSupersededByTree(list<string> ids, list<string> from_
 	returns(list<tuple<fields_Tree, fields_SupersedesTree, fields_Tree>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Treed ;
 
 /*
@@ -5937,7 +6043,8 @@ funcdef get_relationship_IsTreeFrom(list<string> ids, list<string> from_fields, 
 	returns(list<tuple<fields_Tree, fields_Treed, fields_Source>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_UsedBy ;
 
 /*
@@ -5959,7 +6066,8 @@ funcdef get_relationship_UsesMedia(list<string> ids, list<string> from_fields, l
 	returns(list<tuple<fields_Environment, fields_UsedBy, fields_Media>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_UsedInExperimentalUnit ;
 
 /*
@@ -5981,7 +6089,8 @@ funcdef get_relationship_HasEnvironment(list<string> ids, list<string> from_fiel
 	returns(list<tuple<fields_ExperimentalUnit, fields_UsedInExperimentalUnit, fields_Environment>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_Uses ;
 
 /*
@@ -6004,7 +6113,8 @@ funcdef get_relationship_IsUsedBy(list<string> ids, list<string> from_fields, li
 	returns(list<tuple<fields_SSRow, fields_Uses, fields_Genome>>);
 
 typedef structure {
-	string id;
+	string from_link;
+	string to_link;
 } fields_UsesCodons ;
 
 /*
