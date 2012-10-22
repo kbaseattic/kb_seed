@@ -5926,7 +5926,7 @@ sub aliases_to_fids
 
     my $n = @$aliases;
     my %aliases;
-    $aliases{$_} = 1 foreach @$aliases;
+    $aliases{lc($_)} = $_ foreach @$aliases;
 
     my $alist = "(" . ('?,' x $n);
     chop $alist;
@@ -5936,14 +5936,15 @@ sub aliases_to_fids
 			     "Feature(alias) IN $alist",
 			     $aliases,
 			     "Feature(id) Feature(alias)");
+    print Dumper(\%aliases, \@result);
     for my $row (@result)
     {
 	my($fid, @aliases) = @$row;
 	for my $a (@aliases)
 	{
-	    if ($aliases{$a})
+	    if (my $orig = $aliases{lc($a)})
 	    {
-		push(@{$return->{$a}}, $fid);
+		push(@{$return->{$orig}}, $fid);
 		last;
 	    }
 	}
