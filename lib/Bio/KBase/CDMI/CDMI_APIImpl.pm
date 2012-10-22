@@ -5936,7 +5936,6 @@ sub aliases_to_fids
 			     "Feature(alias) IN $alist",
 			     $aliases,
 			     "Feature(id) Feature(alias)");
-    print Dumper(\%aliases, \@result);
     for my $row (@result)
     {
 	my($fid, @aliases) = @$row;
@@ -5957,6 +5956,131 @@ sub aliases_to_fids
 	my $msg = "Invalid returns passed to aliases_to_fids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'aliases_to_fids');
+    }
+    return($return);
+}
+
+
+
+
+=head2 external_ids_to_fids
+
+  $return = $obj->external_ids_to_fids($external_ids, $prefix_match)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$external_ids is an external_ids
+$prefix_match is an int
+$return is a reference to a hash where the key is an external_id and the value is a fid
+external_ids is a reference to a list where each element is an external_id
+external_id is a string
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$external_ids is an external_ids
+$prefix_match is an int
+$return is a reference to a hash where the key is an external_id and the value is a fid
+external_ids is a reference to a list where each element is an external_id
+external_id is a string
+fid is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub external_ids_to_fids
+{
+    my $self = shift;
+    my($external_ids, $prefix_match) = @_;
+
+    my @_bad_arguments;
+    (ref($external_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"external_ids\" (value was \"$external_ids\")");
+    (!ref($prefix_match)) or push(@_bad_arguments, "Invalid type for argument \"prefix_match\" (value was \"$prefix_match\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to external_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'external_ids_to_fids');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN external_ids_to_fids
+
+    my $kb = $self->{db};
+    $return = {};
+    if ((! $external_ids) || (@$external_ids == 0)) { return $return }
+
+    my $n = @$external_ids;
+    my %external_ids;
+    $external_ids{$_} = $_ foreach @$external_ids;
+
+    #
+    # If we are asking for a prefix match, we need to do a series of LIKE queries. For now
+    # just do them individually.
+    #
+    # If no prefix match, we can use an IN query.
+    #
+    if ($prefix_match)
+    {
+	for my $ext_id (@$external_ids)
+	{
+	    my @result = $kb->GetAll("AssertsFunctionFor ProteinSequence IsProteinFor",
+				     "AssertsFunctionFor(external_id) LIKE ?",
+				     ["$ext_id%"],
+				     "IsProteinFor(to_link)");
+	    for my $row (@result)
+	    {
+		my($fid) = @$row;
+		push(@{$return->{$ext_id}}, $fid);
+	    }
+	}
+    }
+    else
+    {
+	my $alist = "(" . ('?,' x $n);
+	chop $alist;
+	$alist .= ")";
+	
+	my @result = $kb->GetAll("AssertsFunctionFor ProteinSequence IsProteinFor",
+				 "AssertsFunctionFor(external_id) IN $alist",
+				 $external_ids,
+				 "AssertsFunctionFor(external_id) IsProteinFor(to_link)");
+	print Dumper(\@result);
+	for my $row (@result)
+	{
+	    my($ext_id, $fid) = @$row;
+	    if (my $orig = $external_ids{$ext_id})
+	    {
+		push(@{$return->{$orig}}, $fid);
+	    }
+	}
+    }	
+    #END external_ids_to_fids
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to external_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'external_ids_to_fids');
     }
     return($return);
 }
@@ -10794,6 +10918,58 @@ a reference to a list where each element is an alias
 =begin text
 
 a reference to a list where each element is an alias
+
+=end text
+
+=back
+
+
+
+=head2 external_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 external_ids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an external_id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an external_id
 
 =end text
 

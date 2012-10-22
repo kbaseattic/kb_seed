@@ -3170,6 +3170,57 @@ sub aliases_to_fids
 
 
 
+=head2 $result = external_ids_to_fids(external_ids, prefix_match)
+
+
+
+=cut
+
+sub external_ids_to_fids
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function external_ids_to_fids (received $n, expecting 2)");
+    }
+    {
+	my($external_ids, $prefix_match) = @args;
+
+	my @_bad_arguments;
+        (ref($external_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"external_ids\" (value was \"$external_ids\")");
+        (!ref($prefix_match)) or push(@_bad_arguments, "Invalid type for argument 2 \"prefix_match\" (value was \"$prefix_match\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to external_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'external_ids_to_fids');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.external_ids_to_fids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'external_ids_to_fids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method external_ids_to_fids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'external_ids_to_fids',
+				       );
+    }
+}
+
+
+
 =head2 $result = reaction_strings(reactions, name_parameter)
 
 Reaction_strings are text strings that represent (albeit crudely)

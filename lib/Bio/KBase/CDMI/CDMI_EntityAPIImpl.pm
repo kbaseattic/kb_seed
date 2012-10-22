@@ -50021,6 +50021,58 @@ a reference to a list where each element is an alias
 
 
 
+=head2 external_id
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 external_ids
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an external_id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an external_id
+
+=end text
+
+=back
+
+
+
 =head2 name_parameter
 
 =over 4
