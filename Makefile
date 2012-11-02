@@ -13,9 +13,6 @@ SERVICE_PORT = 7032
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
 
-SERVICE_DIR = $(TARGET)/services/$(SERVICE)
-
-TPAGE = $(DEPLOY_RUNTIME)/bin/perl $(DEPLOY_RUNTIME)/bin/tpage
 TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE) \
 	--define kb_service_port=$(SERVICE_PORT) --define kb_service_dir=$(SERVICE_DIR) \
 	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST)
@@ -23,9 +20,6 @@ TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --d
 all: bin
 
 bin: $(BIN_PERL)
-
-$(BIN_DIR)/%: scripts/%.pl 
-	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
 deploy: deploy-service
 deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-sphinx
@@ -35,21 +29,6 @@ deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
 	if [ ! -d $(SERVICE_DIR)/webroot ] ; then mkdir $(SERVICE_DIR)/webroot ; fi
 	if [ ! -d $(SERVICE_DIR)/sphinx ] ; then mkdir $(SERVICE_DIR)/sphinx ; fi
-
-deploy-scripts:
-	export KB_TOP=$(TARGET); \
-	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
-	export KB_PERL_PATH=$(TARGET)/lib bash ; \
-	for src in $(SRC_PERL) ; do \
-		basefile=`basename $$src`; \
-		base=`basename $$src .pl`; \
-		echo install $$src $$base ; \
-		cp $$src $(TARGET)/plbin ; \
-		bash $(TOOLS_DIR)/wrap_perl.sh "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
-	done 
-
-deploy-libs:
-	rsync -arv lib/. $(TARGET)/lib/.
 
 deploy-sphinx:
 	$(TPAGE) $(TPAGE_ARGS) service/reindex_sphinx.tt > $(TARGET)/services/$(SERVICE)/reindex_sphinx
@@ -73,3 +52,5 @@ deploy-doc:
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/CDMI_APIImpl.pm > doc/application_api.html
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
+
+include $(TOP_DIR)/tools/Makefile.common.rules
