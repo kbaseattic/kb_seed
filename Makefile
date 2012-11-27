@@ -48,7 +48,7 @@ deploy-services:
 deploy-monit:
 	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
 
-deploy-doc:
+deploy-docs:
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/CDMI_APIImpl.pm > doc/application_api.html
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
