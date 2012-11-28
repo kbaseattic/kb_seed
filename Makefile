@@ -10,6 +10,8 @@ SERVER_MODULE = CDMI_API
 SERVICE = cdmi_api
 SERVICE_PORT = 7032
 
+CLIENT_TESTS = $(wildcard t/*.t)
+
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
 
@@ -52,5 +54,25 @@ deploy-docs:
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/CDMI_APIImpl.pm > doc/application_api.html
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
+
+test: test-client 
+	echo "running client and script tests"
+
+# What does it mean to test a client. This is a test of a client
+# library. If it is a client-server module, then it should be
+# run against a running server. You can say that this also tests
+# the server, and I agree. You can add a test-server dependancy
+# to the test-client target if it makes sense to you. This test
+# example assumes there is already a tested running server.
+test-client:
+        # run each test
+	for t in $(CLIENT_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
 
 include $(TOP_DIR)/tools/Makefile.common.rules
