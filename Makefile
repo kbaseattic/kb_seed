@@ -23,9 +23,9 @@ all: bin
 
 bin: $(BIN_PERL)
 
-deploy: deploy-service
+deploy: deploy-service deploy-docs
 deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-sphinx
-deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
+deploy-client: deploy-dir deploy-scripts deploy-libs
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
