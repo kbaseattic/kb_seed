@@ -1,6 +1,9 @@
 TOP_DIR = ../..
 include $(TOP_DIR)/tools/Makefile.common
 
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET ?= /kb/deployment
+
 SRC_PERL = $(wildcard scripts/*.pl)
 BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
 
@@ -23,9 +26,15 @@ all: bin
 
 bin: $(BIN_PERL)
 
-deploy: deploy-service deploy-docs
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-sphinx
-deploy-client: deploy-dir deploy-scripts deploy-libs
+deploy: deploy-client
+deploy-all: deploy-client deploy-service
+deploy-client: deploy-docs
+
+deploy-service: deploy-dir deploy-monit deploy-sphinx
+	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
+	chmod +x $(TARGET)/services/$(SERVICE)/start_service
+	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
+	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
@@ -40,12 +49,6 @@ deploy-sphinx:
 	$(TPAGE) $(TPAGE_ARGS) service/stop_sphinx.tt > $(TARGET)/services/$(SERVICE)/stop_sphinx
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_sphinx
 	$(DEPLOY_RUNTIME)/bin/perl scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
-
-deploy-services:
-	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
-	chmod +x $(TARGET)/services/$(SERVICE)/start_service
-	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
-	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
 
 deploy-monit:
 	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
@@ -65,7 +68,7 @@ test: test-client
 # to the test-client target if it makes sense to you. This test
 # example assumes there is already a tested running server.
 test-client:
-        # run each test
+	# run each test
 	for t in $(CLIENT_TESTS) ; do \
 		if [ -f $$t ] ; then \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
