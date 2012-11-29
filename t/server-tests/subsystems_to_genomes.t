@@ -13,7 +13,8 @@ use Bio::KBase::CDMI::Client;
 #
 # CONFIGURE THESE
 #
-my $url         = 'http://140.221.92.46:5000';
+#my $url         = 'http://140.221.92.46:5000';
+use CDMITestConfig qw(getHost getPort);
 
 my $test_method = 'subsystems_to_genomes';
 my @additional_args = (
@@ -25,8 +26,11 @@ my @additional_args = (
 #my $cdmi = CDMI_APIClient->new($url);
 #my $cdmie = CDMI_EntityAPIClient->new($url);
 
-my $cdmi  = Bio::KBase::CDMI::Client->new($url);
-my $cdmie = Bio::KBase::CDMI::Client->new($url);
+# MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
+my $host=getHost(); my $port=getPort();
+print "-> attempting to connect to:'".$host.":".$port."'\n";
+my $cdmi  = Bio::KBase::Tree::Client->new($host.":".$port);
+my $cdmie = Bio::KBase::Tree::Client->new($host.":".$port);
 
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
