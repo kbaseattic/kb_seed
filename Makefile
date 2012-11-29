@@ -26,7 +26,7 @@ all: bin
 
 bin: $(BIN_PERL)
 
-deploy: deploy-client
+deploy: deploy-all
 deploy-all: deploy-client deploy-service
 deploy-client: deploy-docs
 
