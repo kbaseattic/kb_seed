@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+#update 11/29/2012 - landml
 
 use strict;
 use warnings;
@@ -8,13 +9,14 @@ use Test::More;
 #use CDMI_APIClient;
 #use CDMI_EntityAPIClient;
 use Bio::KBase::CDMI::Client;
+use lib "t/server-tests";
+use CDMITestConfig qw(getHost getPort);
 
 ############
 #
 # CONFIGURE THESE
 #
 #my $url         = 'http://140.221.92.46:5000';
-my $url = 'http://localhost:7032';
 
 my $test_method = 'locations_to_fids';
 my @additional_args = (
@@ -26,8 +28,11 @@ my @additional_args = (
 #my $cdmi = CDMI_APIClient->new($url);
 #my $cdmie = CDMI_EntityAPIClient->new($url);
 
-my $cdmi  = Bio::KBase::CDMI::Client->new($url);
-my $cdmie = Bio::KBase::CDMI::Client->new($url);
+# MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
+my $host=getHost(); my $port=getPort();
+print "-> attempting to connect to:'".$host.":".$port."'\n";
+my $cdmi  = Bio::KBase::CDMI::Client->new($host.":".$port);
+my $cdmie= Bio::KBase::CDMI::Client->new($host.":".$port);
 
 #
 # CONFIGURE THIS TO LOAD YOUR DATA

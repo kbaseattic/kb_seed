@@ -1,12 +1,23 @@
+#updated 11/29/2012 - landml
+
 use strict;
 use Data::Dumper;
 use Test::More tests => 36;
 use Carp;
-use CDMI_APIClient;
-use CDMI_EntityAPIClient;
+#use CDMI_APIClient;
+#use CDMI_EntityAPIClient;
+use Bio::KBase::CDMI::Client;
+use lib "t/server-tests";
+use CDMITestConfig qw(getHost getPort);
 
-my $cdmie = CDMI_EntityAPIClient->new("http://140.221.92.46:5000");
-my $cdmi = CDMI_APIClient->new("http://140.221.92.46:5000");
+
+#my $cdmie = CDMI_EntityAPIClient->new("http://140.221.92.46:5000");
+#my $cdmi = CDMI_APIClient->new("http://140.221.92.46:5000");
+# MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
+my $host=getHost(); my $port=getPort();
+print "-> attempting to connect to:'".$host.":".$port."'\n";
+my $cdmi  = Bio::KBase::CDMI::Client->new($host.":".$port);
+my $cdmie= Bio::KBase::CDMI::Client->new($host.":".$port);
 
 # fids_to_* tests (kkeller)
 # general plan: test a good fid and a bad fid

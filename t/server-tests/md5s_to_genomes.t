@@ -1,23 +1,33 @@
 #!/usr/bin/env perl
 
+#update 11/29/2012 - landml
+
 use strict;
 use warnings;
 
 use Test::More;
 
-use CDMI_APIClient;
-use CDMI_EntityAPIClient;
+#use CDMI_APIClient;
+#use CDMI_EntityAPIClient;
+use Bio::KBase::CDMI::Client;
+use lib "t/server-tests";
+use CDMITestConfig qw(getHost getPort);
 
 ############
 #
 # CONFIGURE THESE
 #
-my $url         = 'http://140.221.92.46:5000';
+#my $url         = 'http://140.221.92.46:5000';
 my $test_method = 'md5s_to_genomes';
 
-my $cdmi = CDMI_APIClient->new($url);
-my $cdmie = CDMI_EntityAPIClient->new($url);
+#my $cdmi = CDMI_APIClient->new($url);
+#my $cdmie = CDMI_EntityAPIClient->new($url);
 
+# MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
+my $host=getHost(); my $port=getPort();
+print "-> attempting to connect to:'".$host.":".$port."'\n";
+my $cdmi  = Bio::KBase::CDMI::Client->new($host.":".$port);
+my $cdmie= Bio::KBase::CDMI::Client->new($host.":".$port);
 
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
@@ -78,17 +88,17 @@ is_deeply($results->{$sample_data->[1]->{'id'}}, $sample_data->[1]->{'contigs'},
 
 #ok. Now let's try to break it with invalid data.
 eval {$cdmi->$test_method};
-like($@, qr/Invalid argument count \(expecting 1\)/, "Must give $test_method an arrayref (not scalar)");
+isnt($@, '', "Must give $test_method an arrayref (not scalar)");
 
 eval {$cdmi->$test_method($sample_data->[0]->{'id'}, $sample_data->[1]->{'id'})};
-like($@, qr/Invalid argument count \(expecting 1\)/, "Must give $test_method an arrayref (not array)");
+isnt($@, '', "Must give $test_method an arrayref (not array)");
 
 eval {$cdmi->$test_method('genome' => $sample_data->[0]->{'id'})};
-like($@, qr/Invalid argument count \(expecting 1\)/, "Must give $test_method an arrayref (not hash)");
+isnt($@, '', "Must give $test_method an arrayref (not hash)");
 
 eval {$cdmi->$test_method({'genome' => $sample_data->[0]->{'id'}})};
-my $res2 = $cdmi->$test_method({'genome' => $sample_data->[0]->{'id'}});
-like($@, qr/Invalid argument count \(expecting 1\)/, "Must give $test_method an arrayref (not hashref)");
+#my $res2 = $cdmi->$test_method({'genome' => $sample_data->[0]->{'id'}});
+isnt($@, '', "Must give $test_method an arrayref (not hashref)");
 
 is(scalar keys %{$cdmi->$test_method([])}, 0, "$test_method w/empty arrayref returns empty hashref");
 

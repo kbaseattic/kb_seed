@@ -1,16 +1,28 @@
+#update 11/29/2012 - landml
+
 use strict;
 use Test::More 'no_plan';
 use Data::Dumper;
 use Carp;
-use CDMI_APIClient;
-use CDMI_EntityAPIClient;
+#use CDMI_APIClient;
+#use CDMI_EntityAPIClient;
+use Bio::KBase::CDMI::Client;
+use lib "t/server-tests";
+use CDMITestConfig qw(getHost getPort);
+
 
 
 my $NRANDOM = 2;
 my $RANDOM_RANGE = 100; # max random interger
 
-my $cdmie = CDMI_EntityAPIClient->new("http://140.221.92.46:5000");
-my $cdmi = CDMI_APIClient->new("http://140.221.92.46:5000");
+#my $cdmie = CDMI_EntityAPIClient->new("http://140.221.92.46:5000");
+#my $cdmi = CDMI_APIClient->new("http://140.221.92.46:5000");
+
+# MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
+my $host=getHost(); my $port=getPort();
+print "-> attempting to connect to:'".$host.":".$port."'\n";
+my $cdmi  = Bio::KBase::CDMI::Client->new($host.":".$port);
+my $cdmie= Bio::KBase::CDMI::Client->new($host.":".$port);
 
 my $ra_all_roles = $cdmi->all_roles_used_in_models();
 ok($#$ra_all_roles > 1999, "# of all_roles_used_in_model() > 2000");

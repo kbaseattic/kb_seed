@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# updated 11/29/2012 landml
 
 use strict;
 use warnings;
@@ -14,6 +15,7 @@ use Bio::KBase::CDMI::Client;
 # CONFIGURE THESE
 #
 #my $url         = 'http://140.221.92.46:5000';
+use lib "t/server-tests";
 use CDMITestConfig qw(getHost getPort);
 
 my $test_method = 'subsystems_to_genomes';
@@ -29,8 +31,8 @@ my @additional_args = (
 # MAKE A CONNECTION (DETERMINE THE URL TO USE BASED ON THE CONFIG MODULE)
 my $host=getHost(); my $port=getPort();
 print "-> attempting to connect to:'".$host.":".$port."'\n";
-my $cdmi  = Bio::KBase::Tree::Client->new($host.":".$port);
-my $cdmie = Bio::KBase::Tree::Client->new($host.":".$port);
+my $cdmi  = Bio::KBase::CDMI::Client->new($host.":".$port);
+my $cdmie = Bio::KBase::CDMI::Client->new($host.":".$port);
 
 #
 # CONFIGURE THIS TO LOAD YOUR DATA
