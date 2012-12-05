@@ -1,14 +1,22 @@
 use strict;
 use warnings;
-use Test::More tests=>635;
+use Test::More tests=>636;
 use Data::Dumper;
 use Carp;
 use Bio::KBase::CDMI::Client;
 use Cwd;
 
+use lib "lib";
+use lib "t/client-tests";
+#NEW VERSION WITH AUTO START / STOP SERVICE
+use Server;
+my ($pid, $url) = Server::start('CDMI');
+print "-> attempting to connect to:'".$url."' with PID=$pid\n";
+
 #  Test 1 - Can the CDMI_EntityAPIClient be created?
-my $cdmie = Bio::KBase::CDMI::Client->new("http://localhost:7032");
+#my $cdmie = Bio::KBase::CDMI::Client->new("http://localhost:7032");
 #my $cdmie = Bio::KBase::CDMI::Client->new("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
+my $cdmie = Bio::KBase::CDMI::Client->new($url);
 ok( defined $cdmie, "Can the CDMI_EntityAPIClient be created?" );               
 
 #  Test 2 - Is the object in the right class?
@@ -21,7 +29,8 @@ if ($path =~ m/(.+\/)[^\/]+$/) {
 	$path = $1;
 }
 
-my $schemeFile = $path."../lib/KSaplingDBD_Published.xml";
+#my $schemeFile = $path."../lib/KSaplingDBD_Published.xml";
+my $schemeFile = "lib/KSaplingDBD_Published.xml";
 #print $schemeFile."\n";
 ok( -e $schemeFile, "Does the KBase CDM xml spec exist?" );
 
