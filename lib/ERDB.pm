@@ -4678,6 +4678,11 @@ to the database.
 If TRUE, then the entity instances will not be deleted, only the dependent
 records.
 
+=item print
+
+If TRUE, then all of the DELETE statements will be written to the standard
+output.
+
 =back
 
 =cut
@@ -4749,16 +4754,19 @@ sub Delete {
                         # the current entity, so we need to stack it.
                         my @stackList = (@augmentedList, $toEntity);
                         push @fromPathList, \@stackList;
+                        push @todoList, \@stackList;
                     } else {
                         Trace("$toEntity ignored because it occurred previously.") if T(4);
                     }
                 }
             }
             # Now check the TO field. In this case only the relationship needs
-            # deletion.
+            # deletion, and only if it's not already in the path.
             if ($relationship->{to} eq $myEntityName) {
-                my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
-                push @toPathList, \@augmentedList;
+                if (scalar(grep { $_ eq $relationshipName } @stackedPath) == 0) {
+                    my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
+                    push @toPathList, \@augmentedList;
+                }
             }
         }
     }
@@ -4806,6 +4814,9 @@ sub Delete {
                 # if an error occurs, so we just go ahead and do it without handling
                 # errors afterward.
                 Trace("Executing delete from $target using '$idParameter'.") if T(3);
+                if ($options{'print'}) {
+                    print "Deleting using '$idParameter': $stmt\n";
+                }
                 my $rv = $db->SQL($stmt, 0, $idParameter);
                 # Accumulate the statistics for this delete. The only rows deleted
                 # are from the target table, so we use its name to record the

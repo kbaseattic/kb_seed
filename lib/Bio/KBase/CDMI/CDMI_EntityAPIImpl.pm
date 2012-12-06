@@ -1046,6 +1046,14 @@ our $relationship_field_defs = {
 		    'position' => 1,
 	
     },
+    'ImplementsReaction' => {
+	to_link => 1, from_link => 1,
+	
+    },
+    'ImplementedBasedOn' => {
+	to_link => 1, from_link => 1,
+	
+    },
     'Includes' => {
 	to_link => 1, from_link => 1,
 		    'sequence' => 1,
@@ -1834,6 +1842,10 @@ our $relationship_field_rels = {
     },
     'IsImpactedBy' => {
     },
+    'ImplementsReaction' => {
+    },
+    'ImplementedBasedOn' => {
+    },
     'Includes' => {
     },
     'IsIncludedIn' => {
@@ -2198,6 +2210,8 @@ our $relationship_entities = {
     'IsVariedIn' => [ 'ObservationalUnit', 'Contig' ],
     'Impacts' => [ 'Trait', 'Contig' ],
     'IsImpactedBy' => [ 'Contig', 'Trait' ],
+    'ImplementsReaction' => [ 'Feature', 'ReactionInstance' ],
+    'ImplementedBasedOn' => [ 'ReactionInstance', 'Feature' ],
     'Includes' => [ 'Subsystem', 'Role' ],
     'IsIncludedIn' => [ 'Role', 'Subsystem' ],
     'IncludesAdditionalCompounds' => [ 'Environment', 'Compound' ],
@@ -2453,6 +2467,7 @@ sub _query_entity
     for my $q (@$qry)
     {
 	my($field, $op, $value) = @$q;
+	$field =~ s/-/_/g;
 	if (!$valid_fields->{$field})
 	{
 	    push(@bad_q, "Field $field does not exist in $tbl");
@@ -30423,6 +30438,238 @@ sub get_relationship_IsImpactedBy
 
 
 
+=head2 get_relationship_ImplementsReaction
+
+  $return = $obj->get_relationship_ImplementsReaction($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_ImplementsReaction
+	2: a fields_ReactionInstance
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_ImplementsReaction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ReactionInstance is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	protons has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_ImplementsReaction
+	2: a fields_ReactionInstance
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_ImplementsReaction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ReactionInstance is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	protons has a value which is a float
+
+
+=end text
+
+
+
+=item Description
+
+This relationship connects features to reaction instances
+that exist because the feature is included in a model.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_ImplementsReaction
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_ImplementsReaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_ImplementsReaction');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_ImplementsReaction
+
+    $return = $self->_get_relationship($ctx, 'ImplementsReaction', 'ImplementsReaction', 0, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_ImplementsReaction
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_ImplementsReaction:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_ImplementsReaction');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship_ImplementedBasedOn
+
+  $return = $obj->get_relationship_ImplementedBasedOn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ReactionInstance
+	1: a fields_ImplementsReaction
+	2: a fields_Feature
+fields_ReactionInstance is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	protons has a value which is a float
+fields_ImplementsReaction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ReactionInstance
+	1: a fields_ImplementsReaction
+	2: a fields_Feature
+fields_ReactionInstance is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	direction has a value which is a string
+	protons has a value which is a float
+fields_ImplementsReaction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_ImplementedBasedOn
+{
+    my $self = shift;
+    my($ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my @_bad_arguments;
+    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
+    (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"from_fields\" (value was \"$from_fields\")");
+    (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"rel_fields\" (value was \"$rel_fields\")");
+    (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"to_fields\" (value was \"$to_fields\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship_ImplementedBasedOn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_ImplementedBasedOn');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship_ImplementedBasedOn
+
+    $return = $self->_get_relationship($ctx, 'ImplementedBasedOn', 'ImplementsReaction', 1, $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_ImplementedBasedOn
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship_ImplementedBasedOn:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship_ImplementedBasedOn');
+    }
+    return($return);
+}
+
+
+
+
 =head2 get_relationship_Includes
 
   $return = $obj->get_relationship_Includes($ids, $from_fields, $rel_fields, $to_fields)
@@ -54665,6 +54912,38 @@ source_name has a value which is a string
 rank has a value which is an int
 pvalue has a value which is a float
 position has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_ImplementsReaction
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text

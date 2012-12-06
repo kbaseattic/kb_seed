@@ -120,11 +120,15 @@ C<MOL>, ...) and the name of the directory containing the expression data.
 
 =cut
 
-use constant TABLES => [qw(ProbeSet IndicatedLevelsFor ProducedResultsFor
+# List of tables to be loaded the normal way.
+use constant TABLES => [qw(ProbeSet ProducedResultsFor
                             HasResultsIn Experiment AffectsLevelOf
                             HasIndicatedSignalFrom AtomicRegulon
                             IsFormedOf IsConfiguredBy GeneratedLevelsFor
                             IsCoregulatedWith)];
+# This table contains a complex data type so it must be loaded using normal
+# inserts.
+use constant SPECIAL => [qw(IndicatedLevelsFor)];
 
 # Create the command-line option variables.
 my ($recursive, $newOnly, $clear, $id_server_url);
@@ -154,7 +158,7 @@ if (! $cdmi) {
         # Are we clearing?
         if($clear) {
             # Yes. Recreate the expression tables.
-            for my $table (@{TABLES()}) {
+            for my $table (@{TABLES()}, @{SPECIAL()}) {
                 print "Recreating $table.\n";
                 $cdmi->CreateTable($table, 1);
             }
@@ -365,13 +369,13 @@ sub LoadExpressionData {
                 # Check to see if we can load the correlation coefficients.
                 my $pearsonFile = "$expDataDirectory/pearson.tbl";
                 if (! -f $pearsonFile) {
-                    Trace("Could not find pearson coefficients for $genome.") if T(1);
+                    print "Could not find pearson coefficients for $genome.\n";
                     $stats->Add(missingPearson => 1);
                 } else {
                     # Yes we can. Read them from the pearson coefficient file.
                     open($ih, "<$pearsonFile") || die "Could not open pearson file: $!\n";
                     while (! eof $ih) {
-                        my ($fid1, $fid2, $pc) = Tracer::GetLine($ih);
+                        my ($fid1, $fid2, $pc) = $loader->GetLine($ih);
                         # Only proceed if both feature exists.
                         if (! defined $fidMap{$fid1} || ! defined $fidMap{$fid2}) {
                             $stats->Add(pearsonFidNotFound => 1);
@@ -395,7 +399,7 @@ sub LoadExpressionData {
             print "Generating regulons for $genome.\n";
             # Loop through the regulons.
             while (! eof $ih) {
-                my ($id, $fid) = Tracer::GetLine($ih);
+                my ($id, $fid) = $loader->GetLine($ih);
                 # Only proceed if the feature exists.
                 my $fidKBID = $fidMap{$fid};
                 if (! defined $fidKBID) {
@@ -488,7 +492,7 @@ sub ReadExperiments {
         open (my $ih, "<$fileName") || die "Could not open experiment names file: $!\n";
         # Read in the experiments.
         while (! eof $ih) {
-            my ($id, $name) = CDMILoader::GetLine($ih);
+            my ($id, $name) = Bio::KBase::CDMI::CDMILoader::GetLine($ih);
             # Note that the experiment numbers are 1-based.
             my $seqNo = $id - 1;
             $retVal[$seqNo] = $name;

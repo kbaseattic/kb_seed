@@ -204,20 +204,25 @@ sub Generate {
         # from the SEED.
         Trace("Processing assertions.") if T(2);
         my $featureFile = "$FIG_Config::organisms/$genomeID/assigned_functions";
-        my $ih = Open(undef, "<$featureFile");
-        while (! eof $ih) {
-            # Get the FIG ID and function from this row.
-            my ($fid, $function) = Tracer::GetLine($ih);
-            # Count this ID.
-            $self->Track(figAssertions => $fid, 5000);
-            # Insure this identifier has a valid function.
-            if (! defined $function) {
-                $self->Add("badFunction-SEED" => 1);
-            } else {
-                # It does, so put it in the assertion relationship.
-                $self->PutR(HasAssertionFrom => $fid, 'SEED',
-                            function => $function, expert => 0);
-                $self->Add("goodFunction-SEED" => 1);
+        if (! -f $featureFile) {
+            Trace("Missing $featureFile for $genomeID.") if T(1);
+            $self->Add(missingAssignedFunction => 1);
+        } else {
+            my $ih = Open(undef, "<$featureFile");
+            while (! eof $ih) {
+                # Get the FIG ID and function from this row.
+                my ($fid, $function) = Tracer::GetLine($ih);
+                # Count this ID.
+                $self->Track(figAssertions => $fid, 5000);
+                # Insure this identifier has a valid function.
+                if (! defined $function) {
+                    $self->Add("badFunction-SEED" => 1);
+                } else {
+                    # It does, so put it in the assertion relationship.
+                    $self->PutR(HasAssertionFrom => $fid, 'SEED',
+                                function => $function, expert => 0);
+                    $self->Add("goodFunction-SEED" => 1);
+                }
             }
         }
     }

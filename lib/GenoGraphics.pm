@@ -1,7 +1,7 @@
 # This is a SAS component.
 
 #
-# Copyright (c) 2003-2006 University of Chicago and Fellowship
+# Copyright (c) 2003-2012 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -25,59 +25,8 @@ use Carp;
 use constant  MINPIX  =>  5;
 
 use SeedHTML;
-
+use SeedAware;
 use vars qw($temp_dir $temp_url);
-
-# #
-# #  Let's diagnose the working rendering options of GD:
-# #
-# #  $bool = gd_has_png()
-# #  $bool = gd_has_jpg()
-# #  \%fmt = gd_formats()  # hash keys: gd, jpg and png
-# #
-# #  Cache the answers
-# #
-# my $has_png;
-# my $has_jpg;
-# my %has = ();
-# 
-# sub gd_has_png
-# {
-#    return $has_png if defined $has_png;
-#    return $has_png = $has{ png } if keys %has;
-#    my $image = new GD::Image( 1, 1 );
-#    $image->colorAllocate( 255, 255, 255 );
-#    $has_png = 0;
-#    eval { $image->png; $has_png = 1; };
-#    $has_png;
-# }
-# 
-# sub gd_has_jpg
-# {
-#     return $has_jpg if defined $has_jpg;
-#     return $has_jpg = $has{ jpg } if keys %has;
-#     my $image = new GD::Image( 1, 1 );
-#     $image->colorAllocate( 255, 255, 255 );
-#     $has_jpg = 0;
-#     eval { $image->jpg; $has_jpg = 1; };
-#     $has_jpg;
-# }
-# 
-# sub gd_formats
-# {
-#     if ( ! keys %has )
-#     {
-#         my $image = new GD::Image( 1, 1 );
-#         $image->colorAllocate( 255, 255, 255 );
-#         foreach my $fmt ( qw( jpg png gd ) )
-#         {
-#             $has{$fmt} = 0;
-#             eval { $image->$fmt; $has{$fmt} = 1; };
-#         }
-#     }
-#     \%has;
-# }
-
 use strict;
 
 my $temp_dir     = "/tmp";
@@ -156,9 +105,6 @@ sub render {
     Trace("Rendering width = $width, OHH = $obj_half_heigth") if T(3);
     if (! $img) { $img = 1 }
 
-    #  compute left margin based on text -- GJO
-
-    # my $left_margin = (15 * gdSmallFont->width) + 5;
     my $maxln = 0;
     my ( $text, $ln );
     foreach ( @$gg )
@@ -179,14 +125,18 @@ sub render {
     my($img_file,$img_url);
     if ($save) 
     { 
-        &SeedUtils::verify_dir("$temp_dir/Save"); 
-        $img_file = "$temp_dir/Save/GenoGraphics_$$.$img.$image_suffix";
-        $img_url = "$temp_url/Save/GenoGraphics_$$.$img.$image_suffix";
+        &SeedUtils::verify_dir("$temp_dir/Save");
+        #  SeedAware::new_file_name returns file name without path
+        my $name = SeedAware::new_file_name( 'GenoGraphics', "$img.$image_suffix", "$temp_dir/Save" );
+        $img_file = "$temp_dir/Save/$name";
+        $img_url  = "$temp_url/Save/$name";
     }
     else
     {
-        $img_file = "$temp_dir/GenoGraphics_$$.$img.$image_suffix";
-        $img_url = "$temp_url/GenoGraphics_$$.$img.$image_suffix";
+        #  SeedAware::new_file_name returns file name without path
+        my $name = SeedAware::new_file_name( 'GenoGraphics', "$img.$image_suffix", "$temp_dir" );
+        $img_file = "$temp_dir/$name";
+        $img_url  = "$temp_url/$name";
     }
     &write_image($gd,$img_file);
     return &generate_html($ismap,$img_url,$ggR,$img);

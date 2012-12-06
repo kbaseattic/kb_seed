@@ -110,13 +110,13 @@ P-value of the correlation (pvalue).
 
 This file is used to fill the B<AlleleFrequency> and B<IsSummarizedBy>
 tables. It contains (0) the allele frequency ID (AlleleFrequency.source-id),
-(1,2) the experiment ID (ignored), (3) the ID of the relevant contig 
-(IsSummarizedBy.from-link), (4) the position of the allele on the contig 
+(1,2) the experiment ID (ignored), (3) the ID of the relevant contig
+(IsSummarizedBy.from-link), (4) the position of the allele on the contig
 (AlleleFrequency.position, IsSummarizedBy.position), (5) the
 letter representing the minor allele (AlleleFrequency.minor-allele), (6) the
 frequency of the minor allele as a fraction of 1 (AlleleFrequency.minor-AF),
 (7) the letter representing the major allele (AlleleFrequency.major-allele),
-(8) the frequency of the major allele as a fraction of 1 
+(8) the frequency of the major allele as a fraction of 1
 (AlleleFrequency.major-AF), and (9) the observation unit count
 (AlleleFrequency.obs-unit-count).
 
@@ -163,6 +163,11 @@ before loading.
 Do not delete pre-existing variation data for this genome. This is useful
 when variation data for a genome is loaded in multiple passes.
 
+=item keepTemp
+
+If TRUE, the temporary files used by the loader will be kept. This option
+is only valid on a single-genome load (when B<recursive> is not specified).
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -173,19 +178,19 @@ contig IDs in the input stream are translated.
 =cut
 
 use constant TABLES => [qw(ObservationalUnit AlleleFrequency Assay
-                          Trait Locality StudyExperiment IsSummarizedBy 
-                          Impacts HasVariationIn IsRepresentedBy 
-                          IsReferencedBy HasTrait HasUnits IncludesPart 
+                          Trait Locality StudyExperiment IsSummarizedBy
+                          Impacts HasVariationIn IsRepresentedBy
+                          IsReferencedBy HasTrait HasUnits IncludesPart
                           IsAssayOf)];
 
 # Create the command-line option variables.
-my ($recursive, $clear, $nodelete);
+my ($recursive, $clear, $nodelete, $keepTemp);
 # Turn off buffering for progress messages.
 $| = 1;
 
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive,
-        "clear" => \$clear, "nodelete" => \$nodelete);
+        "clear" => \$clear, "nodelete" => \$nodelete, "keepTemp" => \$keepTemp);
 if (! $cdmi) {
     print "usage: CDMILoadVariations [options] source genomeDirectory\n";
     exit;
@@ -214,7 +219,7 @@ if (! $source) {
     # Are we in recursive mode?
     if (! $recursive) {
         # No. Load the one genome.
-        LoadGenomeVariations($loader, $genomeDirectory, $nodelete);
+        LoadGenomeVariations($loader, $genomeDirectory, $nodelete, $keepTemp);
     } else {
         # Yes. Get the subdirectories.
         opendir(TMP, $genomeDirectory) || die "Could not open $genomeDirectory.\n";
@@ -237,7 +242,7 @@ if (! $source) {
 
 =head3 LoadGenomeVariations
 
-    LoadGenomeVariations($loader, $genomeDirectory, $nodelete);
+    LoadGenomeVariations($loader, $genomeDirectory, $nodelete, $keepTemp);
 
 Load a single genome's variations from the specified genome directory.
 
@@ -254,7 +259,12 @@ Directory containing the genome load files.
 =item nodelete
 
 Normally, previous variation data for a genome is deleted before loading
-new data. If this parameter is TRUE, the delete will be suppressed. 
+new data. If this parameter is TRUE, the delete will be suppressed.
+
+=item keepTemp
+
+Normally, the temporary load files are deleted after being used. If this
+parameter is TRUE, they will be kept on disk.
 
 =back
 
@@ -262,7 +272,7 @@ new data. If this parameter is TRUE, the delete will be suppressed.
 
 sub LoadGenomeVariations {
     # Get the parameters.
-    my ($loader, $genomeDirectory, $nodelete) = @_;
+    my ($loader, $genomeDirectory, $nodelete, $keepTemp) = @_;
     # Indicate our progress.
     print "Processing $genomeDirectory.\n";
     # Compute the genome ID from the directory name.
@@ -285,10 +295,10 @@ sub LoadGenomeVariations {
         # Load the assays.
         my $assayMap = LoadAssays($loader, $genomeKBID, $genomeDirectory);
         # Load the experiments.
-        my $experimentMap = LoadExperiments($loader, $genomeKBID, 
+        my $experimentMap = LoadExperiments($loader, $genomeKBID,
                 $genomeDirectory, $assayMap);
         # Load the localities.
-        my $localityMap = LoadLocalities($loader, $genomeKBID, 
+        my $localityMap = LoadLocalities($loader, $genomeKBID,
                 $genomeDirectory);
         # Load the observation units.
         my $obsMap = LoadObsUnits($loader, $genomeKBID, $genomeDirectory,
@@ -296,7 +306,7 @@ sub LoadGenomeVariations {
         # Load the traits.
         my $traitMap = LoadTraits($loader, $genomeKBID, $genomeDirectory);
         # Load the trait measurements.
-        LoadMeasures($loader, $genomeDirectory, $traitMap, 
+        LoadMeasures($loader, $genomeDirectory, $traitMap,
                 $obsMap);
         # Create a map of internal contig IDs to KBase contig IDs.
         my %contigMap = map { $_->[0] => $_->[1] }
@@ -304,14 +314,14 @@ sub LoadGenomeVariations {
                 'IsComposedOf(from-link) = ?', [$genomeKBID],
                 'Contig(source-id) Contig(id)');
         # Load the trait impacts.
-        LoadImpacts($loader, $genomeDirectory, $traitMap, 
+        LoadImpacts($loader, $genomeDirectory, $traitMap,
                 \%contigMap);
         # Load the allele frequencies.
         LoadAlleles($loader, $genomeKBID, $genomeDirectory, \%contigMap);
         # Load the variation files.
         LoadVCFs($loader, $obsMap, $genomeDirectory, \%contigMap);
         # Fill the database tables from the load information.
-        $loader->LoadRelations();
+        $loader->LoadRelations($keepTemp);
     }
 }
 
@@ -396,7 +406,7 @@ sub LoadVCFs {
                    if ($contigKBID) {
                        # Submit this variation to the loader.
                        $loader->InsertObject('HasVariationIn',
-                            from_link => $contigKBID, data => $primary, 
+                            from_link => $contigKBID, data => $primary,
                             data2 => $secondary, len => $len, position => $position,
                             quality => $quality, to_link => $obsUnitKBID);
                        $stats->Add(hasVariationIn_loaded => 1);
@@ -410,10 +420,10 @@ sub LoadVCFs {
 
 =head3 LoadAlleles
 
-    LoadImpacts($loader, $genomeKBID, $genomeDirectory, \%contigMap);
+    LoadAlleles($loader, $genomeKBID, $genomeDirectory, \%contigMap);
 
-Read and process the allele frequency. This method will read the 
-allele frequency statistics and submit the appropriate 
+Read and process the allele frequency. This method will read the
+allele frequency statistics and submit the appropriate
 B<AlleleFrequency> and B<IsSummarizedBy> records to the loader.
 
 =over 4
@@ -469,7 +479,7 @@ sub LoadAlleles {
     }
     # If there is a residual batch, process it.
     if (scalar(@records) > 0) {
-        ProcessAlleleBatch($loader, $genomeKBID, \@records, $contigMap, 
+        ProcessAlleleBatch($loader, $genomeKBID, \@records, $contigMap,
                 \%missingContigs);
         print "$count allele records processed.\n";
     }
@@ -633,7 +643,7 @@ sub CheckContig {
 
 Read and process the impacts file. This method will read the estimates
 of the impact different locations on the contigs have on the
-various traits and submit the appropriate B<Impacts> records to 
+various traits and submit the appropriate B<Impacts> records to
 the loader.
 
 =over 4
@@ -670,7 +680,7 @@ sub LoadImpacts {
     my %missingContigs;
     # Loop through the file.
     while (! eof $ih) {
-        my ($studyID, $traitID, $traitKBID, $contigID, $position, $rank, 
+        my ($studyID, $traitID, $traitKBID, $contigID, $position, $rank,
                 $pValue) = $loader->GetLine($ih);
         $stats->Add("impact.tab-record" => 1);
         # Compute the actual ID to use for the trait.
@@ -827,13 +837,13 @@ sub LoadTraits {
 
 =head3 LoadObsUnits
 
-    my $obsHash = LoadObsUnits($loader, $genomeKBID, 
+    my $obsHash = LoadObsUnits($loader, $genomeKBID,
             $genomeDirectory, $expMap, $locMap);
 
 Read and process the observational units file. This method will read all
-the observational units, compute the KBase IDs, submit the appropriate 
+the observational units, compute the KBase IDs, submit the appropriate
 B<ObservationalUnit>, B<HasUnits>, B<IsRepresentedBy>, and B<IncludesPart>
-records to the loader, and return the map of source observational unit IDs 
+records to the loader, and return the map of source observational unit IDs
 to KBase observational unit IDs.
 
 =over 4
@@ -977,8 +987,8 @@ sub LoadLocalities {
         # Submit the record to the loader.
         $loader->InsertObject('Locality', id => $retVal->{$sourceID},
             source_name => $sourceID, city => $city, country => $country,
-            elevation => $elevation, latitude => $latitude, 
-            longitude => $longitude, state => $state, 
+            elevation => $elevation, latitude => $latitude,
+            longitude => $longitude, state => $state,
             lo_accession => $loAccession, origcty => $origcty);
         $stats->Add(locality_loaded => 1);
     }
@@ -990,7 +1000,7 @@ sub LoadLocalities {
 
 =head3 LoadAssays
 
-    my $assayMap = LoadAssays($loader, $genomeKBID, 
+    my $assayMap = LoadAssays($loader, $genomeKBID,
             $genomeDirectory);
 
 Read and process the assay file. This method will read all the assays,
@@ -1047,12 +1057,12 @@ sub LoadAssays {
 
 =head3 LoadExperiments
 
-    my $expHash = LoadExperiments($loader, $genomeKBID, 
+    my $expHash = LoadExperiments($loader, $genomeKBID,
             $genomeDirectory, $assayMap);
 
 Read and process the experiments file. This method will read all
-the experiments, compute the KBase IDs, submit the appropriate 
-B<StudyExperiment> and B<IsAssayOf> records to the loader, and 
+the experiments, compute the KBase IDs, submit the appropriate
+B<StudyExperiment> and B<IsAssayOf> records to the loader, and
 return the map of source experiment IDs to KBase experiment IDs.
 
 =over 4
@@ -1101,7 +1111,7 @@ sub LoadExperiments {
         # Compute the KBase ID for the experiment.
         my $expKBID = $retVal->{$sourceID};
         # Submit the StudyExperiment record to the loader.
-        $loader->InsertObject('StudyExperiment', id => $expKBID, 
+        $loader->InsertObject('StudyExperiment', id => $expKBID,
                 source_name => $sourceID, design => $designer,
                 originator => $originator);
         $stats->Add(study_experiment_loaded => 1);
@@ -1208,7 +1218,7 @@ sub OpenFile {
     DeleteGenomeVariations($loader, $genomeKBID);
 
 Delete all variation data currently in the database for the specified
-genome. This is normally required when reloading the complete variations 
+genome. This is normally required when reloading the complete variations
 for a genome.
 
 =over 4

@@ -44,8 +44,8 @@ KBase genome IDs.
 
 The standard output is a tab-delimited file. It consists of the input
 file with extra columns added.  If the abbreviated format is requested,
-two columns get written (sc and the fid projected to).  If the abbreviated
-format is not requested, ten columns will be written
+two columns get added (sc and the fid projected to).  If the abbreviated
+format is not requested, ten columns will be added
 
     1  - percent-identity: the average percent identity over the
          range of the match

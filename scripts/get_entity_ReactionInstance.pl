@@ -37,6 +37,8 @@ The ReactionInstance entity has the following relationship links:
 
 =over 4
     
+=item ImplementedBasedOn Feature
+
 =item IsARequirementOf Model
 
 =item IsExecutionOf Reaction

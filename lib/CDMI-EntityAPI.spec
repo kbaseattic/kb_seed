@@ -4274,6 +4274,29 @@ funcdef get_relationship_IsImpactedBy(list<string> ids, list<string> from_fields
 typedef structure {
 	string from_link;
 	string to_link;
+} fields_ImplementsReaction ;
+
+/*
+This relationship connects features to reaction instances
+that exist because the feature is included in a model.
+It has the following fields:
+
+=over 4
+
+
+
+=back
+
+
+*/
+funcdef get_relationship_ImplementsReaction(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_Feature, fields_ImplementsReaction, fields_ReactionInstance>>);
+funcdef get_relationship_ImplementedBasedOn(list<string> ids, list<string> from_fields, list<string> rel_fields,  list<string> to_fields)
+	returns(list<tuple<fields_ReactionInstance, fields_ImplementsReaction, fields_Feature>>);
+
+typedef structure {
+	string from_link;
+	string to_link;
 	int sequence nullable;
 	string abbreviation nullable;
 	int auxiliary nullable;

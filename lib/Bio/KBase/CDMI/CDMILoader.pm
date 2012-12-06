@@ -517,11 +517,15 @@ sub SetRelations {
     my $relations = $self->{relations};
     # Save the relation name list.
     $self->{relationList} = \@relationNames;
+    # Compute the temporary file directory.
+    my $dirName = File::Spec->tmpdir();
+    print "Temporary file directory is $dirName.\n";
     # Loop through the relation names, creating loaders.
     for my $relationName (@relationNames) {
         # Create the output file.
         my $fh = File::Temp->new(TEMPLATE => "loader_rel_$relationName.XXXXXXXX",
-                SUFFIX => '.dtx', UNLINK => 0, DIR => File::Spec->tmpdir());
+                SUFFIX => '.dtx', UNLINK => 0, DIR => $dirName);
+        chmod(0644, $fh);
         # Get the list of fields in the relation.
         my $relData = $cdmi->FindRelation($relationName);
         my @fields = map { $_->{name} } @{$relData->{Fields}};
@@ -569,10 +573,16 @@ sub InsertObject {
         for my $fieldName (@fieldNames) {
             my $value = $fields{$fieldName};
             if (! defined $value) {
-                die "Missing field $fieldName in $relationName InsertObject.\n";
-            } else {
-                push @values, $value;
+                # Check to see if we're using the hyphenated version of the
+                # field name.
+                my $altName = $fieldName;
+                $altName =~ tr/_/-/;
+                $value = $fields{$altName};
+                if (! defined $value) {
+                    die "Missing field $fieldName in $relationName InsertObject.\n";
+                }
             }
+            push @values, $value;
         }
         # Output the fields to the loader file.
         print $fh join("\t", @values) . "\n";
