@@ -525,16 +525,18 @@ sub SetRelations {
         # Create the output file.
         my $fh = File::Temp->new(TEMPLATE => "loader_rel_$relationName.XXXXXXXX",
                 SUFFIX => '.dtx', UNLINK => 0, DIR => $dirName);
-        chmod(0644, $fh);
-        # Get the list of fields in the relation.
+        # Get the list of fields in the relation and remember which allow nulls.
+        # Note we convert field name hyphens to underscores.
+        my (@fields, @nulls);
         my $relData = $cdmi->FindRelation($relationName);
-        my @fields = map { $_->{name} } @{$relData->{Fields}};
-        # Convert hyphens to underscores.
-        for (my $i = 0; $i < @fields; $i++) {
-            $fields[$i] =~ tr/-/_/;
+        for my $fieldDescriptor (@{$relData->{Fields}}) {
+            my $name = $fieldDescriptor->{name};
+            $name =~ tr/-/_/;
+            push @fields, $name;
+            push @nulls, ($fieldDescriptor->{null} ? 1 : 0);
         }
         # Create the relation loader.
-        $relations->{$relationName} = [$fh, @fields];
+        $relations->{$relationName} = [$fh, \@fields, \@nulls];
     }
 }
 
@@ -567,10 +569,11 @@ sub InsertObject {
         # No loader, so do a real insert.
         $self->cdmi->InsertObject($relationName, %fields);
     } else {
-        my ($fh, @fieldNames) = @$relData;
+        my ($fh, $fieldNames, $nullFlags) = @$relData;
         # Loop through the field names, collecting the field values.
         my @values;
-        for my $fieldName (@fieldNames) {
+        for (my $i = 0; $i < @$fieldNames; $i++) {
+            my $fieldName = $fieldNames->[$i];
             my $value = $fields{$fieldName};
             if (! defined $value) {
                 # Check to see if we're using the hyphenated version of the
@@ -578,8 +581,16 @@ sub InsertObject {
                 my $altName = $fieldName;
                 $altName =~ tr/_/-/;
                 $value = $fields{$altName};
+                # Check for a missing value.
                 if (! defined $value) {
-                    die "Missing field $fieldName in $relationName InsertObject.\n";
+                    # Here the value is missing. If it's nullable, this is OK.
+                    if ($nullFlags->[$i]) {
+                        # Nulls are OK. Put in the MySQL load code for nulls.
+                        $value = "\\N";
+                    } else {
+                        # The missing value is an error.
+                        die "Missing field $fieldName in $relationName InsertObject.\n";
+                    }
                 }
             }
             push @values, $value;

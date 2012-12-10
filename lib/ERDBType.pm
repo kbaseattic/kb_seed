@@ -79,6 +79,21 @@ sub numeric {
     return 0;
 }
 
+=head3 nullable
+
+    my $flag = $et->nullable();
+
+Return TRUE if this type allows null-valued fields, else FALSE. The default is
+FALSE.
+
+=cut
+
+sub nullable {
+    # Get the parameters.
+    my ($self) = @_;
+    # Return the result.
+    return 0;
+}
 
 =head3 averageLength
 

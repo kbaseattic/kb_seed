@@ -501,6 +501,11 @@ call.
 The default value is specified as a string, so it must be in an encoded
 form.
 
+=item null
+
+If C<1>, this attribute indicates that the field can have a null value. The
+default is C<0>.
+
 =back
 
 =head3 Indexes
@@ -519,8 +524,18 @@ The alternate indexes for an entity or relationship are listed inside the
 B<Indexes> tag. The from-index of a relationship is specified using the
 B<FromIndex> tag; the to-index is specified using the B<ToIndex> tag.
 
-Be aware of the fact that in MySQL, the maximum size of an index key is
-1000 bytes. This means at most four normal-sized strings.
+Be aware of the fact that in some versions of MySQL, the maximum size of an
+index key is 1000 bytes. This means at most four normal-sized strings.
+
+The B<Index> tag has one optional attribute.
+
+=over 4
+
+=item unique
+
+If C<1>, then the index is unique. The default is C<0> (a non-unique index).
+
+=back
 
 Each index can contain a B<Notes> tag. In addition, it will have an
 B<IndexFields> tag containing the B<IndexField> tags. The B<IndexField>
@@ -540,7 +555,7 @@ Sort order of the field-- C<ascending> or C<descending>.
 =back
 
 The B<FromIndex>, and B<ToIndex> tags have no attributes. The B<Index> tag can
-have a B<Unique> attribute. If specified, the index will be generated as a
+have a B<unique> attribute. If specified, the index will be generated as a
 unique index.
 
 =head3 Regions
@@ -1863,6 +1878,9 @@ sub ComputeFieldTable {
         my $fieldInfo = $fieldData->{$field};
         # Format the type.
         my $type = "$fieldInfo->{type}";
+        if ($fieldInfo->{null}) {
+            $type .= " (nullable)";
+        }
         # Secondary fields have "C" as the first letter in
         # the sort value. If a field is secondary, we mark
         # it as an array.
@@ -3342,7 +3360,7 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode}, local => 'LOCAL');
+                               style => $options{mode});
     };
     if (!defined $rv) {
         $retVal->AddMessage($@) if ($@);
@@ -4169,7 +4187,7 @@ sub CreateIndex {
         my @fieldList = _FixNames(@rawFields);
         my $flds = join(', ', @fieldList);
         # Get the index's uniqueness flag.
-        my $unique = (exists $indexData->{Unique} ? 'unique' : undef);
+        my $unique = ($indexData->{unique} ? 'unique' : undef);
         # Create the index.
         my $rv = $dbh->create_index(idx => "$indexName$relationName", tbl => $self->{_quote} . $relationName . $self->{_quote},
                                     flds => $flds, kind => $unique);
@@ -4683,6 +4701,11 @@ records.
 If TRUE, then all of the DELETE statements will be written to the standard
 output.
 
+=item onlyRoot
+
+If TRUE, then the entity instance will be deleted, but none of the attached
+data will be removed (the opposite of C<keepRoot>).
+
 =back
 
 =cut
@@ -4735,37 +4758,40 @@ sub Delete {
                 push @fromPathList, \@augmentedList;
             }
         }
-        # Now we need to look for relationships connected to this entity.
-        my $relationshipList = $self->{_metaData}->{Relationships};
-        for my $relationshipName (keys %{$relationshipList}) {
-            my $relationship = $relationshipList->{$relationshipName};
-            # Check the FROM field. We're only interested if it's us.
-            if ($relationship->{from} eq $myEntityName) {
-                # Add the path to this relationship.
-                my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
-                push @fromPathList, \@augmentedList;
-                # Check the arity. If it's MM we're done. If it's 1M
-                # and the target hasn't been seen yet, we want to
-                # stack the entity for future processing.
-                if ($relationship->{arity} eq '1M') {
-                    my $toEntity = $relationship->{to};
-                    if (! exists $alreadyFound{$toEntity}) {
-                        # Here we have a new entity that's dependent on
-                        # the current entity, so we need to stack it.
-                        my @stackList = (@augmentedList, $toEntity);
-                        push @fromPathList, \@stackList;
-                        push @todoList, \@stackList;
-                    } else {
-                        Trace("$toEntity ignored because it occurred previously.") if T(4);
+        # Now we need to look for relationships connected to this entity. We skip
+        # this if "onlyRoot" is specified.
+        if (! $options{onlyRoot}) {
+            my $relationshipList = $self->{_metaData}->{Relationships};
+            for my $relationshipName (keys %{$relationshipList}) {
+                my $relationship = $relationshipList->{$relationshipName};
+                # Check the FROM field. We're only interested if it's us.
+                if ($relationship->{from} eq $myEntityName) {
+                    # Add the path to this relationship.
+                    my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
+                    push @fromPathList, \@augmentedList;
+                    # Check the arity. If it's MM we're done. If it's 1M
+                    # and the target hasn't been seen yet, we want to
+                    # stack the entity for future processing.
+                    if ($relationship->{arity} eq '1M') {
+                        my $toEntity = $relationship->{to};
+                        if (! exists $alreadyFound{$toEntity}) {
+                            # Here we have a new entity that's dependent on
+                            # the current entity, so we need to stack it.
+                            my @stackList = (@augmentedList, $toEntity);
+                            push @fromPathList, \@stackList;
+                            push @todoList, \@stackList;
+                        } else {
+                            Trace("$toEntity ignored because it occurred previously.") if T(4);
+                        }
                     }
                 }
-            }
-            # Now check the TO field. In this case only the relationship needs
-            # deletion, and only if it's not already in the path.
-            if ($relationship->{to} eq $myEntityName) {
-                if (scalar(grep { $_ eq $relationshipName } @stackedPath) == 0) {
-                    my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
-                    push @toPathList, \@augmentedList;
+                # Now check the TO field. In this case only the relationship needs
+                # deletion, and only if it's not already in the path.
+                if ($relationship->{to} eq $myEntityName) {
+                    if (scalar(grep { $_ eq $relationshipName } @stackedPath) == 0) {
+                        my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
+                        push @toPathList, \@augmentedList;
+                    }
                 }
             }
         }
@@ -5494,9 +5520,20 @@ sub _FieldString {
     # Get the fixed-up name.
     my $fieldName = _FixName($descriptor->{name});
     # Compute the SQL type.
-    my $fieldType = $TypeTable->{$descriptor->{type}}->sqlType($self->{_dbh});
+    my $typeDescriptor = $TypeTable->{$descriptor->{type}};
+    my $fieldType = $typeDescriptor->sqlType($self->{_dbh});
+    # Check for nulls. We need to insure that the field is null-capable if it
+    # specifies nulls and that the nullability flag is prepared for the
+    # declaration.
+    my $nullFlag = "NOT NULL";
+    if ($descriptor->{null}) {
+        $nullFlag = "";
+        if (! $typeDescriptor->nullable()) {
+            Confess("Invalid DBD: field \"$fieldName\" is null, but not of a nullable type.");
+        }
+    }
     # Assemble the result.
-    my $retVal = "$self->{_quote}$fieldName$self->{_quote} $fieldType NOT NULL";
+    my $retVal = "$self->{_quote}$fieldName$self->{_quote} $fieldType $nullFlag";
     # Return the result.
     return $retVal;
 }
@@ -6124,10 +6161,14 @@ sub _DumpRelation {
     $query->execute() || Confess("SELECT error dumping $relationName.");
     # Loop through the results.
     while (my @row = $query->fetchrow) {
-        # Escape any tabs or new-lines in the row text.
+        # Escape any tabs or new-lines in the row text, and convert NULLs.
         for my $field (@row) {
-            $field =~ s/\n/\\n/g;
-            $field =~ s/\t/\\t/g;
+            if (! defined $field) {
+                $field = "\\N";
+            } else {
+                $field =~ s/\n/\\n/g;
+                $field =~ s/\t/\\t/g;
+            }
         }
         # Tab-join the row and write it to the output file.
         my $rowText = join("\t", @row);
@@ -6497,7 +6538,7 @@ sub _LoadMetaData {
             # Now each index has been put in a relation. We need to add the primary
             # index for the primary relation.
             push @{$relationTable->{$entityName}->{Indexes}},
-                { IndexFields => [ {name => 'id', order => 'ascending'} ], Unique => 'true',
+                { IndexFields => [ {name => 'id', order => 'ascending'} ], unique => 1,
                   Notes => { content => "Primary index for $entityName." }
                 };
             # The next step is to insure that each relation has at least one index
@@ -6623,7 +6664,7 @@ sub _CreateRelationshipIndex {
     unshift @{$newIndex->{IndexFields}}, $firstField;
     # If this is a one-to-many relationship, the "To" index is unique.
     if ($relationshipStructure->{arity} eq "1M" && $indexKey eq "To") {
-        $newIndex->{Unique} = 'true';
+        $newIndex->{unique} = 'true';
     }
     # Add the index to the relation.
     _AddIndex("idx$indexKey", $relationStructure, $newIndex);

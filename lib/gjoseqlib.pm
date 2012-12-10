@@ -1197,7 +1197,8 @@ sub expand_sequence_by_mask
 
 
 #-----------------------------------------------------------------------------
-#  Remove all alignment gaps from sequences:
+#  Remove all alignment gaps from sequences. This function minimally rewrites
+#  sequence entries, saving memory if nothing else.
 #
 #   @packed_seqs = pack_sequences(  @seqs )  # Also handles single sequence
 #   @packed_seqs = pack_sequences( \@seqs )
@@ -1210,11 +1211,10 @@ sub pack_sequences
     $_[0] && ( ref( $_[0] ) eq 'ARRAY' ) && @{$_[0]} && defined( $_[0]->[0] )
         or return ();
 
-    my @seqs = ( ref( $_[0]->[0] ) eq 'ARRAY' ) ? @{$_[0] } : @_;
+    my @seqs = map { $_->[2] =~ /[^A-Za-z*]/ ? [ @$_[0,1], pack_seq( $_->[2] ) ] : $_ }
+               ( ref( $_[0]->[0] ) eq 'ARRAY' ) ? @{$_[0] } : @_;
 
-    my @seqs2 = map { [ $_->[0], $_->[1], pack_seq( $_->[2] ) ] } @seqs;
-
-    wantarray ? @seqs2 : \@seqs2;
+    wantarray ? @seqs : \@seqs;
 }
 
 

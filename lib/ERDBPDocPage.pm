@@ -130,7 +130,7 @@ sub new {
         $erdb = ERDB::GetDatabase($name);
     }
     # Create the ERDBPDocPage object.
-    my $retVal = { 
+    my $retVal = {
                     erdb => $erdb,
                     idString => $idString,
                     javaThing => "status_erdb_$idString",
@@ -616,7 +616,7 @@ sub DocIndexes {
             # Compute its notes.
             my $notes = join("\n", ERDB::ObjectNotes($indexData, $self));
             # Compute its type.
-            my $type = ($indexData->{Unique} ? 'unique' : '');
+            my $type = ($indexData->{unique} ? 'unique' : '');
             # Compute its field list.
             my $fields = join(", ", @{$indexData->{IndexFields}});
             # Only list the index if it is noteworthy.

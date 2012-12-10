@@ -71,6 +71,42 @@ package gjocodonlib;
 #     $total_countH = sum_counts(  @countH )
 #     $total_countH = sum_counts( \@countH )
 #
+#  Get codon usage counts for genes from a count file
+#
+#     @cnts = labeled_counts_from_file( $file, \%opts )
+#    \@cnts = labeled_counts_from_file( $file, \%opts )
+#     @cnts = labeled_counts_from_file(  \*FH, \%opts )
+#    \@cnts = labeled_counts_from_file(  \*FH, \%opts )
+#     @cnts = labeled_counts_from_file(        \%opts )  # $opts{cntfile} || STDIN
+#    \@cnts = labeled_counts_from_file(        \%opts )  # $opts{cntfile} || STDIN
+#
+#  Get codon usage counts for coding sequences in a fasta file
+#
+#     @cnts = labeled_counts_from_ffn( $file, \%opts )
+#    \@cnts = labeled_counts_from_ffn( $file, \%opts )
+#     @cnts = labeled_counts_from_ffn(  \*FH, \%opts )
+#    \@cnts = labeled_counts_from_ffn(  \*FH, \%opts )
+#     @cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
+#    \@cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
+#
+#  Get codon usage counts for genes from the sapling server.
+#  Requires SAPserver.pm, or a SAPserver object.
+#
+#     @cnts = labeled_counts_from_sapling( $gid, \%opts )
+#    \@cnts = labeled_counts_from_sapling( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the KBase server
+#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
+#
+#     @cnts = labeled_counts_from_kbase( $gid, \%opts )
+#    \@cnts = labeled_counts_from_kbase( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the a local SEED
+#  Requires FIG.pm, or a FIG object.
+#
+#     @cnts = labeled_counts_from_seed( $gid, \%opts )
+#    \@cnts = labeled_counts_from_seed( $gid, \%opts )
+#
 #  Print counts:
 #     One space between synonymous codons, two spaces between amino acids
 #     Counts can be followed by a tab and a label.
@@ -328,6 +364,12 @@ our @EXPORT = qw(
         entry_labeled_codon_count_package
         entry_labeled_codon_count_package_20
 
+        labeled_counts_from_file
+        labeled_counts_from_ffn
+        labeled_counts_from_sapling
+        labeled_counts_from_kbase
+        labeled_counts_from_seed
+        
         n_codon
         sum_counts
 
@@ -610,7 +652,7 @@ sub seq_codon_count_package_20
 #-----------------------------------------------------------------------------
 sub entry_labeled_codon_count_package
 {
-    return map { [ gjocodonlib::seq_codon_count_package( $_->[2] ), $_->[1] ? "$_->[0] $_->[1]" : $_->[0] ] }
+    return map { [ seq_codon_count_package( $_->[2] ), $_->[1] ? "$_->[0] $_->[1]" : $_->[0] ] }
            grep { $_ && ref $_ eq 'ARRAY' }
            @_;
 }
@@ -628,7 +670,7 @@ sub entry_labeled_codon_count_package
 #-----------------------------------------------------------------------------
 sub entry_labeled_codon_count_package_20
 {
-    return map { [ gjocodonlib::seq_codon_count_package_20( $_->[2] ), $_->[1] ? "$_->[0] $_->[1]" : $_->[0] ] }
+    return map { [ seq_codon_count_package_20( $_->[2] ), $_->[1] ? "$_->[0] $_->[1]" : $_->[0] ] }
            grep { $_ && ref $_ eq 'ARRAY' }
            @_;
 }
@@ -778,6 +820,506 @@ sub report_counts
 
 
 #===============================================================================
+#  Support for gathering information for display of codon usages in a genome.
+#  Not everything is implemented.
+#===============================================================================
+#
+#  Option keys:
+#
+#      axes    => \@axes          # [ [ f0, f1, label ], [ f0, f2, label ], ... ]
+#      cntdir  =>  $countfiledir  # place to put count file
+#      cntfile =>  $countfile     # path to file with cds counts
+#      counts  => \@counts        # counts are cached in the options hash
+#      expon   =>  $mode_exp      # exponent in match to mode calculation
+#      ffn     =>  $ffnfile       # path to file with cds sequences
+#      fig     =>  $FIGObject
+#      freqs   => \@frequencies   # [ f0, f1, f2 ... ]
+#      gid     =>  $genome_id
+#      gname   =>  $genome_name
+#      he2     =>  $bool          # require successful iteration of high expression for axis
+#      labels  => \@freq_lbls     # [ 'mode', 'high expression', 'nonnative', ... ]
+#      max_len =>  $max_length    # maximum length in P-value calculation
+#      sap     =>  $saplingObject
+#
+#-------------------------------------------------------------------------------
+#  Get codon usage counts for genes from a count file
+#
+#   @cnts = labeled_counts_from_file( $file, \%opts )
+#  \@cnts = labeled_counts_from_file( $file, \%opts )
+#   @cnts = labeled_counts_from_file(  \*FH, \%opts )
+#  \@cnts = labeled_counts_from_file(  \*FH, \%opts )
+#   @cnts = labeled_counts_from_file(        \%opts )  # $opts{cntfile} || STDIN
+#  \@cnts = labeled_counts_from_file(        \%opts )  # $opts{cntfile} || STDIN
+#
+#  Options:
+#
+#    cntfile => $countfile  # Alternative to supplying the file name in arg list
+#
+#-------------------------------------------------------------------------------
+sub labeled_counts_from_file
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $cntfile = shift || ( $opts->{ cntfile } ||= $opts->{ countfile } );
+
+    my @cnts;
+    my ( $cntFH, $close ) = input_handle( $cntfile );
+    if ( $cntFH )
+    {
+        @cnts = map { [ split_counts( $_ ) ] } <$cntFH>;
+        close $cntFH if $close;
+    }
+
+    $opts->{ counts } = \@cnts;
+    wantarray ? @cnts : \@cnts;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get codon usage counts for genes from a sequence file
+#
+#   @cnts = labeled_counts_from_ffn( $file, \%opts )
+#  \@cnts = labeled_counts_from_ffn( $file, \%opts )
+#   @cnts = labeled_counts_from_ffn(  \*FH, \%opts )
+#  \@cnts = labeled_counts_from_ffn(  \*FH, \%opts )
+#   @cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
+#  \@cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
+#
+#  Options:
+#
+#    ffn => $ffnfile  # Alternative to supplying the file name or
+#                     #       file handle in the arg list
+#
+#-------------------------------------------------------------------------------
+sub labeled_counts_from_ffn
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $ffnfile = shift || $opts->{ ffn };
+
+    my @seqs = gjoseqlib::read_fasta( $ffnfile );
+    my @cnts = entry_labeled_codon_count_package( @seqs );
+
+    $opts->{ counts } = \@cnts;
+    wantarray ? @cnts : \@cnts;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get codon usage counts for genes from the sapling server.
+#  Requires SAPserver.pm, or a SAPserver object.
+#
+#   @cnts = labeled_counts_from_sapling( $gid, \%opts )
+#  \@cnts = labeled_counts_from_sapling( $gid, \%opts )
+#
+#  Options:
+#
+#    gid => $gid        # Alternative to supplying the gid in arg list
+#    sap => $SAPserver  # Supply the server object
+#
+#-------------------------------------------------------------------------------
+sub labeled_counts_from_sapling
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my @seqs = coding_sequences_from_sapling( $gid, $opts );
+    my @cnts = entry_labeled_codon_count_package( @seqs );
+
+    $opts->{ counts } = \@cnts;
+    wantarray ? @cnts : \@cnts;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get coding sequences from the sapling server
+#
+#   @seqs = coding_sequences_from_sapling( $gid, \%opts )
+#  \@seqs = coding_sequences_from_sapling( $gid, \%opts )
+#
+#  Options:
+#
+#    gid => $gid        # Alternative to supplying the gid in arg list
+#    sap => $SAPserver  # Supply the server object
+#
+#-------------------------------------------------------------------------------
+sub coding_sequences_from_sapling
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my $sap = sap_object( $opts ) or return wantarray ? () : [];
+
+    my $funcH = $sap->feature_assignments( { -genome => $gid, -type => 'peg' } );
+    my $fids  = [ keys %$funcH ];
+    my $locH  = $sap->fid_locations( { -ids => $fids } );
+    my $seqH  = $sap->ids_to_sequences( { -ids => $fids } );
+
+    my @seqs = map  { $seqH->{$_} ? [ $_, $funcH->{$_} || '', $seqH->{$_} ] : () }
+               map  { $_->[0] }
+               sort { lc $a->[1] cmp lc $b->[1] || $a->[2] <=> $b->[2] }
+               map  { my @mid = midpoint( $locH->{$_} ); @mid ? [ $_, @mid ] : () }
+               keys %$locH;
+
+    wantarray ? @seqs : \@seqs;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get a Sapling server object
+#
+#   $sapObject = sap_object( \%opts )
+#
+#  Options:
+#
+#    sap => $sapObject  # This will be used if it already exists.
+#
+#-------------------------------------------------------------------------------
+sub sap_object
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $sap = $opts->{ sap };
+    return $sap if ( $sap && eval { $sap->isa( 'SAPserver' ) } );
+
+    eval { require SAPserver } or return undef;
+
+    $opts->{ sap } = SAPserver->new();
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get codon usage counts for genes from the KBase server.
+#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
+#
+#   @cnts = labeled_counts_from_kbase( $gid, \%opts )
+#  \@cnts = labeled_counts_from_kbase( $gid, \%opts )
+#
+#  Options:
+#
+#    gid   => $gid          # Alternative to supplying the gid in arg list
+#    kbase => $KBaseClient  # Supply the client object
+#
+#-------------------------------------------------------------------------------
+sub labeled_counts_from_kbase
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my @seqs = coding_sequences_from_kbase( $gid, $opts );
+    my @cnts = gjocodonlib::entry_labeled_codon_count_package( @seqs );
+
+    $opts->{ counts } = \@cnts;
+    wantarray ? @cnts : \@cnts;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get coding sequences from the KBase server.
+#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
+#
+#   @seqs = coding_sequences_from_kbase( $gid, \%opts )
+#  \@seqs = coding_sequences_from_kbase( $gid, \%opts )
+#
+#  Options:
+#
+#    gid   => $gid          # Alternative to supplying the gid in arg list
+#    kbase => $KBaseClient  # Supply the client object
+#
+#-------------------------------------------------------------------------------
+sub coding_sequences_from_kbase
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+    $gid =~ s/^g\./kb|g./;
+    $gid =~ m/^kb\|g\.\d+$/ or return wantarray ? () : [];
+
+    my $kbase = kbase_object( $opts ) or return wantarray ? () : [];
+
+    my $fidsH = $kbase->genomes_to_fids( [$gid], ['CDS'] ) || {};
+
+    my $fidsL = $fidsH->{ $gid } || [];
+
+    my $funcH = $kbase->fids_to_functions( $fidsL ) || {};
+
+    my $seqH  = $kbase->fids_to_dna_sequences( $fidsL ) || {};
+
+    my $locH  = $kbase->fids_to_locations( $fidsL ) || {};
+
+    my @seqs = map  { $seqH->{$_} ? [ $_, $funcH->{$_} || '', $seqH->{$_} ] : () }
+               map  { $_->[0] }
+               sort { lc $a->[1] cmp lc $b->[1] || $a->[2] <=> $b->[2] }
+               map  { my @mid = midpoint_kbase( $locH->{$_} ); @mid ? [ $_, @mid ] : () }
+               keys %$locH;
+
+    wantarray ? @seqs : \@seqs;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get a KBase server object
+#
+#   $KBObject = kbase_object( \%opts )
+#
+#  Options:
+#
+#    kbase => $KBObject  # This will be used if it already exists.
+#
+#-------------------------------------------------------------------------------
+sub kbase_object
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $kbase = $opts->{ kbase };
+    return $kbase if ( $kbase && eval { $kbase->isa( "Bio::KBase::CDMI::Client" ) } );
+
+    eval { require Bio::KBase } or return undef;
+
+    $opts->{ kbase } = Bio::KBase->central_store();
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get codon usage counts for genes from the a local SEED.
+#  Requires FIG.pm, or a FIG object.
+#
+#   @cnts = labeled_counts_from_seed( $gid, \%opts )
+#  \@cnts = labeled_counts_from_seed( $gid, \%opts )
+#
+#  Options:
+#
+#    fig => $figObject  # This will be used if set
+#    gid => $gid        # Alternative to supplying the gid in arg list
+#
+#-------------------------------------------------------------------------------
+sub labeled_counts_from_seed
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my @seqs = coding_sequences_from_seed( $gid, $opts );
+    my @cnts = entry_labeled_codon_count_package( @seqs );
+
+    $opts->{ counts } = \@cnts;
+    wantarray ? @cnts : \@cnts;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get coding sequences from the local SEED.
+#  Requires FIG.pm, or a FIG object.
+#
+#   @seqs = coding_sequences_from_seed( $gid, \%opts )
+#  \@seqs = coding_sequences_from_seed( $gid, \%opts )
+#
+#  Options:
+#
+#    fig => $figObject  # This will be used if set
+#    gid => $gid        # Alternative to supplying the gid in arg list
+#
+#-------------------------------------------------------------------------------
+sub coding_sequences_from_seed
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my $fig = fig_object( $opts ) or return wantarray ? () : [];
+
+    my @fids  = $fig->all_features( $gid, 'peg' );
+    my $funcH = $fig->function_of_bulk( \@fids );
+
+    #
+    #  Separate locations by contig. For each contig, the list elements are
+    #  [ $fid, $loc, $midpoint ]
+    #
+    my %locH;
+    foreach ( $fig->feature_location_bulk( \@fids ) )
+    {
+        my ( $contig, $midpoint ) = midpoint( $_->[1] );
+        push @{ $locH{ $contig } }, [ @$_, $midpoint ] if $midpoint;
+    }
+
+    #
+    #  Collect sequences one contig at a time
+    #
+    my @seqs;
+    foreach my $contig ( sort { lc $a cmp lc $b } keys %locH )
+    {
+        my $len = $fig->contig_ln( $gid, $contig ) or next;
+        my $seq = $fig->get_dna( $gid, $contig, 1, $len ) or next;
+
+        #
+        #  Add the fid sequences, sorted by midpoint
+        #
+        foreach ( sort { $a->[2] <=> $b->[2] } @{ $locH{ $contig } } )
+        {
+            my $fid = $_->[0];
+            my @subseq = map { [ /^(.+)_(\d+)_(\d+)$/ ] } split /,/, $_->[1];
+            next if grep { $_->[0] ne $contig } @subseq;
+
+            my @parts;
+            foreach ( @subseq )
+            {
+                push @parts, DNA_subseq( \$seq, $_->[1], $_->[2] );
+            }
+            push @seqs, [ $fid, ($funcH->{$fid} || ''), join('', @parts) ];
+        }
+    }
+
+    wantarray ? @seqs : \@seqs;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get a SEED FIG object
+#
+#   $fig = fig_object( \%opts )
+#
+#  Options:
+#
+#    fig => $figObject  # This will be used if it already exists.
+#
+#-------------------------------------------------------------------------------
+sub fig_object
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $fig = $opts->{ fig };
+    return $fig if ( $fig && eval { $fig->isa( 'FIG' ) } );
+
+    eval { require FIG } or return undef;
+
+    $opts->{ fig } = FIG->new();
+}
+
+
+#-------------------------------------------------------------------------------
+#  Auxiliary function for ordering coding sequences from Sapling or SEED
+#
+#  ( $contig, $midpoint ) = midpoint( $seed_or_sap_location )
+#
+#-------------------------------------------------------------------------------
+sub midpoint
+{
+    $_[0] or return ();
+    my $c;
+    my @ends = sort { $a <=> $b }
+               map  { ( $c ||= $_->[0] ) eq $_->[0] ? @$_[1,2] : () }
+               map  { /^(.+)_(\d+)\_(\d+)$/ ? [ $1, $2, $3        ] :
+                      /^(.+)_(\d+)\+(\d+)$/ ? [ $1, $2, $2+($3-1) ] :
+                      /^(.+)_(\d+)\-(\d+)$/ ? [ $1, $2, $2-($3-1) ] : ()
+                    }
+               ref($_[0]) eq 'ARRAY' ? @{$_[0]} : split /,/, $_[0];
+
+    $c && @ends ? ( $c, 0.5*( $ends[0] + $ends[-1] ) ) : ();
+}
+
+
+#-------------------------------------------------------------------------------
+#  Auxiliary function for ordering coding sequences from KBase
+#
+#  ( $contig, $midpoint ) = midpoint_kbase( $kbase_api_location )
+#
+#-------------------------------------------------------------------------------
+sub midpoint_kbase
+{
+    $_[0] && ref $_[0] eq 'ARRAY' && @{$_[0]} or return ();
+
+    my $c;
+    my @ends = sort { $a <=> $b }
+               map  { ( $c ||= $_->[0] ) eq $_->[0] ? @$_[1,2] : () }
+               map  { [ @$_[0,1], $_->[2] eq '+' ? $_->[1]+($_->[3]-1) : $_->[1]+($_->[3]-1) ] }
+               @{$_[0]};
+
+    $c && @ends ? ( $c, 0.5*( $ends[0] + $ends[-1] ) ) : ();
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get available codon usages for a genome from GenomeCodonUsages.pm
+#
+#  ( $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype ) = codon_usages_from_module( $gid );
+#  [ $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype ] = codon_usages_from_module( $gid );
+#
+#-------------------------------------------------------------------------------
+
+sub codon_usages_from_module
+{
+    eval { require GenomeCodonUsages } ? GenomeCodonUsages::genome_axes(@_) : wantarray ? () : [];
+}
+
+
+#-------------------------------------------------------------------------------
+#  Get available codon usages for a genome from KBase server
+#
+#  ( $gname, $mode, $high_expr, $he_type, $nonnative ) = codon_usages_from_kbase( $gid, \%opts );
+#  [ $gname, $mode, $high_expr, $he_type, $nonnative ] = codon_usages_from_kbase( $gid, \%opts );
+#
+#-------------------------------------------------------------------------------
+
+sub codon_usages_from_kbase
+{
+    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
+               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
+
+    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
+
+    my $kbase = kbase_object( $opts ) or return wantarray ? () : [];
+
+    my ( $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type );
+
+    my $usagesL = $kbase->get_relationship_UsesCodons( [ $gid ],
+                                                       [ 'scientific_name' ],
+                                                       [],
+                                                       [ 'frequencies', 'type', 'subtype' ]
+                                                     ) || [];
+    foreach ( @$usagesL )
+    {
+        $gname ||= $_->[0]->{ scientific_name } || '';
+        my $cu      = $_->[2];
+        my $type    = $cu->{ type } or next;
+        my $subtype = $cu->{ subtype };
+        my $freq = scalar gjocodonlib::split_frequencies( $cu->{ frequencies } || next );
+        if    ( $type eq 'modal' )
+        {
+            $mode      = $freq;
+            $md_type   = $subtype;
+        }
+        elsif ( $type eq 'nonnative' )
+        {
+            $nonnative = $freq;
+            $nn_type   = $subtype;
+        }
+        elsif ( $type eq 'high-expression' )
+        {
+            $high_expr = $freq;
+            $he_type   = $cu->{ subtype };
+        }
+    }
+
+    wantarray ? ( $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type )
+              : [ $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type ];
+}
+
+
+#===============================================================================
 #  Codon usage frequencies routines
 #===============================================================================
 #  Convert counts to packaged frequencies.  
@@ -796,7 +1338,7 @@ sub count_to_freq
     my ( $cnts, $pseudocnt ) = @_;
     $cnts or return undef;
     $cnts = codon_count_package( $cnts ) if ref $cnts eq 'HASH';
-    ref $cnts  ne 'ARRAY' && @$cnts >= 18 or return undef;
+    ref $cnts eq 'ARRAY' && @$cnts >= 18 or return undef;
     $pseudocnt ||= 0;
 
     [ map { my $n = $pseudocnt;
@@ -974,12 +1516,12 @@ sub report_frequencies
 #-------------------------------------------------------------------------------
 #  Read all frequencies from a file:
 #
-#     @$freq = read_frequencies( )        # D = STDIN
 #     @$freq = read_frequencies( $file )
-#     @$freq = read_frequencies( \*FH )
-#    \@$freq = read_frequencies( )        # D = STDIN
 #    \@$freq = read_frequencies( $file )
+#     @$freq = read_frequencies( \*FH )
 #    \@$freq = read_frequencies( \*FH )
+#     @$freq = read_frequencies( )        # D = STDIN
+#    \@$freq = read_frequencies( )        # D = STDIN
 #-------------------------------------------------------------------------------
 sub read_frequencies
 {
@@ -995,12 +1537,12 @@ sub read_frequencies
 #-------------------------------------------------------------------------------
 #  Read all frequencies with scores and labels from a file:
 #
-#     @$freq_scr_lbl = read_frequencies_scr_label( )        # D = STDIN
 #     @$freq_scr_lbl = read_frequencies_scr_label( $file )
-#     @$freq_scr_lbl = read_frequencies_scr_label( \*FH )
-#    \@$freq_scr_lbl = read_frequencies_scr_label( )        # D = STDIN
 #    \@$freq_scr_lbl = read_frequencies_scr_label( $file )
+#     @$freq_scr_lbl = read_frequencies_scr_label( \*FH )
 #    \@$freq_scr_lbl = read_frequencies_scr_label( \*FH )
+#     @$freq_scr_lbl = read_frequencies_scr_label( )        # D = STDIN
+#    \@$freq_scr_lbl = read_frequencies_scr_label( )        # D = STDIN
 #-------------------------------------------------------------------------------
 sub read_frequencies_scr_label
 {
@@ -1016,10 +1558,10 @@ sub read_frequencies_scr_label
 #-------------------------------------------------------------------------------
 #  Read one set of frequencies from an open file handle:
 #
-#      $freq                 = read_next_frequencies( )       # D = STDIN
 #      $freq                 = read_next_frequencies( $fh )
-#    ( $freq, $scr, $descr ) = read_next_frequencies( )       # D = STDIN
+#      $freq                 = read_next_frequencies( )       # D = STDIN
 #    ( $freq, $scr, $descr ) = read_next_frequencies( $fh )
+#    ( $freq, $scr, $descr ) = read_next_frequencies( )       # D = STDIN
 #-------------------------------------------------------------------------------
 sub read_next_frequencies
 {
@@ -3955,20 +4497,25 @@ sub option_value
 
 
 #------------------------------------------------------------------------------
-#  Define input stream from undef, glob, or file:
+#  Provide an open input file handle from undef (STDIN), empty string (STDIN),
+#  glob reference, string reference or file name:
 #
-#   ( $fh, $close ) = input_handle( )
+#   ( $fh, $close ) = input_handle( )        # STDIN
+#   ( $fh, $close ) = input_handle(  '' )    # STDIN
 #   ( $fh, $close ) = input_handle( \*FH )
-#   ( $fh, $close ) = input_handle( $file )
+#   ( $fh, $close ) = input_handle( \$string )
+#   ( $fh, $close ) = input_handle(  $filename )
 #
+#  $close is true if the input parameter is a file name or scalar reference,
+#  indicating that the handle should be closed upon completion of the read.
 #------------------------------------------------------------------------------
 sub input_handle
 {
     my ( $in ) = @_;
-    return ( \*STDIN, 0 ) if ! defined $in;
-    return (  $in,    0 ) if ref $in eq 'GLOB';
+    return ( \*STDIN, 0 ) if ( ! defined $in ) || ( $in eq '' );
+    return (  $in,    0 ) if ( ref $in eq 'GLOB' );
     my $fh;
-    return (  $fh,    1 ) if ( -f $in ) && open( $fh, "<$in" );
+    return (  $fh,    1 ) if ( ref $in eq 'SCALAR' || -f $in ) && open( $fh, "<", $in );
     return (  undef,  0 );
 }
 
