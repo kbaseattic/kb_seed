@@ -1,0 +1,86 @@
+<project name="kb_seed" basedir="." default="compile">
+  <description>
+    This module contains the CDMI java client interface.
+  </description>
+  <property name="app.name"	value="kb_seed"/>
+  <property name="module.package" value="CDMI"/>
+  <property name="src" 		location="src"/>
+  <property name="build" 	location="build"/>
+  <property name="dist" 	location="dist"/>
+
+  <path id="project.class.path">
+    <fileset dir="..">
+      <include name="*/dist/lib/*.jar"/>
+    </fileset>
+    <pathelement path="${java.class.path}/"/>
+  </path>
+  
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="-check-code-exists">
+    <available property="code.exists" file="${src}/us/kbase/${module.package}/code_generated_flag"/>
+  </target>
+
+  <target name="generate_java" depends="-check-code-exists" unless="code.exists"
+	  description="Generate java code from type specification document.">
+    <delete dir="${src}/us/kbase/${module.package}"/>
+    <exec executable="gen_java_client"
+	  failonerror="true"
+	  >
+      <arg value="lib/CDMI-API.spec"/>
+      <arg value="lib/CDMI-EntityAPI.spec"/>
+      <arg value="us.kbase.${module.package}"/>
+      <arg value="${src}"/>
+    </exec>
+    <!-- Need to tweak a file since it clashes with a java keyword. -->
+    <exec executable="perl"
+	  failonerror="true"
+	  >
+      <arg value="-pi.bak"/>
+      <arg value="-e"/>
+      <arg value="s/private/m_private/"/>
+      <arg value="${src}/us/kbase/${module.package}/fields_Subsystem.java"/>
+    </exec>
+    <touch file="${src}/us/kbase/${module.package}/code_generated_flag" />
+  </target>
+
+  <target name="compile" depends="init,generate_java"
+	  description="compile java source">
+    <javac
+       includeantruntime="false"
+       srcdir="${src}/us"
+       destdir="${build}">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target> 
+
+  <target name="dist" depends="compile"
+          description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+    <delete file="${dist}/lib/${app.name}.jar" />
+    <jar jarfile="${dist}/lib/${app.name}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="compile_test" depends="dist"
+	  description="compile a simple test code">
+    <javac 
+       includeantruntime="false"
+       srcdir="${src}/tests"
+       destdir="${build}"
+       >
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target> 
+
+  <target name="clean"
+          description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${src}/us/kbase/${module.package}"/>
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
