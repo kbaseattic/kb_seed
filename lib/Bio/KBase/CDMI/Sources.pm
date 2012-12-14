@@ -23,6 +23,7 @@ the default.
 my @NON_GENOME_BASED = qw(
                 MOL
                 SEED
+                Experiment
                 );
 
 =head3 TYPED
@@ -33,6 +34,7 @@ This is a list of the sources that are typed. Untyped is the default.
 
 my @TYPED = qw(
                 MOL
+                Experiment
               );
 
 =head3 SEMI-TYPED

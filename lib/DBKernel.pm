@@ -1037,7 +1037,7 @@ sub load_table {
     my $dbh  = $self->{_dbh};
     my $dbms = $self->{_dbms};
     my $style = $arg{style} || '';
-    my $local = $arg{local} || $FIG_Config::load_mode || '';
+    my $local = $arg{'local'} || $FIG_Config::load_mode || '';
     my $rv;
     # Convert "normal" load mode to null.
     if ($style eq 'normal') {
@@ -1050,13 +1050,15 @@ sub load_table {
             #my $lineEnd = ($FIG_Config::arch eq "win" ? "\\r\\n" : "\\n");
             Trace("Loading $tbl into MySQL using file $file and style $style.") if T(2);
             # Decide whether this is a local file or a server file.
-            my $place = ($self->{_host} ne "localhost" ? "LOCAL" : "");
-	    my $sql = "LOAD DATA $style $local $place INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
+            if ($self->{_host} ne "localhost" && ! $local) {
+                $local = "LOCAL";
+            }
+	    my $sql = "LOAD DATA $style $local INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
 	    Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         } elsif ($dbms eq "Pg") {
             Trace("Loading $tbl into PostGres using file $file.") if T(2);
-	    my $sql = "COPY $tbl FROM '$file' USING DELIMITERS '$delim';";
+	    my $sql = "COPY $tbl FROM '$file' WITH DELIMITER '$delim' NULL AS '\\N';";
 	    Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         }

@@ -126,13 +126,36 @@ package SeedAware;
 #
 #-----------------------------------------------------------------------------
 #  Create a name for a new file or directory that will not clobber an existing
-#  one.
+#  one. File name DOES NOT INCLUDE the directory.
 #
 #     $file_name = new_file_name( )
 #     $file_name = new_file_name( $base_name )
 #     $file_name = new_file_name( $base_name, $extention )
 #     $file_name = new_file_name( $base_name, $extention, $in_directory )
 #
+#  The name is derived by adding an underscore and 8 random characterss (or
+#  12 random digits) to a base file name (D = temp) in a directory (D = .).
+#-----------------------------------------------------------------------------
+#  Create a name for a new file or directory that will not clobber an existing
+#  one. File name INCLUDES any directory supplied.
+#
+#     $path_name = tmp_file_name( )
+#     $path_name = tmp_file_name( $base_name )
+#     $path_name = tmp_file_name( $base_name, $extention )
+#     $path_name = tmp_file_name( $base_name, $extention, $in_directory )
+#
+#  Create and open new file that will not clobber an existing one.
+#  File name INCLUDES any directory supplied.
+#
+#     ( $fh, $path_name ) = open_tmp_file( )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name, $extention )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name, $extention, $in_directory )
+#
+#  The name is derived by adding an underscore and 8 random characterss (or
+#  12 random digits) to a base file name (D = temp) in a directory
+#  (D = location_of_tmp()). This means there will always be a directory,
+#  even if just './'.
 #===============================================================================
 use strict;
 use Carp;
@@ -155,6 +178,9 @@ our @EXPORT = qw(
 our @EXPORT_OK = qw(
         close_line_by_line
         line_by_line_fh
+        new_file_name
+        tmp_file_name
+        open_tmp_file
         );
 
 #
@@ -500,15 +526,17 @@ sub slurp_input
 #===============================================================================
 #  Locate commands in special bin directories
 #
-#  $command = SeedAware::executable_for( $command )
+#  $command = SeedAware::executable_for( $command, \%options )
 #
+#  Currently, no options are supported.
 #===============================================================================
 sub executable_for
 {
-    my $prog = shift;
+    my ( $prog, $opts ) = @_;
 
     return undef if ! defined( $prog ) || $prog !~ /\S/;   # undefined or empty
     return ( -x $prog ? $prog : undef ) if $prog =~ /\//;  # includes path
+    $opts ||= {};
 
     if ( $in_SEED )
     {
@@ -610,37 +638,49 @@ sub temporary_directory
     my $name    = defined( $_[0] ) && ! ref( $_[0] )           ? shift : undef;
     my $options = defined( $_[0] ) &&   ref( $_[0] ) eq 'HASH' ? shift : {};
 
+    my $save_dir = $options->{ savedir } || $options->{ save_dir };
+
     my $tmp_dir = $options->{ tmpdir } || $options->{ tmp_dir };
-    if ( ! defined $tmp_dir )
+    if ( defined $tmp_dir && length $tmp_dir )
+    {
+        $save_dir = $options->{ save_dir } = 1 if -d $tmp_dir;
+    }
+    else
     {
         my $tmp = location_of_tmp( $options );
         return ( wantarray ? () : undef ) if ! $tmp;
 
-        if ( ! defined $name )
+        $name = $options->{ name } if ! ( defined $name && length $name );
+
+        if ( defined $name && length $name )
         {
-            if ( defined $options->{ name } )
+            $tmp_dir = "$tmp/$name";
+            $save_dir = $options->{ save_dir } = 1 if -d $tmp_dir;
+        }
+        else
+        {
+            my $base = $options->{ base } || 'tmp_dir';
+            $base =~ /_$/ or $base .= '_';  # End base with _
+            if ( eval { require File::Temp } )
             {
-                $name = $options->{ name };
+               $base .= 'XXXXXXXX';
+               my @args = ( $base );
+               push @args, ( DIR => $tmp ) if $tmp;
+               $tmp_dir = File::Temp::tempdir( @args );
             }
             else
             {
-                my $base = $options->{ base } || 'tmp_dir';
-                $name = new_file_name( $base, '', $tmp );
+                $tmp_dir = tmp_file_name( $base, '', $tmp );
             }
         }
-        $tmp_dir = "$tmp/$name";
     }
-
-    my $save_dir = $options->{ savedir } || $options->{ save_dir } || -d $tmp_dir;
 
     if ( ! -d $tmp_dir )
     {
-        mkdir $tmp_dir;
-        return ( wantarray ? () : undef ) if ! -d $tmp_dir;
+        mkdir $tmp_dir or return ( wantarray ? () : undef );
     }
 
     #  $options->{ tmp_dir  } = $tmp_dir;
-    #  $options->{ save_dir } = $save_dir;
 
     wantarray ? ( $tmp_dir, $save_dir ) : $tmp_dir;
 }
@@ -648,34 +688,165 @@ sub temporary_directory
 
 #===============================================================================
 #  Create a name for a new file or directory that will not clobber an existing
-#  one.
+#  one. File name DOES NOT INCLUDE the directory.
 #
 #     $file_name = new_file_name( )
 #     $file_name = new_file_name( $base_name )
 #     $file_name = new_file_name( $base_name, $extention )
 #     $file_name = new_file_name( $base_name, $extention, $in_directory )
 #
-#  The name is derived by adding an underscore and 12 random digits to a
-#  base name (D = temp).  The random digits are done in two parts because
-#  the coversion to a decimal integer dies when the number gets too big.
-#  The repeat period of rand() is >10^12 (on my Mac), so these are not
-#  empty digits.
+#  The name is derived by adding an underscore and 8 random characterss (or
+#  12 random digits) to a base file name (D = temp) in a directory (D = .).
 #===============================================================================
 sub new_file_name
 {
     my ( $base, $ext, $dir ) = @_;
-    $base = 'temp' if ! ( defined $base && length $base );
+
+    $base =  'temp' if ! ( defined $base && length $base );
+    $base =~ /_$/ or $base .= '_';  # End base with _
+
     $ext  = ''     if !   defined $ext;
     $ext  =~ s/^([^.])/.$1/;   # Start ext with .
-    $dir  = ''  if ! defined $dir;
-    $dir .= '/' if $dir =~ m/[^\/]$/; # End dir with /
+
+    $dir  = '.'  if ! defined $dir;
+
+    my ( $fh, $name );
+    if ( eval { require File::Temp } )
+    {
+        $base .= 'XXXXXXXX';
+        my @args = ( $base, OPEN => 0 );
+        push @args, ( SUFFIX => $ext ) if $ext;
+        push @args, ( DIR    => $dir ) if $dir;
+        ( undef, $name ) = File::Temp::tempfile( @args );
+
+        $name =~ s/^.*[\/\\]//;  # Remove directory (unix or windows)
+    }
+    #  Fall back to my old method if we do not have File::Temp
+    else
+    {
+        if ( length $dir )
+        {
+            $dir =~ /\/$/ or $dir .= '/';  # End dir with /
+            $base = "$dir$base";
+        }
+        while ( 1 )
+        {
+            my $r  = rand( 1e6 );
+            my $ir = int( $r );
+            $name  = sprintf "%s%06d%06d%s", $base, $ir, int(1e6*($r-$ir)), $ext;
+            last if ! -e "$dir$name";
+        }
+    }
+
+    $name;
+}
+
+
+#===============================================================================
+#  Create a name for a new file or directory that will not clobber an existing
+#  one. File name INCLUDES any directory supplied.
+#
+#     $path_name = tmp_file_name( )
+#     $path_name = tmp_file_name( $base_name )
+#     $path_name = tmp_file_name( $base_name, $extention )
+#     $path_name = tmp_file_name( $base_name, $extention, $in_directory )
+#
+#  Create and open new file that will not clobber an existing one.
+#  File name INCLUDES any directory supplied.
+#
+#     ( $fh, $path_name ) = open_tmp_file( )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name, $extention )
+#     ( $fh, $path_name ) = open_tmp_file( $base_name, $extention, $in_directory )
+#
+#  The name is derived by adding an underscore and 8 random characterss (or
+#  12 random digits) to a base file name (D = temp) in a directory
+#  (D = location_of_tmp()). This means there will always be a directory,
+#  even if just './'.
+#===============================================================================
+sub tmp_file_name
+{
+    my $name;
+    if ( eval { require File::Temp } )
+    {
+        my ( $base, $ext, $dir ) = tmp_file_defaults( @_ );
+        return undef if ! $base;
+        $base .= 'XXXXXXXX';      # complete the template
+
+        my @args = ( $base, OPEN => 0, DIR => $dir );
+        push @args, ( SUFFIX => $ext ) if $ext;
+        ( undef, $name ) = File::Temp::tempfile( @args );
+    }
+
+    #  Fall back to my old method if we do not have File::Temp
+    else
+    {
+        $name = classic_file_name( @_ );
+    }
+
+    $name;
+}
+
+
+sub open_tmp_file
+{
+    my ( $fh, $name );
+    if ( eval { require File::Temp } )
+    {
+        my ( $base, $ext, $dir ) = tmp_file_defaults( @_ );
+        return () if ! $base;
+        $base .= 'XXXXXXXX';
+
+        my @args = ( $base, DIR => $dir );
+        push @args, ( SUFFIX => $ext ) if $ext;
+        ( $fh, $name ) = File::Temp::tempfile( @args );
+    }
+
+    #  Fall back to my old method if we do not have File::Temp
+    else
+    {
+        $name = classic_file_name( @_ ) and open( $fh, '>', $name );
+    }
+
+    ( $fh, $name );
+}
+
+
+sub tmp_file_defaults
+{
+    my ( $base, $ext, $dir ) = @_;
+
+    $base  =  'temp' if ! ( defined $base && length $base );
+    $base  =~ m/_$/ or $base .= '_';  # End base with _
+
+    $ext  = ''     if !   defined $ext;
+    $ext  =~ s/^([^.])/.$1/;   # Start ext with .
+
+    $dir  =  location_of_tmp( ) if ! ( defined $dir && length $dir );
+    return () if ! defined $dir;
+    $dir  =~ m/\/$/ || ( $dir .= '/' );       # End dir with /
+
+    ( $base, $ext, $dir );
+}
+
+
+sub classic_file_name
+{
+    my ( $base, $ext, $dir ) = tmp_file_defaults( @_ );
+    return undef if ! $base;
+
+    my $name;
     while ( 1 )
     {
-        my $r    = rand( 1e6 );
-        my $ir   = int( $r );
-        my $name = sprintf "%s_%06d%06d%s", $base, $ir, int(1e6*($r-$ir)), $ext;
-        return $name if ! -e ( length $dir ? "$dir$name" : $name );
+        my $r  = rand( 1e6 );
+        my $n1 = int( $r );
+        my $n2 = int( 1e6 * ($r - $n1) );
+        my $dig = sprintf "%06d%06d", $n1, $n2;
+        $name  = $dir . $base . $dig . $ext;
+        last if ! -e $name;
     }
+
+    $name;
 }
 
 

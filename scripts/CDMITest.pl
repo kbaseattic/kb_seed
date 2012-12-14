@@ -23,7 +23,7 @@
     use Data::Dumper;
     use Bio::KBase::CDMI::CDMI;
     use Bio::KBase::CDMI::CDMILoader;
-    use Bio::KBase::CDMI::CDMI_APIImpl;
+
 
 =head1 CDMI Test Script
 
@@ -34,13 +34,23 @@ no positional parameters.
 
 =cut
 
+$| = 1;
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    my $kb = Bio::KBase::CDMI::CDMI_APIImpl->new($cdmi);
-    my @fids = qw(kb|g.2.peg.0 kb|g.2.peg.1 kb|g.2.peg.2);
-    my $retHash = $kb->fids_to_feature_data(\@fids);
-    Data::Dumper::Dump($retHash);
+    print "Connecting to database.\n";
+    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
+    $loader->SetSource('SEED');
+    for my $peg (qw(191 769 1980 1982 1961 1961 460 2019 2039 514 1225 1923 2061)) {
+        my $fid = "fig|933267.3.peg.$peg";
+        print "Seeking ID for $fid.\n";
+        my $kbidMap = $loader->FindKBaseIDs('Feature', [$fid]);
+        print "ID is $kbidMap->{$fid}.\n";
+    }
+    $loader->SetSource('EnsemblPlant');
+    print "Looking up Arabidopsis genome.\n";
+    my $gid = $loader->GetKBaseID('kb|g', 'Genome', 'Athaliana.TAIR10');
+    print "Genome ID is $gid.\n";
 }

@@ -57,7 +57,7 @@ our @EXPORT = qw( representative_sequences
 #  Outputs:
 #
 #    \@reps     Reference to the list of retained (representative subset)
-#               of sequence entries.  Sequence entries have the form
+#               of sequence entries. Sequence entries have the form
 #               [ $id, $def, $seq ]
 #
 #    \%representing
@@ -69,45 +69,50 @@ our @EXPORT = qw( representative_sequences
 #
 #  Arguments (only \@seqs is required):
 #
-#    $ref       A reference sequence as [ $id, $def, $seq ].  If present, the
-#               reference sequence defines a focal point for the analysis.  A
+#    $ref       A reference sequence as [ $id, $def, $seq ]. If present, the
+#               reference sequence defines a focal point for the analysis. A
 #               representative sequence from each lineage in its vicinity will
 #               be retained, even though they are more similar than max_sim to
-#               the reference, or to each other.  The reference will always be
-#               included in the representative set.  A limit is put on the
+#               the reference, or to each other. The reference will always be
+#               included in the representative set. A limit is put on the
 #               similarity of lineages retained by the reference sequence with
-#               the max_ref_sim option (default = 0.99).  The reference sequence
-#               should not be repeated in the set of other sequences.  (Only
+#               the max_ref_sim option (default = 0.99). The reference sequence
+#               should not be repeated in the set of other sequences. (Only
 #               applies to representative_sequences; there is no equivalent for
 #               rep_seq_2.)
 #
 #    \@reps     In rep_seq_2, these sequences will each be placed in their own
-#               cluster, regardless of their similarity to one another.  Each
+#               cluster, regardless of their similarity to one another. Each
 #               remaining sequence is added to the cluster to which it is
 #               most similar, unless it is less simililar than max_sim, in
 #               which case it represents a new cluster.
 #
-#    \@seqs     Set of sequences to be pruned.  If there is no reference
+#    \@seqs     Set of sequences to be pruned. If there is no reference
 #               sequence, the fist sequence in this list will be the starting
 #               point for the analysis and will be retained, but all sequences
 #               more similar than max_sim to it will be removed (in contrast to
 #               a reference sequence, which retains a representative of each
-#               lineage in its vicinity).  Sequences that fail the E-value test
+#               lineage in its vicinity). Sequences that fail the E-value test
 #               relative to the reference (or the fist sequence if there is no
 #               reference) are dropped.
 #
 #    $max_sim   (representative_sequences only; an option for rep_seq_2)
 #               Sequences with a higher similarity than max_sim to an existing
 #               representative sequence will not be included in the @reps
-#               output.  Their ids are associated with the identifier of the
-#               sequence representing them in \%representing.  The details of
+#               output. Their ids are associated with the identifier of the
+#               sequence representing them in \%representing. The details of
 #               the behaviour are modified by other options. (default = 0.80)
 #
 #    \%options  Key => Value pairs that modify the behaviour:
 #
 #        by_size    (rep_seq and rep_seq_2 only)
-#                   By default, sequences are analyzed in input order.  This
-#                   option set to true will sort from longest to shortest.
+#                   By default, sequences are analyzed in input order. This
+#                   option set to 1 will order from longest to shortest, or
+#                   set to 2 will order from median outward.
+#
+#        dup_id_ok (rep_seq and rep_seq_2 only)
+#                  Duplicate ids in the input will be silently ignored. This
+#                  is useful when continuing a run.
 #
 #        extra_rep  (rep_seq only)
 #                   Filehandle for a file of the sequences included in the
@@ -117,36 +122,39 @@ our @EXPORT = qw( representative_sequences
 #                   use in continuations of a clustering by inclusion at the
 #                   head of the new data.
 #
-#        logfile    Filehandle for a logfile of the progress.  As each
+#        logfile    Filehandle for a logfile of the progress. As each
 #                   sequence is analyzed, its disposition in recorded.
 #                   In representative_sequences(), the id of each new
 #                   representative is followed by a tab separated list of the
-#                   ids that it represents.  In rep_seq_2(), as each sequence
+#                   ids that it represents. In rep_seq_2(), as each sequence
 #                   is analyzed, it is recorded, followed by the id of the
 #                   sequence representing it, if it is not the first member
-#                   of a new cluster.  Autoflush is set for the logfile.
+#                   of a new cluster. Autoflush is set for the logfile.
 #                   If the value supplied is not a reference to a GLOB, then
 #                   the log is sent to STDOUT (which is probably not what you
-#                   want in most cases).  The behavior is intended to aid in
+#                   want in most cases). The behavior is intended to aid in
 #                   following prgress, and in recovery of interupted runs.
 #
 #        max_ref_sim (representative_sequences only)
-#                   Maximum similarity of any sequence to the reference.  If
+#                   Maximum similarity of any sequence to the reference. If
 #                   max_ref_sim is less than max_sim, it is silently reset to
-#                   max_sim.  (default = 0.99, because 1.0 can be annoying)
+#                   max_sim. (default = 0.99, because 1.0 can be annoying)
 #
-#        max_e_val  Maximum E-value for blastall.  Probably moot, but will help
-#                   with performance.  (default = 0.01)
+#        max_e_val  Maximum E-value for blastall. Probably moot, but will help
+#                   with performance. (default = 0.01)
 #
 #        max_sim    Sequences with a higher similarity than max_sim to a
-#                   retained sequence will be deleted.  The details of the
+#                   retained sequence will be deleted. The details of the
 #                   behaviour is modified by other options. (default = 0.80)
 #                   (a parameter for representative_sequences, but an option
 #                   for rep_seq_2).
 #
+#        n_thread   (rep_seq and rep_seq_2 only)
+#                   Number of threads used by blastall. (default = 2)
+#
 #        n_query    (rep_seq and rep_seq_2 only)
 #                   Blast serveral sequences at a time to decrease process
-#                   creation overhead.  (default = 64)
+#                   creation overhead. (default = 64)
 #
 #        rep_seq_2  (rep_seq only)
 #                   Use rep_seq_2() behavior (only on representative in the
@@ -160,8 +168,8 @@ our @EXPORT = qw( representative_sequences
 #
 #        save_exp   (representative_sequences only)
 #                   When there is a reference sequence, lineages more similar
-#                   than max_sim will be retained near the reference.  The
-#                   default goal is to save one member of each lineage.  If
+#                   than max_sim will be retained near the reference. The
+#                   default goal is to save one member of each lineage. If
 #                   the initial representative of the lineage is seq1, we
 #                   pose the question, "Are there sufficiently deep divisions
 #                   within the lineage to seq1 that it they might be viewed
@@ -179,17 +187,17 @@ our @EXPORT = qw( representative_sequences
 #                   to ref ( S(seq1,ref) ) is greater than max_sim, seq1 would
 #                   be the sole representative of thelineage containing both
 #                   seq1 and seq2, because the similarity of seq1 to seq2
-#                   ( S(seq1,seq2) ) is greater than S(seq1,ref).  This can
-#                   be altered by the value of save_exp.  In terms of
+#                   ( S(seq1,seq2) ) is greater than S(seq1,ref). This can
+#                   be altered by the value of save_exp. In terms of
 #                   similarity, seq2 will be discarded if:
 #
 #                       S(seq1,seq2) > S(seq1,ref) ** save_exp, and
 #                       S(seq1,seq2) > S(seq2,ref) ** save_exp
 #
 #                   The default behavior described above occurs when save_exp
-#                   is 1.  If save_exp < 1, then greater similarities between
-#                   seq1 and seq2 are allowed.  Reasonable values of save_exp
-#                   are roughly 0.7 to 1.0.  (At save_exp = 0, any similarity
+#                   is 1. If save_exp < 1, then greater similarities between
+#                   seq1 and seq2 are allowed. Reasonable values of save_exp
+#                   are roughly 0.7 to 1.0. (At save_exp = 0, any similarity
 #                   would be allowed; yuck.)
 #
 #        stable     (representative_sequences only; always true for rep_seq_2)
@@ -239,22 +247,22 @@ our @EXPORT = qw( representative_sequences
 #      sequences will be A, G, J and K.
 #
 #      With A as the reference sequence and save_exp left at its default, the
-#      representative sequences will be A, C, D, E, G, J and K.  B is excluded
+#      representative sequences will be A, C, D, E, G, J and K. B is excluded
 #      because it is more similar than max_ref_sim to A.
 #
 #      With A as the reference sequence and save_exp = 0.8, the representative
 #      sequences will be A, C, D, E, F (comparably similar to A and E), G,
-#      H (comparably similar to A and G), J and K.  The sequence L will be
+#      H (comparably similar to A and G), J and K. The sequence L will be
 #      represented by K because L is much closer to K than to A.
 #
 #  This oversimplifies the choice of representative of a cluster of related
-#  sequences.  For example, whether G, H or I would represent the group of
+#  sequences. For example, whether G, H or I would represent the group of
 #  three actually depends on relative clock speed (slower is better) and
-#  sequence coverage (more complete is better).  The actual order is by BLAST
+#  sequence coverage (more complete is better). The actual order is by BLAST
 #  bit score (possibly combining independent segments).
 #
 #  In addition, this discussion is in terms of a tree, but the calculations
-#  are based on a (partial) set of pairwise sequence similarities.  Thus, the
+#  are based on a (partial) set of pairwise sequence similarities. Thus, the
 #  precise behavior is hard to predict, but should be similar to that described
 #  above.
 #
@@ -300,9 +308,9 @@ our @EXPORT = qw( representative_sequences
 #===============================================================================
 
 #===============================================================================
-#  Build or add to a set of representative sequences.  The difference of
+#  Build or add to a set of representative sequences. The difference of
 #  rep_seq_2 and rep_seq is that rep_seq can have multiple representatives
-#  in the blast database for a given group.  This helps prevent fragmentation
+#  in the blast database for a given group. This helps prevent fragmentation
 #  of clusters.
 #
 #    \@reps = rep_seq( \@reps, \@new, \%options );
@@ -340,16 +348,18 @@ sub rep_seq
 
     # ---------------------------------------# Default values for options
 
-    my $n_query   = 64;                    # Blast sequences 64 at a time
-    my $by_size   = undef;                 # Analyze sequences in order provided
-    my $extra_rep = undef;                 # File of nonrep sequences in blastdb
-    my $max_sim   = 0.80;                  # Retain 80% identity of less
-    my $logfile   = undef;                 # Log file of sequences processed
-    my $max_e_val = 0.01;                  # Blast E-value to decrease output
-    my $sim_meas  = 'identity_fraction';   # Use sequence identity as measure
-    my $keep_id   = [];
+    my $by_size   =  0;                     # Analyze sequences in order provided
+    my $dup_id_ok =  0;                     # Warn when duplicate ids are seen
+    my $extra_rep = undef;                  # File of nonrep sequences in blastdb
     my $keep_gid  = [];
-    my $rep_seq_2 = 0;                     # Not call to rep_seq_2;
+    my $keep_id   = [];
+    my $logfile   = undef;                  # Log file of sequences processed
+    my $max_e_val =  0.01;                  # Blast E-value to decrease output
+    my $max_sim   =  0.80;                  # Retain 80% identity of less
+    my $n_thread  =  2;                     # Number of threads in blastall
+    my $n_query   = 64;                     # Blast sequences 64 at a time
+    my $rep_seq_2 =  0;                     # Not call to rep_seq_2;
+    my $sim_meas  =  'identity_fraction';   # Use sequence identity as measure
 
     #  Two questionable decisions:
     #     1. Be painfully flexible on option names.
@@ -361,7 +371,11 @@ sub rep_seq
 
         if    ( m/by_?size/i )              #  add longest to shortest
         {
-            $by_size = 1;
+            $by_size = $value;
+        }
+        elsif ( m/dup_?id/i )
+        {
+            $dup_id_ok = $value;
         }
         elsif ( m/keep_?gid/i )
         {
@@ -389,6 +403,10 @@ sub rep_seq
             $value += 0;
             $value  = 0 if $value < 0;
             $max_e_val = $value;
+        }
+        elsif ( m/cpu/i ||  m/proc/i ||  m/thread/i )
+        {
+            $n_thread = $value  || 2;
         }
         elsif ( m/n_?quer/i )
         {
@@ -418,57 +436,76 @@ sub rep_seq
         }
     }
 
-    #  Check sequence ids for duplicates:
-
     my $reps2 = [];
-    my $seen  = {};
-
-    foreach ( @$reps )
-    {
-        my $id = $_->[0];
-        if ( $seen->{ $id }++ )
-        {
-            print STDERR "Duplicate sequence id '$id' skipped by rep_seq\n";
-        }
-        else
-        {
-            push @$reps2, $_;
-        }
-    }
-
-    my %keep_gid_hash = map { $_ => 1 } @$keep_gid;
-    my %keep_id_hash  = map { $_ => 1 } @$keep_id;
-
-    #  Filter sequences to be added;
-
     my $seqs2 = [];
-    foreach ( @$seqs )
+
     {
-        my $id = $_->[0];
-        if ( $seen->{ $id }++ )
+        #  Check sequence ids for duplicates (use bare block to scope $seen):
+
+        my $seen  = {};
+        foreach ( @$reps )
         {
-            print STDERR "Duplicate sequence id '$id' skipped by rep_seq\n";
+            my $id = $_->[0];
+            if ( $seen->{ $id }++ )
+            {
+                print STDERR "Duplicate sequence id '$id' skipped by rep_seq\n" if ! $dup_id_ok;
+            }
+            else
+            {
+                push @$reps2, $_;
+            }
         }
-        elsif ( $keep_id_hash{ $id } || ( $id =~ /^(fig\|\d+\.\d+)\./ && $keep_gid_hash{ $1 } ) )
+
+        my %keep_gid_hash = map { $_ => 1 } @$keep_gid;
+        my %keep_id_hash  = map { $_ => 1 } @$keep_id;
+
+        #  Filter sequences to be added;
+
+        foreach ( @$seqs )
         {
-            push @$reps2, [ @$_ ];
-            $seen->{ $id }++
-        } 
-        else 
-        {
-            push @$seqs2, [ @$_ ];
+            my $id = $_->[0];
+            if ( $seen->{ $id }++ )
+            {
+                print STDERR "Duplicate sequence id '$id' skipped by rep_seq\n" if ! $dup_id_ok;
+            }
+            elsif ( $keep_id_hash{ $id } || ( $id =~ /^(fig\|\d+\.\d+)\./ && $keep_gid_hash{ $1 } ) )
+            {
+                push @$reps2, $_;
+            }
+            else 
+            {
+                push @$seqs2, $_;
+            }
         }
     }
 
     #
     #  Do the analysis.
     #
-    #  Begin by eliminating indels from the input sequences
+    #  Begin by eliminating indels from the input sequences.
+    #  pack_sequences() only rewrites sequences that will be changed.
     #
     $reps2 = &gjoseqlib::pack_sequences( $reps2 ) || $reps2;
     $seqs2 = &gjoseqlib::pack_sequences( $seqs2 ) || $seqs2;
 
-    if ( $by_size )
+    if ( $by_size == 2 )
+    {
+        my @s = sort { length( $b->[2] ) <=> length( $a->[2] ) } @$seqs2;
+        @$seqs2 = ();
+        # index of mid point, rounded down
+        my $i = int( (@s - 1) / 2 );
+        # step direction
+        #    even => first step pos, e.g., (1,2,0,3)
+        #    odd  => first step neg, e.g., (2,1,3,0,4)
+        my $s = @s % 2 ? -1 : 1;
+        for ( my $di = 1; $di <= @s; $di++ )
+        {
+            push @$seqs2, $s[$i];
+            $i += $s * $di;
+            $s *= -1;
+        }
+    }
+    elsif ( $by_size )
     {
         @$seqs2 = sort { length( $b->[2] ) <=> length( $a->[2] ) } @$seqs2;
     }
@@ -504,7 +541,7 @@ sub rep_seq
                       -v => $naln,
                       -b => $naln,
                       -F => 'F',
-                      -a =>  2
+                      -a => $n_thread
                     ];
     push @$blast_opt, ( -r => 1, -q => -1 ) if ! $protein;
 
@@ -543,7 +580,7 @@ sub rep_seq
             @new4blast = ();
         }
 
-        #  Do the blast analysis.  Returned records are of the form:
+        #  Do the blast analysis. Returned records are of the form:
         #
         #        0    1     2     3    4     5     6     7      8     9     10     11
         #     [ qid, qdef, qlen, sid, sdef, slen, scr, e_val, n_mat, n_id, n_pos, n_gap ]
@@ -611,7 +648,7 @@ sub rep_seq
 
 #===============================================================================
 #  Caluculate sequence similarity according to the requested measure, and return
-#  empty list if lower than max_sim.  Otherwise, return the hit and whether
+#  empty list if lower than max_sim. Otherwise, return the hit and whether
 #  the hit is really strong:
 #
 #     [ $score, $hit, $surething ] = in_group( $hit, $max_sim, $measure, $bpp_max )
@@ -790,7 +827,7 @@ sub representative_sequences
         }
     }
 
-    #  Silent sanity check.  This should not happen, as it is almost equivalent
+    #  Silent sanity check. This should not happen, as it is almost equivalent
     #  to making no reference sequence.
 
     $max_ref_sim = $max_sim if ( $max_ref_sim < $max_sim );
@@ -837,7 +874,7 @@ sub representative_sequences
                       -a =>  2
                     ];
 
-    #  Do the blast analysis.  Returned records are of the form:
+    #  Do the blast analysis. Returned records are of the form:
     #
     #        0    1     2     3    4     5     6     7      8     9     10     11
     #     [ qid, qdef, qlen, sid, sdef, slen, scr, e_val, n_mat, n_id, n_pos, n_gap ]
@@ -1001,13 +1038,14 @@ sub seq_similarity
 #===============================================================================
 #  Caluculate self similarity of a sequence in bits per position:
 #
-#     $max_bpp = self_bpp( $db_name, $entry, $protein, $optoins )
+#     $max_bpp = self_bpp( $db_name, $entry, $protein, $options )
 #
 #===============================================================================
 
 sub self_bpp
 {
     my ( $db, $entry, $protein, $options ) = @_;
+    return 2.0;
 
     #  Build blast database:
 
@@ -1020,11 +1058,12 @@ sub self_bpp
     my $prog = $protein ? 'blastp' : 'blastn';
     my $blast_opt = [ -v =>  1,
                       -b =>  1,
-                      -a =>  2
+                      -a =>  2,
+                      -F => 'f'
                      ];
     push @$blast_opt, ( -r => 1, -q => -1 ) if ! $protein;
 
-    #  Do the blast analysis.  Returned records are of the form:
+    #  Do the blast analysis. Returned records are of the form:
     #
     #        0    1     2     3    4     5     6     7      8     9     10     11
     #     [ qid, qdef, qlen, sid, sdef, slen, scr, e_val, n_mat, n_id, n_pos, n_gap ]
@@ -1273,7 +1312,7 @@ sub top_blast_per_subject_2
 
 #===============================================================================
 #  Read output of rationalize blast and assemble minimally overlapping segments
-#  into a total score for each subject sequence.  For each query, sort matches
+#  into a total score for each subject sequence. For each query, sort matches
 #  into user-chosen order (D = total score):
 #
 #      @sims = integrate_blast_segments_0( \*FILEHANDLE, $sort_order, $no_merge )
@@ -1287,7 +1326,7 @@ sub top_blast_per_subject_2
 #     [ qid, qdef, qlen, sid, sdef, slen, scr, e_val, n_mat, n_id, n_pos, n_gap ] 
 #
 #  There is a strategic decision to not read the blast output from memory;
-#  it could be enormous.  This cuts the flexibility some.
+#  it could be enormous. This cuts the flexibility some.
 #===============================================================================
 #
 #  coverage fields:
@@ -1363,7 +1402,7 @@ sub integrate_blast_segments_0
 
 #===============================================================================
 #  Read blast output and assemble minimally overlapping segments into a total
-#  for each subject sequence.  For each query, sort matches into user-chosen
+#  for each subject sequence. For each query, sort matches into user-chosen
 #  order (D = total score):
 #
 #      @sims = integrate_blast_segments( \*FILEHANDLE, $sort_order, $no_merge )
@@ -1377,7 +1416,7 @@ sub integrate_blast_segments_0
 #     [ qid, qdef, qlen, sid, sdef, slen, scr, e_val, n_mat, n_id, n_pos, n_gap ] 
 #
 #  There is a strategic decision to not read the blast output from memory;
-#  it could be enormous.  This cuts the flexibility some.
+#  it could be enormous. This cuts the flexibility some.
 #===============================================================================
 #
 #  coverage fields:
@@ -1430,9 +1469,9 @@ sub integrate_blast_segments
 
 #===============================================================================
 #
-#  Try to integrate non-conflicting HSPs for the same subject sequence.  The
+#  Try to integrate non-conflicting HSPs for the same subject sequence. The
 #  conflicts are only assessed from the standpoint of the query, at least for
-#  now.  We could track the subject sequence coverage as well (to avoid a direct
+#  now. We could track the subject sequence coverage as well (to avoid a direct
 #  repeat in the query from matching the same subject twice).
 #
 #    $new_coverage = integrate_HSP( $coverage, $hsp, $max_frac_overlap, $no_merge )
@@ -1441,8 +1480,8 @@ sub integrate_blast_segments
 #  $coverage = [ scr, e_val, n_mat, n_id, n_pos, n_gap, dir, [ intervals_covered ] ]
 #
 #      $coverage should be undefined at the first call; the function intiallizes
-#      all of the fields from the first HSP.  scr, n_mat, n_id, n_pos, and n_gap
-#      are sums over the combined HSPs.  e_val is based only of the first HSP.
+#      all of the fields from the first HSP. scr, n_mat, n_id, n_pos, and n_gap
+#      are sums over the combined HSPs. e_val is based only of the first HSP.
 #
 #            0     1      2      3      4      5      6     7      8    9  10   11  12  13  14
 #  $hsp = [ scr, e_val, n_seg, e_val2, n_mat, n_id, n_pos, n_gap, dir, s1, e1, sq1, s2, e2, sq2 ]
@@ -1450,9 +1489,9 @@ sub integrate_blast_segments
 #  $max_frac_overlap  Amount of the new HSP that is allowed to overlap already
 #                     incorporated HSPs
 #
-#  $no_merge          Disable the merging of multiple HSPs.  The structure will
+#  $no_merge          Disable the merging of multiple HSPs. The structure will
 #                     be filled in from the first HSP and left unchanged though
-#                     subsequence calls.  This simplifies the program structure.
+#                     subsequence calls. This simplifies the program structure.
 #
 #  Fitting a new HSP into covered intervals:
 #
@@ -1507,9 +1546,9 @@ sub integrate_HSP
                 + ( ( $r >= $next_beg ) ? ( $r - $next_beg + 1 ) : 0 );
     return $coverage  if ( $overlap > $max_overlap );
 
-    #  Okay, we have passed the overlap test.  We need to integrate the
-    #  match into the coverage description.  Yes, I know that this counts
-    #  the overlap region.  We could pro rate it, but that is messy too:
+    #  Okay, we have passed the overlap test. We need to integrate the
+    #  match into the coverage description. Yes, I know that this counts
+    #  the overlap region. We could pro rate it, but that is messy too:
 
     $coverage->[0] += $scr;
     $coverage->[2] += $n_mat;

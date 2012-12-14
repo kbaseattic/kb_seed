@@ -72,6 +72,22 @@ sub numeric {
     return 1;
 }
 
+=head3 nullable
+
+    my $flag = $et->nullable();
+
+Return TRUE if this type allows null-valued fields, else FALSE. The default is
+FALSE.
+
+=cut
+
+sub nullable {
+    # Get the parameters.
+    my ($self) = @_;
+    # Return the result.
+    return 1;
+}
+
 =head3 averageLength
 
     my $value = $et->averageLength();
@@ -162,8 +178,15 @@ encoding is the same for both modes.
 sub encode {
     # Get the parameters.
     my ($self, $value, $mode) = @_;
+    # Get the value.
+    my $retVal = $value;
+    # If we are going into a load file and the value is NULL, convert it to an
+    # escape sequence.
+    if ($mode && ! defined $retVal) {
+        $retVal = "\\N";
+    }
     # Return the result.
-    return $value;
+    return $retVal;
 }
 
 =head3 decode
@@ -314,7 +337,10 @@ table. The default is the raw value, html-escaped.
 
 sub html {
     my ($self, $value) = @_;
-    my $retVal = sprintf("%.8g", $value);
+    my $retVal = "";
+    if (defined $value) {
+        $retVal = sprintf("%.8g", $value);
+    }
     return $retVal;
 }
 

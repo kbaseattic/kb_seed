@@ -54,6 +54,11 @@ Recreate the subsystem tables before loading.
 URL to use for the ID server. The default uses the standard KBase ID
 server.
 
+=item missing
+
+If specified, only subsystems not already in the database will be
+loaded.
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -62,14 +67,15 @@ C<MOL>, ...) and the name of the directory containing the subsystem data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $clear, $id_server_url);
+my ($recursive, $clear, $id_server_url, $missing);
 
 $id_server_url = "http://bio-data-1.mcs.anl.gov:8080/services/idserver";
 
 # Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "clear" => \$clear, "idserver=s" => \$id_server_url);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "clear" => \$clear,
+    "idserver=s" => \$id_server_url, "missing" => \$missing);
 if (! $cdmi) {
     print "usage: CDMILoadSubsystem [options] source subsystemDirectory\n";
 } else {
@@ -100,7 +106,7 @@ if (! $cdmi) {
         # Are we in recursive mode?
         if (! $recursive) {
             # No. Load the one subsystem.
-            LoadSubsystem($loader, $source, $subsystemDirectory);
+            LoadSubsystem($loader, $source, $subsystemDirectory, $missing);
         } else {
             # Yes. Get the subdirectories.
             opendir(TMP, $subsystemDirectory) || die "Could not open $subsystemDirectory.\n";
@@ -110,7 +116,7 @@ if (! $cdmi) {
             for my $subDir (sort @subDirs) {
                 my $fullPath = "$subsystemDirectory/$subDir";
                 if (-d $fullPath) {
-                    LoadSubsystem($loader, $source, $fullPath);
+                    LoadSubsystem($loader, $source, $fullPath, $missing);
                 }
             }
         }
@@ -143,6 +149,12 @@ Directory containing the subsystem files. The lowest-level component of
 the directory name (with any underscores translated to spaces) is the
 subsystem name.
 
+=item missing
+
+If TRUE, then the subsystem will be skipped if it is already in the
+database. The default is FALSE, in which case the subsystem will be
+deleted and reloaded.
+
 =back
 
 =cut
@@ -163,19 +175,42 @@ sub LoadSubsystem {
     }
     $subsysName =~ tr/_/ /;
     print "Subsystem name is $subsysName.\n";
-    # Delete any existing copy.
-    DeleteSubsystem($loader, $subsysName);
-    # Initialize the relation loaders.
-    $loader->SetRelations(qw(IsImplementedBy SSRow Uses IsRowOf SSCell
-            IsRoleOf Contains));
-    # Create the subsystem record and the surrounding roles and variants.
-    my $varHash = CreateSubsystem($loader, $source, $subsysName,
-            $subsystemDirectory);
-    # Process the spreadsheet to connect the subsystems to the features.
-    ParseSpreadsheet($loader, $source, $subsysName, $varHash,
-            "$subsystemDirectory/spreadsheet");
-    # Unspool the relation loaders.
-    $loader->LoadRelations();
+    # Get access to the database.
+    my $cdmi = $loader->cdmi;
+    # We may decide to skip this subsystem. If we decide to load it,
+    # we will set this value to TRUE.
+    my $loadThis;
+    # Check for an existing copy of the subsystem.
+    if (! $cdmi->Exists(Subsystem => $subsysName)) {
+        # No existing copy. Do the load.
+        $loadThis = 1;
+    } else {
+        # We have an existing copy. Are we in missing-only mode?
+        if ($missing) {
+            # Yes. Skip this subsystem.
+            print "$subsysName already exists. Skipped.\n";
+            $loader->stats->Add(skippedSubsystem => 1);
+        } else {
+            # No. Delete the existing copy.
+            DeleteSubsystem($loader, $subsysName);
+            # Go ahead and load it.
+            $loadThis = 1;
+        }
+    }
+    # Only proceed if we approve this load.
+    if ($loadThis) {
+        # Initialize the relation loaders.
+        $loader->SetRelations(qw(IsImplementedBy SSRow Uses IsRowOf SSCell
+                IsRoleOf Contains));
+        # Create the subsystem record and the surrounding roles and variants.
+        my $varHash = CreateSubsystem($loader, $source, $subsysName,
+                $subsystemDirectory);
+        # Process the spreadsheet to connect the subsystems to the features.
+        ParseSpreadsheet($loader, $source, $subsysName, $varHash,
+                "$subsystemDirectory/spreadsheet");
+        # Unspool the relation loaders.
+        $loader->LoadRelations();
+    }
 }
 
 =head3 DeleteSubsystem
@@ -201,7 +236,15 @@ ID of the subsystem to delete.
 =cut
 
 sub DeleteSubsystem {
-    ##TODO
+    # Get the parameters.
+    my ($loader, $subsysID) = @_;
+    # Get the CDMI object.
+    my $cdmi = $loader->cdmi;
+    # Delete the subsystem
+    print "Deleting old copy of $subsysID.\n";
+    my $stats = $cdmi->Delete(Subsystem => $subsysID);
+    # Roll up the statisics.
+    $loader->stats->Accumulate($stats);
 }
 
 =head3 CreateSubsystem
@@ -568,14 +611,18 @@ sub ParseSpreadsheet {
                                             push @pegs, "fig|$genomeID.peg.$pegNum";
                                         }
                                     }
-                                    my $pegMap = $loader->FindKBaseIDs('Feature', \@pegs);
+                                    my $marks = join(", ", map { "?" } @pegs);
+                                    my %pegMap = map { $_->[0] => $_->[1] } $cdmi->GetAll("Feature IsOwnedBy",
+                                         "Feature(source-id) IN ($marks) AND IsOwnedBy(to-link) = ?",
+                                         [@pegs, $genomeKBID],
+                                         [qw(Feature(source-id) Feature(id))]);
                                     for my $peg (@pegs) {
-                                        my $kbPeg = $pegMap->{$peg};
+                                        my $kbPeg = $pegMap{$peg};
                                         if (! $kbPeg) {
                                             $stats->Add(pegNotFound => 1);
                                         } else {
                                             $loader->InsertObject('Contains', from_link => $cellID,
-                                                               to_link => $pegMap->{$peg});
+                                                               to_link => $kbPeg);
                                             $stats->Add(subsysPeg => 1);
                                         }
                                     }

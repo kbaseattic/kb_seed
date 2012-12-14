@@ -21,6 +21,7 @@ use strict;
 use SeedUtils;
 use Bio::KBase::CDMI::CDMI;
 use Bio::KBase::CDMI::CDMILoader;
+use Getopt::Long;
 use IDServerAPIClient;
 use MD5Computer;
 use BasicLocation;
@@ -187,6 +188,10 @@ before loading.
 URL to use for the ID server. The default uses the standard KBase ID
 server.
 
+=item validate
+
+Validate the input files without loading them.
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -195,20 +200,32 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url);
+my ($recursive, $newOnly, $clear, $id_server_url, $validate);
 # Turn off buffering for progress messages.
 $| = 1;
-if ($ENV{LC_ALL} ne 'C') {
-    die "You must set LC_ALL=C in your environment to run this program.\n";
+# Connect to the database. If we are validating, we parse the command
+# line but don't connect. Note we create a hash of the Getopt::Long
+# parameters that we can pass into whichever method we use, and we check
+# for the validate parameter first. This is complicated enough that I'm
+# starting to question the wisdom of the whole validate mode instead of
+# a separate validator.
+$validate = grep { $_ =~ /^--?validate$/ } @ARGV;
+my ($rc, $cdmi);
+my %parms = ("recursive" => \$recursive, "newOnly" => \$newOnly,
+        "clear" => \$clear, "idserver=s" => \$id_server_url, "validate" => \$validate);
+if ($validate) {
+    $rc = GetOptions(%parms);
+} else {
+    $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(%parms);
+    $rc = $cdmi;
+    if ($rc) {
+        print "Connected to CDMI.\n";
+    }
 }
-# Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url);
-if (! $cdmi) {
+if (! $rc) {
     print "usage: CDMILoadGenome [options] source genomeDirectory\n";
     exit;
 }
-print "Connected to CDMI.\n";
 # Get the source and genome directory.
     my ($source, $genomeDirectory) = @ARGV;
     if (! $source) {
@@ -218,7 +235,6 @@ print "Connected to CDMI.\n";
     } elsif (! -d $genomeDirectory) {
         die "Genome directory $genomeDirectory not found.\n";
     } else {
-
         # Connect to the KBID server and create the loader utility object.
         my $id_server;
         if ($id_server_url) {
@@ -243,7 +259,7 @@ print "Connected to CDMI.\n";
         # Are we in recursive mode?
         if (! $recursive) {
             # No. Load the one genome.
-            LoadGenome($loader, $genomeDirectory);
+            LoadGenome($loader, $genomeDirectory, $validate);
         } else {
             # Yes. Get the subdirectories.
             opendir(TMP, $genomeDirectory) || die "Could not open $genomeDirectory.\n";
@@ -253,7 +269,7 @@ print "Connected to CDMI.\n";
             for my $subDir (@subDirs) {
                 my $fullPath = "$genomeDirectory/$subDir";
                 if (-d $fullPath) {
-                    LoadGenome($loader, $fullPath);
+                    LoadGenome($loader, $fullPath, $validate);
                 }
             }
         }
@@ -266,7 +282,7 @@ print "Connected to CDMI.\n";
 
 =head3 LoadGenome
 
-    LoadGenome($loader, $genomeDirectory);
+    LoadGenome($loader, $genomeDirectory, $validate);
 
 Load a single genome from the specified genome directory.
 
@@ -280,13 +296,17 @@ L<Bio::KBase::CDMI::CDMILoader> object to help manage the load.
 
 Directory containing the genome load files.
 
+=item validate
+
+If TRUE, the input files will be validated but not loaded.
+
 =back
 
 =cut
 
 sub LoadGenome {
     # Get the parameters.
-    my ($loader, $genomeDirectory) = @_;
+    my ($loader, $genomeDirectory, $validate) = @_;
     # Indicate our progress.
     print "Processing $genomeDirectory.\n";
     # Compute the genome ID from the directory name.
@@ -303,40 +323,54 @@ sub LoadGenome {
     if (! $scientificName) {
         die "No scientific name found in metadata for $genomeDirectory.\n";
     }
-    # Get the KBID for this genome.
-    my $genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
-    # If this genome exists and we are only loading new genomes, skip it.
-    if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
-        $loader->stats->Add(genomeSkipped => 1);
-        print "Genome skipped: already in database.\n";
+    # Ensure the genome has data.
+    my $contigName = $loader->genome_load_file_name($genomeDirectory, "contigs.fa");
+    if (! -s $contigName) {
+        print "Genome skipped: no contig data.\n";
     } else {
-        # Delete any existing data for this genome.
-        DeleteGenome($loader, $genomeID);
-        # Ensure the genome has data.
-        my $contigName = $loader->genome_load_file_name($genomeDirectory, "contigs.fa");
-        if (! -s $contigName) {
-            print "Genome skipped: no contig data.\n";
-        } else {
-            # Initialize the relation loaders. The order of the relations is
-            # important, since it determines whether or not the DeleteGenome
-            # method will work properly.
-            $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
-                    IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
-                    IsProteinFor Encompasses));
-            # Load the contigs.
+        # This will be set to FALSE if this genome cannot be processed.
+        my $processing = 1;
+        # The KBase genome ID will be put in here.
+        my $genomeID;
+        # If we are not validating, we must prepare the database for
+        # loading this genome.
+        if (! $validate) {
+            # Get the KBID for this genome.
+            $genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
+            # If this genome exists and we are only loading new genomes, skip it.
+            if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
+                $loader->stats->Add(genomeSkipped => 1);
+                print "Genome skipped: already in database.\n";
+                $processing = 0;
+            } else {
+                # Delete any existing data for this genome.
+                DeleteGenome($loader, $genomeID);
+                # Initialize the relation loaders. The order of the relations is
+                # important, since it determines whether or not the DeleteGenome
+                # method will work properly.
+                $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
+                        IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
+                        IsProteinFor Encompasses));
+            }
+        }
+        if ($processing) {
+            # Process the contigs.
             my ($contigMap, $dnaSize, $gcContent, $md5) = LoadContigs($loader,
-                    $genomeID, $genomeOriginalID, $contigName);
-            # Load the features.
+                    $genomeID, $genomeOriginalID, $contigName, $validate);
+            # Process the features.
             my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader, $genomeID,
-                    $genomeDirectory, $contigMap);
-            # Load the proteins.
+                    $genomeDirectory, $contigMap, $validate);
+            # Process the proteins.
             my $protName = $loader->genome_load_file_name($genomeDirectory, "proteins.fa");
-            LoadProteins($loader, $id_mapping, $protName);
-            # Unspool the relation loaders.
-            $loader->LoadRelations();
-            # Create the genome record.
-            CreateGenome($loader, $source, $genomeID, $genomeOriginalID, $metaHash,
-                    $dnaSize, $gcContent, $md5, $pegs, $rnas, scalar(keys %$contigMap));
+            LoadProteins($loader, $id_mapping, $protName, $validate);
+            # If we are loading for real, store everything in the database here.
+            if (! $validate) {
+                # Unspool the relation loaders.
+                $loader->LoadRelations();
+                # Create the genome record.
+                CreateGenome($loader, $source, $genomeID, $genomeOriginalID, $metaHash,
+                        $dnaSize, $gcContent, $md5, $pegs, $rnas, scalar(keys %$contigMap));
+            }
         }
     }
 }
@@ -406,7 +440,7 @@ sub DeleteGenome {
 
     my ($contigMap, $dnaSize, $gcContent, $md5) =
         LoadContigs($loader, $genomeID, $genomeOriginalID,
-        $contigFastaFile);
+        $contigFastaFile, $validate);
 
 Load the contigs for the specified genome into the database.
 
@@ -428,6 +462,10 @@ ID of the genome in the original database.
 
 Name of the FASTA file containing the DNA for the contigs.
 
+=item validate
+
+If TRUE, the input files will be validated but not loaded.
+
 =item RETURN
 
 Returns a list with four elements: (0) a reference to a hash mapping
@@ -441,7 +479,7 @@ the contigs put together, (2) the percent GC content in the DNA, and
 
 sub LoadContigs {
     # Get the parameters.
-    my ($loader, $genomeID, $genomeOriginalID, $contigFastaFile) = @_;
+    my ($loader, $genomeID, $genomeOriginalID, $contigFastaFile, $validate) = @_;
     # Get the CDMI database object.
     my $cdmi = $loader->cdmi;
     # Get the statistics object.
@@ -456,7 +494,7 @@ sub LoadContigs {
     # Open the contig FASTA file.
     open(my $ih, "<$contigFastaFile") || die "Could not open contig file: $!\n";
     # Get the length of a DNA segment.
-    my $segmentLength = $cdmi->TuningParameter('maxSequenceLength');
+    my $segmentLength = ($validate ? 10000 : $cdmi->TuningParameter('maxSequenceLength'));
     # Each contig is separated into a real contig that belongs to the
     # genome and a contig sequence that represents the DNA. Since
     # contig sequences are shared, we cache each contig in memory
@@ -489,43 +527,50 @@ sub LoadContigs {
             undef $sequence;
             # Compute the contig's MD5.
             my $contigMD5 = $md5Object->ProcessContig($foreignID, \@chunks);
-            my $contigKBID = $loader->GetKBaseID("$genomeID.c", 'Contig',
-                    $foreignID);
-            $contigMap->{$foreignID} = $contigKBID;
-            # We now have all the information we need to load the contig
-            # into the database. First, check to see if the sequence is
-            # already in the database.
-            my $contigSeqData = $cdmi->GetEntity(ContigSequence => $contigMD5);
-            if (defined $contigSeqData) {
-                # It is, so we don't have to create it.
-                $stats->Add(contigReused => 1);
+            # If we are validating, we note the contig ID in the map and we're
+            # done.
+            if ($validate) {
+                $contigMap->{$foreignID} = 1;
             } else {
-                # Here we have to create the sequence.
-                $stats->Add(contigFresh => 1);
-                $cdmi->InsertObject('ContigSequence', id => $contigMD5,
-                    'length' => $contigLen);
-                # Loop through the chunks, connecting them to the contig.
-                for (my $i = 0; $i < @chunks; $i++) {
-                    # We have to create the key for this chunk. It's the
-                    # contig key followed by the ordinal number padded to
-                    # seven digits.
-                    my $chunkID = $contigMD5 . ":" . ("0" x (7 - length($i))) . $i;
-                    # Create the chunk and connect it to the sequence.
-                    $cdmi->InsertObject('HasSection', from_link => $contigMD5,
-                            to_link => $chunkID);
-                    $cdmi->InsertObject('ContigChunk', id => $chunkID,
-                        sequence => $chunks[$i]);
-                    $stats->Add(chunkInserted => 1);
+                # Otherwise, we need to load the contig into the database.
+                my $contigKBID = $loader->GetKBaseID("$genomeID.c", 'Contig',
+                        $foreignID);
+                $contigMap->{$foreignID} = $contigKBID;
+                # We now have all the information we need to load the contig
+                # into the database. First, check to see if the sequence is
+                # already in the database.
+                my $contigSeqData = $cdmi->GetEntity(ContigSequence => $contigMD5);
+                if (defined $contigSeqData) {
+                    # It is, so we don't have to create it.
+                    $stats->Add(contigReused => 1);
+                } else {
+                    # Here we have to create the sequence.
+                    $stats->Add(contigFresh => 1);
+                    $cdmi->InsertObject('ContigSequence', id => $contigMD5,
+                        'length' => $contigLen);
+                    # Loop through the chunks, connecting them to the contig.
+                    for (my $i = 0; $i < @chunks; $i++) {
+                        # We have to create the key for this chunk. It's the
+                        # contig key followed by the ordinal number padded to
+                        # seven digits.
+                        my $chunkID = $contigMD5 . ":" . ("0" x (7 - length($i))) . $i;
+                        # Create the chunk and connect it to the sequence.
+                        $cdmi->InsertObject('HasSection', from_link => $contigMD5,
+                                to_link => $chunkID);
+                        $cdmi->InsertObject('ContigChunk', id => $chunkID,
+                            sequence => $chunks[$i]);
+                        $stats->Add(chunkInserted => 1);
+                    }
                 }
+                # Now the sequence is in the database. Add the contig and
+                # connect it to the genome.
+                $loader->InsertObject('IsComposedOf', from_link => $genomeID,
+                        to_link => $contigKBID);
+                $loader->InsertObject('Contig', id => $contigKBID,
+                        source_id => $foreignID);
+                $loader->InsertObject('IsSequenceOf', from_link => $contigMD5,
+                        to_link => $contigKBID);
             }
-            # Now the sequence is in the database. Add the contig and
-            # connect it to the genome.
-            $loader->InsertObject('IsComposedOf', from_link => $genomeID,
-                    to_link => $contigKBID);
-            $loader->InsertObject('Contig', id => $contigKBID,
-                    source_id => $foreignID);
-            $loader->InsertObject('IsSequenceOf', from_link => $contigMD5,
-                    to_link => $contigKBID);
             $stats->Add(contigs => 1);
             # Set up for the next contig.
             $foreignID = $nextID;
@@ -543,7 +588,7 @@ sub LoadContigs {
 =head3 LoadFeatures
 
     my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader,
-            $genomeID, $genomeDirectory, $contigMap);
+            $genomeID, $genomeDirectory, $contigMap, $validate);
 
 Load the genome's features into the database from the feature files.
 The feature information is kept in two tab-delimited files-- one
@@ -569,6 +614,10 @@ Directory containing the feature files-- C<features.tab> and C<functions.tab>.
 Reference to a hash that maps each contig's foreign identifier to
 its KBase ID.
 
+=item validate
+
+If TRUE, the input files will be validated but not loaded.
+
 =item RETURN
 
 Returns a list containing (0) the number of protein-encoding genes
@@ -581,7 +630,7 @@ reference to a hash mapping foreign feature IDs to KBase IDs.
 
 sub LoadFeatures {
     # Get the parameters.
-    my ($loader, $genomeID, $genomeDirectory, $contigMap) = @_;
+    my ($loader, $genomeID, $genomeDirectory, $contigMap, $validate) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Initialize the return variables.
@@ -594,66 +643,42 @@ sub LoadFeatures {
     my $aliasMap = {};
     # We'll track the parents in here.
     my %parentMap;
-    # To pull this off, we need to read two files in parallel-- one
+    # To pull this off, we need to read two parallel files-- one
     # containing the locations and the feature types, and one containing
     # the assignments. Both files have the feature ID in the first
-    # column, so we sort them and use standard merge logic.
-    my $featFileName = $loader->genome_load_file_name($genomeDirectory, 'features.tab');
+    # column. First, we read the function file into memory.
+    my %funcs;
     my $funcFileName = $loader->genome_load_file_name($genomeDirectory, 'functions.tab');
-    open(my $feath, "sort -k 1,1 \"$featFileName\" |") || die "Could not open features file: $!\n";
+    if (! -f $funcFileName) {
+        print "Functions file not found. No functions will be processed.\n";
+    } else {
+        open(my $funch, "<$funcFileName") || die "Could not open functions file: $!\n";
+        while (! eof $funch) {
+            my ($fid2, $function) = $loader->GetLine($funch);
+            $funcs{$fid2} = $function;
+            $stats->Add(functionLines => 1);
+        }
+        close $funch;
+    }
+    # Now we open the feature file for input. This will drive the main loop.
+    my $featFileName = $loader->genome_load_file_name($genomeDirectory, 'features.tab');
+    open(my $feath, "<$featFileName") || die "Could not open features file: $!\n";
     my ($fid1, $type, $locations, $parent, $subset, @aliases) = $loader->GetLine($feath);
     $fidCount++;
-    open(my $funch, "sort -k 1,1 \"$funcFileName\" |") || die "Could not open functions file: $!\n";
-    $stats->Add(functionLines => 1);
-    my ($fid2, $function) = $loader->GetLine($funch);
-
-    # Loop through the files. Note that it is acceptable for a feature to
-    # be without an assignment, but an assignment without a location and a
-    # type is an error and is discarded. Thus, the key file of interest is
-    # the feature file, represented by $fid1. We will process the features
+    # Loop through the file. Note that it is acceptable for a feature to
+    # be without an assignment. We will process the features
     # in batches of 1000 at a time. Each batch is formed into a hash
     # mapping feature IDs to 3-tuples (type, location, function). We
     # then get the KBase IDs for all the features and put the batch
     # into the database.
-
     my %fidBatch;
     my $batchSize = 0;
     while (defined $fid1) {
-        # Get rid of any function file entries that did not have matching
-        # feature file entries.
-        while (defined $fid2 && $fid2 lt $fid1) {
-            ($fid2, $function) = $loader->GetLine($funch);
-            $stats->Add(orphanFunction => 1);
-            $stats->Add(functionLines => 1);
-        }
-        # Compute the function for this feature. It's either the current
-        # function file entry or an empty string. If it's the current
-        # function file entry we advance the function file for the next
-        # loop iteration.
-        my $fidFunction = "";
-        if (defined $fid2 && $fid2 eq $fid1) {
-            # We take care to insure the function exists. Some
-            # function file entries have only a feature ID. If this
-            # is the case, we want to stick with the null string currently
-            # in there.
-            if (defined $function) {
-                $fidFunction = $function;
-            }
-            # Advance the function file to the next entry. Due to a bug
-            # in the sort, we discard duplicates. These are generated
-            # by the bug.
-            my $newFid2;
-            ($newFid2, $function) = $loader->GetLine($funch);
-            while (defined $newFid2 && $newFid2 eq $fid2) {
-                ($newFid2, $function) = $loader->GetLine($funch);
-                $stats->Add(dupFuncLine => 1);
-            }
-            $stats->Add(functionLines => 1);
-            $fid2 = $newFid2;
-        }
+        # Compute the function for this feature.
+        my $fidFunction = $funcs{$fid1} || "";
         # If this feature has aliases, save them.
         if (@aliases) {
-            $aliasMap->{$fid1} = \@aliases;
+            $aliasMap->{$fid1} = [@aliases];
             $stats->Add(aliasesFound => 1);
             $stats->Add(aliasIn => scalar(@aliases));
         }
@@ -669,7 +694,7 @@ sub LoadFeatures {
         if ($batchSize >= 1000) {
             # Yes. Process It.
             ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $genomeID,
-                    \%fidBatch, $contigMap, $aliasMap);
+                    \%fidBatch, $contigMap, $aliasMap, $validate);
             # Start the next one.
             %fidBatch = ();
             $batchSize = 0;
@@ -681,13 +706,7 @@ sub LoadFeatures {
     # Process the residual batch.
     if ($batchSize > 0) {
         ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas, $genomeID,
-                \%fidBatch, $contigMap, $aliasMap);
-    }
-    # Finish out the function file. We only do this to get the statistics.
-    while (defined $fid2) {
-        ($fid2, $function) = $loader->GetLine($funch);
-        $stats->Add(orphanFunction => 1);
-        $stats->Add(functionLines => 1);
+                \%fidBatch, $contigMap, $aliasMap, $validate);
     }
     # Process the parents.
     for my $child (keys %parentMap) {
@@ -695,8 +714,9 @@ sub LoadFeatures {
         # Insure the parent ID is valid.
         if (! $id_mapping->{$parent}) {
             $stats->Add(missingParent => 1);
-        } else {
-            # Store it in the Encompasses table.
+            print "Feature parent $parent not found.\n";
+        } elsif (! $validate) {
+            # If we are loading for real, store it in the Encompasses table.
             $loader->InsertObject('Encompasses', from_link => $id_mapping->{$child},
                     to_link => $id_mapping->{$parent});
         }
@@ -712,7 +732,8 @@ sub LoadFeatures {
 =head3 ProcessFeatureBatch
 
     ProcessFeatureBatch($loader, $id_mapping, \$pegs, \$rnas,
-                        $genomeID, \%fidBatch, \%contigMap, \%aliasMap);
+                        $genomeID, \%fidBatch, \%contigMap,
+                        \%aliasMap, $validate);
 
 Load a batch of features into the database. Features are processed
 in batches to reduce the overhead for requesting feature IDs from
@@ -756,6 +777,10 @@ its KBase ID.
 Reference to a hash that maps each feature's foreign identifier to
 a list of aliases (if any).
 
+=item validate
+
+If TRUE, the input files will be validated but not loaded.
+
 =back
 
 =cut
@@ -763,29 +788,38 @@ a list of aliases (if any).
 sub ProcessFeatureBatch {
     # Get the parameters.
     my ($loader, $id_mapping, $pegs, $rnas, $genomeID,
-            $fidBatch, $contigMap, $aliasMap) = @_;
+            $fidBatch, $contigMap, $aliasMap, $validate) = @_;
     # Get the CDMI database.
     my $cdmi = $loader->cdmi;
     # Get the statistics object.
     my $stats = $loader->stats;
     $stats->Add(featureBatches => 1);
     # Compute the maximum location segment length.
-    my $segmentLength = $cdmi->TuningParameter('maxLocationLength');
+    my $segmentLength = ($validate ? 0 : $cdmi->TuningParameter('maxLocationLength'));
     # Get all the KBase IDs for the features in this batch.
     my @fids = keys %$fidBatch;
-
-    #
-    # We need to split the features by type in order to have the correct prefix.
-    #
+    # Split all the features by type. We need to do this to get the
+    # correct prefixes.
     my %typemap;
     for my $fid (@fids) {
         my($type) = $fidBatch->{$fid}->[0];
         push(@{$typemap{$type}}, $fid);
     }
-    for my $type (keys %typemap) {
-        my $h = $loader->GetKBaseIDs("$genomeID.$type", 'Feature',
-               $typemap{$type});
-        $id_mapping->{$_} = $h->{$_} foreach keys %$h;
+    if ($validate) {
+        # If we are validating, we simply insert the IDs into the
+        # ID map with a valud of 1.
+        for my $type (keys %typemap) {
+            for my $fid (@{$typemap{$type}}) {
+                $id_mapping->{$fid} = 1;
+            }
+        }
+    } else {
+        # If we are loading for real, we call the ID server.
+        for my $type (keys %typemap) {
+            my $h = $loader->GetKBaseIDs("$genomeID.$type", 'Feature',
+                   $typemap{$type});
+            $id_mapping->{$_} = $h->{$_} foreach keys %$h;
+        }
     }
     # Now we have all the KBase IDs we need. Loop through the batch.
     for my $fid (@fids) {
@@ -811,20 +845,23 @@ sub ProcessFeatureBatch {
             print "Zero-length feature $fid found.\n";
             $stats->Add(nullFeature => 1);
         }
-        # Create the feature record.
-        $loader->InsertObject('IsOwnerOf', from_link => $genomeID,
-                to_link => $fidKBID);
-        $loader->InsertObject('Feature', id => $fidKBID,
-                feature_type => $type, function => $function,
-                sequence_length => $len, source_id => $fid);
-        $stats->Add(features => 1);
-        # Check for aliases.
-        my $aliases = $aliasMap->{$fid};
-        if (defined $aliases) {
-            for my $alias (@$aliases) {
-                $loader->InsertObject('FeatureAlias', id => $fidKBID,
-                        alias => $alias);
-                $stats->Add(featureAlias => 1);
+        # If we are loading for real, create the feature record and
+        # check for aliases.
+        if (! $validate) {
+            $loader->InsertObject('IsOwnerOf', from_link => $genomeID,
+                    to_link => $fidKBID);
+            $loader->InsertObject('Feature', id => $fidKBID,
+                    feature_type => $type, function => $function,
+                    sequence_length => $len, source_id => $fid);
+            $stats->Add(features => 1);
+            # Check for aliases.
+            my $aliases = $aliasMap->{$fid};
+            if (defined $aliases) {
+                for my $alias (@$aliases) {
+                    $loader->InsertObject('FeatureAlias', id => $fidKBID,
+                            alias => $alias);
+                    $stats->Add(featureAlias => 1);
+                }
             }
         }
         # Count the feature type.
@@ -844,9 +881,9 @@ sub ProcessFeatureBatch {
         if ($badContig) {
             $stats->Add(badContigs => $badContig);
             $stats->Add(featureContigError => 1);
-        } else {
-            # Now we need to create the feature's location segments.
-            # This variable counts the segments created.
+        } elsif (! $validate) {
+            # If we are loading for real, we need to create the feature's
+            # location segments. This variable counts the segments created.
             my $locIndex = 0;
             # Loop through the sub-locations.
             for my $loc (@locs) {
@@ -865,7 +902,7 @@ sub ProcessFeatureBatch {
                 $loader->InsertObject('IsLocatedIn', from_link => $fidKBID,
                         to_link => $contigKBID, begin => $loc->Left,
                         dir => $loc->Dir, 'len' => $loc->Length,
-                        ordinal => $locIndex);
+                        ordinal => $locIndex++);
                 $stats->Add(locSegments => 1);
             }
         }
@@ -874,8 +911,9 @@ sub ProcessFeatureBatch {
         if (! defined $roles) {
             # Here the function does not appear to be a role.
             $stats->Add(roleRejected => 1);
-        } else {
-            # Here the function contained one or more roles. Count
+        } elsif (! $validate) {
+            # Here the function contained one or more roles and
+            # we are loading for real. We will also count
             # the number of roles that were rejected for being too
             # long.
             $stats->Add(rolesTooLong => $errors);
@@ -893,7 +931,7 @@ sub ProcessFeatureBatch {
 
 =head3 LoadProteins
 
-    LoadProteins($loader, $id_mapping, $proteinFastaFile);
+    LoadProteins($loader, $id_mapping, $proteinFastaFile, $validate);
 
 Load the protein translations into the database.
 
@@ -911,13 +949,17 @@ Reference to a hash mapping foreign feature IDs to KBase IDs.
 
 Name of a FASTA file containing the protein translation for each feature.
 
+=item validate
+
+If TRUE, the input files will be validated but not loaded.
+
 =back
 
 =cut
 
 sub LoadProteins {
     # Get the parameters.
-    my ($loader, $id_mapping, $proteinFastaFile) = @_;
+    my ($loader, $id_mapping, $proteinFastaFile, $validate) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Ensure the protein file exists and is nonempty.
@@ -939,17 +981,22 @@ sub LoadProteins {
                 # Get this feature's protein.
                 my ($sequence, $nextFid, $comment) = $loader->ReadFastaRecord($ih);
                 $protCount++;
-                # Insure the protein sequence is in the database and get its
-                # ID.
-                my $protID = $loader->CheckProtein($sequence);
+                # The protein ID goes in here.
+                my $protID;
+                # If we are loading for real, we need to insure the protein
+                # sequence is in the database and get its ID.
+                if (! $validate) {
+                    $protID = $loader->CheckProtein($sequence);
+                }
                 # Look for the feature.
                 my $kbid = $id_mapping->{$fid};
                 if (! $kbid) {
                     # Not found, so we have an error.
                     print "Feature $fid for protein sequence not found.\n";
                     $stats->Add(proteinFeatureNotFound => 1);
-                } else {
-                    # Found, so we can connect the protein to the feature.
+                } elsif (! $validate) {
+                    # Found, and we are loading for real, so we can connect the
+                    # protein to the feature.
                     $loader->InsertObject('IsProteinFor', from_link => $protID,
                             to_link => $kbid);
                     $stats->Add(featureProtein => 1);

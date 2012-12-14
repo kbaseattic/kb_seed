@@ -37,7 +37,7 @@ sub new
      }
      $self->{ask_storage_dir} = $ask_storage_dir;
      $self->{count} = 0;
-    my $service_url = 'http://bio-data-1.mcs.anl.gov:5000';
+    my $service_url = 'http://ash.mcs.anl.gov:5050';
     my $invoc = Bio::KBase::InvocationService::Client->new($service_url);
     if (! $invoc) { print STDERR Service fail; exit }
      $self->{invoc} = $invoc;
@@ -57,7 +57,7 @@ sub new
 
 =head2 askKB
 
-  $return_1, $return_2 = $obj->askKB($session_id, $cwd, $query)
+  $return_1, $return_2 = $obj->askKB($session_id, $cwd, $query, $guid)
 
 =over 4
 
@@ -69,6 +69,7 @@ sub new
 $session_id is a session_id
 $cwd is a cwd
 $query is a query
+$guid is a string
 $return_1 is a type
 $return_2 is an answer
 session_id is a string
@@ -93,6 +94,7 @@ row is a reference to a list where each element is a string
 $session_id is a session_id
 $cwd is a cwd
 $query is a query
+$guid is a string
 $return_1 is a type
 $return_2 is an answer
 session_id is a string
@@ -124,12 +126,13 @@ row is a reference to a list where each element is a string
 sub askKB
 {
     my $self = shift;
-    my($session_id, $cwd, $query) = @_;
+    my($session_id, $cwd, $query, $guid) = @_;
 
     my @_bad_arguments;
     (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument \"session_id\" (value was \"$session_id\")");
     (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument \"cwd\" (value was \"$cwd\")");
     (!ref($query)) or push(@_bad_arguments, "Invalid type for argument \"query\" (value was \"$query\")");
+    (!ref($guid)) or push(@_bad_arguments, "Invalid type for argument \"guid\" (value was \"$guid\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to askKB:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -149,28 +152,30 @@ sub askKB
     my $userD = "$ask_storage/User/$session_id";
     my $prolog = "/home/overbeek/Ross/Prolog-KB/Grammar/kb_dcg"; 
     my $aliases;
-    if (! -d $userD) {
-        mkdir($userD);
-        $aliases = {};
-    } else {
-        $aliases = LoadFile("$userD/aliases");
 
-    }
+    #if (! -d $userD) {
+        #mkdir($userD);
+        #$aliases = {};
+    #} else {
+        #$aliases = LoadFile("$userD/aliases");
+#
+    #}
     my $state = { invoc => $invoc, session => $session_id, cwd => $cwd,  helpD => $helpD, aliases => $aliases, userD => $userD, prolog => $prolog };
 
 
     my $ret = &Cmd2HTML::process_string($query, $state);
-    print STDERR "RET\n";
-    print STDERR Dumper $ret;
+    #print STDERR "RET\n";
+    #print STDERR Dumper $ret;
     $return_1 = $ret->[0];
     $return_2 = $ret->[1];
-    print STDERR " RETURN1$return_1\n";;
-    print STDERR Dumper $return_1;
-    print STDERR Dumper $return_2;
+    #print STDERR " RETURN1$return_1\n";;
+    #print STDERR Dumper $return_1;
+    #print STDERR Dumper $return_2;
 
     
     DumpFile("$userD/last", $ret);
-    DumpFile("$userD/aliases", $aliases);
+    DumpFile("$userD/$guid", $ret);
+    #DumpFile("$userD/aliases", $aliases);
     #return $html;
     #END askKB
     my @_bad_returns;
@@ -189,7 +194,7 @@ sub askKB
 
 =head2 save
 
-  $obj->save($session_id, $cwd, $filename)
+  $obj->save($session_id, $cwd, $filename, $guid)
 
 =over 4
 
@@ -201,6 +206,7 @@ sub askKB
 $session_id is a session_id
 $cwd is a cwd
 $filename is a string
+$guid is a string
 session_id is a string
 cwd is a string
 
@@ -213,6 +219,7 @@ cwd is a string
 $session_id is a session_id
 $cwd is a cwd
 $filename is a string
+$guid is a string
 session_id is a string
 cwd is a string
 
@@ -232,12 +239,13 @@ cwd is a string
 sub save
 {
     my $self = shift;
-    my($session_id, $cwd, $filename) = @_;
+    my($session_id, $cwd, $filename, $guid) = @_;
 
     my @_bad_arguments;
     (!ref($session_id)) or push(@_bad_arguments, "Invalid type for argument \"session_id\" (value was \"$session_id\")");
     (!ref($cwd)) or push(@_bad_arguments, "Invalid type for argument \"cwd\" (value was \"$cwd\")");
     (!ref($filename)) or push(@_bad_arguments, "Invalid type for argument \"filename\" (value was \"$filename\")");
+    (!ref($guid)) or push(@_bad_arguments, "Invalid type for argument \"guid\" (value was \"$guid\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to save:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -249,7 +257,8 @@ sub save
     my $ask_storage = $self->{ask_storage_dir};
     my $invoc = $self->{invoc};
     my $userD = "$ask_storage/User/$session_id";
-    my $ret = LoadFile("$userD/last");
+    #print STDERR "SAVE!!! $ask_storage, $cwd, $filename, $guid, $userD\n";
+    my $ret = LoadFile("$userD/$guid");
     #print STDERR "SAVE ", Dumper $ret;
     my $type = $ret->[0];
     my $retH = $ret->[1];
@@ -260,6 +269,7 @@ sub save
                     $file .= join("\t", @$line);
                     $file .= "\n";
             }
+        print STDERR "PUT!!! $session_id, \n$file\n$filename, $cwd\n\n";
         $invoc->put_file($session_id, $filename, $file, $cwd);
     }
     if ($type eq 'Fasta File') {

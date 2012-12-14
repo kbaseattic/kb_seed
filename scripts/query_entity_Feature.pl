@@ -43,6 +43,8 @@ The Feature entity has the following relationship links:
 
 =item HasLevelsFrom ProbeSet
 
+=item ImplementsReaction ReactionInstance
+
 =item IsAnnotatedBy Annotation
 
 =item IsContainedIn SSCell

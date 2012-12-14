@@ -1,0 +1,2 @@
+server-test (was CDMI_APIClient) = Directory of scripts for the "well-trodden-path" with example data
+CDMI_EntityAPIClient.t = Basic test of all methods to see if they work

@@ -3925,7 +3925,7 @@ sub subsystems_to_genomes
     $return = {};
     my $kb = $self->{db};
     for my $subsystem (@$subsystems) {
-        my @genomes = $kb->GetAll('Describes Variant IsImplementedBy IsUsedBy', 'Describes(from_link) = ?', [$subsystem],
+        my @genomes = $kb->GetAll('Describes Variant IsImplementedBy SSRow IsUsedBy', 'Describes(from_link) = ?', [$subsystem],
             ['Variant(code)', 'IsUsedBy(to_link)']);
         $return->{$subsystem} = \@genomes;
     }
@@ -4999,21 +4999,16 @@ sub fids_to_feature_data
     my $targets = "(" . ('?,' x $n); chop $targets; $targets .= ')';
     my $fid_constraint       = "Feature(id) IN $targets";
     my $produces_constraint =  "Produces(from-link) IN $targets";
-    my $loc_constraint       = "IsLocatedIn(from-link) IN $targets";
     my %genome;
     my %function;
     my %len;
     my %publications;
     my %location;
-    my @locs = $kb->GetAll('IsLocatedIn',
-                          $loc_constraint,
-                          $fids,
-                          'IsLocatedIn(from-link) IsLocatedIn(to-link) IsLocatedIn(begin) IsLocatedIn(dir) IsLocatedIn(len) IsLocatedIn(ordinal)'
-                          );
-    foreach my $tuple (sort { ($a->[0] cmp $b->[0]) or ($a->[5] <=> $b->[5]) } @locs)
-    {
-        my($fid,$contig,$begin,$dir,$len) = @$tuple;
-        push(@{$location{$fid}},[$contig,$begin,$dir,$len]);
+    for my $fid (@$fids) {
+        my @locs = $kb->GetLocations($fid);
+        for my $loc (@locs) {
+            push @{$location{$fid}},[$loc->Contig, $loc->Begin, $loc->Dir, $loc->Len];
+        }
     }
 
     my @res = $kb->GetAll('Feature IsOwnedBy Genome',
@@ -6059,7 +6054,7 @@ sub external_ids_to_fids
 	my $alist = "(" . ('?,' x $n);
 	chop $alist;
 	$alist .= ")";
-	
+
 	my @result = $kb->GetAll("AssertsFunctionFor ProteinSequence IsProteinFor",
 				 "AssertsFunctionFor(external_id) IN $alist",
 				 $external_ids,
@@ -6073,7 +6068,7 @@ sub external_ids_to_fids
 		push(@{$return->{$orig}}, $fid);
 	    }
 	}
-    }	
+    }
     #END external_ids_to_fids
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
@@ -7935,9 +7930,9 @@ sub build_tree
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN build_tree
-    
+
     my $tree = AlignTree::make_tree($alignment, $build_tree_parms);
-    $return  = gjonewicklib::strNewickTree($tree);    
+    $return  = gjonewicklib::strNewickTree($tree);
 
     #END build_tree
     my @_bad_returns;

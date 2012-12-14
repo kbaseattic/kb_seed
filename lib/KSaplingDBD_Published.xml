@@ -1031,6 +1031,7 @@
         <RegionInfo name="Annotations" col="3" row="3" />
         <RegionInfo name="Expression" col="2" row="2" />
         <RegionInfo name="MicrobePheno" row="7" col="1" />
+        <RegionInfo name="Models" row="3" col="5" />
       </DisplayInfo>
       <Notes>A feature (sometimes also called a gene) is a part of a
       genome that is of special interest. Features may be spread across
@@ -1785,8 +1786,16 @@
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="ImplementsReaction" from="Feature" to="ReactionInstance"
+                  arity="MM" converse="ImplementedBasedOn">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Models" caption="Implements\nReaction" />
+      </DisplayInfo>
+      <Notes>This relationship connects features to reaction instances
+      that exist because the feature is included in a model.</Notes>
+    </Relationship>
     <Relationship name="Treed" from="Source" to="Tree" arity="1M"
-    			  converse="IsTreeFrom">
+                  converse="IsTreeFrom">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Treed" />
       </DisplayInfo>
@@ -1794,7 +1803,7 @@
       which it was generated.</Notes>
     </Relationship>
     <Relationship name="UsesCodons" from="Genome" to="CodonUsage" arity="1M"
-    			  converse="AreCodonsFor">
+                  converse="AreCodonsFor">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Uses\nCodons" />
       </DisplayInfo>

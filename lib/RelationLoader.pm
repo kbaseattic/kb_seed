@@ -37,6 +37,7 @@ sub load
     my($self, $dbh) = @_;
     $self->{fh}->close();
 #     print "Load $self->{file}\n";
+    chmod(0644, $self->{file});
     $dbh->load_table(file => $self->{file}, tbl => $self->{rel_name});
 }
 

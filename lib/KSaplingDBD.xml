@@ -272,10 +272,9 @@
         <Field name="source-id" type="string">
           <Notes>ID from the source of this location</Notes>
         </Field>
-        <Field name="hierarchy" type="int">
-          <Notes>a number indicating where this location occurs
-          in relation other locations in the cell. Zero indicates
-          extra-cellular.</Notes>
+        <Field name="abbr" type="int">
+          <Notes>an abbreviation (usually a single letter) for the
+          location.</Notes>
         </Field>
       </Fields>
     </Entity>
@@ -817,12 +816,12 @@
     </Entity>
     <Entity name="CodonUsage" keyType="string">
       <DisplayInfo theme="purple">
-        <RegionInfo name="Alignments" row="8" col="6" 
+        <RegionInfo name="Alignments" row="8" col="6"
         			caption="Codon Usage" />
       </DisplayInfo>
       <Notes>This entity contains information about the codon usage
       frequency in a particular genome with respect to a particular
-      type of analysis (e.g. high-expression genes, modal, mean, 
+      type of analysis (e.g. high-expression genes, modal, mean,
       etc.).</Notes>
       <Fields>
         <Field name="frequencies" type="long-string">
@@ -1032,6 +1031,7 @@
         <RegionInfo name="Annotations" col="3" row="3" />
         <RegionInfo name="Expression" col="2" row="2" />
         <RegionInfo name="MicrobePheno" row="7" col="1" />
+        <RegionInfo name="Models" row="3" col="5" />
       </DisplayInfo>
       <Notes>A feature (sometimes also called a gene) is a part of a
       genome that is of special interest. Features may be spread across
@@ -1611,7 +1611,7 @@
         <Field name="source-id" type="string">
           <Notes>The ID of the measurement used by the data source.</Notes>
         </Field>
-        <Field name="value" type="float">
+        <Field name="value" type="float" null="1">
           <Notes>The value of the measurement.</Notes>
         </Field>
         <Field name="mean" type="float">
@@ -1786,8 +1786,16 @@
     </Entity>
   </Entities>
   <Relationships>
+    <Relationship name="ImplementsReaction" from="Feature" to="ReactionInstance"
+                  arity="MM" converse="ImplementedBasedOn">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Models" caption="Implements\nReaction" />
+      </DisplayInfo>
+      <Notes>This relationship connects features to reaction instances
+      that exist because the feature is included in a model.</Notes>
+    </Relationship>
     <Relationship name="Treed" from="Source" to="Tree" arity="1M"
-    			  converse="IsTreeFrom">
+                  converse="IsTreeFrom">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Treed" />
       </DisplayInfo>
@@ -1795,7 +1803,7 @@
       which it was generated.</Notes>
     </Relationship>
     <Relationship name="UsesCodons" from="Genome" to="CodonUsage" arity="1M"
-    			  converse="AreCodonsFor">
+                  converse="AreCodonsFor">
       <DisplayInfo theme="purple">
         <RegionInfo name="Alignments" caption="Uses\nCodons" />
       </DisplayInfo>

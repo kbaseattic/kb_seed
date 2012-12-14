@@ -447,8 +447,8 @@ sub AsyncFcgiReq
     # requests. Currently these are only the blast-based assignment
     # calls using assign_function_to_prot.
     #
-    if ($function eq 'assign_function_to_prot' &&
-	$cgi->param('-assignToAll'))
+    if (($function eq 'assign_function_to_prot' && $cgi->param('-assignToAll')) ||
+	($function eq 'metabolic_reconstruction'))
     {
 	$publish_queue = "rpc_slow.$function";
     }

@@ -1,6 +1,9 @@
 TOP_DIR = ../..
 include $(TOP_DIR)/tools/Makefile.common
 
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET ?= /kb/deployment
+
 SRC_PERL = $(wildcard scripts/*.pl)
 BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
 
@@ -9,6 +12,8 @@ DEPLOY_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
 SERVER_MODULE = CDMI_API
 SERVICE = cdmi_api
 SERVICE_PORT = 7032
+
+CLIENT_TESTS = $(wildcard t/*.t)
 
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
@@ -23,13 +28,15 @@ all: bin
 
 bin: $(BIN_PERL)
 
-deploy: deploy-service
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-sphinx deploy-java
-deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc 
-#deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc deploy-java
+deploy: deploy-all
+deploy-all: deploy-client deploy-service
+deploy-client: deploy-libs deploy-scripts deploy-docs
 
-deploy-java: java-client
-	cp $(JARFILE) $(TARGET)/lib/.
+deploy-service: deploy-dir deploy-monit deploy-sphinx
+	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
+	chmod +x $(TARGET)/services/$(SERVICE)/start_service
+	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
+	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
@@ -45,18 +52,12 @@ deploy-sphinx:
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_sphinx
 	$(DEPLOY_RUNTIME)/bin/perl scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
 
-deploy-services:
-	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
-	chmod +x $(TARGET)/services/$(SERVICE)/start_service
-	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
-	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
-
 deploy-monit:
 	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
 
-deploy-doc:
-	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/CDMI_APIImpl.pm > doc/application_api.html
-	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/CDMI_EntityAPIImpl.pm > doc/er_api.html
+deploy-docs: deploy-dir
+	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/Bio/KBase/CDMI/CDMI_APIImpl.pm > doc/application_api.html
+	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
 
 java-client: java.out/built_flag
@@ -74,5 +75,25 @@ java.out/built_flag: lib/CDMI-API.spec lib/CDMI-EntityAPI.spec
 	cd java.out; find us -type f -name \*.class -print > tmp.files
 	cd java.out; $(JAR) cf $(JAR) @tmp.files
 	touch java.out/built_flag
+
+test: test-client 
+	echo "running client and script tests"
+
+# What does it mean to test a client. This is a test of a client
+# library. If it is a client-server module, then it should be
+# run against a running server. You can say that this also tests
+# the server, and I agree. You can add a test-server dependancy
+# to the test-client target if it makes sense to you. This test
+# example assumes there is already a tested running server.
+test-client:
+	# run each test
+	for t in $(CLIENT_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
 
 include $(TOP_DIR)/tools/Makefile.common.rules
