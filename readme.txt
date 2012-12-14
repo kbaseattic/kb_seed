@@ -14,4 +14,18 @@ compile_typespec \
         -py CDMI \
         CDMI-API.spec CDMI-EntityAPI.spec .
 
+This service uses the standard deploy.cfg configuration format:
+Example:
+[cdmi]
+DBD = /home/ubuntu/KSaplingDBD.xml
+dbName = experiment
+userData = root/
+dbhost = localhost
+dbms = mysql
+
+
+and invoke setting the KB_SERVICE_NAME variable to cdmi and the
+KB_DEPLOYMENT_CONFIG variable to the config file above you can
+override the various settings.
+
 
