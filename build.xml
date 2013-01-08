@@ -7,12 +7,18 @@
   <property name="src" 		location="src"/>
   <property name="build" 	location="build"/>
   <property name="dist" 	location="dist"/>
+  <property name="kb_top"	location="../.."/>
+  <property name="jar_file"	location="${dist}/lib/${app.name}.jar" />
 
   <path id="project.class.path">
     <fileset dir="..">
       <include name="*/dist/lib/*.jar"/>
+      <exclude name="${jar_file}"/>
     </fileset>
-    <pathelement path="${java.class.path}/"/>
+    <fileset dir="${kb_top}">
+      <include name="*/lib/*.jar"/>
+    </fileset>
+<!--    <pathelement path="${java.class.path}/"/> -->
   </path>
   
   <target name="init">

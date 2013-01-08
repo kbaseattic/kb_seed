@@ -22,11 +22,15 @@ TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --d
 	--define kb_service_port=$(SERVICE_PORT) --define kb_service_dir=$(SERVICE_DIR) \
 	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST)
 
-JARFILE = $(PWD)/lib/cdmi.jar
+JARFILE = $(PWD)/dist/lib/cdmi.jar
 
 all: bin
+#all: bin jar
 
 bin: $(BIN_PERL)
+
+jar: 
+	ant -Djar_file=$(JARFILE) -Dkb_top=$(KB_TOP) dist
 
 deploy: deploy-all
 deploy-all: deploy-client deploy-service
@@ -95,5 +99,8 @@ test-client:
 			fi \
 		fi \
 	done
+
+clean:
+	ant clean
 
 include $(TOP_DIR)/tools/Makefile.common.rules

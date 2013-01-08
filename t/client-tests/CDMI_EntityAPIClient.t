@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests=>636;
+use Test::More;
 use Data::Dumper;
 use Carp;
 use Bio::KBase::CDMI::Client;
