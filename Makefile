@@ -16,7 +16,7 @@ SERVICE_NAME_PY = cdmi
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVICE_PORT = 7032
 
-CLIENT_TESTS = $(wildcard t/*.t)
+CLIENT_TESTS = $(wildcard t/client-tests/*.t)
 
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
