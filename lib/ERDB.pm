@@ -3360,7 +3360,7 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode});
+                               style => $options{mode}, local => 'LOCAL');
     };
     if (!defined $rv) {
         $retVal->AddMessage($@) if ($@);
