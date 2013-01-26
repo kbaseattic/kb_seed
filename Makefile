@@ -72,15 +72,18 @@ compile-typespec:
 	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
 	touch lib/biokbase/$(SERVICE_NAME_PY)/__init__.py 
 	mkdir -p lib/javascript/$(SERVICE_NAME)
-		#-psgi $(SERVICE_PSGI_FILE) \ #psgi compilation doesn't work quite right at the moment, just use the old one
+		#-psgi $(SERVICE_PSGI_FILE) \ #psgi compilation for the cdmi_api doesn't work quite right at the moment, just use the old one
 	compile_typespec \
-		-impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)_EntityAPIImpl \
-		-service Bio::KBase::$(SERVICE_NAME)::Service \
-		-client Bio::KBase::$(SERVICE_NAME)::Client \
-		-py biokbase/$(SERVICE_NAME_PY)/client \
-		-js javascript/$(SERVICE_NAME)/Client \
+		--impl Bio::KBase::$(SERVICE_NAME)::%sImpl \
+		--service Bio::KBase::$(SERVICE_NAME)::Service \
+		--client Bio::KBase::$(SERVICE_NAME)::Client \
+		--py biokbase/$(SERVICE_NAME_PY)/client \
+		--js javascript/$(SERVICE_NAME)/Client \
 		$(SERVICE_NAME)-API.spec $(SERVICE_NAME)-EntityAPI.spec lib
 	rm -r Bio # For some strange reason, compile_typespec always creates this directory in the root dir!
+	-rm -r lib/$(SERVER_MODULE)Server.py
+	-rm -r lib/$(SERVER_MODULE)Impl.py
+	-rm -r lib/CDMI_EntityAPIImpl.py
 
 java-client: java.out/built_flag
 
