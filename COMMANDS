@@ -1,0 +1,7 @@
+#group-name	cs	Central Store Scripts
+#group-name	er	Entity Relationship Scripts
+#command-set	scripts/([a-z].*).pl	cs
+#command-set	scripts/(get_relationship.*).pl	er
+#command-set	scripts/(get_entity.*).pl	er
+#command-set	scripts/(all_entities.*).pl	er
+#command-set	scripts/(query_entity.*).pl	er
