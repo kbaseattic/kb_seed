@@ -236,6 +236,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 		print join("\t", $line, @$result) . "\n";
 	    }
 	}
+	else
+	{
+	    print STDERR $line, "\n";
+	}
     }
 }
 

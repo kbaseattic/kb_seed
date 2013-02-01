@@ -9,14 +9,17 @@ use Carp;
 
 =head1 get_relationship_IsLocusFor
 
-A feature is a set of DNA sequence fragments. Most features
-are a single contiquous fragment, so they are located in only one
-DNA sequence; however, fragments have a maximum length, so even a
-single contiguous feature may participate in this relationship
-multiple times. A few features belong to multiple DNA sequences. In
-that case, however, all the DNA sequences belong to the same genome.
-A DNA sequence itself will frequently have thousands of features
-connected to it.
+A feature is a set of DNA sequence fragments, the location of
+which are specified by the fields of this relationship. Most features
+are a single contiguous fragment, so they are located in only one
+DNA sequence; however, for search optimization reasons, fragments
+have a maximum length, so even a single contiguous feature may
+participate in this relationship multiple times. Thus, it is better
+to use the CDMI API methods to get feature positions and sequences
+as those methods rejoin the fragements for contiguous features. A few
+features belong to multiple DNA sequences. In that case, however, all
+the DNA sequences belong to the same genome. A DNA sequence itself
+will frequently have thousands of features connected to it.
 
 Example:
 
@@ -226,6 +229,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

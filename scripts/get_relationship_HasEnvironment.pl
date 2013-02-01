@@ -9,8 +9,8 @@ use Carp;
 
 =head1 get_relationship_HasEnvironment
 
-The HasEnvironment relationship describes the enviroment a
-subexperiment defined by Experimental unit was performed in.
+The IsContextOf relationship describes the enviroment a
+subexperiment defined by an ExperimentalUnit was performed in.
 
 Example:
 
@@ -77,7 +77,7 @@ strings. The following fields are available:
 
 =item description
 
-=item anaerobic
+=item oxygenConcentration
 
 =item pH
 
@@ -102,7 +102,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'source_id' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'temperature', 'description', 'anaerobic', 'pH', 'source_id' );
+my @all_to_fields = ( 'id', 'temperature', 'description', 'oxygenConcentration', 'pH', 'source_id' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -212,6 +212,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

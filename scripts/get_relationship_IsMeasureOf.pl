@@ -9,7 +9,7 @@ use Carp;
 
 =head1 get_relationship_IsMeasureOf
 
-The HasMeasurement relationship specifies a measurement
+The HasMeasurement relationship specifies a measurement(s)
 performed on a particular experimental unit.
 
 Example:
@@ -46,8 +46,6 @@ strings. The following fields are available:
 =over 4
 
 =item id
-
-=item timeSeries
 
 =item source_id
 
@@ -108,7 +106,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'timeSeries', 'source_id', 'value', 'mean', 'median', 'stddev', 'N', 'p_value', 'Z_score' );
+my @all_from_fields = ( 'id', 'source_id', 'value', 'mean', 'median', 'stddev', 'N', 'p_value', 'Z_score' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'source_id' );
 
@@ -220,6 +218,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

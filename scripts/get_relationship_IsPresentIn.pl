@@ -83,9 +83,7 @@ strings. The following fields are available:
 
 =item concentration
 
-=item maximum_flux
-
-=item minimum_flux
+=item units
 
 =back    
 
@@ -103,6 +101,12 @@ strings. The following fields are available:
 =item name
 
 =item is_minimal
+
+=item description
+
+=item solid
+
+=item is_defined
 
 =item source_id
 
@@ -126,8 +130,8 @@ use Getopt::Long;
 #Default fields
  
 my @all_from_fields = ( 'id', 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'maximum_flux', 'minimum_flux' );
-my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'units' );
+my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -237,6 +241,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

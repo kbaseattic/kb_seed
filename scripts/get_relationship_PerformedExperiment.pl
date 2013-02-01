@@ -10,7 +10,7 @@ use Carp;
 =head1 get_relationship_PerformedExperiment
 
 Denotes that a Person was associated with a
-PhenotypeExperiment in some role.
+Experiment in some role.
 
 Example:
 
@@ -76,20 +76,22 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the PhenotypeExperiment entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the ExperimentMeta entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
+=item title
+
 =item description
 
 =item source_id
 
-=item dateUploaded
+=item startDate
 
-=item metadata
+=item comments
 
 =back    
 
@@ -110,7 +112,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'firstName', 'lastName', 'contactEmail', 'institution', 'source_id' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'role' );
-my @all_to_fields = ( 'id', 'description', 'source_id', 'dateUploaded', 'metadata' );
+my @all_to_fields = ( 'id', 'title', 'description', 'source_id', 'startDate', 'comments' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -220,6 +222,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

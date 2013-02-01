@@ -36,7 +36,7 @@ The Person entity has the following relationship links:
 
 =over 4
     
-=item PerformedExperiment PhenotypeExperiment
+=item PerformedExperiment ExperimentMeta
 
 
 =back

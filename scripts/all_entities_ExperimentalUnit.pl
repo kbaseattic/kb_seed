@@ -29,13 +29,17 @@ The ExperimentalUnit entity has the following relationship links:
 
 =over 4
     
+=item GroupedBy ExperimentalUnitGroup
+
 =item HasEnvironment Environment
 
 =item HasMeasurement Measurement
 
 =item IncludesStrain Strain
 
-=item IsExperimentalUnitOf PhenotypeExperiment
+=item IsExperimentalUnitOf ExperimentMeta
+
+=item IsTimepointOf TimeSeries
 
 
 =back

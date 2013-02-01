@@ -28,11 +28,13 @@ The Environment entity has the following relationship links:
 
 =over 4
     
+=item HasMedia Media
+
+=item HasParameter Parameter
+
 =item IncludesAdditionalCompounds Compound
 
-=item UsedInExperimentalUnit ExperimentalUnit
-
-=item UsesMedia Media
+=item IsContextOf ExperimentalUnit
 
 
 =back
@@ -61,7 +63,7 @@ strings. The following fields are available:
 
 =item description
 
-=item anaerobic
+=item oxygenConcentration
 
 =item pH
 
@@ -84,7 +86,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'temperature', 'description', 'anaerobic', 'pH', 'source_id' );
+my @all_fields = ( 'temperature', 'description', 'oxygenConcentration', 'pH', 'source_id' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: all_entities_Environment [-show-fields] [-a | -f field list] > entity.data";

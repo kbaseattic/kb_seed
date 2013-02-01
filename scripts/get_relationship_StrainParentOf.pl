@@ -9,7 +9,7 @@ use Carp;
 
 =head1 get_relationship_StrainParentOf
 
-The recursive DerivedFromStrain relationship organizes derived
+The recursive StrainParentOf relationship organizes derived
 organisms into a tree based on parent/child relationships.
 
 Example:
@@ -47,11 +47,17 @@ strings. The following fields are available:
 
 =item id
 
+=item name
+
 =item description
 
 =item source_id
 
 =item aggregateData
+
+=item wildtype
+
+=item referenceStrain
 
 =back    
 
@@ -77,11 +83,17 @@ strings. The following fields are available:
 
 =item id
 
+=item name
+
 =item description
 
 =item source_id
 
 =item aggregateData
+
+=item wildtype
+
+=item referenceStrain
 
 =back    
 
@@ -100,9 +112,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'description', 'source_id', 'aggregateData' );
+my @all_from_fields = ( 'id', 'name', 'description', 'source_id', 'aggregateData', 'wildtype', 'referenceStrain' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'description', 'source_id', 'aggregateData' );
+my @all_to_fields = ( 'id', 'name', 'description', 'source_id', 'aggregateData', 'wildtype', 'referenceStrain' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -212,6 +224,10 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
+	}
+	else
+	{
+	    print STDERR $line, "\n";
 	}
     }
 }

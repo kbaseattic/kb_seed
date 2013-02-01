@@ -30,7 +30,7 @@ The Publication entity has the following relationship links:
     
 =item Concerns ProteinSequence
 
-=item PublishedExperiment PhenotypeExperiment
+=item PublishedExperiment ExperimentMeta
 
 =item PublishedProtocol Protocol
 

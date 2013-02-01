@@ -26,6 +26,8 @@ The Compound entity has the following relationship links:
     
 =item ComponentOf Compound
 
+=item CompoundMeasuredBy Measurement
+
 =item ConsistsOfCompounds Compound
 
 =item IncludedIn Environment

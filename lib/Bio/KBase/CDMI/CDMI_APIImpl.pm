@@ -3956,7 +3956,7 @@ sub subsystems_to_genomes
 <pre>
 $subsystems is a subsystems
 $genomes is a genomes
-$return is a reference to a hash where the key is a subsystem and the value is a reference to a hash where the key is a genome and the value is a reference to a list containing 2 items:
+$return is a reference to a hash where the key is a subsystem and the value is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a variant
 	1: a fids
 subsystems is a reference to a list where each element is a subsystem
@@ -3975,7 +3975,7 @@ fid is a string
 
 $subsystems is a subsystems
 $genomes is a genomes
-$return is a reference to a hash where the key is a subsystem and the value is a reference to a hash where the key is a genome and the value is a reference to a list containing 2 items:
+$return is a reference to a hash where the key is a subsystem and the value is a reference to a hash where the key is a genome and the value is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a variant
 	1: a fids
 subsystems is a reference to a list where each element is a subsystem

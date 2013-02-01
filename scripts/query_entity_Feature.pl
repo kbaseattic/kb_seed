@@ -35,6 +35,8 @@ The Feature entity has the following relationship links:
 
 =item Encompasses Feature
 
+=item FeatureMeasuredBy Measurement
+
 =item HasCoregulationWith Feature
 
 =item HasFunctional Role

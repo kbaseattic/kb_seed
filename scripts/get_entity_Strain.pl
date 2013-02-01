@@ -38,11 +38,11 @@ The Strain entity has the following relationship links:
 
 =over 4
     
-=item BelongsTo ExperimentalUnit
-
 =item DerivedFromGenome Genome
 
 =item DerivedFromStrain Strain
+
+=item EvaluatedIn ExperimentalUnit
 
 =item HasKnockoutIn Feature
 
@@ -70,11 +70,17 @@ strings. The following fields are available:
 
 =over 4
 
+=item name
+
 =item description
 
 =item source_id
 
 =item aggregateData
+
+=item wildtype
+
+=item referenceStrain
 
 =back    
 
@@ -93,7 +99,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'description', 'source_id', 'aggregateData' );
+my @all_fields = ( 'name', 'description', 'source_id', 'aggregateData', 'wildtype', 'referenceStrain' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $usage = "usage: get_entity_Strain [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
