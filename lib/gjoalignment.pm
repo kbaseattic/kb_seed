@@ -125,7 +125,7 @@ sub align_with_mafft
     if ( $version )
     {
         my $tmpdir = SeedAware::location_of_tmp( $opts );
-        my $tmpF   = SeedAware::new_file_name( "$tmpdir/version", '' );
+        my $tmpF   = SeedAware::tmp_file_name( "version", '', $tmpdir );
 
         SeedAware::system_with_redirect( $mafft, "--help", { stderr => $tmpF } );
         open( MAFFT, $tmpF ) or die "Could not open $tmpF";
@@ -187,9 +187,9 @@ sub align_with_mafft
     my $tree  = ! ( $add || $profile );
 
     my $tmpdir = SeedAware::location_of_tmp( $opts );
-    my $tmpin  = SeedAware::new_file_name( "$tmpdir/seqs",  'fasta' );
-    my $tmpin2 = SeedAware::new_file_name( "$tmpdir/seqs2", 'fasta' );
-    my $tmpout = SeedAware::new_file_name( "$tmpdir/ali",   'fasta' );
+    my $tmpin  = SeedAware::tmp_file_name( "seqs",  'fasta', $tmpdir );
+    my $tmpin2 = SeedAware::tmp_file_name( "seqs2", 'fasta', $tmpdir );
+    my $tmpout = SeedAware::tmp_file_name( "ali",   'fasta', $tmpdir );
 
     if ( ! ( $seqs && ref($seqs) eq 'ARRAY' && @$seqs && ref($seqs->[0]) eq 'ARRAY' ) )
     {
@@ -377,10 +377,10 @@ sub align_with_muscle
     my $tree  = ! ( $add || $profile || $refine );
 
     my $tmpdir = SeedAware::location_of_tmp( $opts );
-    my $tmpin  = SeedAware::new_file_name( "$tmpdir/seqs",  'fasta' );
-    my $tmpin2 = SeedAware::new_file_name( "$tmpdir/seqs2", 'fasta' );
-    my $tmpout = SeedAware::new_file_name( "$tmpdir/ali",   'fasta' );
-    my $treeF  = SeedAware::new_file_name( "$tmpdir/ali",   'newick' );
+    my $tmpin  = SeedAware::tmp_file_name( "seqs",  'fasta',  $tmpdir );
+    my $tmpin2 = SeedAware::tmp_file_name( "seqs2", 'fasta',  $tmpdir );
+    my $tmpout = SeedAware::tmp_file_name( "ali",   'fasta',  $tmpdir );
+    my $treeF  = SeedAware::tmp_file_name( "ali",   'newick', $tmpdir );
 
     if ( ! ( $seqs && ref($seqs) eq 'ARRAY' && @$seqs && ref($seqs->[0]) eq 'ARRAY' ) )
     {
@@ -489,9 +489,9 @@ sub align_with_clustal
     #  Do the alignment:
 
     my $tmpdir  = SeedAware::location_of_tmp( $opts );
-    my $seqfile = SeedAware::new_file_name( "$tmpdir/align_fasta",  'fasta' );
-    my $outfile = SeedAware::new_file_name( "$tmpdir/align_fasta",  'aln' );
-    my $dndfile = SeedAware::new_file_name( "$tmpdir/align_fasta",  'dnd' );
+    my $seqfile = SeedAware::tmp_file_name( "align_fasta",  'fasta', $tmpdir );
+    my $outfile = SeedAware::tmp_file_name( "align_fasta",  'aln',   $tmpdir );
+    my $dndfile = SeedAware::tmp_file_name( "align_fasta",  'dnd',   $tmpdir );
 
     gjoseqlib::print_alignment_as_fasta( $seqfile, \@seqs2 );
 
@@ -610,9 +610,9 @@ sub add_to_alignment
     #  Do the profile alignment:
 
     my $tmpdir  = SeedAware::location_of_tmp( );
-    my $profile = SeedAware::new_file_name( "$tmpdir/add_to_align_1", 'fasta' );
-    my $seqfile = SeedAware::new_file_name( "$tmpdir/add_to_align_2", 'fasta' );
-    my $outfile = SeedAware::new_file_name( "$tmpdir/add_to_align",   'aln' );
+    my $profile = SeedAware::tmp_file_name( "add_to_align_1", 'fasta', $tmpdir );
+    my $seqfile = SeedAware::tmp_file_name( "add_to_align_2", 'fasta', $tmpdir );
+    my $outfile = SeedAware::tmp_file_name( "add_to_align",   'aln',   $tmpdir );
     ( my $dndfile = $profile ) =~ s/fasta$/dnd/;  # The program ignores our name
 
     gjoseqlib::print_alignment_as_fasta( $profile, \@relevant );
@@ -1176,9 +1176,9 @@ sub clustal_profile_alignment_0
     my ( $seqs1, $seqs2 ) = @_;
 
     my $tmpdir  = SeedAware::location_of_tmp( );
-    my $profile = SeedAware::new_file_name( "$tmpdir/add_to_align_1", 'fasta' );
-    my $seqfile = SeedAware::new_file_name( "$tmpdir/add_to_align_2", 'fasta' );
-    my $outfile = SeedAware::new_file_name( "$tmpdir/add_to_align",   'aln' );
+    my $profile = SeedAware::tmp_file_name( "add_to_align_1", 'fasta', $tmpdir );
+    my $seqfile = SeedAware::tmp_file_name( "add_to_align_2", 'fasta', $tmpdir );
+    my $outfile = SeedAware::tmp_file_name( "add_to_align",   'aln',   $tmpdir );
     ( my $dndfile = $profile ) =~ s/fasta$/dnd/;  # The program ignores our name
 
     $seqs2 = [ $seqs2 ] if ! ( ref $seqs2->[0] );
@@ -1258,9 +1258,9 @@ sub fract_identity
     my ( $s1, $s2, $i, $same );
 
     my $tmpdir  = SeedAware::location_of_tmp( );
-    my $infile  = SeedAware::new_file_name( "$tmpdir/fract_identity", 'fasta' );
-    my $outfile = SeedAware::new_file_name( "$tmpdir/fract_identity", 'aln' );
-    my $dndfile = SeedAware::new_file_name( "$tmpdir/fract_identity", 'dnd' );
+    my $infile  = SeedAware::tmp_file_name( "fract_identity", 'fasta', $tmpdir );
+    my $outfile = SeedAware::tmp_file_name( "fract_identity", 'aln',   $tmpdir );
+    my $dndfile = SeedAware::tmp_file_name( "fract_identity", 'dnd',   $tmpdir );
 
     $s1 = $seq1->[2];
     $s1 =~ s/[^A-Za-z]+//g;
@@ -1376,8 +1376,8 @@ sub trim_with_blastall
     my( $clnseq, $clnali, $type ) = @_;
 
     my $tmpdir    = SeedAware::location_of_tmp( );
-    my $blastfile = SeedAware::new_file_name( "$tmpdir/trim_blastdb" );
-    my $seqfile   = SeedAware::new_file_name( "$tmpdir/trim_query" );
+    my $blastfile = SeedAware::tmp_file_name( "trim_blastdb", $tmpdir );
+    my $seqfile   = SeedAware::tmp_file_name( "trim_query",   $tmpdir );
 
     gjoseqlib::print_alignment_as_fasta( $blastfile, scalar gjoseqlib::pack_sequences( $clnali ) );
     gjoseqlib::print_alignment_as_fasta( $seqfile,   scalar gjoseqlib::pack_sequences( $clnseq ) );

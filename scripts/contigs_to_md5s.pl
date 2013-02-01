@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 contigs_to_md5s
+=head1 NAME
+
+contigs_to_md5s
+
+=head1 SYNOPSIS
+
+contigs_to_md5s [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 contigs_to_md5s can be used to acquire MD5 values for each of a list of contigs.
@@ -33,60 +41,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call contigs_to_md5s. It is documented as follows:
-
-  $return = $obj->contigs_to_md5s($contigs)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$contigs is a contigs
-$return is a reference to a hash where the key is a contig and the value is a md5
-contigs is a reference to a list where each element is a contig
-contig is a string
-md5 is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$contigs is a contigs
-$return is a reference to a hash where the key is a contig and the value is a md5
-contigs is a reference to a list where each element is a contig
-contig is a string
-md5 is a string
+Usage: contigs_to_md5s [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (the contig md5) added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

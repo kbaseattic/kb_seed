@@ -2442,9 +2442,9 @@ sub useful_nt_align
 #  residues, number of differing residues, number of gaps, and number of gap
 #  opennings.
 #
-#     ( $npos, $nid, $ndif, $ngap, $nopen, $tgap, $topen ) = interpret_aa_align( $seq1, $seq2 )
+#     ( $nmat, $nid, $ndif, $ngap, $nopen, $tgap, $topen ) = interpret_aa_align( $seq1, $seq2 )
 #
-#  $npos  = total aligned positons (= $nid + $ndif + $ngap)
+#  $nmat  = total aligned positons (= $nid + $ndif + $ngap)
 #  $nid   = number of positions with identical amino acids (ignoring case)
 #  $ndif  = number of positions with differing amino acids
 #  $ngap  = number of positions with gap in one sequence but not the other

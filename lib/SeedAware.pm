@@ -416,7 +416,7 @@ sub run_gathering_output
         my $end =       0;
         my $read;
         while ( $read = read( PROC_READ, $out, $inc, $end ) ) { $end += $read }
-        close( PROC_READ ) or die "FAILED: '$name' with error return $?";
+        close( PROC_READ ) or confess "FAILED: '$name' with error return $?";
         return $out;
     }
 }
@@ -650,9 +650,9 @@ sub temporary_directory
         my $tmp = location_of_tmp( $options );
         return ( wantarray ? () : undef ) if ! $tmp;
 
-        $name = $options->{ name } if ! ( defined $name && length $name );
+        $name = $options->{ name } if ! ( defined $name && $name ne '' );
 
-        if ( defined $name && length $name )
+        if ( defined $name && $name ne '' )
         {
             $tmp_dir = "$tmp/$name";
             $save_dir = $options->{ save_dir } = 1 if -d $tmp_dir;
@@ -660,18 +660,7 @@ sub temporary_directory
         else
         {
             my $base = $options->{ base } || 'tmp_dir';
-            $base =~ /_$/ or $base .= '_';  # End base with _
-            if ( eval { require File::Temp } )
-            {
-               $base .= 'XXXXXXXX';
-               my @args = ( $base );
-               push @args, ( DIR => $tmp ) if $tmp;
-               $tmp_dir = File::Temp::tempdir( @args );
-            }
-            else
-            {
-                $tmp_dir = tmp_file_name( $base, '', $tmp );
-            }
+            $tmp_dir = tmp_file_name( $base, '', $tmp );
         }
     }
 
@@ -680,15 +669,14 @@ sub temporary_directory
         mkdir $tmp_dir or return ( wantarray ? () : undef );
     }
 
-    #  $options->{ tmp_dir  } = $tmp_dir;
-
     wantarray ? ( $tmp_dir, $save_dir ) : $tmp_dir;
 }
 
 
 #===============================================================================
 #  Create a name for a new file or directory that will not clobber an existing
-#  one. File name DOES NOT INCLUDE the directory.
+#  one. File name DOES NOT INCLUDE the directory (unless it is supplied as
+#  part of the base_name).
 #
 #     $file_name = new_file_name( )
 #     $file_name = new_file_name( $base_name )
@@ -697,10 +685,17 @@ sub temporary_directory
 #
 #  The name is derived by adding an underscore and 8 random characterss (or
 #  12 random digits) to a base file name (D = temp) in a directory (D = .).
+#  To handle some old code, the base name can include the directory.
 #===============================================================================
 sub new_file_name
 {
     my ( $base, $ext, $dir ) = @_;
+
+    if ( defined $base && ! ( defined $dir && length $dir ) && $base =~ m#^(.*/)([^/]*)$# )
+    {
+        ( $dir, $base ) = ( $1, $2 );
+        return tmp_file_name( $base, $ext, $dir );
+    }
 
     $base =  'temp' if ! ( defined $base && length $base );
     $base =~ /_$/ or $base .= '_';  # End base with _
@@ -708,7 +703,7 @@ sub new_file_name
     $ext  = ''     if !   defined $ext;
     $ext  =~ s/^([^.])/.$1/;   # Start ext with .
 
-    $dir  = '.'  if ! defined $dir;
+    $dir  = '.'  if ! defined $dir && $base !~ m,^/,;
 
     my ( $fh, $name );
     if ( eval { require File::Temp } )
@@ -815,6 +810,11 @@ sub open_tmp_file
 sub tmp_file_defaults
 {
     my ( $base, $ext, $dir ) = @_;
+
+    if ( defined $base && ! ( defined $dir && length $dir ) && $base =~ m#^(.*[/\\])([^/\\]*)$# )
+    {
+        ( $dir, $base ) = ( $1, $2 );
+    }
 
     $base  =  'temp' if ! ( defined $base && length $base );
     $base  =~ m/_$/ or $base .= '_';  # End base with _

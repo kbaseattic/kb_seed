@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 fids_to_proteins
+=head1 NAME
+
+fids_to_proteins
+
+=head1 SYNOPSIS
+
+fids_to_proteins [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 
@@ -28,60 +36,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call fids_to_proteins. It is documented as follows:
-
-  $return = $obj->fids_to_proteins($fids)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a md5
-fids is a reference to a list where each element is a fid
-fid is a string
-md5 is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a md5
-fids is a reference to a list where each element is a fid
-fid is a string
-md5 is a string
+Usage: fids_to_proteins [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

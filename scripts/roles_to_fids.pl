@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 roles_to_fids
+=head1 NAME
+
+roles_to_fids
+
+=head1 SYNOPSIS
+
+roles_to_fids [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
             You often wish to find the fids in one or more genomes that
@@ -30,68 +38,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call roles_to_fids. It is documented as follows:
-
-  $return = $obj->roles_to_fids($roles, $genomes)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$roles is a roles
-$genomes is a genomes
-$return is a reference to a hash where the key is a role and the value is a fid
-roles is a reference to a list where each element is a role
-role is a string
-genomes is a reference to a list where each element is a genome
-genome is a string
-fid is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$roles is a roles
-$genomes is a genomes
-$return is a reference to a hash where the key is a role and the value is a fid
-roles is a reference to a list where each element is a role
-role is a string
-genomes is a reference to a list where each element is a genome
-genome is a string
-fid is a string
+Usage: roles_to_fids [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=item genomes - A list of genomes to restricty the output
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

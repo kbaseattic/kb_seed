@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 equiv_sequence_assertions
+=head1 NAME
+
+equiv_sequence_assertions
+
+=head1 SYNOPSIS
+
+equiv_sequence_assertions [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 Different groups have made assertions of function for numerous protein sequences.
@@ -33,78 +41,17 @@ where N is the column (from 1) that contains the protein identifiers.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call equiv_sequence_assertions. It is documented as follows:
-
-  $return = $obj->equiv_sequence_assertions($proteins)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$proteins is a proteins
-$return is a reference to a hash where the key is a protein and the value is a function_assertions
-proteins is a reference to a list where each element is a protein
-protein is a string
-function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
-	0: an id
-	1: a function
-	2: a source
-	3: an expert
-id is a string
-function is a string
-source is a string
-expert is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$proteins is a proteins
-$return is a reference to a hash where the key is a protein and the value is a function_assertions
-proteins is a reference to a list where each element is a protein
-protein is a string
-function_assertions is a reference to a list where each element is a function_assertion
-function_assertion is a reference to a list containing 4 items:
-	0: an id
-	1: a function
-	2: a source
-	3: an expert
-id is a string
-function is a string
-source is a string
-expert is a string
+Usage: equiv_sequence_assertions [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the md5s is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added (identifier,source,function,expert).
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

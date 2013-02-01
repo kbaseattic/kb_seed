@@ -1029,7 +1029,7 @@ a boolean expressing. If an error occurs, will return C<undef>.
 
 sub load_table {
     my $self     = shift @_;
-    my %defaults = ( delim => "\t" );
+    my %defaults = ( delim => "\\t" );
     my %arg      = (%defaults, @_);
     my $file     = $arg{file};
     my $tbl      = $arg{tbl};
@@ -1049,6 +1049,8 @@ sub load_table {
             # terminator string.
             #my $lineEnd = ($FIG_Config::arch eq "win" ? "\\r\\n" : "\\n");
             Trace("Loading $tbl into MySQL using file $file and style $style.") if T(2);
+            # Fix the file name for windows.
+            $file =~ tr/\\/\//;
             # Decide whether this is a local file or a server file.
             if ($self->{_host} ne "localhost" && ! $local) {
                 $local = "LOCAL";
@@ -1166,8 +1168,9 @@ Type of index.
 
 =item kind (optional)
 
-C<unique> for a unique index, C<fulltext> for a full-text index. If omitted, an ordinary
-non-unique index is created. Note that only MySQL supports full-text indexes.
+C<unique> for a unique index, C<primary> for a primary index, C<fulltext> for a
+full-text index. If omitted, an ordinary non-unique index is created. Note that
+only MySQL supports full-text indexes.
 
 =item RETURN
 
@@ -1193,15 +1196,23 @@ sub create_index {
     $self->drop_index(idx => $idx, tbl => $tbl);
     $dbh->{PrintError} = $printError;
     # Now we can create the index safely.
-    my $uniqueFlag = ($arg{kind} ? " $arg{kind}" : "");
+    my $uniqueFlag = ($arg{kind} ? "$arg{kind}" : "");
     # If this is SQLite, fix the field list.
     if ($dbms eq "SQLite") {
 	$flds =~ s/\(\d+\)//g;
     }
     # Build the create command.
-    my $cmd  = "CREATE$uniqueFlag INDEX $idx ON $tbl ";
-    if ($type && $dbms eq "Pg") {
-        $cmd .= " USING $type ";
+    my $cmd;
+    if ($dbms eq "mysql") {
+        $cmd = "ALTER TABLE $tbl ADD $uniqueFlag KEY $idx";
+    } else {
+        if (lc($uniqueFlag) eq 'primary') {
+            $uniqueFlag = 'unique';
+        }
+        $cmd = "CREATE $uniqueFlag INDEX $idx ON $tbl";
+        if ($type && $dbms eq "Pg") {
+            $cmd .= " USING $type ";
+        }
     }
     $cmd .= " ( $flds );";
     # If this is Postgres, descending indexes are not allowed.

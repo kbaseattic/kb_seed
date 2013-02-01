@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 protein_families_to_proteins
+=head1 NAME
+
+protein_families_to_proteins
+
+=head1 SYNOPSIS
+
+protein_families_to_proteins [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 protein_families_to_proteins can be used to access the set of proteins (i.e., the set of MD5 values)
@@ -30,61 +38,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call protein_families_to_proteins. It is documented as follows:
-
-  $return = $obj->protein_families_to_proteins($protein_families)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$protein_families is a protein_families
-$return is a reference to a hash where the key is a protein_family and the value is a proteins
-protein_families is a reference to a list where each element is a protein_family
-protein_family is a string
-proteins is a reference to a list where each element is a protein
-protein is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$protein_families is a protein_families
-$return is a reference to a hash where the key is a protein_family and the value is a proteins
-protein_families is a reference to a list where each element is a protein_family
-protein_family is a string
-proteins is a reference to a list where each element is a protein
-protein is a string
+Usage: protein_families_to_proteins [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. For each input line, there are multiple output lines, one for each protein in the family. The protein is added to the end of each line.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

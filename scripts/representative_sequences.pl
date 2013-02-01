@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 representative_sequences
+=head1 NAME
+
+representative_sequences
+
+=head1 SYNOPSIS
+
+representative_sequences [arguments] < input > output
+
+=head1 DESCRIPTION
 
 Example:
 
@@ -15,140 +23,22 @@ Example:
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call representative_sequences. It is documented as follows:
-
-we return two arguments.  The first is the list of representative triples,
-and the second is the list of sets (the first entry always being the
-representative sequence)
-
-=over 4
-
-=item -e Existing Representatives
-
-These are sequences that are currently represenatives and the command extends this set.
-
-=item -o order-option
-
-order sequences using the designated option (note that -b is another way
-to get a long-to-short ordering).  Supported options are
-
-    long-to-short
-    default (as is)
-
-=item -b
-
-order input sequences by size (long to short)
-
-=item -c cluster_type
-
-behavior of clustering algorithm (0 or 1, D=1)
-
-cluster_type 0 is the original method, which has only the representative
-for each group in the blast database.  This can randomly segregate
-distant members of groups, regardless of the placement of other very
-similar sequences.
-    
-cluster_type 1 adds more diverse representatives of a group in the blast
-database.  This is slightly more expensive, but is much less likely to
-split close relatives into different groups.
-
-=item -d  seq_clust_dir  - directory for files of clustered sequencees
-
-With the -d option, each cluster of sequences is written to a 
-distinct file in the specified directory.
-
-=item -f id_clust_file  - file with one line per cluster, listing its ids 
-
-With the -f option, for each cluster, a tab-separated list
-of ids is written to the specified file.  
-
-=item -m measure_of_sim - measure of similarity to use:
-
-Sequences are removed if there similarity to a "kept" sequence exceeds a specified 
-threshold (see -similarity below)
-
-The possible measures of similarity that you can specify are as follows:
-      
-identity_fraction  (default),
-positive_fraction  (proteins only), or
-score_per_position (0-2 bits)
-
-=item -s similarity     - similarity required to be clustered (D = 0.8)
-
-The similarity threshhold used to determine when sequences are deleted (but
-represented by a kept sequence).
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$seq_set is a seq_set
-$rep_seq_parms is a rep_seq_parms
-$return_1 is an id_set
-$return_2 is a reference to a list where each element is an id_set
-seq_set is a reference to a list where each element is a seq_triple
-seq_triple is a reference to a list containing 3 items:
-	0: an id
-	1: a comment
-	2: a sequence
-id is a string
-comment is a string
-sequence is a string
-rep_seq_parms is a reference to a hash where the following keys are defined:
-	existing_reps has a value which is a seq_set
-	order has a value which is an int
-	alg has a value which is an int
-	type_sim has a value which is an int
-	cutoff has a value which is a float
-id_set is a reference to a list where each element is an id
-
-</pre>
-
-=end html
-
-=begin text
-
-$seq_set is a seq_set
-$rep_seq_parms is a rep_seq_parms
-$return_1 is an id_set
-$return_2 is a reference to a list where each element is an id_set
-seq_set is a reference to a list where each element is a seq_triple
-seq_triple is a reference to a list containing 3 items:
-	0: an id
-	1: a comment
-	2: a sequence
-id is a string
-comment is a string
-sequence is a string
-rep_seq_parms is a reference to a hash where the following keys are defined:
-	existing_reps has a value which is a seq_set
-	order has a value which is an int
-	alg has a value which is an int
-	type_sim has a value which is an int
-	cutoff has a value which is a float
-id_set is a reference to a list where each element is an id
+Usage: representative_sequences [arguments] < input > output
 
 
-=end text
+    --e string
+    --o string
+    -c num        Select the identifier from column num
+    --d string
+    --f string
+    --m integer
+    --s value
 
-=back
+=head1 AUTHORS
 
-=head2 Input Format
-
-    The input is a fasta-formatted set of sequences.  These sequences
-    should not contain indels.
-
-=head2 Output Format
-
-    FASTA output of the representatives is always written to STDOUT.
-
-    The -d option will cause a directory to be built containing the clusters.
-
-    The -f option will cause an abbreviated format of the clusters (just IDs) to
-    be written
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

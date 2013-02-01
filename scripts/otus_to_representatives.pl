@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 otus_to_representatives
+=head1 NAME
+
+otus_to_representatives
+
+=head1 SYNOPSIS
+
+otus_to_representatives [arguments] < input > output
+
+=head1 DESCRIPTION
 
 We deine the notion of OTU loosely.  We try to keep genomes with 97% identical SSUrRNAs
 within the same OTU.  We pick a representative genome for each OTU, and we try to
@@ -30,54 +38,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call otu_members. It is documented as follows:
+Usage: otus_to_representatives [arguments] < input > output
 
-  $return = $obj->otus_to_representatives($otus)
 
-=over 4
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=item Parameter and return types
+=head1 AUTHORS
 
-=begin html
-
-<pre>
-$otus is a reference to a list where each element is an int
-$return is a reference to a hash where the key is an int and the value is a genome
-genome is a string
-</pre>
-
-=end html
-
-=begin text
-
-$otus is a reference to a list where each element is an int
-$return is a reference to a hash where the key is an int and the value is a genome
-genome is a string
-
-=end text
-
-=back
-
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing genome identifiers is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (the representative genome from the OTU) added.  
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

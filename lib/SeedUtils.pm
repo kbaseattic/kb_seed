@@ -2160,13 +2160,18 @@ sub open_berk_table
 {
     my($table, %opts) = @_;
 
-    require BerkTable;
-
     if (! -f $table)
     {
 	warn "Cannot read table file $table\n";
 	return undef;
     }
+
+    if ( ! eval { require BerkTable; } )
+    {
+	warn "Failed in require BerkTable.\n";
+        return undef;
+    }
+
     my $h = {};
     tie %$h, 'BerkTable', $table, %opts;
     return $h;

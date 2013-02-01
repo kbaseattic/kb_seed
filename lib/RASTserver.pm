@@ -16,7 +16,6 @@ $YAML::CompressSeries = 0;
 
 use strict;
 
-
 =head1 RAST Submission Server Function Object
 
 This file contains the functions and utilities used by the RAST Submission Server
@@ -534,6 +533,13 @@ sub copy_to_RAST_dir
 	return { status => 'error', error_msg => $res->status_line };
     }
 }	     
+
+sub jobs
+{
+	my ($self, $params)=@_;
+	return $self->run_query('get_jobs_for_user_fast', $params);
+}
+
 
 1;
 

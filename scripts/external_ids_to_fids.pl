@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 external_ids_to_fids
+=head1 NAME
+
+external_ids_to_fids
+
+=head1 SYNOPSIS
+
+external_ids_to_fids [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 external_ids_to_fids is used to search for the feature ids that a set of given
@@ -31,58 +39,17 @@ and the output is to the standard output. For each input line, there
 can be many output lines, one per feature. The feature id is added to
 the end of the line.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call external_ids_to_fids. It is documented as follows:
+Usage: external_ids_to_fids [arguments] < input > output
 
-  $return = $obj->external_ids_to_fids($external_ids)
 
-=over 4
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=item Parameter and return types
+=head1 AUTHORS
 
-=begin html
-
-<pre>
-$external_ids is an external_ids
-$return is a reference to a hash where the key is an alias and the value is a fid
-external_ids is a reference to a list where each element is an external_id
-external_id is a string
-fid is a string
-</pre>
-
-=end html
-
-=begin text
-
-$external_ids is an external_ids
-$return is a reference to a hash where the key is an alias and the value is a fid
-external_ids is a reference to a list where each element is an external_id
-external_id is a string
-fid is a string
-
-=end text
-
-=back
-
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

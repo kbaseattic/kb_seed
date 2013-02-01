@@ -786,6 +786,14 @@ A name to be used when travelling backward through the relationship. This
 value can be used in place of the real relationship name to make queries
 more readable.
 
+=item loose
+
+If TRUE (C<1>), then deletion of an entity instance on the B<from> side
+will NOT cause deletion of the connected entity instances on the B<to>
+side. All many-to-many relationships are automatically loose. A one-to-many
+relationship is generally not loose, but specifying this attribute can make
+it so.
+
 =back
 
 =head3 Shapes
@@ -3360,7 +3368,7 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode}, local => 'LOCAL');
+                               style => $options{mode}, 'local' => 'LOCAL' );
     };
     if (!defined $rv) {
         $retVal->AddMessage($@) if ($@);
@@ -4187,7 +4195,7 @@ sub CreateIndex {
         my @fieldList = _FixNames(@rawFields);
         my $flds = join(', ', @fieldList);
         # Get the index's uniqueness flag.
-        my $unique = ($indexData->{unique} ? 'unique' : undef);
+        my $unique = ($indexData->{primary} ? 'primary' : ($indexData->{unique} ? 'unique' : undef));
         # Create the index.
         my $rv = $dbh->create_index(idx => "$indexName$relationName", tbl => $self->{_quote} . $relationName . $self->{_quote},
                                     flds => $flds, kind => $unique);
@@ -4769,10 +4777,10 @@ sub Delete {
                     # Add the path to this relationship.
                     my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
                     push @fromPathList, \@augmentedList;
-                    # Check the arity. If it's MM we're done. If it's 1M
-                    # and the target hasn't been seen yet, we want to
+                    # Check the arity. If it's MM or loose, we're done. If it's
+                    # 1M and the target hasn't been seen yet, we want to
                     # stack the entity for future processing.
-                    if ($relationship->{arity} eq '1M') {
+                    if ($relationship->{arity} eq '1M' && ! $relationship->{loose}) {
                         my $toEntity = $relationship->{to};
                         if (! exists $alreadyFound{$toEntity}) {
                             # Here we have a new entity that's dependent on
@@ -6538,7 +6546,7 @@ sub _LoadMetaData {
             # Now each index has been put in a relation. We need to add the primary
             # index for the primary relation.
             push @{$relationTable->{$entityName}->{Indexes}},
-                { IndexFields => [ {name => 'id', order => 'ascending'} ], unique => 1,
+                { IndexFields => [ {name => 'id', order => 'ascending'} ], primary => 1,
                   Notes => { content => "Primary index for $entityName." }
                 };
             # The next step is to insure that each relation has at least one index
@@ -6664,7 +6672,7 @@ sub _CreateRelationshipIndex {
     unshift @{$newIndex->{IndexFields}}, $firstField;
     # If this is a one-to-many relationship, the "To" index is unique.
     if ($relationshipStructure->{arity} eq "1M" && $indexKey eq "To") {
-        $newIndex->{unique} = 'true';
+        $newIndex->{unique} = 1;
     }
     # Add the index to the relation.
     _AddIndex("idx$indexKey", $relationStructure, $newIndex);

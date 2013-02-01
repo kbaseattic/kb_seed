@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 subsystems_to_roles
+=head1 NAME
+
+subsystems_to_roles
+
+=head1 SYNOPSIS
+
+subsystems_to_roles [arguments] < input > output
+
+=head1 DESCRIPTION
 
 The command subsystem_to_roles takes as input a table with a column containing subsystem IDs.  The table is
 extended with an extra column set to roles that make up the subsystems.  For each
@@ -31,66 +39,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call subsystems_to_roles. It is documented as follows:
-
-  $return = $obj->subsystems_to_roles($subsystems, $aux)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$subsystems is a subsystems
-$aux is an aux
-$return is a reference to a hash where the key is a subsystem and the value is a roles
-subsystems is a reference to a list where each element is a subsystem
-subsystem is a string
-aux is an int
-roles is a reference to a list where each element is a role
-role is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$subsystems is a subsystems
-$aux is an aux
-$return is a reference to a hash where the key is a subsystem and the value is a roles
-subsystems is a reference to a list where each element is a subsystem
-subsystem is a string
-aux is an int
-roles is a reference to a list where each element is a role
-role is a string
+Usage: subsystems_to_roles [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (Role) added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

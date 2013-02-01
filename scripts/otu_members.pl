@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 otu_members
+=head1 NAME
+
+otu_members
+
+=head1 SYNOPSIS
+
+otu_members [arguments] < input > output
+
+=head1 DESCRIPTION
 
 We deine the notion of OTU loosely.  We try to keep genomes with 97% identical SSUrRNAs
 within the same OTU.  We pick a representative genome for each OTU, and we try to
@@ -30,62 +38,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call otu_members. It is documented as follows:
-
-  $return = $obj->otu_members($genomes)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$genomes is a genomes
-$return is a reference to a hash where the key is a genome and the value is a reference to a hash where the key is a genome and the value is a genome_name
-genomes is a reference to a list where each element is a genome
-genome is a string
-genome_name is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$genomes is a genomes
-$return is a reference to a hash where the key is a genome and the value is a reference to a hash where the key is a genome and the value is a genome_name
-genomes is a reference to a list where each element is a genome
-genome is a string
-genome_name is a string
+Usage: otu_members [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing genome identifiers is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (a genome from the same OTU) added.  If there
-are N genomes in the OTU for the genome in an input line, then N output
-lines will be generated, each containing a single genome ID from the same OTU.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 locations_to_dna_sequences
+=head1 NAME
+
+locations_to_dna_sequences
+
+=head1 SYNOPSIS
+
+locations_to_dna_sequences [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 locations_to_dna_sequences takes as input a list of locations (each in the form of
@@ -34,82 +42,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call locations_to_dna_sequences. It is documented as follows:
-
-  $dna_seqs = $obj->locations_to_dna_sequences($locations)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$locations is a locations
-$dna_seqs is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a location
-	1: a dna
-locations is a reference to a list where each element is a location
-location is a reference to a list where each element is a region_of_dna
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
-dna is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$locations is a locations
-$dna_seqs is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a location
-	1: a dna
-locations is a reference to a list where each element is a location
-location is a reference to a list where each element is a region_of_dna
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
-dna is a string
+Usage: locations_to_dna_sequences [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

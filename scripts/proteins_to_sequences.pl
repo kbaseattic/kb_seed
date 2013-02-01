@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 proteins_to_sequences
+=head1 NAME
+
+proteins_to_sequences
+
+=head1 SYNOPSIS
+
+proteins_to_sequences [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 proteins_to_sequences allows the user to look up the amino acid sequences

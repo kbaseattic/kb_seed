@@ -19,15 +19,17 @@
 
 package GenoGraphics;
 
+use strict;
+
 use GD;
 use Data::Dumper;
 use Carp;
-use constant  MINPIX  =>  5;
+use constant  MINPIX  =>  4;
 
 use SeedHTML;
 use SeedAware;
 use vars qw($temp_dir $temp_url);
-use strict;
+no warnings qw( redefine );
 
 my $temp_dir     = "/tmp";
 my $temp_url     = "file://localhost/tmp";
@@ -122,7 +124,7 @@ sub render {
     my $ismap = {};
     my $color_of = &choose_colors($gd,$ggR);
     &draw( $gd, $ismap, $ggR, $color_of, $width, $obj_half_heigth, $left_margin );
-    my($img_file,$img_url);
+    my( $img_file, $img_url );
     if ($save) 
     { 
         &SeedUtils::verify_dir("$temp_dir/Save");
@@ -134,12 +136,12 @@ sub render {
     else
     {
         #  SeedAware::new_file_name returns file name without path
-        my $name = SeedAware::new_file_name( 'GenoGraphics', "$img.$image_suffix", "$temp_dir" );
+        my $name = SeedAware::new_file_name( 'GenoGraphics', "$img.$image_suffix", $temp_dir );
         $img_file = "$temp_dir/$name";
         $img_url  = "$temp_url/$name";
     }
-    &write_image($gd,$img_file);
-    return &generate_html($ismap,$img_url,$ggR,$img);
+    &write_image( $gd, $img_file );
+    return &generate_html( $ismap, $img_url, $ggR, $img );
 }
 
 
@@ -184,15 +186,21 @@ sub draw {
                 my( $begO, $endO, $shapeO, $colorO ) = @$object;
                 my $begOP = &get_pos_of_pixel( $gd, $begO, $beg, $end, $width, $left_margin );
                 my $endOP = &get_pos_of_pixel( $gd, $endO, $beg, $end, $width, $left_margin );
-                if (($endOP - $begOP) < MINPIX)
+
+                #  Is feature too narrow?
+                if ( ($endOP - $begOP - 1) < MINPIX )
                 {
-                    if (0 <  int($begOP - (MINPIX/2)))
+                    #  Move beginning to get desired width, conserving midpoint
+                    $begOP -= int( (MINPIX - ($endOP - $begOP + 1) ) / 2 );
+                    #  Adjust if out of bounds
+                    $begOP  = $begP if $begOP <  $begP;
+                    #  Move end to get desired width
+                    $endOP  = $begOP + MINPIX - 1;
+                    #  Move end (and beginning) if out of bounds
+                    if ( $endOP >= $endP )
                     {
-                        $begOP = int($begOP - (MINPIX/2));
-                    }
-                    if ($width > int($endOP + (MINPIX/2)))
-                    {
-                        $endOP = int($endOP + (MINPIX/2));
+                        $endOP = $endP - 1;
+                        $begOP = $endOP - MINPIX + 1;
                     }
                 }
                 Trace("Shape $shapeO from $begOP to $endOP in color $colorO.") if T(4);
@@ -546,99 +554,260 @@ sub filledRectangle {
 
     my $y1 = $y - $obj_half_heigth;
     my $y2 = $y + $obj_half_heigth;
-    $gd->filledRectangle( $begOP, $y1, $begOP, $y2, $color );
+    $gd->filledRectangle( $begOP, $y1, $endOP, $y2, $color );
+
     push( @$ismap, [ [ $begOP, $y1 ], [$endOP, $y2 ] ] );
 }
 
 
 sub Rectangle {
-    my($gd,$ismap,$y,$begOP,$endOP,$color,$obj_half_heigth) = @_;
+    my( $gd, $ismap, $y, $begOP, $endOP, $color, $obj_half_heigth ) = @_;
     Trace("Rectangle begOP = $begOP, endOP = $endOP, color = $color, OHH = $obj_half_heigth.") if T(4);
+
+    my $y1 = $y - 2 * $obj_half_heigth;  # top
+    my $y2 = $y + 2 * $obj_half_heigth;  # bottom
+    $gd->filledRectangle( $begOP, $y1, $endOP, $y2, $color );
+
+    push( @$ismap, [ [ $begOP, $y1 ], [ $endOP, $y2 ] ] );
+}
+
+
+sub rightArrow
+{
+    my( $gd, $ismap, $y, $begOP, $endOP, $color, $obj_half_heigth ) = @_;
+
+    my $x0 = $begOP;
+    my $x2 = $endOP; 
+    my $x1 = $x2 - 2 * $obj_half_heigth;
+    my $y0 = $y  + 2 * $obj_half_heigth;
+    my $y1 = $y  +     $obj_half_heigth;
+    my $y2 = $y;
+    my $y3 = $y  -     $obj_half_heigth;
+    my $y4 = $y  - 2 * $obj_half_heigth;
+
     my @poly = ();
 
-    push(@poly,[$endOP,$y-(2 * $obj_half_heigth)]);
-    push(@poly,[$endOP,$y+(2 * $obj_half_heigth)]);
-    push(@poly,[$begOP,$y+(2 * $obj_half_heigth)]);
-    push(@poly,[$begOP,$y-(2 * $obj_half_heigth)]);
-    &render_poly($gd,$y,\@poly,$color);
-    push(@$ismap,[[$begOP,$y-(2 * $obj_half_heigth)],[$endOP,$y+(2 * $obj_half_heigth)]]);
+    #   y4  *
+    #       ***
+    #   y2  *****
+    #       *** |
+    #   y0  *   |
+    #    |  |   |
+    #   x1 x0  x2
+    if ( $x1 <= $x0 )
+    {
+        push( @poly, [ $x0, $y0 ] );
+        push( @poly, [ $x0, $y4 ] );
+        push( @poly, [ $x2, $y2 ] );
+    }
+
+    #   y4            *
+    #   y3  **************
+    #   y2  *****************
+    #   y1  **************  |
+    #   y0  |         *     |
+    #       |         |     |
+    #      x0        x1    x2
+    else
+    {
+        push( @poly, [ $x0, $y1 ] );
+        push( @poly, [ $x0, $y3 ] );
+        push( @poly, [ $x1, $y3 ] );
+        push( @poly, [ $x1, $y4 ] );
+        push( @poly, [ $x2, $y2 ] );
+        push( @poly, [ $x1, $y0 ] );
+        push( @poly, [ $x1, $y1 ] );
+    }
+    &render_poly( $gd, $y, \@poly, $color );
+
+    #                upper-left    lower-right
+    push( @$ismap, [ [ $x0, $y4 ], [ $x2, $y0 ] ] );
 }
 
 
-sub rightArrow {
-    my($gd,$ismap,$y,$begOP,$endOP,$color,$obj_half_heigth) = @_;
-    Trace("Right Arrow begOP = $begOP, endOP = $endOP, color = $color, OHH = $obj_half_heigth.") if T(4);
+sub leftArrow
+{
+    my( $gd, $ismap, $y, $begOP, $endOP, $color, $obj_half_heigth ) = @_;
+
+    my $x0 = $begOP;
+    my $x2 = $endOP; 
+    my $x1 = $x0 + 2 * $obj_half_heigth;
+    my $y0 = $y  + 2 * $obj_half_heigth;
+    my $y1 = $y  +     $obj_half_heigth;
+    my $y2 = $y;
+    my $y3 = $y  -     $obj_half_heigth;
+    my $y4 = $y  - 2 * $obj_half_heigth;
+
     my @poly = ();
 
-    if (($endOP - $begOP) <= (2 * $obj_half_heigth))
+    #   y4       *
+    #          ***
+    #   y2   *****
+    #          ***
+    #   y0       *
+    #        |   |  |
+    #       x0  x2 x1
+    if ( $x1 >= $x2 )
     {
-        push(@poly,[$endOP,$y]);
-        push(@poly,[$begOP,$y+(2 * $obj_half_heigth)]);
-        push(@poly,[$begOP,$y-(2 * $obj_half_heigth)]);
+        push( @poly, [ $x2, $y0 ] );
+        push( @poly, [ $x0, $y2 ] );
+        push( @poly, [ $x2, $y4 ] );
     }
+
+    #   y4        *
+    #   y3     **************
+    #   y2  *****************
+    #   y1  |  **************
+    #   y0  |     *         |
+    #       |     |         |
+    #      x0    x1        x2
     else
     {
-        push(@poly,[$endOP,$y]);
-        push(@poly,[$endOP-(2 * $obj_half_heigth),$y+(2 * $obj_half_heigth)]);
-        push(@poly,[$endOP-(2 * $obj_half_heigth),$y+$obj_half_heigth]);
-        push(@poly,[$begOP,$y+$obj_half_heigth]);
-        push(@poly,[$begOP,$y-$obj_half_heigth]);
-        push(@poly,[$endOP-(2 * $obj_half_heigth),$y-$obj_half_heigth]);
-        push(@poly,[$endOP-(2 * $obj_half_heigth),$y-(2 * $obj_half_heigth)]);
+        push( @poly, [ $x1, $y0 ] );
+        push( @poly, [ $x0, $y2 ] );
+        push( @poly, [ $x1, $y4 ] );
+        push( @poly, [ $x1, $y3 ] );
+        push( @poly, [ $x2, $y3 ] );
+        push( @poly, [ $x2, $y1 ] );
+        push( @poly, [ $x1, $y1 ] );
     }
-    &render_poly($gd,$y,\@poly,$color);
-    push(@$ismap,[[$begOP,$y-$obj_half_heigth],[$endOP,$y+$obj_half_heigth]]);
+    &render_poly( $gd, $y, \@poly, $color );
+
+    #                upper-left    lower-right
+    push( @$ismap, [ [ $x0, $y4 ], [ $x2, $y0 ] ] );
 }
 
-sub leftArrow {
-    my($gd,$ismap,$y,$begOP,$endOP,$color,$obj_half_heigth) = @_;
-    Trace("Left Arrow begOP = $begOP, endOP = $endOP, color = $color, OHH = $obj_half_heigth.") if T(4);
-    my @poly;
 
-    if (($endOP - $begOP) <= (2 * $obj_half_heigth))
+sub topArrow
+{
+    my( $gd, $ismap, $y, $begOP, $endOP, $color, $obj_half_heigth ) = @_;
+
+    my $x0 = $begOP;
+    my $x2 = $endOP; 
+    my $x1 = $endOP - $obj_half_heigth;
+    my $y0 = $y;
+    my $y1 = $y -     $obj_half_heigth;
+    my $y2 = $y - 2 * $obj_half_heigth;
+
+    my @poly = ();
+
+    #   y2  *
+    #       ***
+    #   y1  *****
+    #       *** |
+    #   y0  *  - - - -  - - - 
+    #    |  |   |
+    #   x1 x0  x2
+    if ( $x1 <= $x0 )
     {
-        push(@poly,[$begOP,$y]);
-        push(@poly,[$endOP,$y+(2 * $obj_half_heigth)]);
-        push(@poly,[$endOP,$y-(2 * $obj_half_heigth)]);
+        push( @poly, [ $x0, $y0 ] );
+        push( @poly, [ $x0, $y2 ] );
+        push( @poly, [ $x2, $y1 ] );
     }
+
+    #   y2  ***********
+    #       **************
+    #   y1  *****************
+    #       **************  |
+    #   y0  *********** - - - - - 
+    #       |         |     |
+    #      x0        x1    x2
     else
     {
-        push(@poly,[$begOP,$y]);
-        push(@poly,[$begOP+(2 * $obj_half_heigth),$y+(2 * $obj_half_heigth)]);
-        push(@poly,[$begOP+(2 * $obj_half_heigth),$y+$obj_half_heigth]);
-        push(@poly,[$endOP,$y+$obj_half_heigth]);
-        push(@poly,[$endOP,$y-$obj_half_heigth]);
-        push(@poly,[$begOP+(2 * $obj_half_heigth),$y-$obj_half_heigth]);
-        push(@poly,[$begOP+(2 * $obj_half_heigth),$y-(2 * $obj_half_heigth)]);
+        push( @poly, [ $x0, $y0 ] );
+        push( @poly, [ $x0, $y2 ] );
+        push( @poly, [ $x1, $y2 ] );
+        push( @poly, [ $x2, $y1 ] );
+        push( @poly, [ $x1, $y0 ] );
     }
-    &render_poly($gd,$y,\@poly,$color);
-    push(@$ismap,[[$begOP,$y-$obj_half_heigth],[$endOP,$y+$obj_half_heigth]]);
+    &render_poly( $gd, $y, \@poly, $color );
+
+    #                upper-left    lower-right
+    push( @$ismap, [ [ $x0, $y2 ], [ $x2, $y0 ] ] );
 }
 
-sub render_poly {
-    my($gd,$y,$poly,$color) = @_;
-    my($pt);
+
+sub bottomArrow
+{
+    my( $gd, $ismap, $y, $begOP, $endOP, $color, $obj_half_heigth ) = @_;
+
+    my $x0 = $begOP;
+    my $x2 = $endOP; 
+    my $x1 = $begOP + $obj_half_heigth;
+    my $y0 = $y + 2 * $obj_half_heigth;
+    my $y1 = $y +     $obj_half_heigth;
+    my $y2 = $y;
+
+    my @poly = ();
+
+    #   y2 - - - *
+    #          ***
+    #   y1   *****
+    #          ***
+    #   y0       *
+    #        |   |  |
+    #       x0  x2 x1
+    if ( $x1 >= $x2 )
+    {
+        push( @poly, [ $x2, $y0 ] );
+        push( @poly, [ $x0, $y1 ] );
+        push( @poly, [ $x2, $y2 ] );
+    }
+
+    #   y2  - - - ***********
+    #          **************
+    #   y1  *****************
+    #       |  **************
+    #   y0  |     ***********
+    #       |     |         |
+    #      x0    x1        x2
+    else
+    {
+        push( @poly, [ $x1, $y0 ] );
+        push( @poly, [ $x0, $y1 ] );
+        push( @poly, [ $x1, $y2 ] );
+        push( @poly, [ $x2, $y2 ] );
+        push( @poly, [ $x2, $y0 ] );
+    }
+    &render_poly( $gd, $y, \@poly, $color );
+
+    #                upper-left    lower-right
+    push( @$ismap, [ [ $x0, $y2 ], [ $x2, $y0 ] ] );
+}
+
+
+sub move_and_render_poly {
+    my( $gd, $y0, $poly, $color ) = @_;
 
     my $GDpoly = new GD::Polygon;
+    foreach ( @$poly ) { $_->[1] += $y0; $GDpoly->addPt( @$_ ) }
+    $gd->filledPolygon( $GDpoly, $color );
+}
 
-    foreach $pt (@$poly)
+
+#  It is not clear why $y is passed.
+sub render_poly {
+    my( $gd, $y, $poly, $color ) = @_;
+
+    my $GDpoly = new GD::Polygon;
+    foreach my $pt ( @$poly )
     {
         my($x,$y) = @$pt;
         $GDpoly->addPt($x,$y);
     }
 
-    $gd->filledPolygon($GDpoly,$color);
+    $gd->filledPolygon( $GDpoly, $color );
 }
 
 
 sub write_image {
-    my($gd,$file) = @_;
-    open(TMPXXJPEG,">$file")
+    my( $gd, $file ) = @_;
+    open( TMPXXJPEG, ">$file" )
         || die "could not open $file";
-    binmode(TMPXXJPEG);
+    binmode( TMPXXJPEG );
     print TMPXXJPEG $gd->$image_type;
-    close(TMPXXJPEG);
-    chmod 0777,$file;
+    close( TMPXXJPEG );
+    chmod 0666, $file;
 }
 
 

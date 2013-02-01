@@ -10,6 +10,7 @@ package Bio::KBase::CDMI::CDMILoader;
     use File::Temp;
     use IDServerAPIClient;
     use Bio::KBase::CDMI::Sources;
+    use ERDBTypeSemiBoolean;
 
 =head1 CDMI Load Utility Object
 
@@ -957,6 +958,10 @@ Copy the first half of the value.
 
 Copy the second half of the value.
 
+=item semi-boolean
+
+Convert to a ERDB Semi-Boolean from a displayable string.
+
 =back
 
 As a shorthand, a single number is equivalent to the number, 'copy',
@@ -984,6 +989,14 @@ sub ConvertFileRecord {
         }
         # The output value will be put in here.
         my $outputValue = $default;
+        # We do extra checking for semi-boolean.
+        if ($rule eq 'semi-boolean') {
+            # The validator returns an empty string if the value is valid.
+            my $badValue = ERDBTypeSemiBoolean->validate($outputValue);
+            if ($badValue) {
+                die "Illegal default value for semi-boolean: $outputValue";
+            }
+        }
         # Get the specified input field. If the input field spec is
         # missing, we'll always do the default.
         my $inputValue;
@@ -1004,6 +1017,8 @@ sub ConvertFileRecord {
                 $outputValue = substr($inputValue, 0, length($inputValue)/2);
             } elsif ($rule eq 'copy2') {
                 $outputValue = substr($inputValue, length($inputValue)/2);
+            } elsif ($rule eq 'semi-boolean') {
+                $outputValue = ERDBTypeSemiBoolean::ComputeFromString($inputValue);
             } else {
                 die "Invalid input rule $rule.\n";
             }

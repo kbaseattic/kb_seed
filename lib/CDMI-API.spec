@@ -603,7 +603,7 @@ module CDMI_API : CDMI_API {
 	   takes genome IDs to 2-tuples that capture the variant code of the genome and the fids from
 	   the genome that are included in the subsystem.
 	*/
-    funcdef subsystems_to_fids(subsystems,genomes) returns (mapping<subsystem,mapping<genome,tuple<variant,fids>>>);
+    funcdef subsystems_to_fids(subsystems,genomes) returns (mapping<subsystem,mapping<genome,list<tuple<variant,fids>>>>);
 
     typedef int aux;
 	/* The routine subsystem_to_roles is used to determine the role descriptions that

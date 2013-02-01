@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 fids_to_feature_data
+=head1 NAME
+
+fids_to_feature_data
+
+=head1 SYNOPSIS
+
+fids_to_feature_data [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 
@@ -28,130 +36,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call fids_to_feature_data. It is documented as follows:
-
-  $return = $obj->fids_to_feature_data($fids)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a feature_data
-fids is a reference to a list where each element is a fid
-fid is a string
-feature_data is a reference to a hash where the following keys are defined:
-	feature_id has a value which is a fid
-	genome_name has a value which is a string
-	feature_function has a value which is a string
-	feature_length has a value which is an int
-	feature_publications has a value which is a pubrefs
-	feature_location has a value which is a location
-pubrefs is a reference to a list where each element is a pubref
-pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-location is a reference to a list where each element is a region_of_dna
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
-
-</pre>
-
-=end html
-
-=begin text
-
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a feature_data
-fids is a reference to a list where each element is a fid
-fid is a string
-feature_data is a reference to a hash where the following keys are defined:
-	feature_id has a value which is a fid
-	genome_name has a value which is a string
-	feature_function has a value which is a string
-	feature_length has a value which is an int
-	feature_publications has a value which is a pubrefs
-	feature_location has a value which is a location
-pubrefs is a reference to a list where each element is a pubref
-pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-location is a reference to a list where each element is a region_of_dna
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
+Usage: fids_to_feature_data [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added in this order:
-
-=over 4
-    
-=item feature_id
-
-Feature identifier
-
-=item feature_publications 
-
-List of Pubmed identifiers for publications associated with this feature.
-
-=item genome_name 
-
-Name of the genome this feature is present in.
-
-=item feature_location 
-
-Location string describing the location of this feature in its genome.
-
-=item feature_length 
-
-Length of the DNA sequence of this feature.
-
-=item feature_function
-
-The function currently assigned to this feature.
-
-=back
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

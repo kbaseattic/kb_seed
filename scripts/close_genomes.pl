@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 close_genomes
+=head1 NAME
+
+close_genomes
+
+=head1 SYNOPSIS
+
+close_genomes [arguments] < input > output
+
+=head1 DESCRIPTION
 
 Example:
 
@@ -38,82 +46,19 @@ where N is the column (from 1) that contains the identifier.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call close_genomes. It is documented as follows:
-
-  $return = $obj->close_genomes($seq_set, $n)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$seq_set is a seq_set
-$n is an int
-$return is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a genome
-	1: a float
-seq_set is a reference to a list where each element is a seq_triple
-seq_triple is a reference to a list containing 3 items:
-	0: an id
-	1: a comment
-	2: a sequence
-id is a string
-comment is a string
-sequence is a string
-genome is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$seq_set is a seq_set
-$n is an int
-$return is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a genome
-	1: a float
-seq_set is a reference to a list where each element is a seq_triple
-seq_triple is a reference to a list containing 3 items:
-	0: an id
-	1: a comment
-	2: a sequence
-id is a string
-comment is a string
-sequence is a string
-genome is a string
+Usage: close_genomes [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
+    --n integer
+    --g string
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the identifier is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=item -n N            [ N is the number of close genomes desired ]
-
-
-=back
-
-=head2 Output Format
-
-If close genomes are being computed for genomes in the CS, then
-the input is a tab-delimited file, and the output will have two
-extra columns: [projected degree of identity,close-genome].
-If the -g option is used, then an updated genome structure will
-be encoded and written to STDOUT.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

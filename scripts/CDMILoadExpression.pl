@@ -113,6 +113,13 @@ not already found in the database.
 If this option is specified, the expression tables will be recreated
 before loading.
 
+=item slow
+
+Use individual INSERT commands to load the database instead of spooling into
+sequential load files.
+
+=item
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -131,13 +138,13 @@ use constant TABLES => [qw(ProbeSet ProducedResultsFor
 use constant SPECIAL => [qw(IndicatedLevelsFor)];
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url);
+my ($recursive, $newOnly, $clear, $id_server_url, $slow);
 
 # Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive,
+        "newOnly" => \$newOnly, "slow" => \$slow, "clear" => \$clear);
 if (! $cdmi) {
     print "usage: CDMILoadExpression [options] source genomeDirectory\n";
     exit;
@@ -229,7 +236,9 @@ sub LoadExpressionData {
     } else {
         print "Processing $expDataDirectory for $genomeID ($genome).\n";
         # Initialize the relation loaders.
-        $loader->SetRelations(@{TABLES()});
+        if (! $slow) {
+            $loader->SetRelations(@{TABLES()});
+        }
         # The chipd ID will go in here.
         my $chipID;
         # Check for a chip ID file.
@@ -313,6 +322,7 @@ sub LoadExpressionData {
                 close $ih; undef $ih;
                 # Now we need to generate the signal records. This includes the signal values we just
                 # read in plus on/off indications from the "final_on_off_calls.txt".
+                print "Reading final on/off calls.\n";
                 open($ih, "<$expDataDirectory/final_on_off_calls.txt") || die "Could not open final_on_off_calls.\n";
                 # Discard the experiment list. It will be the same as the one we already have.
                 $loader->GetLine($ih);
@@ -373,6 +383,7 @@ sub LoadExpressionData {
                     $stats->Add(missingPearson => 1);
                 } else {
                     # Yes we can. Read them from the pearson coefficient file.
+                    print "Reading pearson coefficients.\n";
                     open($ih, "<$pearsonFile") || die "Could not open pearson file: $!\n";
                     while (! eof $ih) {
                         my ($fid1, $fid2, $pc) = $loader->GetLine($ih);
@@ -457,8 +468,10 @@ sub LoadExpressionData {
             }
         }
         # Load the relations.
-        print "Unspooling relations.\n";
-        $loader->LoadRelations();
+        if (! $slow) {
+            print "Unspooling relations.\n";
+            $loader->LoadRelations();
+        }
     }
 }
 

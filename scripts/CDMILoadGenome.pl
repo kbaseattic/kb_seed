@@ -192,6 +192,11 @@ server.
 
 Validate the input files without loading them.
 
+=item slow
+
+Use individual INSERT commands to load the database instead of spooling into
+sequential load files.
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -200,7 +205,7 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url, $validate);
+my ($recursive, $newOnly, $clear, $id_server_url, $validate, $slow);
 # Turn off buffering for progress messages.
 $| = 1;
 # Connect to the database. If we are validating, we parse the command
@@ -212,7 +217,8 @@ $| = 1;
 $validate = grep { $_ =~ /^--?validate$/ } @ARGV;
 my ($rc, $cdmi);
 my %parms = ("recursive" => \$recursive, "newOnly" => \$newOnly,
-        "clear" => \$clear, "idserver=s" => \$id_server_url, "validate" => \$validate);
+        "clear" => \$clear, "idserver=s" => \$id_server_url,
+        "validate" => \$validate, "slow" => \$slow);
 if ($validate) {
     $rc = GetOptions(%parms);
 } else {
@@ -348,9 +354,11 @@ sub LoadGenome {
                 # Initialize the relation loaders. The order of the relations is
                 # important, since it determines whether or not the DeleteGenome
                 # method will work properly.
-                $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
-                        IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
-                        IsProteinFor Encompasses));
+                if (! $slow) {
+                    $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
+                            IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
+                            IsProteinFor Encompasses));
+                }
             }
         }
         if ($processing) {
@@ -366,7 +374,9 @@ sub LoadGenome {
             # If we are loading for real, store everything in the database here.
             if (! $validate) {
                 # Unspool the relation loaders.
-                $loader->LoadRelations();
+                if (! $slow) {
+                    $loader->LoadRelations();
+                }
                 # Create the genome record.
                 CreateGenome($loader, $source, $genomeID, $genomeOriginalID, $metaHash,
                         $dnaSize, $gcContent, $md5, $pegs, $rnas, scalar(keys %$contigMap));

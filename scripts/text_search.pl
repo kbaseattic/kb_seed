@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 text_search
+=head1 NAME
+
+text_search
+
+=head1 SYNOPSIS
+
+text_search [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 text_search performs a search against a full-text index maintained 
@@ -32,74 +40,18 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call text_search. It is documented as follows:
-
-  $return = $obj->text_search($fids)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is an annotations
-fids is a reference to a list where each element is a fid
-fid is a string
-annotations is a reference to a list where each element is an annotation
-annotation is a reference to a list containing 3 items:
-	0: a comment
-	1: an annotator
-	2: an annotation_time
-comment is a string
-annotator is a string
-annotation_time is an int
-
-</pre>
-
-=end html
-
-=begin text
-
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is an annotations
-fids is a reference to a list where each element is a fid
-fid is a string
-annotations is a reference to a list where each element is an annotation
-annotation is a reference to a list containing 3 items:
-	0: a comment
-	1: an annotator
-	2: an annotation_time
-comment is a string
-annotator is a string
-annotation_time is an int
+Usage: text_search [arguments] < input > output
 
 
-=end text
+    --start string
+    --count string
+    --entity string
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

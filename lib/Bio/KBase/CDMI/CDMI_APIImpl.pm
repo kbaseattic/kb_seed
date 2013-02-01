@@ -5007,7 +5007,7 @@ sub fids_to_feature_data
     for my $fid (@$fids) {
         my @locs = $kb->GetLocations($fid);
         for my $loc (@locs) {
-            push @{$location{$fid}},[$loc->Contig, $loc->Begin, $loc->Dir, $loc->Len];
+            push @{$location{$fid}},[$loc->Contig, $loc->Begin, $loc->Dir, $loc->Length];
         }
     }
 

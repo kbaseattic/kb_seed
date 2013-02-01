@@ -25,6 +25,7 @@ package find_special_proteins;
 use strict;
 use gjoseqlib;
 use gjoparseblast;
+use SeedAware;
 use NCBI_genetic_code;
 
 # use Data::Dumper;
@@ -61,7 +62,7 @@ sub find_selenoproteins
 {
     my ( $params ) = @_;
 
-    my ( $tmp_dir, $save_tmp ) = temporary_directory( $params );
+    my ( $tmp_dir, $save_tmp ) = SeedAware::temporary_directory( $params );
 
     my ( $contig_key ) = grep { /^contig/ || /^gen/ } keys %$params;
     my $contigs = $contig_key ? $params->{ $contig_key } : undef;
@@ -296,7 +297,7 @@ sub find_protein_homologs
 {
     my ( $params ) = @_;
 
-    my ( $tmp_dir, $save_tmp ) = temporary_directory( $params );
+    my ( $tmp_dir, $save_tmp ) = SeedAware::temporary_directory( $params );
 
     my ( $contig_key ) = grep { $_ !~ /code/ }   # Don't get "genetic_code"
                          grep { /^contig/ || /^gen/ }
@@ -617,46 +618,6 @@ sub opt_hash
 }
 
 
-#-------------------------------------------------------------------------------
-#  ( $tmp_dir, $save_tmp ) = temporary_directory( \%options )
-#-------------------------------------------------------------------------------
-sub temporary_directory
-{
-    my $options = ( shift ) || {};
-
-    #  Accept these option names with or without an underscore
-    my $tmp_dir  = $options->{ tmpdir }  || $options->{ tmp_dir };
-    my $save_tmp = $options->{ savetmp } || $options->{ save_tmp } || '';
-
-    if ( $tmp_dir )
-    {
-        #  User-supplied directory?  Don't blow it away when we're done
-        if ( -d $tmp_dir ) { $options->{ savetmp } = $save_tmp = 1 }
-    }
-    else
-    {
-        my $tmp = $options->{ tmp } && -d  $options->{ tmp } ?  $options->{ tmp }
-                : $FIG_Config::temp && -d  $FIG_Config::temp ?  $FIG_Config::temp
-                :                      -d '/tmp'             ? '/tmp'
-                :                                              '.';
-        $tmp_dir = sprintf( "$tmp/special_proteins_tmp_dir.%05d.%09d", $$, int(1000000000*rand) );
-        #  We named the directoy, let's add it in the options hash
-        $options->{ tmpdir } = $tmp_dir;
-    }
-
-    if ( $tmp_dir && ! -d $tmp_dir )
-    {
-        mkdir $tmp_dir;
-        if ( ! -d $tmp_dir )
-        {
-            print STDERR "find_special_proteins::temporary_directory could not create '$tmp_dir'\n";
-            $options->{ tmpdir } = $tmp_dir = undef;
-        }
-    }
-
-    return ( $tmp_dir, $save_tmp );
-}
-
 #===============================================================================
 #  Use a database of reference sequences to locate proteins with unusual starts in a genome.
 #
@@ -681,7 +642,7 @@ sub find_odd_starts
 {
     my ( $params ) = @_;
     my %locs;
-    my ( $tmp_dir, $save_tmp ) = temporary_directory( $params );
+    my ( $tmp_dir, $save_tmp ) = SeedAware::temporary_directory( $params );
 
     my ( $contig_key ) = grep { /^contig/ || /^gen/ } keys %$params;
     my $contigs = $contig_key ? $params->{ $contig_key } : undef;

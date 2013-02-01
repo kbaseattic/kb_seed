@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 md5s_to_genomes
+=head1 NAME
+
+md5s_to_genomes
+
+=head1 SYNOPSIS
+
+md5s_to_genomes [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 md5s to genomes is used to get the genomes associated with each of a list of input md5 values.
@@ -34,62 +42,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call md5s_to_genomes. It is documented as follows:
-
-  $return = $obj->md5s_to_genomes($md5s)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$md5s is a md5s
-$return is a reference to a hash where the key is a md5 and the value is a genomes
-md5s is a reference to a list where each element is a md5
-md5 is a string
-genomes is a reference to a list where each element is a genome
-genome is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$md5s is a md5s
-$return is a reference to a hash where the key is a md5 and the value is a genomes
-md5s is a reference to a list where each element is a md5
-md5 is a string
-genomes is a reference to a list where each element is a genome
-genome is a string
+Usage: md5s_to_genomes [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

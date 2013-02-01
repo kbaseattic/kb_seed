@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 reactions_to_complexes
+=head1 NAME
+
+reactions_to_complexes
+
+=head1 SYNOPSIS
+
+reactions_to_complexes [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 Reactions are thought of as being either spontaneous or implemented by
@@ -33,62 +41,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call reactions_to_complexes. It is documented as follows:
-
-  $return = $obj->reactions_to_complexes($reactions)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$reactions is a reactions
-$return is a reference to a hash where the key is a reaction and the value is a complexes
-reactions is a reference to a list where each element is a reaction
-reaction is a string
-complexes is a reference to a list where each element is a complex
-complex is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$reactions is a reactions
-$return is a reference to a hash where the key is a reaction and the value is a complexes
-reactions is a reference to a list where each element is a reaction
-reaction is a string
-complexes is a reference to a list where each element is a complex
-complex is a string
+Usage: reactions_to_complexes [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (the complex ID) added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

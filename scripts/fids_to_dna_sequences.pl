@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 fids_to_dna_sequences
+=head1 NAME
+
+fids_to_dna_sequences
+
+=head1 SYNOPSIS
+
+fids_to_dna_sequences [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 fids_to_dna_sequences allows the user to look up the DNA sequences
@@ -29,66 +37,18 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call fids_to_dna_sequences. It is documented as follows:
-
-  $return = $obj->fids_to_dna_sequences($fids)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a dna_sequence
-fids is a reference to a list where each element is a fid
-fid is a string
-dna_sequence is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$fids is a fids
-$return is a reference to a hash where the key is a fid and the value is a dna_sequence
-fids is a reference to a list where each element is a fid
-fid is a string
-dna_sequence is a string
+Usage: fids_to_dna_sequences [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    --fasta integer
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=item -fasta
-
-This is used to request a fasta output file (dropping all of the other columns in the input lines).
-It defaults to outputing just a fasta entry.
-
-=back
-
-=head2 Output Format
-
-The standard output is just a fasta file with the sequence.  You can also get
-a tab-delimited file by using -fasta=0.  The tab-delimited format consists of the input
-file with an extra column of sequence  added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 

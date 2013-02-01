@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 reaction_strings
+=head1 NAME
+
+reaction_strings
+
+=head1 SYNOPSIS
+
+reaction_strings [arguments] < input > output
+
+=head1 DESCRIPTION
 
 
 Reaction_strings are text strings that represent (albeit crudely)
@@ -29,62 +37,17 @@ where N is the column (from 1) that contains the subsystem.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call reaction_strings. It is documented as follows:
-
-  $return = $obj->reaction_strings($reactions, $name_parameter)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$reactions is a reactions
-$name_parameter is a name_parameter
-$return is a reference to a hash where the key is a reaction and the value is a string
-reactions is a reference to a list where each element is a reaction
-reaction is a string
-name_parameter is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$reactions is a reactions
-$name_parameter is a name_parameter
-$return is a reference to a hash where the key is a reaction and the value is a string
-reactions is a reference to a list where each element is a reaction
-reaction is a string
-name_parameter is a string
+Usage: reaction_strings [arguments] < input > output
 
 
-=end text
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=back
+=head1 AUTHORS
 
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column (the readable reaction string) added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
