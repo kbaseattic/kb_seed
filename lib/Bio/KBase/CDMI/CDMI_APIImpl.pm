@@ -370,9 +370,9 @@ fids is a reference to a list where each element is a fid
 fid is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 </pre>
 
@@ -386,9 +386,9 @@ fids is a reference to a list where each element is a fid
 fid is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 
 =end text
@@ -742,7 +742,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 </pre>
 
@@ -757,7 +757,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 
 =end text
@@ -1045,7 +1045,7 @@ alleles is a reference to a list where each element is an allele
 allele is a string
 bp_loc is a reference to a list containing 2 items:
 	0: a contig
-	1: an int
+	1: (position) an int
 contig is a string
 
 </pre>
@@ -1060,7 +1060,7 @@ alleles is a reference to a list where each element is an allele
 allele is a string
 bp_loc is a reference to a list containing 2 items:
 	0: a contig
-	1: an int
+	1: (position) an int
 contig is a string
 
 
@@ -1230,7 +1230,7 @@ sub region_to_fids
 $region_of_dna is a region_of_dna
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: an allele
-	1: an int
+	1: (position) an int
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
 	1: a begin
@@ -1251,7 +1251,7 @@ allele is a string
 $region_of_dna is a region_of_dna
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: an allele
-	1: an int
+	1: (position) an int
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
 	1: a begin
@@ -1904,9 +1904,9 @@ proteins is a reference to a list where each element is a protein
 protein is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 </pre>
 
@@ -1920,9 +1920,9 @@ proteins is a reference to a list where each element is a protein
 protein is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 
 =end text
@@ -2467,7 +2467,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 </pre>
 
@@ -2482,7 +2482,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 
 =end text
@@ -4916,9 +4916,9 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -4949,9 +4949,9 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -7347,7 +7347,7 @@ $seq_set is a seq_set
 $n is an int
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
-	1: a float
+	1: (ident) a float
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -7368,7 +7368,7 @@ $seq_set is a seq_set
 $n is an int
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
-	1: a float
+	1: (ident) a float
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -9063,9 +9063,9 @@ The URL and title are often missing (but, can usually be inferred from the pubme
 
 <pre>
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 </pre>
 
@@ -9074,9 +9074,9 @@ a reference to a list containing 3 items:
 =begin text
 
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 
 =end text
@@ -9098,7 +9098,7 @@ a reference to a list containing 3 items:
 <pre>
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 </pre>
 
@@ -9108,7 +9108,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 
 =end text
@@ -9988,7 +9988,7 @@ a reference to a list where each element is an ou
 <pre>
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 </pre>
 
@@ -9998,7 +9998,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 
 =end text

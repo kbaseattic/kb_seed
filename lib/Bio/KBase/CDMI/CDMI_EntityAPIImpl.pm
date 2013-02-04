@@ -50781,9 +50781,9 @@ The URL and title are often missing (but, can usually be inferred from the pubme
 
 <pre>
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 </pre>
 
@@ -50792,9 +50792,9 @@ a reference to a list containing 3 items:
 =begin text
 
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 
 =end text
@@ -50816,7 +50816,7 @@ a reference to a list containing 3 items:
 <pre>
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 </pre>
 
@@ -50826,7 +50826,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 
 =end text
@@ -51706,7 +51706,7 @@ a reference to a list where each element is an ou
 <pre>
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 </pre>
 
@@ -51716,7 +51716,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 
 =end text

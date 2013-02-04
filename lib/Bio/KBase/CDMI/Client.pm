@@ -18,17 +18,102 @@ Bio::KBase::CDMI::Client
 =head1 DESCRIPTION
 
 
+The CDMI_API defines the component of the Kbase API that supports interaction with
+instances of the CDM (Central Data Model).  A basic familiarity with these routines
+will allow the user to extract data from the CS (Central Store).  We anticipate
+supporting numerous sparse CDMIs in the PS (Persistent Store).
+
+=head2 Basic Themes
+
+There are several broad categories of routines supported in the CDMI-API.
+
+The simplest is set of "get entity" routines -- each returning data
+extracted from instances of a single entity type.  These routines all take
+as input a list of ids referencing instances of a single type of entity.
+They construct as output a mapping which takes as input an id and
+associates as output a set of fields from that instance of the entity.  Each
+routine allows the user to specify which fields are desired.
+
+For example, assume you have an input file "Staphylococci," which is a list of genome IDs for each species of Staphylococcus in the database. The get_entity_Genome command is used to retrieve detailed information about each genome in the file. By using different modifiers, you can specify what kind of information you want to display. In this example, the modifier "contigs" was used. Thus, the number next to the genome ID in the output file indicates the number of contigs each Staphylococcus genome has. For a list of available modifiers relating to each identity, please refer to the ER model.
+
+        > / cat Staphylococci | cut -f 1 | get_entity_Genome - f contigs
+        kb|g.134        2
+        kb|g.636        1
+        kb|g.2506        15
+        kb|g.9303        1
+        kb|g.3801        87
+        kb|g.2025        46
+        kb|g.2516        13
+        kb|g.2603        33
+        kb|g.19928        2
+        kb|g.1852        131
+        kb|g.8476        1
+        kb|g.2742        46
+
+To use these routines effectively, a user will need to gradually
+become familiar with the entities supported in the CDM.  We suggest
+perusing the entity-relationship model that underlies the CDM to
+get a good introduction.
+
+The next simplest set of routines provide the "get relationship" routines.  These
+take as input a list of ids for a specific entity type, and the give access
+to the relationship nodes associated with each entity.  Thus, get_relationship_WasSubmittedBy takes the input genome ID and outputs the ID with an added column showing the source of that particular genome. It is essential to be able to navigate the ER model to successfully implement these commands, since not all relationship types are applicable to each entity.
+
+        > / echo 'kb|g.0' | get_relationship_WasSubmittedBy -to id
+        kb|g.0        SEED
+
+Of the remaining CDMI-API routines, most are used to extract data by
+"crossing one or more relationships".  Thus,
+
+        my $references = $kbO->fids_to_literature($fids)
+
+takes as input a list of feature ids referenced by the variable $fids.  It
+creates a hash ($references) which maps each input key to a list of literature
+references.  The construction of the literature references for a given ID involves
+crossing relationships from the entity 'Feature' to 'ProteinSequence' to 'Publication'.
+We have attempted to package this specific search in a convenient form.  We anticipate
+that the number of queries of this last class will grow (especially as new entities are
+added to the model).
+
+=head2 Batching queries
+
+A majority of the CS-API routines take a list of ids as input.  Each id may be thought
+of as input to a query that produces an output result.  We support processing an input list,
+since the performance (which is usually governed by network interactions) is much better
+if you process a batch of items, rather than invoking the API repeatedly for each of the
+ids.  Normally, the output would be a mapping (a hash for Perl versions) from the
+input ids to the output results.  Thus, a routine like
+
+             fids_to_literature
+
+will take a list of feature ids as input.  The returned value will be a mapping from
+feature ids (fids) to publication references.
+
+It is a little inconvenient to batch your requests by supplying a list of fids,
+but the performance will be much better in most cases.  Please note that you are
+controlling the granularity of each request, and in most cases the size of the input
+list is not critical.  However, you should note that while batching up hundreds or thousands
+of input ids at a time should work just fine, millions may well cause things to break (e.g.,
+you may exhaust local memory in your machine as the output results are returned).  As
+machines get larger, the appropriate size of the input lists may become largely irrelevant.
+For now, we recommend that you experiment a bit and use common sense.
+
+
+
 
 =cut
 
 sub new
 {
-    my($class, $url) = @_;
+    my($class, $url, @args) = @_;
+    
 
     my $self = {
 	client => Bio::KBase::CDMI::Client::RpcClient->new,
 	url => $url,
     };
+
+
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
     $ua->timeout($timeout);
@@ -99,6 +184,8 @@ made the annotation and when (as seconds from the epoch).
 sub fids_to_annotations
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -185,6 +272,8 @@ sub fids_to_functions
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -242,9 +331,9 @@ fids is a reference to a list where each element is a fid
 fid is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 </pre>
 
@@ -258,9 +347,9 @@ fids is a reference to a list where each element is a fid
 fid is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 
 =end text
@@ -286,6 +375,8 @@ connections, we hope that they will help record the associations.
 sub fids_to_literature
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -378,6 +469,8 @@ sub fids_to_protein_families
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -465,6 +558,8 @@ This can occur due to fusions or to broad specificity of substrate.
 sub fids_to_roles
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -555,6 +650,8 @@ sub fids_to_subsystems
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -613,7 +710,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 </pre>
 
@@ -628,7 +725,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 
 =end text
@@ -659,6 +756,8 @@ approximately what percentage appear to be actually related for a few cutoff val
 sub fids_to_co_occurring_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -775,6 +874,8 @@ sub fids_to_locations
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -864,6 +965,8 @@ sub locations_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -921,7 +1024,7 @@ alleles is a reference to a list where each element is an allele
 allele is a string
 bp_loc is a reference to a list containing 2 items:
 	0: a contig
-	1: an int
+	1: (position) an int
 contig is a string
 
 </pre>
@@ -936,7 +1039,7 @@ alleles is a reference to a list where each element is an allele
 allele is a string
 bp_loc is a reference to a list containing 2 items:
 	0: a contig
-	1: an int
+	1: (position) an int
 contig is a string
 
 
@@ -953,6 +1056,8 @@ contig is a string
 sub alleles_to_bp_locs
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -1054,6 +1159,8 @@ sub region_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -1108,7 +1215,7 @@ sub region_to_fids
 $region_of_dna is a region_of_dna
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: an allele
-	1: an int
+	1: (position) an int
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
 	1: a begin
@@ -1129,7 +1236,7 @@ allele is a string
 $region_of_dna is a region_of_dna
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: an allele
-	1: an int
+	1: (position) an int
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
 	1: a begin
@@ -1155,6 +1262,8 @@ allele is a string
 sub region_to_alleles
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -1242,6 +1351,8 @@ sub alleles_to_traits
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -1327,6 +1438,8 @@ allele is a string
 sub traits_to_alleles
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -1427,6 +1540,8 @@ measurement_value is a float
 sub ous_with_trait
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 5)
     {
@@ -1544,6 +1659,8 @@ sub locations_to_dna_sequences
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -1632,6 +1749,8 @@ be the entire set (within Kbase) that have the sequence as a translation.
 sub proteins_to_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -1725,6 +1844,8 @@ sub proteins_to_protein_families
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -1782,9 +1903,9 @@ proteins is a reference to a list where each element is a protein
 protein is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 </pre>
 
@@ -1798,9 +1919,9 @@ proteins is a reference to a list where each element is a protein
 protein is a string
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 
 
 =end text
@@ -1824,6 +1945,8 @@ and we will attempt to do so.
 sub proteins_to_literature
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -1928,6 +2051,8 @@ sub proteins_to_functions
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2030,6 +2155,8 @@ sub proteins_to_roles
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2118,6 +2245,8 @@ sub roles_to_proteins
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2205,6 +2334,8 @@ is returned as a hash with key role description and values composed of sets of s
 sub roles_to_subsystems
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -2295,6 +2426,8 @@ sub roles_to_protein_families
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2353,7 +2486,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 </pre>
 
@@ -2368,7 +2501,7 @@ fid is a string
 scored_fids is a reference to a list where each element is a scored_fid
 scored_fid is a reference to a list containing 2 items:
 	0: a fid
-	1: a float
+	1: (score) a float
 
 
 =end text
@@ -2388,6 +2521,8 @@ greater than 0.5 or less than -0.5.
 sub fids_to_coexpressed_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -2477,6 +2612,8 @@ sub protein_families_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2565,6 +2702,8 @@ sub protein_families_to_proteins
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2649,6 +2788,8 @@ that make up the family.  Each input protein_family is mapped to a family functi
 sub protein_families_to_functions
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -2749,6 +2890,8 @@ on clustered pairs from the same protein_families.
 sub protein_families_to_co_occurring_families
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -2853,6 +2996,8 @@ sub co_occurrence_evidence
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -2938,6 +3083,8 @@ produces a mapping from the input IDs to the returned DNA sequence in each case.
 sub contigs_to_sequences
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -3027,6 +3174,8 @@ sub contigs_to_lengths
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3115,6 +3264,8 @@ from contig ID to MD5 value.
 sub contigs_to_md5s
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -3208,6 +3359,8 @@ sub md5s_to_genomes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3297,6 +3450,8 @@ sub genomes_to_md5s
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3384,6 +3539,8 @@ from genome ID to the list of contigs included in the genome.
 sub genomes_to_contigs
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -3478,6 +3635,8 @@ types_of_fids argument.
 sub genomes_to_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -3597,6 +3756,8 @@ sub genomes_to_taxonomies
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3696,6 +3857,8 @@ sub genomes_to_subsystems
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3788,6 +3951,8 @@ a [variant-code,genome ID] pair.
 sub subsystems_to_genomes
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -3891,6 +4056,8 @@ sub subsystems_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -3984,6 +4151,8 @@ are not returned.  If it is 1, they are returned.
 sub subsystems_to_roles
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -4094,6 +4263,8 @@ sub subsystems_to_spreadsheets
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4176,6 +4347,8 @@ the minimal set we need to clean up in order to properly support modeling.
 sub all_roles_used_in_models
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 0)
     {
@@ -4273,6 +4446,8 @@ reaction is a string
 sub complexes_to_complex_data
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -4378,6 +4553,8 @@ sub genomes_to_genome_data
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4472,6 +4649,8 @@ sub fids_to_regulon_data
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4558,6 +4737,8 @@ sub regulons_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4622,9 +4803,9 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -4655,9 +4836,9 @@ feature_data is a reference to a hash where the following keys are defined:
 	feature_location has a value which is a location
 pubrefs is a reference to a list where each element is a pubref
 pubref is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
+	0: (id) a string
+	1: (link) a string
+	2: (title) a string
 location is a reference to a list where each element is a region_of_dna
 region_of_dna is a reference to a list containing 4 items:
 	0: a contig
@@ -4683,6 +4864,8 @@ length is an int
 sub fids_to_feature_data
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -4786,6 +4969,8 @@ sub equiv_sequence_assertions
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4881,6 +5066,8 @@ sub fids_to_atomic_regulons
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -4967,6 +5154,8 @@ Regulons may arise from several sources; hence, fids can be in multiple regulons
 sub atomic_regulons_to_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -5055,6 +5244,8 @@ sub fids_to_protein_sequences
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -5138,6 +5329,8 @@ md5 is a string
 sub fids_to_proteins
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -5223,6 +5416,8 @@ corresponding to each of a set of fids.
 sub fids_to_dna_sequences
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -5323,6 +5518,8 @@ sub roles_to_fids
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -5420,6 +5617,8 @@ sub reactions_to_complexes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -5503,6 +5702,8 @@ fid is a string
 sub aliases_to_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -5589,6 +5790,8 @@ fid is a string
 sub external_ids_to_fids
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -5677,6 +5880,8 @@ the details of Reactions.
 sub reaction_strings
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -5773,6 +5978,8 @@ sub roles_to_complexes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -5858,6 +6065,8 @@ role is a string
 sub complexes_to_roles
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -5957,6 +6166,8 @@ sub fids_to_subsystem_data
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -6038,6 +6249,8 @@ genome is a string
 sub representative
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -6123,6 +6336,8 @@ sub otu_members
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -6202,6 +6417,8 @@ genome is a string
 sub otus_to_representatives
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -6286,6 +6503,8 @@ genome is a string
 sub fids_to_genomes
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -6386,6 +6605,8 @@ parameters limit the results to "count" hits starting at "start".
 sub text_search
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -6497,6 +6718,8 @@ correspondence is a reference to a hash where the following keys are defined:
 sub corresponds
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -6645,6 +6868,8 @@ sub corresponds_from_sequences
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -6703,7 +6928,7 @@ $seq_set is a seq_set
 $n is an int
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
-	1: a float
+	1: (ident) a float
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -6724,7 +6949,7 @@ $seq_set is a seq_set
 $n is an int
 $return is a reference to a list where each element is a reference to a list containing 2 items:
 	0: a genome
-	1: a float
+	1: (ident) a float
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -6749,6 +6974,8 @@ genome is a string
 sub close_genomes
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -6864,6 +7091,8 @@ representative sequence)
 sub representative_sequences
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 2)
     {
@@ -7144,6 +7373,8 @@ sub align_sequences
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7263,6 +7494,8 @@ sub build_tree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7362,6 +7595,8 @@ sub alignment_by_id
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7443,6 +7678,8 @@ newick_tree is a string
 sub tree_by_id
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -7616,6 +7853,8 @@ sub get_entity_Alignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7727,6 +7966,8 @@ sub query_entity_Alignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7834,6 +8075,8 @@ sub all_entities_Alignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -7930,6 +8173,8 @@ sub get_entity_AlignmentAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8021,6 +8266,8 @@ sub query_entity_AlignmentAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8107,6 +8354,8 @@ fields_AlignmentAttribute is a reference to a hash where the following keys are 
 sub all_entities_AlignmentAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -8265,6 +8514,8 @@ sub get_entity_AlignmentRow
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8372,6 +8623,8 @@ sub query_entity_AlignmentRow
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8474,6 +8727,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 sub all_entities_AlignmentRow
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -8618,6 +8873,8 @@ sub get_entity_AlleleFrequency
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8723,6 +8980,8 @@ sub query_entity_AlleleFrequency
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -8823,6 +9082,8 @@ fields_AlleleFrequency is a reference to a hash where the following keys are def
 sub all_entities_AlleleFrequency
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -8942,6 +9203,8 @@ sub get_entity_Annotation
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9039,6 +9302,8 @@ sub query_entity_Annotation
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9131,6 +9396,8 @@ fields_Annotation is a reference to a hash where the following keys are defined:
 sub all_entities_Annotation
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -9246,6 +9513,8 @@ sub get_entity_Assay
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9343,6 +9612,8 @@ sub query_entity_Assay
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9435,6 +9706,8 @@ fields_Assay is a reference to a hash where the following keys are defined:
 sub all_entities_Assay
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -9533,6 +9806,8 @@ sub get_entity_AtomicRegulon
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9624,6 +9899,8 @@ sub query_entity_AtomicRegulon
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9710,6 +9987,8 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 sub all_entities_AtomicRegulon
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -9813,6 +10092,8 @@ sub get_entity_Attribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9906,6 +10187,8 @@ sub query_entity_Attribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -9994,6 +10277,8 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 sub all_entities_Attribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -10155,6 +10440,8 @@ sub get_entity_Biomass
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10262,6 +10549,8 @@ sub query_entity_Biomass
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10364,6 +10653,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 sub all_entities_Biomass
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -10495,6 +10786,8 @@ sub get_entity_CodonUsage
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10594,6 +10887,8 @@ sub query_entity_CodonUsage
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10688,6 +10983,8 @@ fields_CodonUsage is a reference to a hash where the following keys are defined:
 sub all_entities_CodonUsage
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -10804,6 +11101,8 @@ sub get_entity_Complex
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10901,6 +11200,8 @@ sub query_entity_Complex
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -10993,6 +11294,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub all_entities_Complex
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -11164,6 +11467,8 @@ sub get_entity_Compound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11275,6 +11580,8 @@ sub query_entity_Compound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11381,6 +11688,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub all_entities_Compound
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -11492,6 +11801,8 @@ sub get_entity_CompoundInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11587,6 +11898,8 @@ sub query_entity_CompoundInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11677,6 +11990,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 sub all_entities_CompoundInstance
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -11786,6 +12101,8 @@ sub get_entity_Contig
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11879,6 +12196,8 @@ sub query_entity_Contig
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -11967,6 +12286,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 sub all_entities_Contig
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -12071,6 +12392,8 @@ sub get_entity_ContigChunk
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12164,6 +12487,8 @@ sub query_entity_ContigChunk
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12252,6 +12577,8 @@ fields_ContigChunk is a reference to a hash where the following keys are defined
 sub all_entities_ContigChunk
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -12360,6 +12687,8 @@ sub get_entity_ContigSequence
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12453,6 +12782,8 @@ sub query_entity_ContigSequence
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12541,6 +12872,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub all_entities_ContigSequence
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -12656,6 +12989,8 @@ sub get_entity_CoregulatedSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12751,6 +13086,8 @@ sub query_entity_CoregulatedSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -12841,6 +13178,8 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 sub all_entities_CoregulatedSet
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -12950,6 +13289,8 @@ sub get_entity_Diagram
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13045,6 +13386,8 @@ sub query_entity_Diagram
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13135,6 +13478,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub all_entities_Diagram
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -13246,6 +13591,8 @@ sub get_entity_EcNumber
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13341,6 +13688,8 @@ sub query_entity_EcNumber
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13431,6 +13780,8 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 sub all_entities_EcNumber
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -13565,6 +13916,8 @@ sub get_entity_Environment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13666,6 +14019,8 @@ sub query_entity_Environment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13762,6 +14117,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 sub all_entities_Environment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -13865,6 +14222,8 @@ sub get_entity_Experiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -13958,6 +14317,8 @@ sub query_entity_Experiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14046,6 +14407,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub all_entities_Experiment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -14179,6 +14542,8 @@ sub get_entity_ExperimentMeta
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14280,6 +14645,8 @@ sub query_entity_ExperimentMeta
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14376,6 +14743,8 @@ fields_ExperimentMeta is a reference to a hash where the following keys are defi
 sub all_entities_ExperimentMeta
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -14480,6 +14849,8 @@ sub get_entity_ExperimentalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14573,6 +14944,8 @@ sub query_entity_ExperimentalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14661,6 +15034,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 sub all_entities_ExperimentalUnit
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -14786,6 +15161,8 @@ sub get_entity_ExperimentalUnitGroup
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14885,6 +15262,8 @@ sub query_entity_ExperimentalUnitGroup
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -14979,6 +15358,8 @@ fields_ExperimentalUnitGroup is a reference to a hash where the following keys a
 sub all_entities_ExperimentalUnitGroup
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -15118,6 +15499,8 @@ sub get_entity_Family
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -15217,6 +15600,8 @@ sub query_entity_Family
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -15311,6 +15696,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub all_entities_Family
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -15455,6 +15842,8 @@ sub get_entity_Feature
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -15556,6 +15945,8 @@ sub query_entity_Feature
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -15652,6 +16043,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub all_entities_Feature
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -15848,6 +16241,8 @@ sub get_entity_Genome
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -15965,6 +16360,8 @@ sub query_entity_Genome
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16077,6 +16474,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub all_entities_Genome
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -16234,6 +16633,8 @@ sub get_entity_Locality
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16343,6 +16744,8 @@ sub query_entity_Locality
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16448,6 +16851,8 @@ sub all_entities_Locality
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16546,6 +16951,8 @@ sub get_entity_LocalizedCompound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16637,6 +17044,8 @@ sub query_entity_LocalizedCompound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16723,6 +17132,8 @@ fields_LocalizedCompound is a reference to a hash where the following keys are d
 sub all_entities_LocalizedCompound
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -16849,6 +17260,8 @@ sub get_entity_Location
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -16948,6 +17361,8 @@ sub query_entity_Location
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17042,6 +17457,8 @@ fields_Location is a reference to a hash where the following keys are defined:
 sub all_entities_Location
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -17173,6 +17590,8 @@ sub get_entity_LocationInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17272,6 +17691,8 @@ sub query_entity_LocationInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17366,6 +17787,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 sub all_entities_LocationInstance
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -17526,6 +17949,8 @@ sub get_entity_Measurement
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17633,6 +18058,8 @@ sub query_entity_Measurement
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17735,6 +18162,8 @@ fields_Measurement is a reference to a hash where the following keys are defined
 sub all_entities_Measurement
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -17867,6 +18296,8 @@ sub get_entity_MeasurementDescription
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -17968,6 +18399,8 @@ sub query_entity_MeasurementDescription
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18064,6 +18497,8 @@ fields_MeasurementDescription is a reference to a hash where the following keys 
 sub all_entities_MeasurementDescription
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -18219,6 +18654,8 @@ sub get_entity_Media
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18326,6 +18763,8 @@ sub query_entity_Media
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18428,6 +18867,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 sub all_entities_Media
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -18583,6 +19024,8 @@ sub get_entity_Model
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18690,6 +19133,8 @@ sub query_entity_Model
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18793,6 +19238,8 @@ sub all_entities_Model
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18887,6 +19334,8 @@ sub get_entity_OTU
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -18978,6 +19427,8 @@ sub query_entity_OTU
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19064,6 +19515,8 @@ fields_OTU is a reference to a hash where the following keys are defined:
 sub all_entities_OTU
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -19181,6 +19634,8 @@ sub get_entity_ObservationalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19278,6 +19733,8 @@ sub query_entity_ObservationalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19370,6 +19827,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 sub all_entities_ObservationalUnit
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -19478,6 +19937,8 @@ sub get_entity_PairSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19571,6 +20032,8 @@ sub query_entity_PairSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19659,6 +20122,8 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 sub all_entities_PairSet
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -19758,6 +20223,8 @@ sub get_entity_Pairing
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19849,6 +20316,8 @@ sub query_entity_Pairing
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -19935,6 +20404,8 @@ fields_Pairing is a reference to a hash where the following keys are defined:
 sub all_entities_Pairing
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -20030,6 +20501,8 @@ sub get_entity_Parameter
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20121,6 +20594,8 @@ sub query_entity_Parameter
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20207,6 +20682,8 @@ fields_Parameter is a reference to a hash where the following keys are defined:
 sub all_entities_Parameter
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -20336,6 +20813,8 @@ sub get_entity_Person
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20437,6 +20916,8 @@ sub query_entity_Person
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20534,6 +21015,8 @@ sub all_entities_Person
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20628,6 +21111,8 @@ sub get_entity_ProbeSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20719,6 +21204,8 @@ sub query_entity_ProbeSet
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -20805,6 +21292,8 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub all_entities_ProbeSet
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -20913,6 +21402,8 @@ sub get_entity_ProteinSequence
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21006,6 +21497,8 @@ sub query_entity_ProteinSequence
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21094,6 +21587,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 sub all_entities_ProteinSequence
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -21213,6 +21708,8 @@ sub get_entity_Protocol
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21310,6 +21807,8 @@ sub query_entity_Protocol
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21402,6 +21901,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 sub all_entities_Protocol
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -21522,6 +22023,8 @@ sub get_entity_Publication
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21619,6 +22122,8 @@ sub query_entity_Publication
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21711,6 +22216,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub all_entities_Publication
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -21883,6 +22390,8 @@ sub get_entity_Reaction
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -21994,6 +22503,8 @@ sub query_entity_Reaction
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22100,6 +22611,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub all_entities_Reaction
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -22214,6 +22727,8 @@ sub get_entity_ReactionInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22309,6 +22824,8 @@ sub query_entity_ReactionInstance
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22399,6 +22916,8 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 sub all_entities_ReactionInstance
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -22504,6 +23023,8 @@ sub get_entity_Role
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22597,6 +23118,8 @@ sub query_entity_Role
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22685,6 +23208,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub all_entities_Role
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -22782,6 +23307,8 @@ sub get_entity_SSCell
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22873,6 +23400,8 @@ sub query_entity_SSCell
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -22959,6 +23488,8 @@ fields_SSCell is a reference to a hash where the following keys are defined:
 sub all_entities_SSCell
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -23078,6 +23609,8 @@ sub get_entity_SSRow
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23173,6 +23706,8 @@ sub query_entity_SSRow
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23263,6 +23798,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 sub all_entities_SSRow
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -23370,6 +23907,8 @@ sub get_entity_Scenario
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23463,6 +24002,8 @@ sub query_entity_Scenario
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23551,6 +24092,8 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub all_entities_Scenario
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -23647,6 +24190,8 @@ sub get_entity_Source
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23738,6 +24283,8 @@ sub query_entity_Source
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -23824,6 +24371,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub all_entities_Source
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -23973,6 +24522,8 @@ sub get_entity_Strain
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24076,6 +24627,8 @@ sub query_entity_Strain
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24174,6 +24727,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 sub all_entities_Strain
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -24289,6 +24844,8 @@ sub get_entity_StudyExperiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24386,6 +24943,8 @@ sub query_entity_StudyExperiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24478,6 +25037,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 sub all_entities_StudyExperiment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -24644,6 +25205,8 @@ sub get_entity_Subsystem
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24751,6 +25314,8 @@ sub query_entity_Subsystem
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24854,6 +25419,8 @@ sub all_entities_Subsystem
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -24948,6 +25515,8 @@ sub get_entity_SubsystemClass
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25039,6 +25608,8 @@ sub query_entity_SubsystemClass
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25125,6 +25696,8 @@ fields_SubsystemClass is a reference to a hash where the following keys are defi
 sub all_entities_SubsystemClass
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -25255,6 +25828,8 @@ sub get_entity_TaxonomicGrouping
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25354,6 +25929,8 @@ sub query_entity_TaxonomicGrouping
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25448,6 +26025,8 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 sub all_entities_TaxonomicGrouping
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -25573,6 +26152,8 @@ sub get_entity_TimeSeries
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25672,6 +26253,8 @@ sub query_entity_TimeSeries
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25766,6 +26349,8 @@ fields_TimeSeries is a reference to a hash where the following keys are defined:
 sub all_entities_TimeSeries
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -25888,6 +26473,8 @@ sub get_entity_Trait
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -25987,6 +26574,8 @@ sub query_entity_Trait
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26081,6 +26670,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 sub all_entities_Trait
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -26239,6 +26830,8 @@ sub get_entity_Tree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26346,6 +26939,8 @@ sub query_entity_Tree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26449,6 +27044,8 @@ sub all_entities_Tree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26545,6 +27142,8 @@ sub get_entity_TreeAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26636,6 +27235,8 @@ sub query_entity_TreeAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26722,6 +27323,8 @@ fields_TreeAttribute is a reference to a hash where the following keys are defin
 sub all_entities_TreeAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -26819,6 +27422,8 @@ sub get_entity_TreeNodeAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26910,6 +27515,8 @@ sub query_entity_TreeNodeAttribute
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -26996,6 +27603,8 @@ fields_TreeNodeAttribute is a reference to a hash where the following keys are d
 sub all_entities_TreeNodeAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -27130,6 +27739,8 @@ sub get_entity_Variant
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -27229,6 +27840,8 @@ sub query_entity_Variant
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 2)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -27323,6 +27936,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 sub all_entities_Variant
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 3)
     {
@@ -27448,6 +28063,8 @@ sub get_relationship_AffectsLevelOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -27558,6 +28175,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_IsAffectedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -27694,6 +28313,8 @@ sub get_relationship_Aligned
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -27820,6 +28441,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasAlignedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -27976,6 +28599,8 @@ sub get_relationship_AssertsFunctionFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -28094,6 +28719,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_HasAssertedFunctionFrom
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -28245,6 +28872,8 @@ sub get_relationship_CompoundMeasuredBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -28388,6 +29017,8 @@ sub get_relationship_MeasuresCompound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -28511,6 +29142,8 @@ sub get_relationship_Concerns
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -28625,6 +29258,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub get_relationship_IsATopicOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -28768,6 +29403,8 @@ sub get_relationship_ConsistsOfCompounds
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -28892,6 +29529,8 @@ fields_ConsistsOfCompounds is a reference to a hash where the following keys are
 sub get_relationship_ComponentOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -29020,6 +29659,8 @@ sub get_relationship_Contains
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -29136,6 +29777,8 @@ fields_SSCell is a reference to a hash where the following keys are defined:
 sub get_relationship_IsContainedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -29325,6 +29968,8 @@ sub get_relationship_ContainsAlignedDNA
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -29463,6 +30108,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 sub get_relationship_IsAlignedDNAComponentOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -29652,6 +30299,8 @@ sub get_relationship_ContainsAlignedProtein
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -29790,6 +30439,8 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 sub get_relationship_IsAlignedProteinComponentOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -29933,6 +30584,8 @@ sub get_relationship_ContainsExperimentalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -30053,6 +30706,8 @@ fields_ExperimentalUnitGroup is a reference to a hash where the following keys a
 sub get_relationship_GroupedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -30183,6 +30838,8 @@ sub get_relationship_Controls
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -30303,6 +30960,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsControlledUsing
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -30444,6 +31103,8 @@ sub get_relationship_Describes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -30574,6 +31235,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_IsDescribedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -30717,6 +31380,8 @@ sub get_relationship_DescribesAlignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -30845,6 +31510,8 @@ fields_AlignmentAttribute is a reference to a hash where the following keys are 
 sub get_relationship_HasAlignmentAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -30987,6 +31654,8 @@ sub get_relationship_DescribesMeasurement
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -31119,6 +31788,8 @@ fields_MeasurementDescription is a reference to a hash where the following keys 
 sub get_relationship_IsDefinedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -31258,6 +31929,8 @@ sub get_relationship_DescribesTree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -31382,6 +32055,8 @@ fields_TreeAttribute is a reference to a hash where the following keys are defin
 sub get_relationship_HasTreeAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -31528,6 +32203,8 @@ sub get_relationship_DescribesTreeNode
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -31654,6 +32331,8 @@ fields_TreeNodeAttribute is a reference to a hash where the following keys are d
 sub get_relationship_HasNodeAttribute
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -31804,6 +32483,8 @@ sub get_relationship_Displays
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -31939,6 +32620,8 @@ sub get_relationship_IsDisplayedOn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32062,6 +32745,8 @@ sub get_relationship_Encompasses
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32174,6 +32859,8 @@ fields_Encompasses is a reference to a hash where the following keys are defined
 sub get_relationship_IsEncompassedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -32304,6 +32991,8 @@ sub get_relationship_EvaluatedIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32424,6 +33113,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 sub get_relationship_IncludesStrain
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -32565,6 +33256,8 @@ sub get_relationship_FeatureMeasuredBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32698,6 +33391,8 @@ sub get_relationship_MeasuresFeature
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32817,6 +33512,8 @@ sub get_relationship_Formulated
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -32927,6 +33624,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasFormulatedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -33053,6 +33752,8 @@ sub get_relationship_GeneratedLevelsFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33163,6 +33864,8 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_WasGeneratedFrom
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -33317,6 +34020,8 @@ sub get_relationship_GenomeParentOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33462,6 +34167,8 @@ sub get_relationship_DerivedFromGenome
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33605,6 +34312,8 @@ sub get_relationship_HasCompoundAliasFrom
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33734,6 +34443,8 @@ sub get_relationship_UsesAliasForCompound
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33861,6 +34572,8 @@ sub get_relationship_HasExperimentalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -33979,6 +34692,8 @@ fields_ExperimentMeta is a reference to a hash where the following keys are defi
 sub get_relationship_IsExperimentalUnitOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -34123,6 +34838,8 @@ sub get_relationship_HasIndicatedSignalFrom
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -34245,6 +34962,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IndicatesSignalFor
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -34383,6 +35102,8 @@ sub get_relationship_HasKnockoutIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -34511,6 +35232,8 @@ fields_Strain is a reference to a hash where the following keys are defined:
 sub get_relationship_KnockedOutIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -34645,6 +35368,8 @@ sub get_relationship_HasMeasurement
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -34769,6 +35494,8 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 sub get_relationship_IsMeasureOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -34904,6 +35631,8 @@ sub get_relationship_HasMember
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -35028,6 +35757,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub get_relationship_IsMemberOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -35161,6 +35892,8 @@ sub get_relationship_HasParameter
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -35279,6 +36012,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 sub get_relationship_OfEnvironment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -35429,6 +36164,8 @@ sub get_relationship_HasParticipant
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -35559,6 +36296,8 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub get_relationship_ParticipatesIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -35730,6 +36469,8 @@ sub get_relationship_HasPresenceOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -35877,6 +36618,8 @@ sub get_relationship_IsPresentIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36012,6 +36755,8 @@ sub get_relationship_HasProteinMember
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36130,6 +36875,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub get_relationship_IsProteinMemberOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -36274,6 +37021,8 @@ sub get_relationship_HasReactionAliasFrom
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36402,6 +37151,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_UsesAliasForReaction
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -36554,6 +37305,8 @@ sub get_relationship_HasRepresentativeOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36695,6 +37448,8 @@ sub get_relationship_IsRepresentedIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36830,6 +37585,8 @@ sub get_relationship_HasRequirementOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -36957,6 +37714,8 @@ sub get_relationship_IsARequirementOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -37081,6 +37840,8 @@ sub get_relationship_HasResultsIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -37191,6 +37952,8 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_HasResultsFor
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -37311,6 +38074,8 @@ sub get_relationship_HasSection
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -37421,6 +38186,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub get_relationship_IsSectionOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -37563,6 +38330,8 @@ sub get_relationship_HasStep
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -37695,6 +38464,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub get_relationship_IsStepOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -37845,6 +38616,8 @@ sub get_relationship_HasTrait
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -37971,6 +38744,8 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 sub get_relationship_Measures
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -38111,6 +38886,8 @@ sub get_relationship_HasUnits
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -38242,6 +39019,8 @@ sub get_relationship_IsLocated
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -38361,6 +39140,8 @@ sub get_relationship_HasUsage
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -38471,6 +39252,8 @@ fields_LocalizedCompound is a reference to a hash where the following keys are d
 sub get_relationship_IsUsageOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -38599,6 +39382,8 @@ sub get_relationship_HasValueFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -38711,6 +39496,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_HasValueIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -38875,6 +39662,8 @@ sub get_relationship_HasVariationIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -38999,6 +39788,8 @@ fields_Contig is a reference to a hash where the following keys are defined:
 sub get_relationship_IsVariedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -39153,6 +39944,8 @@ sub get_relationship_Impacts
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -39277,6 +40070,8 @@ fields_Trait is a reference to a hash where the following keys are defined:
 sub get_relationship_IsImpactedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -39407,6 +40202,8 @@ sub get_relationship_ImplementsReaction
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -39527,6 +40324,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_ImplementedBasedOn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -39690,6 +40489,8 @@ sub get_relationship_Includes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -39820,6 +40621,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_IsIncludedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -39985,6 +40788,8 @@ sub get_relationship_IncludesAdditionalCompounds
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -40125,6 +40930,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 sub get_relationship_IncludedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -40277,6 +41084,8 @@ sub get_relationship_IncludesAlignmentRow
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -40420,6 +41229,8 @@ sub get_relationship_IsAlignmentRowIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -40547,6 +41358,8 @@ sub get_relationship_IncludesPart
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -40665,6 +41478,8 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 sub get_relationship_IsPartOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -40801,6 +41616,8 @@ sub get_relationship_IndicatedLevelsFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -40921,6 +41738,8 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 sub get_relationship_HasLevelsFrom
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -41079,6 +41898,8 @@ sub get_relationship_Involves
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -41209,6 +42030,8 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 sub get_relationship_IsInvolvedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -41342,6 +42165,8 @@ sub get_relationship_IsAnnotatedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -41464,6 +42289,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_Annotates
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -41592,6 +42419,8 @@ sub get_relationship_IsAssayOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -41710,6 +42539,8 @@ fields_Assay is a reference to a hash where the following keys are defined:
 sub get_relationship_IsAssayedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -41844,6 +42675,8 @@ sub get_relationship_IsClassFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -41966,6 +42799,8 @@ fields_SubsystemClass is a reference to a hash where the following keys are defi
 sub get_relationship_IsInClass
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -42114,6 +42949,8 @@ sub get_relationship_IsCollectionOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -42248,6 +43085,8 @@ fields_OTU is a reference to a hash where the following keys are defined:
 sub get_relationship_IsCollectedInto
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -42393,6 +43232,8 @@ sub get_relationship_IsComposedOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -42527,6 +43368,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsComponentOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -42671,6 +43514,8 @@ sub get_relationship_IsComprisedOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -42799,6 +43644,8 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 sub get_relationship_Comprises
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -42941,6 +43788,8 @@ sub get_relationship_IsConfiguredBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -43074,6 +43923,8 @@ sub get_relationship_ReflectsStateOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -43195,6 +44046,8 @@ sub get_relationship_IsConsistentWith
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -43307,6 +44160,8 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 sub get_relationship_IsConsistentTo
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -43435,6 +44290,8 @@ sub get_relationship_IsContextOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -43553,6 +44410,8 @@ fields_Environment is a reference to a hash where the following keys are defined
 sub get_relationship_HasEnvironment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -43683,6 +44542,8 @@ sub get_relationship_IsCoregulatedWith
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -43797,6 +44658,8 @@ fields_IsCoregulatedWith is a reference to a hash where the following keys are d
 sub get_relationship_HasCoregulationWith
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -43937,6 +44800,8 @@ sub get_relationship_IsCoupledTo
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -44051,6 +44916,8 @@ fields_IsCoupledTo is a reference to a hash where the following keys are defined
 sub get_relationship_IsCoupledWith
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -44183,6 +45050,8 @@ sub get_relationship_IsDeterminedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -44293,6 +45162,8 @@ fields_PairSet is a reference to a hash where the following keys are defined:
 sub get_relationship_Determines
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -44433,6 +45304,8 @@ sub get_relationship_IsDividedInto
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -44563,6 +45436,8 @@ fields_Model is a reference to a hash where the following keys are defined:
 sub get_relationship_IsDivisionOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -44702,6 +45577,8 @@ sub get_relationship_IsExecutedAs
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -44833,6 +45710,8 @@ sub get_relationship_IsExecutionOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -44960,6 +45839,8 @@ sub get_relationship_IsExemplarOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -45078,6 +45959,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_HasAsExemplar
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -45204,6 +46087,8 @@ sub get_relationship_IsFamilyFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -45320,6 +46205,8 @@ fields_Family is a reference to a hash where the following keys are defined:
 sub get_relationship_DeterminesFunctionOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -45446,6 +46333,8 @@ sub get_relationship_IsFormedOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -45562,6 +46451,8 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 sub get_relationship_IsFormedInto
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -45690,6 +46581,8 @@ sub get_relationship_IsFunctionalIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -45808,6 +46701,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub get_relationship_HasFunctional
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -45929,6 +46824,8 @@ sub get_relationship_IsGroupFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -46039,6 +46936,8 @@ fields_IsGroupFor is a reference to a hash where the following keys are defined:
 sub get_relationship_IsInGroup
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -46168,6 +47067,8 @@ sub get_relationship_IsImplementedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -46286,6 +47187,8 @@ fields_Variant is a reference to a hash where the following keys are defined:
 sub get_relationship_Implements
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -46414,6 +47317,8 @@ sub get_relationship_IsInPair
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -46530,6 +47435,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsPairOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -46662,6 +47569,8 @@ sub get_relationship_IsInstantiatedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -46784,6 +47693,8 @@ fields_Location is a reference to a hash where the following keys are defined:
 sub get_relationship_IsInstanceOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -46952,6 +47863,8 @@ sub get_relationship_IsLocatedIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -47078,6 +47991,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsLocusFor
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -47216,6 +48131,8 @@ sub get_relationship_IsMeasurementMethodOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -47344,6 +48261,8 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 sub get_relationship_WasMeasuredBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -47502,6 +48421,8 @@ sub get_relationship_IsModeledBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -47651,6 +48572,8 @@ sub get_relationship_Models
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -47796,6 +48719,8 @@ sub get_relationship_IsModifiedToBuildAlignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -47922,6 +48847,8 @@ fields_IsModifiedToBuildAlignment is a reference to a hash where the following k
 sub get_relationship_IsModificationOfAlignment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -48065,6 +48992,8 @@ sub get_relationship_IsModifiedToBuildTree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -48187,6 +49116,8 @@ fields_IsModifiedToBuildTree is a reference to a hash where the following keys a
 sub get_relationship_IsModificationOfTree
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -48342,6 +49273,8 @@ sub get_relationship_IsOwnerOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -48485,6 +49418,8 @@ sub get_relationship_IsOwnedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -48608,6 +49543,8 @@ sub get_relationship_IsParticipatingAt
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -48722,6 +49659,8 @@ fields_Location is a reference to a hash where the following keys are defined:
 sub get_relationship_ParticipatesAt
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -48852,6 +49791,8 @@ sub get_relationship_IsProteinFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -48970,6 +49911,8 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 sub get_relationship_Produces
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -49108,6 +50051,8 @@ sub get_relationship_IsReagentIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -49224,6 +50169,8 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 sub get_relationship_Targets
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -49352,6 +50299,8 @@ sub get_relationship_IsRealLocationOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -49470,6 +50419,8 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 sub get_relationship_HasRealLocationIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -49619,6 +50570,8 @@ sub get_relationship_IsReferencedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -49758,6 +50711,8 @@ sub get_relationship_UsesReference
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -49886,6 +50841,8 @@ sub get_relationship_IsRegulatedIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50006,6 +50963,8 @@ fields_Feature is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRegulatedSetOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -50143,6 +51102,8 @@ sub get_relationship_IsRelevantFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50269,6 +51230,8 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRelevantTo
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -50399,6 +51362,8 @@ sub get_relationship_IsRepresentedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50520,6 +51485,8 @@ sub get_relationship_DefinedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50639,6 +51606,8 @@ sub get_relationship_IsRoleOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50747,6 +51716,8 @@ fields_Role is a reference to a hash where the following keys are defined:
 sub get_relationship_HasRole
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -50867,6 +51838,8 @@ sub get_relationship_IsRowOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -50977,6 +51950,8 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 sub get_relationship_IsRoleFor
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -51099,6 +52074,8 @@ sub get_relationship_IsSequenceOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -51209,6 +52186,8 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 sub get_relationship_HasAsSequence
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -51344,6 +52323,8 @@ sub get_relationship_IsSubInstanceOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -51468,6 +52449,8 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 sub get_relationship_Validates
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -51608,6 +52591,8 @@ sub get_relationship_IsSummarizedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -51733,6 +52718,8 @@ sub get_relationship_Summarizes
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -51844,6 +52831,8 @@ sub get_relationship_IsSuperclassOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -51946,6 +52935,8 @@ fields_IsSuperclassOf is a reference to a hash where the following keys are defi
 sub get_relationship_IsSubclassOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -52098,6 +53089,8 @@ sub get_relationship_IsTaxonomyOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -52238,6 +53231,8 @@ fields_TaxonomicGrouping is a reference to a hash where the following keys are d
 sub get_relationship_IsInTaxa
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -52388,6 +53383,8 @@ sub get_relationship_IsTerminusFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -52518,6 +53515,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub get_relationship_HasAsTerminus
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -52665,6 +53664,8 @@ sub get_relationship_IsTriggeredBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -52785,6 +53786,8 @@ fields_Complex is a reference to a hash where the following keys are defined:
 sub get_relationship_Triggers
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -52937,6 +53940,8 @@ sub get_relationship_IsUsedToBuildTree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -53079,6 +54084,8 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 sub get_relationship_IsBuiltFromAlignment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -53227,6 +54234,8 @@ sub get_relationship_Manages
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -53366,6 +54375,8 @@ sub get_relationship_IsManagedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -53499,6 +54510,8 @@ sub get_relationship_OperatesIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -53623,6 +54636,8 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUtilizedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -53767,6 +54782,8 @@ sub get_relationship_OrdersExperimentalUnit
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -53887,6 +54904,8 @@ fields_TimeSeries is a reference to a hash where the following keys are defined:
 sub get_relationship_IsTimepointOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -54011,6 +55030,8 @@ sub get_relationship_Overlaps
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -54123,6 +55144,8 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 sub get_relationship_IncludesPartOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -54259,6 +55282,8 @@ sub get_relationship_ParticipatesAs
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -54385,6 +55410,8 @@ fields_Compound is a reference to a hash where the following keys are defined:
 sub get_relationship_IsParticipationOf
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -54529,6 +55556,8 @@ sub get_relationship_PerformedExperiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -54657,6 +55686,8 @@ fields_Person is a reference to a hash where the following keys are defined:
 sub get_relationship_PerformedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -54800,6 +55831,8 @@ sub get_relationship_ProducedResultsFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -54933,6 +55966,8 @@ sub get_relationship_HadResultsProducedBy
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -55064,6 +56099,8 @@ sub get_relationship_Provided
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -55186,6 +56223,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasProvidedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -55318,6 +56357,8 @@ sub get_relationship_PublishedExperiment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -55440,6 +56481,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub get_relationship_ExperimentPublishedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -55568,6 +56611,8 @@ sub get_relationship_PublishedProtocol
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -55686,6 +56731,8 @@ fields_Publication is a reference to a hash where the following keys are defined
 sub get_relationship_ProtocolPublishedIn
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -55836,6 +56883,8 @@ sub get_relationship_Shows
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -55971,6 +57020,8 @@ sub get_relationship_IsShownOn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -56094,6 +57145,8 @@ sub get_relationship_StrainParentOf
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -56208,6 +57261,8 @@ fields_StrainParentOf is a reference to a hash where the following keys are defi
 sub get_relationship_DerivedFromStrain
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -56350,6 +57405,8 @@ sub get_relationship_Submitted
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -56482,6 +57539,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_WasSubmittedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -56622,6 +57681,8 @@ sub get_relationship_SupersedesAlignment
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -56746,6 +57807,8 @@ fields_SupersedesAlignment is a reference to a hash where the following keys are
 sub get_relationship_IsSupersededByAlignment
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -56882,6 +57945,8 @@ sub get_relationship_SupersedesTree
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -57002,6 +58067,8 @@ fields_SupersedesTree is a reference to a hash where the following keys are defi
 sub get_relationship_IsSupersededByTree
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -57134,6 +58201,8 @@ sub get_relationship_Treed
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -57256,6 +58325,8 @@ fields_Source is a reference to a hash where the following keys are defined:
 sub get_relationship_IsTreeFrom
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -57398,6 +58469,8 @@ sub get_relationship_UsedIn
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -57530,6 +58603,8 @@ fields_Media is a reference to a hash where the following keys are defined:
 sub get_relationship_HasMedia
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -57677,6 +58752,8 @@ sub get_relationship_Uses
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -57813,6 +58890,8 @@ fields_Genome is a reference to a hash where the following keys are defined:
 sub get_relationship_IsUsedBy
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 4)
     {
@@ -57963,6 +59042,8 @@ sub get_relationship_UsesCodons
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -58104,6 +59185,8 @@ sub get_relationship_AreCodonsFor
 {
     my($self, @args) = @_;
 
+# Authentication: none
+
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
@@ -58144,7 +59227,6 @@ sub get_relationship_AreCodonsFor
 				       );
     }
 }
-
 
 
 
@@ -59111,9 +60193,9 @@ The URL and title are often missing (but, can usually be inferred from the pubme
 
 <pre>
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 </pre>
 
@@ -59122,9 +60204,9 @@ a reference to a list containing 3 items:
 =begin text
 
 a reference to a list containing 3 items:
-0: a string
-1: a string
-2: a string
+0: (id) a string
+1: (link) a string
+2: (title) a string
 
 
 =end text
@@ -59146,7 +60228,7 @@ a reference to a list containing 3 items:
 <pre>
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 </pre>
 
@@ -59156,7 +60238,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a fid
-1: a float
+1: (score) a float
 
 
 =end text
@@ -60036,7 +61118,7 @@ a reference to a list where each element is an ou
 <pre>
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 </pre>
 
@@ -60046,7 +61128,7 @@ a reference to a list containing 2 items:
 
 a reference to a list containing 2 items:
 0: a contig
-1: an int
+1: (position) an int
 
 
 =end text
@@ -68214,7 +69296,6 @@ to_link has a value which is a string
 
 =cut
 
-
 package Bio::KBase::CDMI::Client::RpcClient;
 use base 'JSON::RPC::Client';
 
@@ -68256,5 +69337,38 @@ sub call {
         return;
     }
 }
+
+
+sub _post {
+    my ($self, $uri, $obj) = @_;
+    my $json = $self->json;
+
+    $obj->{version} ||= $self->{version} || '1.1';
+
+    if ($obj->{version} eq '1.0') {
+        delete $obj->{version};
+        if (exists $obj->{id}) {
+            $self->id($obj->{id}) if ($obj->{id}); # if undef, it is notification.
+        }
+        else {
+            $obj->{id} = $self->id || ($self->id('JSON::RPC::Client'));
+        }
+    }
+    else {
+        $obj->{id} = $self->id if (defined $self->id);
+    }
+
+    my $content = $json->encode($obj);
+
+    $self->ua->post(
+        $uri,
+        Content_Type   => $self->{content_type},
+        Content        => $content,
+        Accept         => 'application/json',
+	($self->{token} ? (Authorization => $self->{token}) : ()),
+    );
+}
+
+
 
 1;

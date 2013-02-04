@@ -515,6 +515,8 @@ our %return_counts = (
         'version' => 1,
 );
 
+
+
 sub _build_valid_methods
 {
     my($self) = @_;
@@ -1025,14 +1027,15 @@ sub _build_valid_methods
 
 sub call_method {
     my ($self, $data, $method_info) = @_;
+
     my ($module, $method) = @$method_info{qw(module method)};
     
     my $ctx = Bio::KBase::CDMI::ServiceContext->new(client_ip => $self->_plack_req->address);
     
     my $args = $data->{arguments};
 
-        # Service CDMI_API does not require authentication.
-        
+    # Service CDMI_API does not require authentication.
+    
     my $new_isa = $self->get_package_isa($module);
     no strict 'refs';
     local @{"${module}::ISA"} = @$new_isa;
@@ -1136,7 +1139,7 @@ is available via $context->client_ip.
 
 use base 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(user client_ip));
+__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated token));
 
 sub new
 {

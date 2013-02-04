@@ -79,8 +79,7 @@ compile-typespec:
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME_PY)/client \
 		--js javascript/$(SERVICE_NAME)/Client \
-		$(SERVICE_NAME)-API.spec $(SERVICE_NAME)-EntityAPI.spec lib
-	rm -r Bio # For some strange reason, compile_typespec always creates this directory in the root dir!
+		lib/$(SERVICE_NAME)-API.spec lib/$(SERVICE_NAME)-EntityAPI.spec lib
 	-rm -r lib/$(SERVER_MODULE)Server.py
 	-rm -r lib/$(SERVER_MODULE)Impl.py
 	-rm -r lib/CDMI_EntityAPIImpl.py
