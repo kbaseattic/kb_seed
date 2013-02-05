@@ -7,8 +7,15 @@ use Carp;
 # This is a SAS Component
 #
 
+=head1 NAME
 
-=head1 get_entity_Location
+get_entity_Location
+
+=head1 SYNOPSIS
+
+get_entity_Location [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+
+=head1 DESCRIPTION
 
 A location is a region of the cell where reaction compounds
 originate from or are transported to (e.g. cell wall, extracellular,
@@ -18,7 +25,7 @@ Example:
 
     get_entity_Location -a < ids > table.with.fields.added
 
-would read in a file of ids and add a column for each filed in the entity.
+would read in a file of ids and add a column for each field in the entity.
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -45,44 +52,69 @@ The Location entity has the following relationship links:
 
 =back
 
-=head2 Command-Line Options
+=head1 COMMAND-LINE OPTIONS
 
-=over 4
+Usage: get_entity_Location [arguments] < ids > table.with.fields.added
 
-=item -c Column
+    -a		    Return all available fields.
+    -c num          Select the identifier from column num.
+    -i filename     Use filename rather than stdin for input.
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-Use the specified column to define the id of the entity to retrieve.
+The following fields are available:
 
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item mod_date
 
+date and time of the last modification to the compartment's definition
+
 =item name
+
+common name for the location
 
 =item source_id
 
+ID from the source of this location
+
 =item abbr
 
-=back    
+an abbreviation (usually a single letter) for the location.
+
 
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
+
+
+our $usage = <<'END';
+Usage: get_entity_Location [arguments] < ids > table.with.fields.added
+
+    -c num          Select the identifier from column num
+    -i filename     Use filename rather than stdin for input
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    mod_date
+        date and time of the last modification to the compartment's definition
+    name
+        common name for the location
+    source_id
+        ID from the source of this location
+    abbr
+        an abbreviation (usually a single letter) for the location.
+END
+
+
 
 use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
@@ -92,26 +124,37 @@ use Getopt::Long;
 my @all_fields = ( 'mod_date', 'name', 'source_id', 'abbr' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_Location [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
-
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
+my $help;
 my $show_fields;
-my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
-								  "a"	   	=> \$a,
-								  "h"	   	=> \$show_fields,
-								  "show-fields"	=> \$show_fields,
-								  "fields=s" 	=> \$f,
-								  'i=s'	   	=> \$i);
-if ($show_fields)
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'		 => \$column,
+								  "all-fields|a" => \$a,
+								  "help|h"	 => \$help,
+								  "show-fields"	 => \$show_fields,
+								  "fields=s"	 => \$f,
+								  'i=s'		 => \$i);
+if ($help)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print $usage;
     exit 0;
 }
-if ($a && $f) { print STDERR $usage; exit 1 }
+
+if ($show_fields)
+{
+    print STDERR "Available fields:\n";
+    print STDERR "\t$_\n" foreach @all_fields;
+    exit 0;
+}
+
+if ($a && $f) 
+{
+    print STDERR "Only one of the -a and --fields options may be specified\n";
+    exit 1;
+} 
 if ($a)
 {
     @fields = @all_fields;
@@ -170,3 +213,4 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+__DATA__

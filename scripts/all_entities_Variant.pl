@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Variant
+=head1 NAME
+
+all_entities_Variant
+
+=head1 SYNOPSIS
+
+all_entities_Variant [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Variant entity.
 
@@ -37,43 +45,40 @@ The Variant entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Variant [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item role_rule
 
+a space-delimited list of role IDs, in alphabetical order, that represents a possible list of non-auxiliary roles applicable to this variant. The roles are identified by their abbreviations. A variant may have multiple role rules.
+
 =item code
+
+the variant code all by itself
 
 =item type
 
+variant type indicating the quality of the subsystem support. A type of "vacant" means that the subsystem does not appear to be implemented by the variant. A type of "incomplete" means that the subsystem appears to be missing many reactions. In all other cases, the type is "normal".
+
 =item comment
 
-=back    
-   
+commentary text about the variant
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -85,20 +90,46 @@ use Getopt::Long;
 my @all_fields = ( 'role_rule', 'code', 'type', 'comment' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Variant [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Variant [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    role_rule
+        a space-delimited list of role IDs, in alphabetical order, that represents a possible list of non-auxiliary roles applicable to this variant. The roles are identified by their abbreviations. A variant may have multiple role rules.
+    code
+        the variant code all by itself
+    type
+        variant type indicating the quality of the subsystem support. A type of "vacant" means that the subsystem does not appear to be implemented by the variant. A type of "incomplete" means that the subsystem appears to be missing many reactions. In all other cases, the type is "normal".
+    comment
+        commentary text about the variant
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

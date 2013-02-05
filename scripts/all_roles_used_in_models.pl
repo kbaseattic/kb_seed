@@ -6,62 +6,38 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 all_roles_used_in_models
+=head1 NAME
 
+all_roles_used_in_models
 
-The all_roles_used_in_models allows a user to access the set of roles that are included in current models.  This is
-important.  There are far fewer roles used in models than overall.  Hence, the returned set represents
-the minimal set we need to clean up in order to properly support modeling.
+=head1 SYNOPSIS
 
+all_roles_used_in_models > output
+
+=head1 DESCRIPTION
+
+The all_roles_used_in_models allows a user to access the set of roles that are included in current models.
+Note that there are far fewer roles used in models than in the complete set of functional roles.
+Hence, the returned set represents the minimal set we need to clean up in order to properly support modeling.
 
 Example:
 
     all_roles_used_in_models > output
 
-This is a pipe command. The is no input, and the
-output is to the standard output.
+This is a pipe command. The is no input, and the output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call all_roles_used_in_models. It is documented as follows:
+Usage: all_roles_used_in_models > output
 
-  $return = $obj->all_roles_used_in_models()
+=head1 AUTHORS
 
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$return is a roles
-roles is a reference to a list where each element is a role
-role is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$return is a roles
-roles is a reference to a list where each element is a role
-role is a string
-
-
-=end text
-
-=back
-
-=head2 Output Format
-
-The output is a file in which each line contains just a role
-used in the construction of models.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
 
-my $usage = "usage: all_roles_used_in_models [-c column] < input > output";
+our $usage = "usage: all_roles_used_in_models > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -72,5 +48,7 @@ if (! $kbO) { print STDERR $usage; exit }
 
 my $h = $kbO->all_roles_used_in_models();
 foreach my $role (@$h) {
-print $role, "\n";
+    print $role, "\n";
 }
+
+__DATA__

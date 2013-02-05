@@ -64,7 +64,7 @@ L<The SEED Project|http://www.theseed.org>
 
 use SeedUtils;
 
-my $usage = "usage: close_genomes [-c column] < input > output";
+our $usage = "usage: close_genomes [-c column] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -136,3 +136,5 @@ else
         }
     }
 }
+
+__DATA__

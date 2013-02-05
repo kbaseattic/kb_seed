@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Strain
+=head1 NAME
+
+all_entities_Strain
+
+=head1 SYNOPSIS
+
+all_entities_Strain [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Strain entity.
 
@@ -41,47 +49,48 @@ The Strain entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Strain [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item name
 
+The common or laboratory name of the strain, e.g. DH5a or JMP1004.
+
 =item description
+
+A description of the strain, e.g. knockout/modification methods, resulting phenotypes, etc.
 
 =item source_id
 
+The ID of the strain used by the data source.
+
 =item aggregateData
+
+Denotes whether this entity represents a physical strain (False) or aggregate data calculated from one or more strains (True).
 
 =item wildtype
 
+Denotes this strain is presumably identical to the parent genome.
+
 =item referenceStrain
 
-=back    
-   
+Denotes whether this strain is a reference strain; e.g. it is identical to the genome it's related to (True) or not (False). In contrast to wildtype, a referenceStrain is abstract and does not physically exist and is used for data that refers to a genome but not a particular strain. There should only exist one reference strain per genome and all reference strains are wildtype. 
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -93,20 +102,50 @@ use Getopt::Long;
 my @all_fields = ( 'name', 'description', 'source_id', 'aggregateData', 'wildtype', 'referenceStrain' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Strain [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Strain [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    name
+        The common or laboratory name of the strain, e.g. DH5a or JMP1004.
+    description
+        A description of the strain, e.g. knockout/modification methods, resulting phenotypes, etc.
+    source_id
+        The ID of the strain used by the data source.
+    aggregateData
+        Denotes whether this entity represents a physical strain (False) or aggregate data calculated from one or more strains (True).
+    wildtype
+        Denotes this strain is presumably identical to the parent genome.
+    referenceStrain
+        Denotes whether this strain is a reference strain; e.g. it is identical to the genome it's related to (True) or not (False). In contrast to wildtype, a referenceStrain is abstract and does not physically exist and is used for data that refers to a genome but not a particular strain. There should only exist one reference strain per genome and all reference strains are wildtype. 
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

@@ -56,7 +56,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-my $usage = "usage: text_search [-start N] [-count N] [-entity name -entity name ..] search-string\n";
+our $usage = "usage: text_search [-start N] [-count N] [-entity name -entity name ..] search-string\n";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -88,3 +88,5 @@ for my $entity (keys %$res)
 
     }
 }
+
+__DATA__

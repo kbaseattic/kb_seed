@@ -6,8 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 all_roles_used_in_models_and_subsystems
+=head1 NAME
 
+all_roles_used_in_models_and_subsystems
+
+=head1 SYNOPSIS
+
+all_roles_used_in_models_and_subsystems > output
+
+=head1 DESCRIPTION
 
 The all_roles_used_in_models_and_subsystems allows a user to access
 the set of roles that are included in current models and subsystems.  This is
@@ -22,19 +29,23 @@ Example:
 This is a pipe command. The is no input, and the
 output is to the standard output.
 
-=over 4
-
-=item Parameter and return types
-
 =head2 Output Format
 
 The output is a file in which each line contains just a role
 used in the construction of models or occurring in a subsystem.
 
+=head1 COMMAND-LINE OPTIONS
+
+Usage: all_roles_used_in_models_and_subsystems > output
+
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
+
 =cut
 
 
-my $usage = "usage: all_roles_used_in_models_and_subsystems > output";
+our $usage = "usage: all_roles_used_in_models_and_subsystems > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -49,15 +60,15 @@ foreach my $role (@$h) {
 }
 
 open(SSPIPE, "all_entities_Subsystem | subsystems_to_roles |");
-while (<SSPIPE>)
-{
+while (<SSPIPE>) {
     chomp;
     my($ss, $role) = split(/\t/);
     $roles{$role} = 1;
 }
 close(SSPIPE);
 
-for my $role (sort keys %roles)
-{
+for my $role (sort keys %roles) {
     print "$role\n";
 }
+
+__DATA__

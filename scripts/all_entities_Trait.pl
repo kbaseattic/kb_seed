@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Trait
+=head1 NAME
+
+all_entities_Trait
+
+=head1 SYNOPSIS
+
+all_entities_Trait [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Trait entity.
 
@@ -33,43 +41,40 @@ The Trait entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Trait [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item trait_name
 
+Text name or description of the trait
+
 =item unit_of_measure
+
+The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
 
 =item TO_ID
 
+Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
+
 =item protocol
 
-=back    
-   
+A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -81,20 +86,46 @@ use Getopt::Long;
 my @all_fields = ( 'trait_name', 'unit_of_measure', 'TO_ID', 'protocol' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Trait [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Trait [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    trait_name
+        Text name or description of the trait
+    unit_of_measure
+        The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
+    TO_ID
+        Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
+    protocol
+        A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

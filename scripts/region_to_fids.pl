@@ -6,7 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 region_to_fids
+=head1 NAME
+
+region_to_fids
+
+=head1 SYNOPSIS
+
+region_to_fids [arguments] <input > output
+
+=head1 DESCRIPTION
 
 This command is used to take positions in contigs and to find fids
 that ocur within a specified distance of each position.  It differs
@@ -31,84 +39,24 @@ Positions are represented as Contig_Pos or Contig_Pos+1.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
 
-This script is a wrapper for the CDMI-API call region_to_fids. It is documented as follows:
+=head1 COMMAND-LINE OPTIONS
 
+Usage: region_to_fids [arguments] <input > output
 
+    -d Distance   All feature-IDs within this distance of a query will be reported (Default=5000)
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=over 4
+=head1 AUTHORS
 
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$region_of_dna is a region_of_dna
-$return is a fids
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
-fids is a reference to a list where each element is a fid
-fid is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$region_of_dna is a region_of_dna
-$return is a fids
-region_of_dna is a reference to a list containing 4 items:
-	0: a contig
-	1: a begin
-	2: a strand
-	3: a length
-contig is a string
-begin is an int
-strand is a string
-length is an int
-fids is a reference to a list where each element is a fid
-fid is a string
-
-
-=end text
-
-=back
-
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the position is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=item -d Distance     [ all fids that are within this distance will be reported ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
 use SeedUtils;
 
-my $usage = "usage: region_to_fids [-c column] [-d distance] < input > output";
+our $usage = "usage: region_to_fids [-c column] [-d distance] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -157,3 +105,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	}
     }
 }
+
+__DATA__

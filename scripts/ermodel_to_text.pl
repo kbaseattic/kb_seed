@@ -9,22 +9,28 @@ use String::CamelCase 'decamelize';
 # This is a SAS Component
 #
 
-=head1 ermodel_to_text
+=head1 NAME
+
+ermodel_to_text
+
+=head1 SYNOPSIS
+
+ermodel_to_text [--decamelize] > output
+
+=head1 DESCRIPTION
 
 Given the XML description of an Entity-Relationship model on stdin, dump the description
 of the model as an easy-to-parse tab-delimited text file.
 
-=head2 Command-line options
+=head1 COMMAND-LINE OPTIONS
 
-=over 4
+Usage: ermodel_to_text [--decamelize] > output
 
-=item --decamelize
+    --decamelize
 
-If set, convert all entity, relationship, and field names to a decamelized form.
+        If set, convert all entity, relationship, and field names to a decamelized form.
 
-=back
-
-=head2 Output Format
+=head1 OUTPUT FORMAT
 
 The output is a tab-delimited file. It contains blocks of data delimited by
 lines containing only the string "//".
@@ -72,6 +78,10 @@ Each field description line contains the following fields:
 =item The name of a relation, if the field data is stored in a separate relation.
 
 =back
+
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -159,3 +169,5 @@ sub convert_field_name
     $n =~ s/-/_/g;
     return $n;
 }
+
+__DATA__

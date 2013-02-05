@@ -55,7 +55,7 @@ my @all_fields = ( 'regulon_id', 'regulon_set', 'tfs' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 
-my $usage = "usage: fids_to_regulon_data [-h] [-c column] [-a | -f field list] < input > output";
+our $usage = "usage: fids_to_regulon_data [-h] [-c column] [-a | -f field list] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -157,3 +157,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+
+__DATA__

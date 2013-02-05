@@ -2567,40 +2567,59 @@ sub _query_entity
     my($self, $ctx, $tbl, $qry, $fields) = @_;
 
     my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
-    
+
     my @filter;
     my @filter_params;
 
     my $valid_fields = $entity_field_defs->{$tbl};
     my $field_rels = $entity_field_rels->{$tbl};
-    my %valid_ops = map { $_ => 1 } ('LIKE', '<', '>', '=', '>=', '<=');
+    
+    #IN violates the typespec since it requires an array as the $value rather than a string
+    my %valid_ops = map { $_ => 1 } ('IS NULL', 'IS NOT NULL', 'LIKE', '<', '>', '=', '>=', '<='); # 'IN');
     my @bad_q;
     for my $q (@$qry)
     {
-	my($field, $op, $value) = @$q;
+        my($field, $op, $value) = @$q;
 	$field =~ s/-/_/g;
-	if (!$valid_fields->{$field})
-	{
-	    push(@bad_q, "Field $field does not exist in $tbl");
-	    next;
-	}
-	if ($field_rels->{$field})
-	{
-	    push(@bad_q, "Field $field is stored in a secondary relation; this is not yet supported for queries.");
-	    next;
-	}
-	if (!$valid_ops{uc($op)})
-	{
-	    push(@bad_q, "Operator $op is not allowed");
-	    next;
-	}
-	push(@filter, "$field $op ?");
-	push(@filter_params, $value);
-    }
+        if (!$valid_fields->{$field})
+        {
+            push(@bad_q, "Field $field does not exist in $tbl");
+            next;
+        }
+        if ($field_rels->{$field})
+        {
+            push(@bad_q, "Field $field is stored in a secondary relation; this is not yet supported for queries.");
+            next;
+        }
+        if (!$valid_ops{uc($op)})
+        {
+            push(@bad_q, "Operator $op is not allowed");
+               next;
+        }
+        if ($op eq 'IN')
+        {
+            if (! ref $value eq 'ARRAY')
+            {
+                push(@bad_q, "Associated value for operator $op must be an array");
+                next;
+            } else {
+                my $quest = '(' . join(', ', ('?') x @$value) . ')';
+                push(@filter, "$field $op $quest");
+                push(@filter_params, @$value);
+            }
+        }
+        elsif ($op eq 'IS NOT NULL' or $op eq 'IS NULL')
+        {
+            push(@filter, "$field $op");
+        } else {
+            push(@filter, "$field $op ?");
+            push(@filter_params, $value);
+        }
+    } 
 
     if (@bad_q)
     {
-	die "Errors found in query:\n" . join("\n", @bad_q);
+        die "Errors found in query:\n" . join("\n", @bad_q);
     }
 
     my $cdmi = $self->{db};
@@ -2966,7 +2985,23 @@ sub new
 
     my($cdmi) = @args;
     if (! $cdmi) {
-	$cdmi = Bio::KBase::CDMI::CDMI->new();
+		my %params;
+		if (my $e = $ENV{KB_DEPLOYMENT_CONFIG})
+		{
+	    	my $service = $ENV{KB_SERVICE_NAME};
+	    	my $c = Config::Simple->new();
+	    	$c->read($e);
+	    	my @params = qw(DBD dbName sock userData dbhost port dbms develop);
+	    	for my $p (@params)
+	    	{
+				my $v = $c->param("$service.$p");
+				if ($v)
+				{
+		    		$params{$p} = $v;
+				}
+	    	}
+		}
+        $cdmi = Bio::KBase::CDMI::CDMI->new(%params);
     }
     $self->{db} = $cdmi;
 

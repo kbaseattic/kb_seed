@@ -6,8 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 co_occurrence_evidence
+=head1 NAME
 
+co_occurrence_evidence
+
+=head1 SYNOPSIS
+
+co_occurrence_evidence [-c column] < input > output
+
+=head1 DESCRIPTION
 
 co-occurence_evidence is used to retrieve the detailed pairs of genes that go into the
 computation of co-occurence scores.  The scores reflect an estimate of the number of distinct OTUs that
@@ -31,75 +38,28 @@ the pair of fids are,in fact, related.  The evidence is a comma-separated list o
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Documentation for underlying call
+=head1 COMMAND-LINE OPTIONS
 
-This script is a wrapper for the CDMI-API call co_occurrence_evidence. It is documented as follows:
+Usage: co_occurrence_evidence [-c column] < input > output
 
-  $return = $obj->co_occurrence_evidence($pairs_of_fids)
+    -c num        Select the identifier from column num
+    -i filename   Use filename rather than stdin for input
 
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$pairs_of_fids is a pairs_of_fids
-$return is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a pair_of_fids
-	1: an evidence
-pairs_of_fids is a reference to a list where each element is a pair_of_fids
-pair_of_fids is a reference to a list containing 2 items:
-	0: a fid
-	1: a fid
-fid is a string
-evidence is a reference to a list where each element is a pair_of_fids
-
-</pre>
-
-=end html
-
-=begin text
-
-$pairs_of_fids is a pairs_of_fids
-$return is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a pair_of_fids
-	1: an evidence
-pairs_of_fids is a reference to a list where each element is a pair_of_fids
-pair_of_fids is a reference to a list containing 2 items:
-	0: a fid
-	1: a fid
-fid is a string
-evidence is a reference to a list where each element is a pair_of_fids
-
-
-=end text
-
-=back
-
-=head2 Command-Line Options
-
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the subsystem is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
+=head OUTPUT FORMAT
 
 The standard output is a tab-delimited file. It consists of the input
 file with an extra column (containing large evidence strings)  added.
 
 Input lines that cannot be extended are written to stderr.
 
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
+
 =cut
 
 
-my $usage = "usage: co_occurrence_evidence [-c column] < input > output";
+our $usage = "usage: co_occurrence_evidence [-c column] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -145,3 +105,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	print join(",",@b), "\n";
     }
 }
+
+__DATA__

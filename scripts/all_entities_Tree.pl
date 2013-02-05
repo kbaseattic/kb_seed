@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Tree
+=head1 NAME
+
+all_entities_Tree
+
+=head1 SYNOPSIS
+
+all_entities_Tree [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Tree entity.
 
@@ -47,51 +55,56 @@ The Tree entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Tree [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item status
 
+status of the tree, currently either [i]active[/i], [i]superseded[/i], or [i]bad[/i]
+
 =item data_type
+
+type of data the tree was built from, usually [i]sequence_alignment[/i]
 
 =item timestamp
 
+date and time the tree was loaded
+
 =item method
+
+name of the primary software package or script used to construct the tree
 
 =item parameters
 
+non-default parameters used as input to the software package or script indicated in the method attribute
+
 =item protocol
+
+description of the steps taken to construct the tree, or a reference to an external pipeline
 
 =item source_id
 
+ID of this tree in the source database
+
 =item newick
 
-=back    
-   
+NEWICK format string containing the structure of the tree
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -103,20 +116,54 @@ use Getopt::Long;
 my @all_fields = ( 'status', 'data_type', 'timestamp', 'method', 'parameters', 'protocol', 'source_id', 'newick' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Tree [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Tree [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    status
+        status of the tree, currently either [i]active[/i], [i]superseded[/i], or [i]bad[/i]
+    data_type
+        type of data the tree was built from, usually [i]sequence_alignment[/i]
+    timestamp
+        date and time the tree was loaded
+    method
+        name of the primary software package or script used to construct the tree
+    parameters
+        non-default parameters used as input to the software package or script indicated in the method attribute
+    protocol
+        description of the steps taken to construct the tree, or a reference to an external pipeline
+    source_id
+        ID of this tree in the source database
+    newick
+        NEWICK format string containing the structure of the tree
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

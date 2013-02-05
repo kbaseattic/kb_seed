@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Pairing
+=head1 NAME
+
+all_entities_Pairing
+
+=head1 SYNOPSIS
+
+all_entities_Pairing [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Pairing entity.
 
@@ -38,35 +46,24 @@ The Pairing entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Pairing [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
+=over 4    
 
-=item -h
 
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
-
-=back    
-   
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -78,20 +75,38 @@ use Getopt::Long;
 my @all_fields = (  );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Pairing [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Pairing [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

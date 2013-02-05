@@ -10,12 +10,26 @@ use String::CamelCase 'camelize';
 # This is a SAS Component
 #
 
-=head1 dump_relationship relname
+=head1 NAME
+
+dump_relationship
+
+=head1 SYNOPSIS
+
+dump_relationship relname > output
+
+=head1 DESCRIPTION
 
 Dump all the from/to data for the given relname. This command talks directly to the Sapling database
 and thus must run within the KB infrastructure (in other words, this is not a general purpose command).
 
-=head2 Command-line options
+Example:
+
+   dump_relationship relname > output
+
+=head1 COMMAND-LINE OPTIONS
+
+Usage: dump_relationship relname > output
 
 =over 4
 
@@ -28,6 +42,10 @@ Name of the relationship to dump.
 =head2 Output Format
 
 Tab delimited file containing to and from links for the given relationship.
+
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -58,3 +76,5 @@ while (my $r = $sth->fetchrow_arrayref())
 
 
 
+
+__DATA__

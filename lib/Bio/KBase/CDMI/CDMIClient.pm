@@ -109,11 +109,13 @@ sub new_for_script_with_type
     # Create the variables for our internal options.
     my ($loadDirectory, $dbd, $dbName, $sock, $userData, $dbhost, $port, $dbms);
     my ($local, $url);
+    my($help);
 
     $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
 
     # Parse the command line.
     my $rc = GetOptions(%options,
+			"help|h"	  => \$help,
 			"local"		  => \$local,
 			"url=s"		  => \$url,
 			"loadDirectory=s" => \$loadDirectory,
@@ -124,6 +126,33 @@ sub new_for_script_with_type
 			"dbhost=s"	  => \$dbhost,
 			"port=i"	  => \$port,
 			"dbms=s"	  => \$dbms);
+
+    if (!$rc || $help)
+    {
+	my $u = "";
+	seek(main::DATA, 0, 0);
+	while (<main::DATA>)
+        {
+	    last if /^=head1 COMMAND-LINE /;
+	}
+	while (<main::DATA>)
+        {
+	    last if /^=/;
+	    $u .= $_;
+	}
+
+	#
+	# If we didn't get a usage message here, revert to old behavior.
+	#
+	if ($u eq '')
+	{
+	    return undef;
+	}
+	$main::usage = $u;
+	print $main::usage;
+	exit($help ? 0 : 1);
+    }
+
     # If the parse worked, create the CDMI object.
     if ($rc) {
 	if ($local)

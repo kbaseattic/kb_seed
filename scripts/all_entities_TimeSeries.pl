@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_TimeSeries
+=head1 NAME
+
+all_entities_TimeSeries
+
+=head1 SYNOPSIS
+
+all_entities_TimeSeries [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the TimeSeries entity.
 
@@ -33,43 +41,40 @@ The TimeSeries entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_TimeSeries [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item source_id
 
+The ID of the time series used by the data source.
+
 =item name
+
+The name of this time series, if any.
 
 =item comments
 
+Any comments regarding this time series.
+
 =item timeUnits
 
-=back    
-   
+The units of time for this time series, e.g. 'seconds', 'hours', or more abstractly, 'number of times culture grown to saturation.'
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -81,20 +86,46 @@ use Getopt::Long;
 my @all_fields = ( 'source_id', 'name', 'comments', 'timeUnits' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_TimeSeries [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_TimeSeries [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    source_id
+        The ID of the time series used by the data source.
+    name
+        The name of this time series, if any.
+    comments
+        Any comments regarding this time series.
+    timeUnits
+        The units of time for this time series, e.g. 'seconds', 'hours', or more abstractly, 'number of times culture grown to saturation.'
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

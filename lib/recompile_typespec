@@ -1,10 +1,14 @@
 #!/bin/sh
 
 dbd=/home/parrello/CdmiData/Published/KSaplingDBD.xml
-/home/olson/kb_test/bin/compile_dbd_to_typespec CDMI_API CDMI_EntityAPI $dbd CDMI-EntityAPI.spec  \
+
+bin=/home/olson/kb_test/bin
+bin=/vol/kbase/deployment/bin
+
+$bin/compile_dbd_to_typespec CDMI_API CDMI_EntityAPI $dbd CDMI-EntityAPI.spec  \
 	Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm er_scripts
 
-/home/olson/kb_test/bin/compile_typespec \
+$bin/compile_typespec \
 	-impl Bio::KBase::CDMI::%sImpl \
 	-service Bio::KBase::CDMI::Service \
 	-psgi CDMI.psgi \

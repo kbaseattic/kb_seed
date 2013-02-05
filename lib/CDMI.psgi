@@ -2,6 +2,7 @@ use Bio::KBase::CDMI::CDMI_APIImpl;
 use Bio::KBase::CDMI::CDMI_EntityAPIImpl;
 
 use Bio::KBase::CDMI::Service;
+use Plack::Middleware::CrossOrigin;
 
 
 
@@ -21,17 +22,6 @@ my $server = Bio::KBase::CDMI::Service->new(instance_dispatch => { @dispatch },
 				allow_get => 0,
 			       );
 
-my $handler = sub {
-    my($env) = @_;
-    
-    my $resp = $server->handle_input($env);
+my $handler = sub { $server->handle_input(@_) };
 
-    if ($env->{HTTP_ORIGIN})
-    {
-	my($code, $hdrs, $body) = @$resp;
-	push(@$hdrs, 'Access-Control-Allow-Origin', $env->{HTTP_ORIGIN});
-    }
-    return $resp;
-};
-
-$handler;
+$handler = Plack::Middleware::CrossOrigin->wrap( $handler, origins => "*", headers => "*");

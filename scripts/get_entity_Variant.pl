@@ -7,8 +7,15 @@ use Carp;
 # This is a SAS Component
 #
 
+=head1 NAME
 
-=head1 get_entity_Variant
+get_entity_Variant
+
+=head1 SYNOPSIS
+
+get_entity_Variant [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+
+=head1 DESCRIPTION
 
 Each subsystem may include the designation of distinct
 variants.  Thus, there may be three closely-related, but
@@ -20,7 +27,7 @@ Example:
 
     get_entity_Variant -a < ids > table.with.fields.added
 
-would read in a file of ids and add a column for each filed in the entity.
+would read in a file of ids and add a column for each field in the entity.
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -47,44 +54,69 @@ The Variant entity has the following relationship links:
 
 =back
 
-=head2 Command-Line Options
+=head1 COMMAND-LINE OPTIONS
 
-=over 4
+Usage: get_entity_Variant [arguments] < ids > table.with.fields.added
 
-=item -c Column
+    -a		    Return all available fields.
+    -c num          Select the identifier from column num.
+    -i filename     Use filename rather than stdin for input.
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-Use the specified column to define the id of the entity to retrieve.
+The following fields are available:
 
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item role_rule
 
+a space-delimited list of role IDs, in alphabetical order, that represents a possible list of non-auxiliary roles applicable to this variant. The roles are identified by their abbreviations. A variant may have multiple role rules.
+
 =item code
+
+the variant code all by itself
 
 =item type
 
+variant type indicating the quality of the subsystem support. A type of "vacant" means that the subsystem does not appear to be implemented by the variant. A type of "incomplete" means that the subsystem appears to be missing many reactions. In all other cases, the type is "normal".
+
 =item comment
 
-=back    
+commentary text about the variant
+
 
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
+
+
+our $usage = <<'END';
+Usage: get_entity_Variant [arguments] < ids > table.with.fields.added
+
+    -c num          Select the identifier from column num
+    -i filename     Use filename rather than stdin for input
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    role_rule
+        a space-delimited list of role IDs, in alphabetical order, that represents a possible list of non-auxiliary roles applicable to this variant. The roles are identified by their abbreviations. A variant may have multiple role rules.
+    code
+        the variant code all by itself
+    type
+        variant type indicating the quality of the subsystem support. A type of "vacant" means that the subsystem does not appear to be implemented by the variant. A type of "incomplete" means that the subsystem appears to be missing many reactions. In all other cases, the type is "normal".
+    comment
+        commentary text about the variant
+END
+
+
 
 use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
@@ -94,26 +126,37 @@ use Getopt::Long;
 my @all_fields = ( 'role_rule', 'code', 'type', 'comment' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_Variant [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
-
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
+my $help;
 my $show_fields;
-my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
-								  "a"	   	=> \$a,
-								  "h"	   	=> \$show_fields,
-								  "show-fields"	=> \$show_fields,
-								  "fields=s" 	=> \$f,
-								  'i=s'	   	=> \$i);
-if ($show_fields)
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'		 => \$column,
+								  "all-fields|a" => \$a,
+								  "help|h"	 => \$help,
+								  "show-fields"	 => \$show_fields,
+								  "fields=s"	 => \$f,
+								  'i=s'		 => \$i);
+if ($help)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print $usage;
     exit 0;
 }
-if ($a && $f) { print STDERR $usage; exit 1 }
+
+if ($show_fields)
+{
+    print STDERR "Available fields:\n";
+    print STDERR "\t$_\n" foreach @all_fields;
+    exit 0;
+}
+
+if ($a && $f) 
+{
+    print STDERR "Only one of the -a and --fields options may be specified\n";
+    exit 1;
+} 
 if ($a)
 {
     @fields = @all_fields;
@@ -172,3 +215,4 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+__DATA__

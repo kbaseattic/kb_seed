@@ -6,8 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
-=head1 genome_to_intergenic_regions
+=head1 NAME
 
+genome_to_intergenic_regions
+
+=head1 SYNOPSIS
+
+genome_to_intergenic_regions -g GenomeID [-pad=num] > output
+
+=head1 DESCRIPTION
 
 genome_to_intergenic_regions is used to get the intergenic regions in a specified
 genome (specified using the -g argument).  The command allows you
@@ -15,35 +22,37 @@ to take "padding DNA" from the bounding fids using a -pad argument.
 
 Example:
 
-    genome_to_intergenic_regions -g 'kb|g.0' -pad=10 
+    genome_to_intergenic_regions -g 'kb|g.0' -pad=10 > output
 
 This is a pipe command in the sense that it produces a tab-separated list of lines.
 The columns will correspond to [Fid1,Fid2,padded-intergenic-region].
 Overlapping Fids produce no lines in the output.
 
-=head2 Command-Line Options
+=head1 COMMAND-LINE OPTIONS
 
-=over 4
+Usage: genome_to_intergenic_regions -g GenomeID [-pad=num] > output
 
-=item -g Genome
+    -g GenomeID
 
-This is required and specifies a KBase genome
+        This is required and specifies a KBase genome
 
-=item -pad PadSize [defaults to 0]
+    -pad PadSize [defaults to 0]
 
-If the intergenic regions are to be padded with characters from the Fids,
-this specifies the size.
+        If the intergenic regions are to be padded with characters from the Fids,
+        this specifies the size.
 
-=back
-
-=head2 Output Format
+=head1 OUTPUT FORMAT
 
 The standard output is a tab-delimited file. It consists of 3 columns:
 [Fid1,Fid2,LocationOfIntergenicRegion]
 
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
+
 =cut
 
-my $usage = "usage: genome_to_intergenic_regions > output";
+our $usage = "usage: genome_to_intergenic_regions > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -111,3 +120,5 @@ foreach my $tuple (@$dna_seqs)
     my $hdr = $fids{$loc};
     print ">$hdr location=$loc\n$dna\n";
 }
+
+__DATA__

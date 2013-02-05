@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Media
+=head1 NAME
+
+all_entities_Media
+
+=head1 SYNOPSIS
+
+all_entities_Media [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Media entity.
 
@@ -38,51 +46,56 @@ The Media entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Media [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item mod_date
 
+date and time of the last modification to the media's definition
+
 =item name
+
+descriptive name of the media
 
 =item is_minimal
 
+TRUE if this is a minimal media, else FALSE
+
 =item description
+
+description of the media condition
 
 =item solid
 
+Whether the media is solid (True) or liquid (False).
+
 =item is_defined
+
+TRUE if this media condition is defined (all components explicitly known)
 
 =item source_id
 
+The ID of the media used by the data source.
+
 =item type
 
-=back    
-   
+The general category of the media.
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -94,20 +107,54 @@ use Getopt::Long;
 my @all_fields = ( 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Media [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Media [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    mod_date
+        date and time of the last modification to the media's definition
+    name
+        descriptive name of the media
+    is_minimal
+        TRUE if this is a minimal media, else FALSE
+    description
+        description of the media condition
+    solid
+        Whether the media is solid (True) or liquid (False).
+    is_defined
+        TRUE if this media condition is defined (all components explicitly known)
+    source_id
+        The ID of the media used by the data source.
+    type
+        The general category of the media.
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

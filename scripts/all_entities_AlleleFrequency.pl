@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_AlleleFrequency
+=head1 NAME
+
+all_entities_AlleleFrequency
+
+=head1 SYNOPSIS
+
+all_entities_AlleleFrequency [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the AlleleFrequency entity.
 
@@ -31,49 +39,52 @@ The AlleleFrequency entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_AlleleFrequency [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item source_id
 
+identifier for this allele in the original (source) database
+
 =item position
+
+Specific position on the contig where the allele occurs
 
 =item minor_AF
 
+Minor allele frequency.  Floating point number from 0.0 to 0.5.
+
 =item minor_allele
+
+Text letter representation of the minor allele. Valid values are A, C, G, and T.
 
 =item major_AF
 
+Major allele frequency.  Floating point number less than or equal to 1.0.
+
 =item major_allele
+
+Text letter representation of the major allele. Valid values are A, C, G, and T.
 
 =item obs_unit_count
 
-=back    
-   
+Number of observational units used to compute the allele frequencies. Indicates the quality of the analysis.
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -85,20 +96,52 @@ use Getopt::Long;
 my @all_fields = ( 'source_id', 'position', 'minor_AF', 'minor_allele', 'major_AF', 'major_allele', 'obs_unit_count' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_AlleleFrequency [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_AlleleFrequency [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    source_id
+        identifier for this allele in the original (source) database
+    position
+        Specific position on the contig where the allele occurs
+    minor_AF
+        Minor allele frequency.  Floating point number from 0.0 to 0.5.
+    minor_allele
+        Text letter representation of the minor allele. Valid values are A, C, G, and T.
+    major_AF
+        Major allele frequency.  Floating point number less than or equal to 1.0.
+    major_allele
+        Text letter representation of the major allele. Valid values are A, C, G, and T.
+    obs_unit_count
+        Number of observational units used to compute the allele frequencies. Indicates the quality of the analysis.
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

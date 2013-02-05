@@ -61,7 +61,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-my $usage = "usage: regulons_to_fids [-c column] < input > output";
+our $usage = "usage: regulons_to_fids [-c column] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -111,3 +111,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+
+__DATA__

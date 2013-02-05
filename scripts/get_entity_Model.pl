@@ -7,8 +7,15 @@ use Carp;
 # This is a SAS Component
 #
 
+=head1 NAME
 
-=head1 get_entity_Model
+get_entity_Model
+
+=head1 SYNOPSIS
+
+get_entity_Model [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+
+=head1 DESCRIPTION
 
 A model specifies a relationship between sets of features and
 reactions in a cell. It is used to simulate cell growth and gene
@@ -18,7 +25,7 @@ Example:
 
     get_entity_Model -a < ids > table.with.fields.added
 
-would read in a file of ids and add a column for each filed in the entity.
+would read in a file of ids and add a column for each field in the entity.
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -49,52 +56,93 @@ The Model entity has the following relationship links:
 
 =back
 
-=head2 Command-Line Options
+=head1 COMMAND-LINE OPTIONS
 
-=over 4
+Usage: get_entity_Model [arguments] < ids > table.with.fields.added
 
-=item -c Column
+    -a		    Return all available fields.
+    -c num          Select the identifier from column num.
+    -i filename     Use filename rather than stdin for input.
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-Use the specified column to define the id of the entity to retrieve.
+The following fields are available:
 
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item mod_date
 
+date and time of the last change to the model data
+
 =item name
+
+descriptive name of the model
 
 =item version
 
+revision number of the model
+
 =item type
+
+string indicating where the model came from (e.g. single genome, multiple genome, or community model)
 
 =item status
 
+indicator of whether the model is stable, under construction, or under reconstruction
+
 =item reaction_count
+
+number of reactions in the model
 
 =item compound_count
 
+number of compounds in the model
+
 =item annotation_count
 
-=back    
+number of features associated with one or more reactions in the model
+
 
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
+
+
+our $usage = <<'END';
+Usage: get_entity_Model [arguments] < ids > table.with.fields.added
+
+    -c num          Select the identifier from column num
+    -i filename     Use filename rather than stdin for input
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    mod_date
+        date and time of the last change to the model data
+    name
+        descriptive name of the model
+    version
+        revision number of the model
+    type
+        string indicating where the model came from (e.g. single genome, multiple genome, or community model)
+    status
+        indicator of whether the model is stable, under construction, or under reconstruction
+    reaction_count
+        number of reactions in the model
+    compound_count
+        number of compounds in the model
+    annotation_count
+        number of features associated with one or more reactions in the model
+END
+
+
 
 use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
@@ -104,26 +152,37 @@ use Getopt::Long;
 my @all_fields = ( 'mod_date', 'name', 'version', 'type', 'status', 'reaction_count', 'compound_count', 'annotation_count' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: get_entity_Model [-h] [-c column] [-a | -f field list] < ids > extended.by.a.column(s)";
-
 my $column;
 my $a;
 my $f;
 my $i = "-";
 my @fields;
+my $help;
 my $show_fields;
-my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'	   	=> \$column,
-								  "a"	   	=> \$a,
-								  "h"	   	=> \$show_fields,
-								  "show-fields"	=> \$show_fields,
-								  "fields=s" 	=> \$f,
-								  'i=s'	   	=> \$i);
-if ($show_fields)
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script('c=i'		 => \$column,
+								  "all-fields|a" => \$a,
+								  "help|h"	 => \$help,
+								  "show-fields"	 => \$show_fields,
+								  "fields=s"	 => \$f,
+								  'i=s'		 => \$i);
+if ($help)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print $usage;
     exit 0;
 }
-if ($a && $f) { print STDERR $usage; exit 1 }
+
+if ($show_fields)
+{
+    print STDERR "Available fields:\n";
+    print STDERR "\t$_\n" foreach @all_fields;
+    exit 0;
+}
+
+if ($a && $f) 
+{
+    print STDERR "Only one of the -a and --fields options may be specified\n";
+    exit 1;
+} 
 if ($a)
 {
     @fields = @all_fields;
@@ -182,3 +241,4 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+__DATA__

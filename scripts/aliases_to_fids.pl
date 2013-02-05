@@ -43,7 +43,6 @@ the end of the line.
 
 Usage: aliases_to_fids [arguments] < input > output
 
-
     -c num        Select the identifier from column num
     -i filename   Use filename rather than stdin for input
 
@@ -54,7 +53,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-my $usage = "usage: aliases_to_fids [-c column] < input > output";
+our $usage = "usage: aliases_to_fids [-c column] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -104,3 +103,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, 10, $colum
         }
     }
 }
+
+__DATA__

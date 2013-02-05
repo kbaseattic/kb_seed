@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Reaction
+=head1 NAME
+
+all_entities_Reaction
+
+=head1 SYNOPSIS
+
+all_entities_Reaction [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Reaction entity.
 
@@ -42,55 +50,64 @@ The Reaction entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Reaction [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item mod_date
 
+date and time of the last modification to this reaction's definition
+
 =item name
+
+descriptive name of this reaction
 
 =item source_id
 
+ID of this reaction in the resource from which it was added
+
 =item abbr
+
+abbreviated name of this reaction
 
 =item direction
 
+direction of this reaction (> for forward-only, < for backward-only, = for bidirectional)
+
 =item deltaG
+
+Gibbs free-energy change for the reaction calculated using the group contribution method (units are kcal/mol)
 
 =item deltaG_error
 
+uncertainty in the [b]deltaG[/b] value (units are kcal/mol)
+
 =item thermodynamic_reversibility
+
+computed reversibility of this reaction in a pH-neutral environment
 
 =item default_protons
 
+number of protons absorbed by this reaction in a pH-neutral environment
+
 =item status
 
-=back    
-   
+string indicating additional information about this reaction, generally indicating whether the reaction is balanced and/or lumped
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -102,20 +119,58 @@ use Getopt::Long;
 my @all_fields = ( 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Reaction [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Reaction [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    mod_date
+        date and time of the last modification to this reaction's definition
+    name
+        descriptive name of this reaction
+    source_id
+        ID of this reaction in the resource from which it was added
+    abbr
+        abbreviated name of this reaction
+    direction
+        direction of this reaction (> for forward-only, < for backward-only, = for bidirectional)
+    deltaG
+        Gibbs free-energy change for the reaction calculated using the group contribution method (units are kcal/mol)
+    deltaG_error
+        uncertainty in the [b]deltaG[/b] value (units are kcal/mol)
+    thermodynamic_reversibility
+        computed reversibility of this reaction in a pH-neutral environment
+    default_protons
+        number of protons absorbed by this reaction in a pH-neutral environment
+    status
+        string indicating additional information about this reaction, generally indicating whether the reaction is balanced and/or lumped
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

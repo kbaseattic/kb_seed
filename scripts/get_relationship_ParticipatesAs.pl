@@ -6,8 +6,15 @@ use Carp;
 # This is a SAS Component
 #
 
+=head1 NAME
 
-=head1 get_relationship_ParticipatesAs
+get_relationship_ParticipatesAs
+
+=head1 SYNOPSIS
+
+get_relationship_ParticipatesAs [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+
+=head1 DESCRIPTION
 
 This relationship connects a generic compound to a specific compound
 where subceullar location has been specified.
@@ -30,18 +37,21 @@ where N is the column (from 1) that contains the id.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
-=head2 Command-Line Options
+=head1 COMMAND-LINE OPTIONS
+
+Usage: get_relationship_ParticipatesAs [arguments] < ids > table.with.fields.added
 
 =over 4
 
-=item -c Column
+=item -c num
 
-This is used only if the column containing id is not the last.
+Select the identifier from column num
 
 =item -from field-list
 
-Choose a set of fields from the Compound entity to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
+Choose a set of fields from the Compound
+entity to return. Field-list is a comma-separated list of strings. The
+following fields are available:
 
 =over 4
 
@@ -95,13 +105,12 @@ strings. The following fields are available:
 
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
+
 use Bio::KBase::Utilities::ScriptThing;
 use Bio::KBase::CDMI::CDMIClient;
 use Getopt::Long;
@@ -122,7 +131,43 @@ my @from_fields;
 my @rel_fields;
 my @to_fields;
 
-my $usage = "usage: get_relationship_ParticipatesAs [-c column] [-a | -from field list -rel field list -to field list] < ids > extended.by.a.column(s)\n";
+our $usage = <<'END';
+Usage: get_relationship_ParticipatesAs [arguments] < ids > table.with.fields.added
+
+--show-fields
+    List the available fields.
+
+-c num        
+    Select the identifier from column num
+
+--from field-list
+    Choose a set of fields from the Compound
+    entity to return. Field-list is a comma-separated list of strings. The
+    following fields are available:
+        id
+        label
+        abbr
+        source_id
+        ubiquitous
+        mod_date
+        mass
+        formula
+        charge
+        deltaG
+        deltaG_error
+
+--rel field-list
+    Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
+    strings. The following fields are available:
+        from_link
+        to_link
+
+--to field-list
+    Choose a set of fields from the LocalizedCompound entity to 
+    return. Field-list is a comma-separated list of strings. The following fields are available:
+        id
+
+END
 
 my $column;
 my $input_file;
@@ -130,23 +175,33 @@ my $a;
 my $f;
 my $r;
 my $t;
-my $h;
+my $help;
+my $show_fields;
 my $i = "-";
 
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("c=i"		=> \$column,
-								  "h"	   	=> \$h,
-								  "show-fields"	=> \$h,
+								  "h"	   	=> \$help,
+								  "show-fields"	=> \$show_fields,
 								  "a"	   	=> \$a,
 								  "from=s" 	=> \$f,
 								  "rel=s" 	=> \$r,
 								  "to=s" 	=> \$t,
 								  'i=s'	   	=> \$i);
 
-if ($h) {
-	print STDERR "from: ", join(",", @all_from_fields), "\n";
-	print STDERR "relation: ", join(",", @all_rel_fields), "\n";
-	print STDERR "to: ", join(",", @all_to_fields), "\n";
-	exit 0;
+if ($help) {
+    print $usage;
+    exit 0;
+}
+
+if ($show_fields)
+{
+    print "from fields:\n";
+    print "    $_\n" foreach @all_from_fields;
+    print "relation fields:\n";
+    print "    $_\n" foreach @all_rel_fields;
+    print "to fields:\n";
+    print "    $_\n" foreach @all_to_fields;
+    exit 0;
 }
 
 if ($a  && ($f || $r || $t)) {die $usage};
@@ -220,10 +275,6 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
 	    for my $result (@$resultsForId) {
 		print join("\t", $line, @$result) . "\n";
 	    }
-	}
-	else
-	{
-	    print STDERR $line, "\n";
 	}
     }
 }

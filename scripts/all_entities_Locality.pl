@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Locality
+=head1 NAME
+
+all_entities_Locality
+
+=head1 SYNOPSIS
+
+all_entities_Locality [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Locality entity.
 
@@ -31,53 +39,60 @@ The Locality entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Locality [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item source_name
 
+Name or description of the location used as a collection site.
+
 =item city
+
+City of the collecting site.
 
 =item state
 
+State or province of the collecting site.
+
 =item country
+
+Country of the collecting site.
 
 =item origcty
 
+3-letter ISO 3166-1 extended country code for the country of origin.
+
 =item elevation
+
+Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
 
 =item latitude
 
+Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
+
 =item longitude
+
+Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
 
 =item lo_accession
 
-=back    
-   
+gazeteer ontology term ID
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -89,20 +104,56 @@ use Getopt::Long;
 my @all_fields = ( 'source_name', 'city', 'state', 'country', 'origcty', 'elevation', 'latitude', 'longitude', 'lo_accession' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Locality [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Locality [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    source_name
+        Name or description of the location used as a collection site.
+    city
+        City of the collecting site.
+    state
+        State or province of the collecting site.
+    country
+        Country of the collecting site.
+    origcty
+        3-letter ISO 3166-1 extended country code for the country of origin.
+    elevation
+        Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
+    latitude
+        Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
+    longitude
+        Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
+    lo_accession
+        gazeteer ontology term ID
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

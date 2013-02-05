@@ -107,6 +107,10 @@ sub new
 {
     my($class, $url, @args) = @_;
     
+    if (!defined($url))
+    {
+	$url = 'http://bio-data-1.mcs.anl.gov/services/cdmi_api';
+    }
 
     my $self = {
 	client => Bio::KBase::CDMI::Client::RpcClient->new,

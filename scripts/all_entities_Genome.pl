@@ -7,7 +7,15 @@ use Carp;
 #
 
 
-=head1 all_entities_Genome
+=head1 NAME
+
+all_entities_Genome
+
+=head1 SYNOPSIS
+
+all_entities_Genome [-a] [--fields fieldlist] > entity-data
+
+=head1 DESCRIPTION
 
 Return all instances of the Genome entity.
 
@@ -61,61 +69,76 @@ The Genome entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+Usage: all_entities_Genome [arguments] > entity.data
 
-=over 4
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
 
-=item -a
+The following fields are available:
 
-Return all fields.
-
-=item -h
-
-Display a list of the fields available for use.
-
-=item -fields field-list
-
-Choose a set of fields to return. Field-list is a comma-separated list of 
-strings. The following fields are available:
-
-=over 4
+=over 4    
 
 =item pegs
 
+Number of protein encoding genes for this genome.
+
 =item rnas
+
+Number of RNA features found for this organism.
 
 =item scientific_name
 
+Full genus/species/strain name of the genome sequence.
+
 =item complete
+
+TRUE if the genome sequence is complete, else FALSE
 
 =item prokaryotic
 
+TRUE if this is a prokaryotic genome sequence, else FALSE
+
 =item dna_size
+
+Number of base pairs in the genome sequence.
 
 =item contigs
 
+Number of contigs for this genome sequence.
+
 =item domain
+
+Domain for this organism (Archaea, Bacteria, Eukaryota, Virus, Plasmid, or Environmental Sample).
 
 =item genetic_code
 
+Genetic code number used for protein translation on most of this genome sequence's contigs.
+
 =item gc_content
+
+Percent GC content present in the genome sequence's DNA.
 
 =item phenotype
 
+zero or more strings describing phenotypic information about this genome sequence
+
 =item md5
+
+MD5 identifier describing the genome's DNA sequence
 
 =item source_id
 
-=back    
-   
+identifier assigned to this genome by the original source
+
+
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file. It consists of the input
-file with an extra column added for each requested field.  Input lines that cannot
-be extended are written to stderr.  
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -127,20 +150,64 @@ use Getopt::Long;
 my @all_fields = ( 'pegs', 'rnas', 'scientific_name', 'complete', 'prokaryotic', 'dna_size', 'contigs', 'domain', 'genetic_code', 'gc_content', 'phenotype', 'md5', 'source_id' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
-my $usage = "usage: all_entities_Genome [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+Usage: all_entities_Genome [arguments] > entity.data
+
+    --fields list   Choose a set of fields to return. List is a comma-separated list of strings.
+    -a		    Return all available fields.
+    --show-fields   List the available fields.
+
+The following fields are available:
+
+    pegs
+        Number of protein encoding genes for this genome.
+    rnas
+        Number of RNA features found for this organism.
+    scientific_name
+        Full genus/species/strain name of the genome sequence.
+    complete
+        TRUE if the genome sequence is complete, else FALSE
+    prokaryotic
+        TRUE if this is a prokaryotic genome sequence, else FALSE
+    dna_size
+        Number of base pairs in the genome sequence.
+    contigs
+        Number of contigs for this genome sequence.
+    domain
+        Domain for this organism (Archaea, Bacteria, Eukaryota, Virus, Plasmid, or Environmental Sample).
+    genetic_code
+        Genetic code number used for protein translation on most of this genome sequence's contigs.
+    gc_content
+        Percent GC content present in the genome sequence's DNA.
+    phenotype
+        zero or more strings describing phenotypic information about this genome sequence
+    md5
+        MD5 identifier describing the genome's DNA sequence
+    source_id
+        identifier assigned to this genome by the original source
+END
+
 
 my $a;
 my $f;
 my @fields;
 my $show_fields;
+my $help;
 my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
 								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
+								  "h" 		=> \$help,
 								  "fields=s"    => \$f);
+
+if ($help)
+{
+    print $usage;
+    exit 0;
+}
 
 if ($show_fields)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print "Available fields:\n";
+    print "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

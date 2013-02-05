@@ -44,7 +44,7 @@ L<The SEED Project|http://www.theseed.org>
 
 use SeedUtils;
 
-my $usage = "usage: representative_sequences [arguments] < input > output";
+our $usage = "usage: representative_sequences [arguments] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -118,3 +118,5 @@ if ($clusterF)
     }
     close(CLUSTERS);
 }
+
+__DATA__

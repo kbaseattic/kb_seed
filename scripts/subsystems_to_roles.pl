@@ -54,7 +54,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-my $usage = "usage: subsystems_to_roles [-c column] < input > output";
+our $usage = "usage: subsystems_to_roles [-c column] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -105,3 +105,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $co
         }
     }
 }
+
+__DATA__

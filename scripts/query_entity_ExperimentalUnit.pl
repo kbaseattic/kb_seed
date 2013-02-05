@@ -7,9 +7,27 @@ use Carp;
 #
 
 
-=head1 query_entity_ExperimentalUnit
+=head1 NAME
 
-Query the entity ExperimentalUnit.
+query_entity_ExperimentalUnit
+
+=head1 SYNOPSIS
+
+query_entity_ExperimentalUnit [--is field,value] [--like field,value] [--op operator,field,value]
+
+=head1 DESCRIPTION
+
+Query the entity ExperimentalUnit. Results are limited using one or more of the query flags:
+
+=over 4
+
+=item the C<--is> flag to match for exact values; 
+
+=item the C<--like> flag for SQL LIKE searches, or 
+
+=item the C<--op> flag for making other comparisons. 
+
+=back
 
 An ExperimentalUnit is a subset of an experiment consisting of
 a Strain, an Environment, and one or more Measurements on that
@@ -18,7 +36,7 @@ single experiment.
 
 Example:
 
-    query_entity_ExperimentalUnit -a 
+    query_entity_ExperimentalUnit -is id,exact-match-value -a > records
 
 =head2 Related entities
 
@@ -41,20 +59,21 @@ The ExperimentalUnit entity has the following relationship links:
 
 =back
 
+=head1 COMMAND-LINE OPTIONS
 
-=head2 Command-Line Options
+query_entity_ExperimentalUnit [arguments] > records
 
 =over 4
 
-=item -is field,value
+=item --is field,value
 
 Limit the results to entities where the given field has the given value.
 
-=item -like field,value
+=item --like field,value
 
 Limit the results to entities where the given field is LIKE (in the sql sense) the given value.
 
-=item -op operator,field,value
+=item --op operator,field,value
 
 Limit the results to entities where the given field is related to the given value based on the given operator.
 
@@ -78,15 +97,15 @@ confusing them with shell I/O redirection operators.
 
 =back
 
-=item -a
+=item --a
 
 Return all fields.
 
-=item -h
+=item --show-fields
 
 Display a list of the fields available for use.
 
-=item -fields field-list
+=item --fields field-list
 
 Choose a set of fields to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
@@ -99,10 +118,9 @@ strings. The following fields are available:
    
 =back
 
-=head2 Output Format
+=head1 AUTHORS
 
-The standard output is a tab-delimited file containing a column
-for each requested field.
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
@@ -114,11 +132,48 @@ use Getopt::Long;
 my @all_fields = ( 'source_id' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
-my $usage = "usage: query_entity_ExperimentalUnit [-is field,value] [-like field,value] [-op operator,field,value] [-show-fields] [-a | -f field list] > entity.data";
+our $usage = <<'END';
+query_entity_ExperimentalUnit [arguments] > records
+
+--is field,value
+    Limit the results to entities where the given field has the given value.
+
+--like field,value
+    Limit the results to entities where the given field is LIKE (in the sql sense) the given value.
+
+--op operator,field,value
+    Limit the results to entities where the given field is related to
+    the given value based on the given operator.
+
+    The operators supported are as follows. We provide text based
+    alternatives to the comparison operators so that extra quoting is
+    not required to keep the command-line shell from confusing them
+    with shell I/O redirection operators.
+
+        < or lt
+        > or gt
+        <=  or le
+        >= or ge
+        =
+        LIKE
+
+-a
+    Return all fields.
+
+--show-fields
+    Display a list of the fields available for use.
+
+--fields field-list
+    Choose a set of fields to return. Field-list is a comma-separated list of 
+    strings. The following fields are available:
+
+        source_id
+END
 
 my $a;
 my $f;
 my @fields;
+my $help;
 my $show_fields;
 my @query_is;
 my @query_like;
@@ -135,17 +190,23 @@ my %op_map = ('>', '>',
 	      'like', 'LIKE',
 	      );
 
-my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("a" 		=> \$a,
-								  "show-fields" => \$show_fields,
-								  "h" 		=> \$show_fields,
-								  "is=s"	=> \@query_is,
-								  "like=s"	=> \@query_like,
-								  "op=s"	=> \@query_op,
-								  "fields=s"    => \$f);
+my $geO = Bio::KBase::CDMI::CDMIClient->new_get_entity_for_script("all-fields|a" => \$a,
+								  "show-fields"	 => \$show_fields,
+								  "help|h"	 => \$help,
+								  "is=s"	 => \@query_is,
+								  "like=s"	 => \@query_like,
+								  "op=s"	 => \@query_op,
+								  "fields=s"	 => \$f);
 
-if ($show_fields)
+if ($help)
 {
-    print STDERR "Available fields: @all_fields\n";
+    print $usage;
+    exit 0;
+}
+elsif ($show_fields)
+{
+    print STDERR "Available fields:\n";
+    print STDERR "\t$_\n" foreach @all_fields;
     exit 0;
 }
 

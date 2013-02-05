@@ -54,7 +54,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-my $usage = "usage: external_ids_to_fids [-c column] [-prefix] < input > output";
+our $usage = "usage: external_ids_to_fids [-c column] [-prefix] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -106,3 +106,5 @@ while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, 10, $colum
         }
     }
 }
+
+__DATA__

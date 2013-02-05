@@ -8,11 +8,15 @@ use JSON::XS;
 # This is a SAS Component
 #
 
-=head1 corresponds
+=head1 NAME
 
-Example:
+corresponds
 
-    corresponds [-a cutoff] genome-1 genome-2
+=head1 SYNOPSIS
+
+corresponds [-a cutoff] genome1 genome2 > output
+
+=head1 DESCRIPTION
 
 This command produces a correspondence between genes in genome=1 and genome-2.
 It is often the case that you wish to know which gene in genome X "corresponds" to a specific
@@ -20,65 +24,73 @@ gene in genome Y.  Frequently the term "ortholog" is used, although not always a
 Here we offer a basic tool that produces a reasonable estimate for the set of genes that
 form a 1-1 correspondence. 
 
-=head2 Command-Line Options
+Example:
 
-=over 4
+    corresponds [-a cutoff] genome1 genome2 > output
 
-=item -a Cutoff
+=head1 COMMAND-LINE OPTIONS
 
-This requests an abbreviated format in which only two columns are written:
-the projection score and the fid in the target genome.  If this is not
-used 10 column are produced.  The Cutoff specifies a minimum projection score.
+corresponds [-a cutoff] genome1 genome2 > output
 
-=item genome-1
+    -a Cutoff
+        This requests an abbreviated format in which only two columns are written:
+        the projection score and the fid in the target genome.  If this is not
+        used 10 column are produced.  The Cutoff specifies a minimum projection score.
 
-=item genome-2
+    genome1
+    genome2
 
-Input genomes. These are either filenames which are expected to contain genome
-typed-objects (as created by annotate_genome, for instances) or they are
-KBase genome IDs.
+        Input genomes. These are either filenames which are expected to contain genome
+        typed-objects (as created by annotate_genome, for instances) or they are
+        KBase genome IDs.
 
-=back
-
-=head2 Output Format
+=head1 OUTPUT FORMAT
 
 The standard output is a tab-delimited file. It consists of the input
 file with extra columns added.  If the abbreviated format is requested,
 two columns get added (sc and the fid projected to).  If the abbreviated
 format is not requested, ten columns will be added
 
-    1  - percent-identity: the average percent identity over the
+=over 4
+
+=item 1  - percent-identity: the average percent identity over the
          range of the match
 
-    2  - the number of genes in the five adjacent genes to the left and
+=item 2  - the number of genes in the five adjacent genes to the left and
          the five adjacent genes to the right (i.e., the number of genes in 
          the "chromosomal context") that correspond to genes in genome-2 which
          occur within the chromosomal context of id2
 
-    3   - b1, the start of the match in the protein encoded by the gene in genome -1
+=item 3   - b1, the start of the match in the protein encoded by the gene in genome -1
 
-    4   - e1, the end of the match in the protein encoded by the gene in genome-1
+=item 4   - e1, the end of the match in the protein encoded by the gene in genome-1
 
-    5   - ln1, the length of the protein encoded by the gene in genome-1
+=item 5   - ln1, the length of the protein encoded by the gene in genome-1
 
-    6   - b2
+=item 6   - b2
 
-    7   - e2
+=item 7   - e2
 
-    8   - ln2
+=item 8   - ln2
 
-    9   - a score between 0 and 1 that reflects the reliability of the
+=item 9   - a score between 0 and 1 that reflects the reliability of the
           projection
 
-    10  - id2, the corresponding gene in genome-2
+=item 10  - id2, the corresponding gene in genome-2
 
 Input lines that cannot be extended are written to stderr.
+
+=back
+
+=head1 AUTHORS
+
+L<The SEED Project|http://www.theseed.org>
 
 =cut
 
 use SeedUtils;
 
-my $usage = "usage: corresponds [-a cutoff] g1 g2 > output";
+our $usage = "usage: corresponds [-a cutoff] g1 g2 > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -196,3 +208,5 @@ sub load_from_cs
 
     return($seqs, $locs);
 }
+
+__DATA__
