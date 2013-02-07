@@ -129,6 +129,18 @@ sub new_for_script_with_type
 
     if (!$rc || $help)
     {
+	#
+	# If $main::usage has more than one line, it's probably a full description
+	# and the one we should use.
+	#
+
+	my $lines = $main::usage =~ tr/\n/\n/;
+	if ($lines > 1)
+	{
+	    print $main::usage;
+	    exit($help  ? 0 :1);
+	}
+	
 	my $u = "";
 	seek(main::DATA, 0, 0);
 	while (<main::DATA>)
@@ -148,8 +160,7 @@ sub new_for_script_with_type
 	{
 	    return undef;
 	}
-	$main::usage = $u;
-	print $main::usage;
+	print $u;
 	exit($help ? 0 : 1);
     }
 
