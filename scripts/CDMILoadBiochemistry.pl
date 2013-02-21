@@ -155,6 +155,15 @@ whether the reaction is balanced or not (status), and (9) the
 computed reversibility of the reaction in a pH-neutral environment
 (thermodynamic-reversibility).
 
+=item IsComprisedOf.dtx
+
+Each record in this file represents an instance of 
+B<ConsistsOfCompounds> relationship between B<Compound> and B<Compound>. The
+fields are (0) The KBase parent compound ID (from-link), (1) the KBase child
+compound ID (to-link), and (2) the molar ratio of the child compound to the 
+parent compound. E.g., for the parent compound CoCl2 the child compound Co2+ 
+would have a molar ratio of 1 and Cl- would have a ratio of 2 (molar-ratio).
+
 =back
 
 =head2 Command-Line Options
@@ -213,6 +222,7 @@ Name of the directory containing the model data files.
         ParticipatesAs HasPresenceOf HasCompoundAliasFrom
         LocalizedCompound Reaction IsParticipatingAt
         HasReactionAliasFrom HasStep IsTriggeredBy Involves
+        ConsistsOfCompounds
     );
     # Clear the tables, if necessary.
     if ($clear) {
@@ -236,8 +246,8 @@ Name of the directory containing the model data files.
     LoadAliasTable($loader, $inDirectory, 'hasCompoundAliasFrom.dtx',
         'HasCompoundAliasFrom', \%sources);
     $loader->SimpleLoad($inDirectory, 'hasPresenceOf.dtx', 'HasPresenceOf',
-        { concentration => 0, from_link => 1, maximum_flux => 2,
-          minimum_flux => 3, to_link => 4 }, 1);
+        { concentration => [0, 'copy', undef], from_link => 1, to_link => 2,
+          units => [3, 'copy', 'mol/L'] }, 1, 1);
     LoadAliasTable($loader, $inDirectory, 'hasReactionAliasFrom.dtx',
         'HasReactionAliasFrom', \%sources);
     $loader->SimpleLoad($inDirectory, 'hasStep.dtx', 'HasStep',
@@ -249,23 +259,28 @@ Name of the directory containing the model data files.
         { from_link => 0, optional => 1, to_link => 2, triggering => 3,
           type => 4 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'LocalizedCompound.dtx', 'LocalizedCompound',
-        { id => 0 }, 1);
+        { id => 0 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'location.dtx', 'Location',
         { id => 1, abbr => 0, mod_date => 2, name => 3, source_id => 4 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'media.dtx', 'Media', { id => 0,
-          is_minimal => 1, mod_date => [2, 'timeStamp', 0], source_id => 3,
-          name => 4, type => 5 }, 1, 1);
+          is_minimal => [1, 'semi-boolean', 'Y'], 
+          mod_date => [2, 'timeStamp', 0], source_id => 3,
+          name => 4, type => 5, description => [6, 'copy', ''],
+          is_defined => [7, 'semi-boolean', 'Y'], 
+          solid => [8, 'semi-boolean', 'N']}, 1, 1);
     $loader->SimpleLoad($inDirectory, 'ParticipatesAs.dtx', 'ParticipatesAs',
         { from_link => 0, to_link => 1 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'reaction.dtx', 'Reaction', { abbr => [0, 'copy', ''],
           default_protons => 1, deltaG => [2, 'copy', 1000000], deltaG_error => [3, 'copy', 1000000],
           direction => 4, id => 5, mod_date => [6, 'timeStamp', 0], name => 7, source_id => 8,
           status => [9, 'copy', 'OK'], thermodynamic_reversibility => [10, 'copy', '<=>'] }, 1, 1);
+    $loader->SimpleLoad($inDirectory, 'IsComprisedOf.dtx', 'ConsistsOfCompounds',
+        { from_link => 0, molar_ratio => 1, to_link => 2 }, 1, 1);
     # Unspool the relation loaders.
     print "Loading database relations.\n";
     $loader->LoadRelations($keep);
     # Insure all the sources are present.
-    for my $source (%sources) {
+    for my $source (keys %sources) {
         $stats->Add(sourcesFound => 1);
         $loader->InsureEntity(Source => $source);
     }
