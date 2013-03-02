@@ -1010,11 +1010,12 @@ module CDMI_API : CDMI_API {
      } entity_info;
 
      /* Information about a relationship in the database, including the 
-        entities it relates, its name, and its fields. */
+        entities it relates, its name and converse name, and its fields. */
      typedef structure {
 	string name;
 	string from_entity;
 	string to_entity;
+	string converse;
 	list<field_info> fields;
      } relationship_info;
 

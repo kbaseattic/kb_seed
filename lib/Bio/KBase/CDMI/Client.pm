@@ -7982,6 +7982,7 @@ relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	from_entity has a value which is a string
 	to_entity has a value which is a string
+	converse has a value which is a string
 	fields has a value which is a reference to a list where each element is a field_info
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -8001,6 +8002,7 @@ relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	from_entity has a value which is a string
 	to_entity has a value which is a string
+	converse has a value which is a string
 	fields has a value which is a reference to a list where each element is a field_info
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -63451,7 +63453,7 @@ fields has a value which is a reference to a list where each element is a field_
 =item Description
 
 Information about a relationship in the database, including the 
-entities it relates, its name, and its fields.
+entities it relates, its name and converse name, and its fields.
 
 
 =item Definition
@@ -63463,6 +63465,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 
 </pre>
@@ -63475,6 +63478,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 
 

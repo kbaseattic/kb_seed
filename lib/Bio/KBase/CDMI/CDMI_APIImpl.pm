@@ -122,10 +122,15 @@ sub AUTOLOAD
     return $self->{get_entity}->$func(@args);
 }
 
-sub processFields{
-    my ($fields) = @_;
+sub processFields {
+    my ($fields, $converse) = @_;
     my @fieldinfo = ();
 
+    if ($converse) {
+        my $to = $fields->{'to-link'};
+        $fields->{'to-link'} = $fields->{'from-link'};
+        $fields->{'from-link'} = $to;
+    }
     for my $field (keys $fields) {
         my $fi = {name => $field,
                   type => $fields->{$field}->{type},
@@ -135,6 +140,22 @@ sub processFields{
     }
 
     return \@fieldinfo;
+}
+
+sub setUpRelationships {
+    my ($self, $cdmi) = @_;
+    
+    my @reltables = keys $cdmi->GetObjectsTable('Relationship');
+    
+    my $converseToRel = {};
+    
+    foreach my $rel (@reltables) { #is there another way to get the converse?
+        $converseToRel->{$cdmi->FindRelationship($rel)->{converse}} = $rel;
+    }
+    
+    push @reltables, keys $converseToRel;
+    $self->{relationships} = \@reltables;
+    $self->{converseToRel} = $converseToRel;
 }
 
 #END_HEADER
@@ -168,6 +189,7 @@ sub new
 	}
         $cdmi = Bio::KBase::CDMI::CDMI->new(%params);
     }
+    setUpRelationships($self, $cdmi);
     $self->{db} = $cdmi;
 
     my $e = Bio::KBase::CDMI::CDMI_EntityAPIImpl->new($cdmi);
@@ -8238,17 +8260,7 @@ sub all_relationships
     my($return);
     #BEGIN all_relationships
     
-    #memoize if this becomes a problem, unlikely
-    my @reltables = keys $self->{db}->GetObjectsTable('Relationship');
-    
-    my @converse = ();
-    foreach my $rel (@reltables) { #is there another way to get the converse?
-        push @converse, $self->{db}->FindRelationship($rel)->{converse};
-    }
-    
-    push @reltables, @converse;
-    
-    $return = \@reltables;
+    $return = $self->{relationships};
     
     #END all_relationships
     my @_bad_returns;
@@ -8352,7 +8364,7 @@ sub get_entity
             next;
         }
         $return->{$ent}->{name} = $ent;
-        $return->{$ent}->{fields} = processFields($entdata->{Fields});
+        $return->{$ent}->{fields} = processFields($entdata->{Fields}, 0);
         my @rels = ();
         my @reldata = $self->{db}->GetConnectingRelationshipData($ent);
         for my $rel (keys $reldata[0]) {
@@ -8398,6 +8410,7 @@ relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	from_entity has a value which is a string
 	to_entity has a value which is a string
+	converse has a value which is a string
 	fields has a value which is a reference to a list where each element is a field_info
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -8417,6 +8430,7 @@ relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	from_entity has a value which is a string
 	to_entity has a value which is a string
+	converse has a value which is a string
 	fields has a value which is a reference to a list where each element is a field_info
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -8455,6 +8469,32 @@ sub get_relationship
     #BEGIN get_relationship
     
     # could memoize this if necessary, unlikely
+    
+    my $return = {};
+    
+    for my $rel (@$arg_1) {
+        if ($self->{converseToRel}->{$rel}) {
+            my $relr = $self->{converseToRel}->{$rel};
+            my $r = $self->{db}->FindRelationship($relr);
+            $return->{$rel} = {name => $rel,
+                               to_entity => $r->{from},
+                               from_entity => $r->{to},
+                               converse => $relr,
+                               fields => processFields($r->{Fields}, 1)
+                               };
+        } else {
+            my $r = $self->{db}->FindRelationship($rel);
+            if ($r == undef) {
+                next;
+            }
+            $return->{$rel} = {name => $rel,
+                               to_entity => $r->{to},
+                               from_entity => $r->{from},
+                               converse => $r->{converse},
+                               fields => processFields($r->{Fields}, 0)
+                               };
+        }
+    }
     
     #END get_relationship
     my @_bad_returns;
@@ -12328,7 +12368,7 @@ fields has a value which is a reference to a list where each element is a field_
 =item Description
 
 Information about a relationship in the database, including the 
-entities it relates, its name, and its fields.
+entities it relates, its name and converse name, and its fields.
 
 
 =item Definition
@@ -12340,6 +12380,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 
 </pre>
@@ -12352,6 +12393,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 
 
