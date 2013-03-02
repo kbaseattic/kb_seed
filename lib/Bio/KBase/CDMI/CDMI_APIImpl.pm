@@ -122,6 +122,21 @@ sub AUTOLOAD
     return $self->{get_entity}->$func(@args);
 }
 
+sub processFields{
+    my ($fields) = @_;
+    my @fieldinfo = ();
+
+    for my $field (keys $fields) {
+        my $fi = {name => $field,
+                  type => $fields->{$field}->{type},
+                  notes => $fields->{$field}->{Notes}->{content}
+                  };
+        push @fieldinfo, $fi;
+    }
+
+    return \@fieldinfo;
+}
+
 #END_HEADER
 
 sub new
@@ -8327,6 +8342,8 @@ sub get_entity
     my($return);
     #BEGIN get_entity
     
+    # could memoize this if necessary, unlikely
+    
     my $return = {};
     
     for my $ent (@$arg_1) {
@@ -8335,7 +8352,7 @@ sub get_entity
             next;
         }
         $return->{$ent}->{name} = $ent;
-        #$return->{$ent}->{fields} = processFields($entdata->{Fields});
+        $return->{$ent}->{fields} = processFields($entdata->{Fields});
         my @rels = ();
         my @reldata = $self->{db}->GetConnectingRelationshipData($ent);
         for my $rel (keys $reldata[0]) {
@@ -8436,6 +8453,9 @@ sub get_relationship
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN get_relationship
+    
+    # could memoize this if necessary, unlikely
+    
     #END get_relationship
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
