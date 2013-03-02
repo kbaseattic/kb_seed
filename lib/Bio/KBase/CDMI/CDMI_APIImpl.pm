@@ -8223,6 +8223,7 @@ sub all_relationships
     my($return);
     #BEGIN all_relationships
     
+    #memoize if this becomes a problem, unlikely
     my @reltables = keys $self->{db}->GetObjectsTable('Relationship');
     
     my @converse = ();
@@ -8325,6 +8326,29 @@ sub get_entity
     my $ctx = $Bio::KBase::CDMI::Service::CallContext;
     my($return);
     #BEGIN get_entity
+    
+    my $return = {};
+    
+    for my $ent (@$arg_1) {
+        my $entdata = $self->{db}->FindEntity($ent);
+        if ($entdata == undef) {
+            next;
+        }
+        $return->{$ent}->{name} = $ent;
+        #$return->{$ent}->{fields} = processFields($entdata->{Fields});
+        my @rels = ();
+        my @reldata = $self->{db}->GetConnectingRelationshipData($ent);
+        for my $rel (keys $reldata[0]) {
+            push @rels, [$rel, $reldata[0]->{$rel}->{to}];
+        }
+        for my $rel (keys $reldata[1]) {
+            push @rels, [$reldata[1]->{$rel}->{converse}, 
+                         $reldata[1]->{$rel}->{from}];
+        }
+        $return->{$ent}->{relationships} = \@rels;
+        
+    }
+    
     #END get_entity
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
