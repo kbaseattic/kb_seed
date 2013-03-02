@@ -8119,6 +8119,313 @@ sub tree_by_id
 
 
 
+=head2 all_entities
+
+  $return = $obj->all_entities()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$return is a reference to a list where each element is an entity_name
+entity_name is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$return is a reference to a list where each element is an entity_name
+entity_name is a string
+
+
+=end text
+
+
+
+=item Description
+
+Returns a list of all entities in the database.
+
+=back
+
+=cut
+
+sub all_entities
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN all_entities
+    
+    $return = [$self->{db}->GetEntityTypes()];
+    
+    #END all_entities
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to all_entities:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'all_entities');
+    }
+    return($return);
+}
+
+
+
+
+=head2 all_relationships
+
+  $return = $obj->all_relationships()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$return is a reference to a list where each element is a relationship_name
+relationship_name is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$return is a reference to a list where each element is a relationship_name
+relationship_name is a string
+
+
+=end text
+
+
+
+=item Description
+
+Returns a list of all relationships in the database.
+
+=back
+
+=cut
+
+sub all_relationships
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN all_relationships
+    
+    my @reltables = keys $self->{db}->GetObjectsTable('Relationship');
+    
+    my @converse = ();
+    foreach my $rel (@reltables) { #is there another way to get the converse?
+        push @converse, $self->{db}->FindRelationship($rel)->{converse};
+    }
+    
+    push @reltables, @converse;
+    
+    $return = \@reltables;
+    
+    #END all_relationships
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to all_relationships:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'all_relationships');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_entity
+
+  $return = $obj->get_entity($arg_1)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$arg_1 is a reference to a list where each element is an entity_name
+$return is a reference to a hash where the key is a string and the value is an entity_info
+entity_name is a string
+entity_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+	0: (rel_name) a string
+	1: (entity_name) a string
+
+	fields has a value which is a reference to a list where each element is a field_info
+field_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	notes has a value which is a string
+	type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$arg_1 is a reference to a list where each element is an entity_name
+$return is a reference to a hash where the key is a string and the value is an entity_info
+entity_name is a string
+entity_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+	0: (rel_name) a string
+	1: (entity_name) a string
+
+	fields has a value which is a reference to a list where each element is a field_info
+field_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	notes has a value which is a string
+	type has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Returns information about a set of entities in the database. Invalid
+entity names are ignored.
+
+=back
+
+=cut
+
+sub get_entity
+{
+    my $self = shift;
+    my($arg_1) = @_;
+
+    my @_bad_arguments;
+    (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"arg_1\" (value was \"$arg_1\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_entity:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_entity');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_entity
+    #END get_entity
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_entity:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_entity');
+    }
+    return($return);
+}
+
+
+
+
+=head2 get_relationship
+
+  $return = $obj->get_relationship($arg_1)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$arg_1 is a reference to a list where each element is a relationship_name
+$return is a reference to a hash where the key is a string and the value is a relationship_info
+relationship_name is a string
+relationship_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	from_entity has a value which is a string
+	to_entity has a value which is a string
+	fields has a value which is a reference to a list where each element is a field_info
+field_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	notes has a value which is a string
+	type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$arg_1 is a reference to a list where each element is a relationship_name
+$return is a reference to a hash where the key is a string and the value is a relationship_info
+relationship_name is a string
+relationship_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	from_entity has a value which is a string
+	to_entity has a value which is a string
+	fields has a value which is a reference to a list where each element is a field_info
+field_info is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	notes has a value which is a string
+	type has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Returns information about a set of relationships in the database. 
+Invalid relationship names are ignored.
+
+=back
+
+=cut
+
+sub get_relationship
+{
+    my $self = shift;
+    my($arg_1) = @_;
+
+    my @_bad_arguments;
+    (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"arg_1\" (value was \"$arg_1\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_relationship:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN get_relationship
+    #END get_relationship
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_relationship:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_relationship');
+    }
+    return($return);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -11823,6 +12130,186 @@ a string
 =begin text
 
 a string
+
+=end text
+
+=back
+
+
+
+=head2 entity_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 relationship_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 field_info
+
+=over 4
+
+
+
+=item Description
+
+Information about a field in the database. Includes the name of the 
+field, any associated formatted notes, and the type.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+notes has a value which is a string
+type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+notes has a value which is a string
+type has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 entity_info
+
+=over 4
+
+
+
+=item Description
+
+Information about an entity in the database, including the entity name
+and its relationships and fields.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+0: (rel_name) a string
+1: (entity_name) a string
+
+fields has a value which is a reference to a list where each element is a field_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+0: (rel_name) a string
+1: (entity_name) a string
+
+fields has a value which is a reference to a list where each element is a field_info
+
+
+=end text
+
+=back
+
+
+
+=head2 relationship_info
+
+=over 4
+
+
+
+=item Description
+
+Information about a relationship in the database, including the 
+entities it relates, its name, and its fields.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+from_entity has a value which is a string
+to_entity has a value which is a string
+fields has a value which is a reference to a list where each element is a field_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+from_entity has a value which is a string
+to_entity has a value which is a string
+fields has a value which is a reference to a list where each element is a field_info
+
 
 =end text
 

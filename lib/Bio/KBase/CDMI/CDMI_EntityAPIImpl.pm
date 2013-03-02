@@ -53583,6 +53583,186 @@ a string
 
 
 
+=head2 entity_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 relationship_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 field_info
+
+=over 4
+
+
+
+=item Description
+
+Information about a field in the database. Includes the name of the 
+field, any associated formatted notes, and the type.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+notes has a value which is a string
+type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+notes has a value which is a string
+type has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 entity_info
+
+=over 4
+
+
+
+=item Description
+
+Information about an entity in the database, including the entity name
+and its relationships and fields.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+0: (rel_name) a string
+1: (entity_name) a string
+
+fields has a value which is a reference to a list where each element is a field_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+relationships has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+0: (rel_name) a string
+1: (entity_name) a string
+
+fields has a value which is a reference to a list where each element is a field_info
+
+
+=end text
+
+=back
+
+
+
+=head2 relationship_info
+
+=over 4
+
+
+
+=item Description
+
+Information about a relationship in the database, including the 
+entities it relates, its name, and its fields.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+from_entity has a value which is a string
+to_entity has a value which is a string
+fields has a value which is a reference to a list where each element is a field_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+from_entity has a value which is a string
+to_entity has a value which is a string
+fields has a value which is a reference to a list where each element is a field_info
+
+
+=end text
+
+=back
+
+
+
 =head2 diamond
 
 =over 4
