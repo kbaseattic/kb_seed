@@ -53635,6 +53635,32 @@ a string
 
 
 
+=head2 boolean
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
 =head2 field_info
 
 =over 4
@@ -53731,6 +53757,9 @@ fields has a value which is a reference to a list where each element is a field_
 
 Information about a relationship in the database, including the 
 entities it relates, its name and converse name, and its fields.
+The real_table boolean designates that the relationship is a real
+table in the database rather than the converse relationship to that
+table.
 
 
 =item Definition
@@ -53742,6 +53771,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+real_table has a value which is a boolean
 converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 
@@ -53755,6 +53785,7 @@ a reference to a hash where the following keys are defined:
 name has a value which is a string
 from_entity has a value which is a string
 to_entity has a value which is a string
+real_table has a value which is a boolean
 converse has a value which is a string
 fields has a value which is a reference to a list where each element is a field_info
 

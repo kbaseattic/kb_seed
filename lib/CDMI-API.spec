@@ -986,6 +986,7 @@ module CDMI_API : CDMI_API {
      
      typedef string entity_name;
      typedef string relationship_name;
+     typedef int boolean;
      
      /* Returns a list of all entities in the database. */
      funcdef all_entities() returns (list<entity_name>);
@@ -1010,11 +1011,15 @@ module CDMI_API : CDMI_API {
      } entity_info;
 
      /* Information about a relationship in the database, including the 
-        entities it relates, its name and converse name, and its fields. */
+        entities it relates, its name and converse name, and its fields.
+        The real_table boolean designates that the relationship is a real
+        table in the database rather than the converse relationship to that
+        table. */
      typedef structure {
 	string name;
 	string from_entity;
 	string to_entity;
+	boolean real_table;
 	string converse;
 	list<field_info> fields;
      } relationship_info;
