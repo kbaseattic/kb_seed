@@ -274,7 +274,7 @@ Name of the directory containing the model data files.
           default_protons => 1, deltaG => [2, 'copy', 1000000], deltaG_error => [3, 'copy', 1000000],
           direction => 4, id => 5, mod_date => [6, 'timeStamp', 0], name => 7, source_id => 8,
           status => [9, 'copy', 'OK'], thermodynamic_reversibility => [10, 'copy', '<=>'] }, 1, 1);
-    $loader->SimpleLoad($inDirectory, 'IsComprisedOf.dtx', 'ConsistsOfCompounds',
+    $loader->SimpleLoad($inDirectory, 'ConsistsOfCompounds.dtx', 'ConsistsOfCompounds',
         { from_link => 0, molar_ratio => 1, to_link => 2 }, 1, 1);
     # Unspool the relation loaders.
     print "Loading database relations.\n";
