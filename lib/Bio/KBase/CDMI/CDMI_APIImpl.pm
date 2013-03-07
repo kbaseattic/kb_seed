@@ -124,22 +124,26 @@ sub AUTOLOAD
 
 sub processFields {
     my ($fields, $converse) = @_;
-    my @fieldinfo = ();
-
-    if ($converse) {
-        my $to = $fields->{'to-link'};
-        $fields->{'to-link'} = $fields->{'from-link'};
-        $fields->{'from-link'} = $to;
-    }
+    my $fieldinfo = {};
+    
     for my $field (keys $fields) {
-        my $fi = {name => $field,
+        my $name = $field;
+        if ($converse) {
+            if($field eq 'to-link') {
+                $name = 'from-link';
+            }
+            if($field eq 'from-link') {
+                $name = 'to-link';
+            }
+        }
+        my $fi = {name => $name,
                   type => $fields->{$field}->{type},
                   notes => $fields->{$field}->{Notes}->{content}
                   };
-        push @fieldinfo, $fi;
+        $fieldinfo->{$name} = $fi;
     }
 
-    return \@fieldinfo;
+    return $fieldinfo;
 }
 
 sub setUpRelationships {
@@ -8296,7 +8300,8 @@ entity_info is a reference to a hash where the following keys are defined:
 	0: (rel_name) a string
 	1: (entity_name) a string
 
-	fields has a value which is a reference to a list where each element is a field_info
+	fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
+field_name is a string
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	notes has a value which is a string
@@ -8317,7 +8322,8 @@ entity_info is a reference to a hash where the following keys are defined:
 	0: (rel_name) a string
 	1: (entity_name) a string
 
-	fields has a value which is a reference to a list where each element is a field_info
+	fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
+field_name is a string
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	notes has a value which is a string
@@ -8412,8 +8418,9 @@ relationship_info is a reference to a hash where the following keys are defined:
 	to_entity has a value which is a string
 	real_table has a value which is a boolean
 	converse has a value which is a string
-	fields has a value which is a reference to a list where each element is a field_info
+	fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 boolean is an int
+field_name is a string
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	notes has a value which is a string
@@ -8434,8 +8441,9 @@ relationship_info is a reference to a hash where the following keys are defined:
 	to_entity has a value which is a string
 	real_table has a value which is a boolean
 	converse has a value which is a string
-	fields has a value which is a reference to a list where each element is a field_info
+	fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 boolean is an int
+field_name is a string
 field_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	notes has a value which is a string
@@ -8477,19 +8485,19 @@ sub get_relationship
     my $return = {};
     
     for my $rel (@$arg_1) {
-        if ($self->{converseToRel}->{$rel}) {
+        if (exists $self->{converseToRel}->{$rel}) {
             my $relr = $self->{converseToRel}->{$rel};
-            my $r = $self->{db}->FindRelationship($relr);
+            my $real = $self->{db}->FindRelationship($relr);
             $return->{$rel} = {name => $rel,
-                               to_entity => $r->{from},
-                               from_entity => $r->{to},
+                               to_entity => $real->{from},
+                               from_entity => $real->{to},
                                converse => $relr,
                                real_table => 0,
-                               fields => processFields($r->{Fields}, 1)
+                               fields => processFields($real->{Fields}, 1)
                                };
         } else {
             my $r = $self->{db}->FindRelationship($rel);
-            if ($r == undef) {
+            unless($r) {
                 next;
             }
             $return->{$rel} = {name => $rel,
@@ -12279,6 +12287,32 @@ a string
 
 
 
+=head2 field_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 boolean
 
 =over 4
@@ -12368,7 +12402,7 @@ relationships has a value which is a reference to a list where each element is a
 0: (rel_name) a string
 1: (entity_name) a string
 
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 </pre>
 
@@ -12382,7 +12416,7 @@ relationships has a value which is a reference to a list where each element is a
 0: (rel_name) a string
 1: (entity_name) a string
 
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 
 =end text
@@ -12417,7 +12451,7 @@ from_entity has a value which is a string
 to_entity has a value which is a string
 real_table has a value which is a boolean
 converse has a value which is a string
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 </pre>
 
@@ -12431,7 +12465,7 @@ from_entity has a value which is a string
 to_entity has a value which is a string
 real_table has a value which is a boolean
 converse has a value which is a string
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 
 =end text

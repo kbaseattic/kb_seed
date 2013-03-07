@@ -53635,6 +53635,32 @@ a string
 
 
 
+=head2 field_name
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 boolean
 
 =over 4
@@ -53724,7 +53750,7 @@ relationships has a value which is a reference to a list where each element is a
 0: (rel_name) a string
 1: (entity_name) a string
 
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 </pre>
 
@@ -53738,7 +53764,7 @@ relationships has a value which is a reference to a list where each element is a
 0: (rel_name) a string
 1: (entity_name) a string
 
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 
 =end text
@@ -53773,7 +53799,7 @@ from_entity has a value which is a string
 to_entity has a value which is a string
 real_table has a value which is a boolean
 converse has a value which is a string
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 </pre>
 
@@ -53787,7 +53813,7 @@ from_entity has a value which is a string
 to_entity has a value which is a string
 real_table has a value which is a boolean
 converse has a value which is a string
-fields has a value which is a reference to a list where each element is a field_info
+fields has a value which is a reference to a hash where the key is a field_name and the value is a field_info
 
 
 =end text

@@ -986,6 +986,7 @@ module CDMI_API : CDMI_API {
      
      typedef string entity_name;
      typedef string relationship_name;
+     typedef string field_name;
      typedef int boolean;
      
      /* Returns a list of all entities in the database. */
@@ -1007,7 +1008,7 @@ module CDMI_API : CDMI_API {
      typedef structure {
 	string name;
 	list<tuple<string rel_name, string entity_name>> relationships;
-	list<field_info> fields;
+	mapping<field_name, field_info> fields;
      } entity_info;
 
      /* Information about a relationship in the database, including the 
@@ -1021,7 +1022,7 @@ module CDMI_API : CDMI_API {
 	string to_entity;
 	boolean real_table;
 	string converse;
-	list<field_info> fields;
+	mapping<field_name, field_info> fields;
      } relationship_info;
 
      /* Returns information about a set of entities in the database. Invalid

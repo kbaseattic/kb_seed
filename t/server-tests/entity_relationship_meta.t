@@ -39,33 +39,34 @@ ok($allrelh{'IsLocatedIn'}, 'IsLocatedIn relationship exists');
 ok($allrelh{'IsLocusFor'}, 'IsLocusFor relationship exists');
 
 my $nada = $cdmi->get_entity(['foo']);
-is_deeply({}, $nada, 'Invalid entity name returns empty DS');
+is_deeply($nada, {}, 'Invalid entity name returns empty DS');
 
 my $pub = $cdmi->get_entity(['foo', 'Publication']);
+
 my $expected = {
           'Publication' => {
-                             'fields' => [
-                                           {
-                                             'notes' => 'URL of the article, DOI preferred',
-                                             'name' => 'link',
-                                             'type' => 'string'
-                                           },
-                                           {
-                                             'notes' => 'publication date of the article',
-                                             'name' => 'pubdate',
-                                             'type' => 'date'
-                                           },
-                                           {
-                                             'notes' => 'title of the article, or (unknown) if the title is not known',
-                                             'name' => 'title',
-                                             'type' => 'string'
-                                           },
-                                           {
-                                             'notes' => 'Unique identifier for this [b]Publication[/b].',
-                                             'name' => 'id',
-                                             'type' => 'string'
-                                           }
-                                         ],
+                             'fields' => {
+                                           'link' => {
+                                                       'notes' => 'URL of the article, DOI preferred',
+                                                       'name' => 'link',
+                                                       'type' => 'string'
+                                                     },
+                                           'pubdate' => {
+                                                          'notes' => 'publication date of the article',
+                                                          'name' => 'pubdate',
+                                                          'type' => 'date'
+                                                        },
+                                           'id' => {
+                                                     'notes' => 'Unique identifier for this [b]Publication[/b].',
+                                                     'name' => 'id',
+                                                     'type' => 'string'
+                                                   },
+                                           'title' => {
+                                                        'notes' => 'title of the article, or (unknown) if the title is not known',
+                                                        'name' => 'title',
+                                                        'type' => 'string'
+                                                      }
+                                         },
                              'name' => 'Publication',
                              'relationships' => [
                                                   [
@@ -84,10 +85,11 @@ my $expected = {
                            }
         };
 
-is_deeply($expected, $pub, 'Check publication entity');
 
-my $nada = $cdmi->get_relationship(['foo']);
-is_deeply({}, $nada, 'Invalid relationship name returns empty DS');
+is_deeply($pub, $expected, 'Check publication entity');
+
+$nada = $cdmi->get_relationship(['foo']);
+is_deeply($nada, {}, 'Invalid relationship name returns empty DS');
 
 my $ili = $cdmi->get_relationship(['foo', 'IsLocatedIn']);
 
@@ -95,92 +97,92 @@ $expected = {
           'IsLocatedIn' => {
                              'to_entity' => 'Contig',
                              'real_table' => 1,
-                             'fields' => [
-                                           {
-                                             'notes' => 'Sequence number of this segment, starting from 1 and proceeding sequentially forward from there.',
-                                             'name' => 'ordinal',
-                                             'type' => 'int'
-                                           },
-                                           {
-                                             'notes' => 'Length of this segment.',
-                                             'name' => 'len',
-                                             'type' => 'int'
-                                           },
-                                           {
-                                             'notes' => '[b]id[/b] of the target [b][link #Contig]Contig[/link][/b].',
-                                             'name' => 'to-link',
-                                             'type' => 'string'
-                                           },
-                                           {
-                                             'notes' => 'Index (1-based) of the first residue in the contig that belongs to the segment.',
-                                             'name' => 'begin',
-                                             'type' => 'int'
-                                           },
-                                           {
-                                             'notes' => '[b]id[/b] of the source [b][link #Feature]Feature[/link][/b].',
-                                             'name' => 'from-link',
-                                             'type' => 'string'
-                                           },
-                                           {
-                                             'notes' => 'Direction (strand) of the segment: "+" if it is forward and "-" if it is backward.',
-                                             'name' => 'dir',
-                                             'type' => 'char'
-                                           }
-                                         ],
+                             'fields' => {
+                                           'len' => {
+                                                      'notes' => 'Length of this segment.',
+                                                      'name' => 'len',
+                                                      'type' => 'int'
+                                                    },
+                                           'ordinal' => {
+                                                          'notes' => 'Sequence number of this segment, starting from 1 and proceeding sequentially forward from there.',
+                                                          'name' => 'ordinal',
+                                                          'type' => 'int'
+                                                        },
+                                           'to-link' => {
+                                                          'notes' => '[b]id[/b] of the target [b][link #Contig]Contig[/link][/b].',
+                                                          'name' => 'to-link',
+                                                          'type' => 'string'
+                                                        },
+                                           'begin' => {
+                                                        'notes' => 'Index (1-based) of the first residue in the contig that belongs to the segment.',
+                                                        'name' => 'begin',
+                                                        'type' => 'int'
+                                                      },
+                                           'from-link' => {
+                                                            'notes' => '[b]id[/b] of the source [b][link #Feature]Feature[/link][/b].',
+                                                            'name' => 'from-link',
+                                                            'type' => 'string'
+                                                          },
+                                           'dir' => {
+                                                      'notes' => 'Direction (strand) of the segment: "+" if it is forward and "-" if it is backward.',
+                                                      'name' => 'dir',
+                                                      'type' => 'char'
+                                                    }
+                                         },
                              'name' => 'IsLocatedIn',
                              'from_entity' => 'Feature',
                              'converse' => 'IsLocusFor'
                            }
         };
 
-is_deeply($expected, $ili, 'Correct IsLocatedIn information');
-
-
+is_deeply($ili, $expected, 'Correct IsLocatedIn information');
 
 my $ilf = $cdmi->get_relationship(['foo', 'IsLocusFor']);
+
+#print Dumper($ilf);
 
 $expected = {
           'IsLocusFor' => {
                             'to_entity' => 'Feature',
                             'real_table' => 0,
-                            'fields' => [
-                                          {
-                                            'notes' => 'Sequence number of this segment, starting from 1 and proceeding sequentially forward from there.',
-                                            'name' => 'ordinal',
-                                            'type' => 'int'
-                                          },
-                                          {
-                                            'notes' => 'Length of this segment.',
-                                            'name' => 'len',
-                                            'type' => 'int'
-                                          },
-                                          {
-                                            'notes' => '[b]id[/b] of the source [b][link #Feature]Feature[/link][/b].',
-                                            'name' => 'to-link',
-                                            'type' => 'string'
-                                          },
-                                          {
-                                            'notes' => 'Index (1-based) of the first residue in the contig that belongs to the segment.',
-                                            'name' => 'begin',
-                                            'type' => 'int'
-                                          },
-                                          {
-                                            'notes' => '[b]id[/b] of the target [b][link #Contig]Contig[/link][/b].',
-                                            'name' => 'from-link',
-                                            'type' => 'string'
-                                          },
-                                          {
-                                            'notes' => 'Direction (strand) of the segment: "+" if it is forward and "-" if it is backward.',
-                                            'name' => 'dir',
-                                            'type' => 'char'
-                                          }
-                                        ],
+                            'fields' => {
+                                          'len' => {
+                                                     'notes' => 'Length of this segment.',
+                                                     'name' => 'len',
+                                                     'type' => 'int'
+                                                   },
+                                          'ordinal' => {
+                                                         'notes' => 'Sequence number of this segment, starting from 1 and proceeding sequentially forward from there.',
+                                                         'name' => 'ordinal',
+                                                         'type' => 'int'
+                                                       },
+                                          'to-link' => {
+                                                         'notes' => '[b]id[/b] of the source [b][link #Feature]Feature[/link][/b].',
+                                                         'name' => 'to-link',
+                                                         'type' => 'string'
+                                                       },
+                                          'begin' => {
+                                                       'notes' => 'Index (1-based) of the first residue in the contig that belongs to the segment.',
+                                                       'name' => 'begin',
+                                                       'type' => 'int'
+                                                     },
+                                          'from-link' => {
+                                                           'notes' => '[b]id[/b] of the target [b][link #Contig]Contig[/link][/b].',
+                                                           'name' => 'from-link',
+                                                           'type' => 'string'
+                                                         },
+                                          'dir' => {
+                                                     'notes' => 'Direction (strand) of the segment: "+" if it is forward and "-" if it is backward.',
+                                                     'name' => 'dir',
+                                                     'type' => 'char'
+                                                   }
+                                        },
                             'name' => 'IsLocusFor',
                             'from_entity' => 'Contig',
                             'converse' => 'IsLocatedIn'
                           }
         };
 
-is_deeply($expected, $ilf, 'Correct IsLocusFor information');
+is_deeply($ilf, $expected, 'Correct IsLocusFor information');
 
 done_testing();
