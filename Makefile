@@ -126,7 +126,7 @@ test-server:
 	# run each server test
 	for t in $(SERVER_TESTS) ; do \
 		if [ -f $$t ] ; then \
-			echo Running $$t ;
+			echo Running $$t ; \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
 			if [ $$? -ne 0 ] ; then \
 				exit 1 ; \
@@ -138,7 +138,7 @@ test-prod-server:
 	# run each prod test
 	for t in $(PROD_TESTS) ; do \
 		if [ -f $$t ] ; then \
-			echo Running $$t ;
+			echo Running $$t ; \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
 			if [ $$? -ne 0 ] ; then \
 				exit 1 ; \
