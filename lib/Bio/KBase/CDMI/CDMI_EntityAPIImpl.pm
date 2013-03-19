@@ -18,6 +18,8 @@ CDMI_EntityAPI
 #BEGIN_HEADER
 
 use Bio::KBase::CDMI::CDMI;
+use Text::ParseWords;
+use Data::Dumper;
 
 our $entity_field_defs = {
     'Alignment' => {
@@ -2574,8 +2576,8 @@ sub _query_entity
     my $valid_fields = $entity_field_defs->{$tbl};
     my $field_rels = $entity_field_rels->{$tbl};
     
-    #IN violates the typespec since it requires an array as the $value rather than a string
-    my %valid_ops = map { $_ => 1 } ('IS NULL', 'IS NOT NULL', 'LIKE', '<', '>', '=', '>=', '<='); # 'IN');
+    my %valid_ops = map { $_ => 1 } ('IS NULL', 'IS NOT NULL', 'LIKE', '<', 
+                                     '>', '=', '>=', '<=', 'IN');
     my @bad_q;
     for my $q (@$qry)
     {
@@ -2598,15 +2600,10 @@ sub _query_entity
         }
         if ($op eq 'IN')
         {
-            if (! ref $value eq 'ARRAY')
-            {
-                push(@bad_q, "Associated value for operator $op must be an array");
-                next;
-            } else {
-                my $quest = '(' . join(', ', ('?') x @$value) . ')';
-                push(@filter, "$field $op $quest");
-                push(@filter_params, @$value);
-            }
+            my @v = parse_line('\s*,\s*', 0, $value);
+            my $quest = '(' . join(', ', ('?') x @v) . ')';
+            push(@filter, "$field $op $quest");
+            push(@filter_params, @v);
         }
         elsif ($op eq 'IS NOT NULL' or $op eq 'IS NULL')
         {
