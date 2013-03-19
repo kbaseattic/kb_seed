@@ -53609,6 +53609,32 @@ a string
 
 
 
+=head2 entity_names
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an entity_name
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an entity_name
+
+=end text
+
+=back
+
+
+
 =head2 relationship_name
 
 =over 4
@@ -53628,6 +53654,32 @@ a string
 =begin text
 
 a string
+
+=end text
+
+=back
+
+
+
+=head2 relationship_names
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a relationship_name
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a relationship_name
 
 =end text
 

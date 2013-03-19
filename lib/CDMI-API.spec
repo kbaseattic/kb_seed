@@ -985,15 +985,17 @@ module CDMI_API : CDMI_API {
      funcdef tree_by_id(tree_id) returns (newick_tree);
      
      typedef string entity_name;
+     typedef list<entity_name> entity_names;
      typedef string relationship_name;
+     typedef list<relationship_name> relationship_names;
      typedef string field_name;
      typedef int boolean;
      
      /* Returns a list of all entities in the database. */
-     funcdef all_entities() returns (list<entity_name>);
+     funcdef all_entities() returns (entity_names);
      
      /* Returns a list of all relationships in the database. */
-     funcdef all_relationships() returns (list<relationship_name>);
+     funcdef all_relationships() returns (relationship_names);
      
      /* Information about a field in the database. Includes the name of the 
         field, any associated formatted notes, and the type. */
@@ -1027,9 +1029,9 @@ module CDMI_API : CDMI_API {
 
      /* Returns information about a set of entities in the database. Invalid
         entity names are ignored. */
-     funcdef get_entity(list<entity_name>) returns (mapping<string, entity_info>);
+     funcdef get_entity(entity_names) returns (mapping<string, entity_info>);
      
      /* Returns information about a set of relationships in the database. 
         Invalid relationship names are ignored. */
-     funcdef get_relationship(list<relationship_name>) returns (mapping<string, relationship_info>);
+     funcdef get_relationship(relationship_names) returns (mapping<string, relationship_info>);
 };

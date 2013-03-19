@@ -7732,7 +7732,8 @@ sub tree_by_id
 =begin html
 
 <pre>
-$return is a reference to a list where each element is an entity_name
+$return is an entity_names
+entity_names is a reference to a list where each element is an entity_name
 entity_name is a string
 
 </pre>
@@ -7741,7 +7742,8 @@ entity_name is a string
 
 =begin text
 
-$return is a reference to a list where each element is an entity_name
+$return is an entity_names
+entity_names is a reference to a list where each element is an entity_name
 entity_name is a string
 
 
@@ -7801,7 +7803,8 @@ sub all_entities
 =begin html
 
 <pre>
-$return is a reference to a list where each element is a relationship_name
+$return is a relationship_names
+relationship_names is a reference to a list where each element is a relationship_name
 relationship_name is a string
 
 </pre>
@@ -7810,7 +7813,8 @@ relationship_name is a string
 
 =begin text
 
-$return is a reference to a list where each element is a relationship_name
+$return is a relationship_names
+relationship_names is a reference to a list where each element is a relationship_name
 relationship_name is a string
 
 
@@ -7861,7 +7865,7 @@ sub all_relationships
 
 =head2 get_entity
 
-  $return = $obj->get_entity($arg_1)
+  $return = $obj->get_entity($entity_names)
 
 =over 4
 
@@ -7870,8 +7874,9 @@ sub all_relationships
 =begin html
 
 <pre>
-$arg_1 is a reference to a list where each element is an entity_name
+$entity_names is an entity_names
 $return is a reference to a hash where the key is a string and the value is an entity_info
+entity_names is a reference to a list where each element is an entity_name
 entity_name is a string
 entity_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -7892,8 +7897,9 @@ field_info is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$arg_1 is a reference to a list where each element is an entity_name
+$entity_names is an entity_names
 $return is a reference to a hash where the key is a string and the value is an entity_info
+entity_names is a reference to a list where each element is an entity_name
 entity_name is a string
 entity_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -7932,10 +7938,10 @@ sub get_entity
 							       "Invalid argument count for function get_entity (received $n, expecting 1)");
     }
     {
-	my($arg_1) = @args;
+	my($entity_names) = @args;
 
 	my @_bad_arguments;
-        (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"arg_1\" (value was \"$arg_1\")");
+        (ref($entity_names) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"entity_names\" (value was \"$entity_names\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_entity:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -7968,7 +7974,7 @@ sub get_entity
 
 =head2 get_relationship
 
-  $return = $obj->get_relationship($arg_1)
+  $return = $obj->get_relationship($relationship_names)
 
 =over 4
 
@@ -7977,8 +7983,9 @@ sub get_entity
 =begin html
 
 <pre>
-$arg_1 is a reference to a list where each element is a relationship_name
+$relationship_names is a relationship_names
 $return is a reference to a hash where the key is a string and the value is a relationship_info
+relationship_names is a reference to a list where each element is a relationship_name
 relationship_name is a string
 relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -8000,8 +8007,9 @@ field_info is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$arg_1 is a reference to a list where each element is a relationship_name
+$relationship_names is a relationship_names
 $return is a reference to a hash where the key is a string and the value is a relationship_info
+relationship_names is a reference to a list where each element is a relationship_name
 relationship_name is a string
 relationship_info is a reference to a hash where the following keys are defined:
 	name has a value which is a string
@@ -8041,10 +8049,10 @@ sub get_relationship
 							       "Invalid argument count for function get_relationship (received $n, expecting 1)");
     }
     {
-	my($arg_1) = @args;
+	my($relationship_names) = @args;
 
 	my @_bad_arguments;
-        (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"arg_1\" (value was \"$arg_1\")");
+        (ref($relationship_names) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"relationship_names\" (value was \"$relationship_names\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_relationship:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -63340,6 +63348,32 @@ a string
 
 
 
+=head2 entity_names
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an entity_name
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an entity_name
+
+=end text
+
+=back
+
+
+
 =head2 relationship_name
 
 =over 4
@@ -63359,6 +63393,32 @@ a string
 =begin text
 
 a string
+
+=end text
+
+=back
+
+
+
+=head2 relationship_names
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a relationship_name
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a relationship_name
 
 =end text
 
@@ -69948,7 +70008,9 @@ sub _post {
         }
     }
     else {
-        $obj->{id} = $self->id if (defined $self->id);
+        # $obj->{id} = $self->id if (defined $self->id);
+	# Assign a random number to the id if one hasn't been set
+	$obj->{id} = (defined $self->id) ? $self->id : substr(rand(),2);
     }
 
     my $content = $json->encode($obj);
