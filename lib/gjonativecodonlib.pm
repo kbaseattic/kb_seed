@@ -10,12 +10,13 @@ package gjonativecodonlib;
 
 use strict;
 use SeedAware       qw( location_of_tmp
-                        new_file_name
+                        tmp_file_name
                       );
 use bidir_best_hits qw( bbh );
 use gjocodonlib     qw( codon_freq_distance
                         count_vs_freq_chi_sqr
                         seq_codon_count_package
+                        read_genome_codon_usages
                         report_frequencies
                         modal_codon_usage
                         project_on_freq_vector_by_chi_sqr_2
@@ -24,12 +25,14 @@ use gjocodonlib     qw( codon_freq_distance
 use gjoseqlib       qw( translate_seq );
 use gjostat         qw( chisqr_prob mean_stddev );
 use IPC::Open2      qw( open2 );
-# use Data::Dumper;
+use Data::Dumper;
 
 require Exporter;
 our @ISA    = qw( Exporter );
 our @EXPORT = qw( find_axis
                   native_codon_usage
+                  codon_usages_from_seqs
+                  codon_usages_from_ffn
                 );
 
 my $usage = <<'End_of_Comments';
@@ -55,10 +58,11 @@ Optional parameters:
     bbh_identity     => frac           # D = 0.20    # bbh 20% amino acid identity
     bbh_positives    => frac           # D = 0.30    # bbh 30% amino acids with positive score
     bias_stats       => bool           # D = undef   # don't do bias statistics
+    counts           => bool           # D = undef   # if true, in returned opts counts => \@cnts
     counts_file      => file           # D = ''      # none
     genome_title     => string         # D = ''      # prefix to each mode label
     log              => file_handle    # D = STDERR  # (if log_label is supplied)
-    log_label        =>                # D = ''      # no log
+    log_label        => log_label      # D = ''      # no log
     he_ref_module    => perl_module    # D ='high_expression_ref_ab';
     match_p_value    => p_value        # D = 0.10;   # a match it mode is P > 0.1
     max_he_decline   => fraction       # D = 0.20    # < 20% decline in finding original he candidates
@@ -73,6 +77,7 @@ Optional parameters:
     omit_p_value     => p_value        # D = 0.10    # omit from high exp calc if P > 0.1 to mode
     p_val_max_len    => int            # D = undef;  # no limit on length in chi-square
     reach_p_value    => p_value        # D = 0.05    # allow direction to drift
+    title            => string         # D = ''      # same as genome_title
 
 Special parameters that change the function, or return values:
 
@@ -257,7 +262,8 @@ sub native_codon_usage
     my $bias_stats       = defined( $param->{ bias_stats } )       ? $param->{ bias_stats }       : undef;      # don't do bias statistics
     my $counts_file      = defined( $param->{ counts_file } )      ? $param->{ counts_file }      :    '';      # don't save the counts
     my $dna              = defined( $param->{ dna } )              ? $param->{ dna }              :    [];
-    my $genome_title     = defined( $param->{ genome_title } )     ? $param->{ genome_title }     :    '';      # prefix for codon frequency labels
+    my $genome_title     = defined( $param->{ genome_title } )     ? $param->{ genome_title }
+                         : defined( $param->{ title } )            ? $param->{ title }            :    '';      # prefix for codon frequency labels
     my $he_ref_module    = defined( $param->{ he_ref_module } )    ? $param->{ he_ref_module }    : 'high_expression_ref_ab';
     my $initial_he_ids   = defined( $param->{ initial_he_ids } )   ? $param->{ initial_he_ids }   : undef;
     my $log              = defined( $param->{ log } )              ? $param->{ log }              :    '';      # file handle for log
@@ -318,12 +324,18 @@ sub native_codon_usage
 
     #  Build: [ id, def, counts ]
     my @labeled_counts = map { [ @$_[0,1], gjocodonlib::seq_codon_count_package( $_->[2] ) ] } @$dna;
+
     #  Just the counts
     my @gen_counts     = map { $_->[2] }  @labeled_counts;
+
     #  Counts indexed by id
     my %gen_counts     = map { @$_[0,2] } @labeled_counts;
+
     #  Counts with full description
     my @gen_cnt_ids    = map { [ $_->[2], join( ' ', grep { $_ } @$_[0,1] ) ] } @labeled_counts;
+
+    #  Did the caller request that the counts be returned?
+    $param->{ counts } = \@gen_cnt_ids if $param->{ counts };
 
     my $save_cnt_file = $counts_file ? 1 : 0;
     if ( $counts_file )
@@ -333,7 +345,7 @@ sub native_codon_usage
     else
     {
         my $tmp      = SeedAware::location_of_tmp( $param );
-        $counts_file = SeedAware::new_file_name( "$tmp/native_codon_usage", 'counts' );
+        $counts_file = SeedAware::tmp_file_name( 'native_codon_usage', 'counts', $tmp );
     }
 
     if ( ( @gen_counts >= 6 ) || $save_cnt_file )
@@ -618,14 +630,152 @@ sub native_codon_usage
 
 
 #===============================================================================
-#  Just subroutines below:
+#  Genome codon usage frequencies and axes from various data sources.
+#
+#      @usages = ( [ $gid, $gname, $type, $subtype, $freqs, $gencode ], ... )
+#
+#      @axes = ( $gname, $mode,      $md_subtype,
+#                        $high_expr, $he_subtype,
+#                        $nonnative, $nn_subtype
+#              )
+#
+#      $gencode might be undefined.
 #===============================================================================
+#  Codon usages from sequences.
+#
+#      @usages = codon_usages_from_seqs( $seqs, $opts );
+#     \@usages = codon_usages_from_seqs( $seqs, $opts );
+#
+#      @axes = genome_axes_from_seqs( $seqs, $opts );
+#     \@axes = genome_axes_from_seqs( $seqs, $opts );
+#
+#  Codon usages from sequence data in file.
+#
+#      @usages = codon_usages_from_ffn( $file, $opts );
+#     \@usages = codon_usages_from_ffn( $file, $opts );
+#
+#      @axes = genome_axes_from_ffn( $file, $opts );
+#     \@axes = genome_axes_from_ffn( $file, $opts );
+#
+#  Codon usages from frequencies in a file.
+#
+#      @usages = codon_usages_from_file( $file, $opts );
+#     \@usages = codon_usages_from_file( $file, $opts );
+#
+#      @axes = genome_axes_from_file( $file, $opts );
+#     \@axes = genome_axes_from_file( $file, $opts );
+#
+#  Options:
+#
+#      gencode       => $gencode   #  Supply the genetic code number
+#      genetic_code  => $gencode   #  Supply the genetic code number
+#      genus_species => $gname     #  Supply the genome name
+#      gid           => $gid       #  Supply the genome id
+#      gname         => $gname     #  Supply the genome name
+#
+#  Other options are the same as those for native_codon_usage();
+#-------------------------------------------------------------------------------
+#  Codon usages from sequences.
+#-------------------------------------------------------------------------------
+sub codon_usages_from_seqs
+{
+    my ( $seqs, $opts ) = @_;
+    $seqs && ref( $seqs ) eq 'ARRAY' && @$seqs
+        or return wantarray ? () : [];
+
+    $opts ||= {};
+    $opts->{ counts       }   = 1;
+    $opts->{ dna          }   = $seqs;
+    $opts->{ genome_title } ||= 'NoID User-supplied sequences';
+    $opts->{ nonnative    }   = 1;
+
+    my @usages = map { $_->[0] ? [ gjocodonlib::split_mode_description_4( $_->[1] ), $_->[0] ] : () }
+                 native_codon_usage( $opts );
+
+    my $gid = $opts->{ gid };
+    if ( $gid ) { foreach ( @usages ) { $_->[0] = $gid } }
+
+    my $gname = $opts->{ gname } || $opts->{ genus_species };
+    if ( $gname ) { foreach ( @usages ) { $_->[1] = $gname } }
+
+    my $gencode = $opts->{ gencode } || $opts->{ genetic_code };
+    if ( $gencode ) { foreach ( @usages ) { $_->[5] = $gencode } }
+
+    wantarray ? @usages : \@usages;
+}
+
+
+sub genome_axes_from_seqs
+{
+    gjocodonlib::genome_axes_from_usages( codon_usages_from_seqs( @_ ) );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Codon usages from sequences in a file.
+#-------------------------------------------------------------------------------
+sub codon_usages_from_ffn
+{
+    my ( $file, $opts ) = @_;
+
+    my @seqs = gjoseqlib::read_fasta( $file )
+         or return wantarray ? () : [];
+
+    $opts ||= {};
+    if ( ! defined( $opts->{ genome_title } ) )
+    {
+        $opts->{ genome_title } = $file ? "NoGID Data from $file"
+                                        : "NoGID Data from STDIN";
+    }
+
+    codon_usages_from_seqs( \@seqs, $opts );
+}
+
+
+sub genome_axes_from_ffn
+{
+    gjocodonlib::genome_axes_from_usages( codon_usages_from_ffn( @_ ) );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Codon usages from frequencies in a file.
+#-------------------------------------------------------------------------------
+sub codon_usages_from_file
+{
+    my ( $file, $opts ) = @_;
+    $opts ||= {};
+
+    my @usages = gjocodonlib::read_genome_codon_usages( $file );
+
+    my $gid = $opts->{ gid };
+    if ( $gid ) { foreach ( @usages ) { $_->[0] = $gid } }
+
+    my $gname = $opts->{ gname } || $opts->{ genus_species };
+    if ( $gname ) { foreach ( @usages ) { $_->[1] = $gname } }
+
+    my $gencode = $opts->{ gencode } || $opts->{ genetic_code };
+    if ( $gencode ) { foreach ( @usages ) { $_->[5] = $gencode } }
+
+    foreach ( @usages ) { foreach ( @$_ ) { $_ = '' if ! defined $_ } }
+
+    wantarray ? @usages : \@usages;
+}
+
+
+sub genome_axes_from_file
+{
+    gjocodonlib::genome_axes_from_usages( codon_usages_from_file( @_ ) );
+}
+
+
+#-------------------------------------------------------------------------------
 #
 #       $x_p_eval_pipe = open_evaluation_pipe( $counts_file, $l_max );
 #
 #  where,
 #
-#       $x_p_eval_pipe = [ $pid, $rw, $wr ]
+#       $x_p_eval_pipe = [ $pid, $rd, $wr ]
 #
 #-------------------------------------------------------------------------------
 sub open_evaluation_pipe

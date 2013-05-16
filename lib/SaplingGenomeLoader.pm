@@ -26,6 +26,8 @@ package SaplingGenomeLoader;
     use SAPserver;
     use Sapling;
     use AliasAnalysis;
+    use BaseSaplingLoader;
+    use MD5Computer;
     use base qw(SaplingDataLoader);
 
 =head1 Sapling Genome Loader
@@ -57,25 +59,15 @@ ID of the genome being loaded.
 
 Name of the directory containing the genome information.
 
-=item disconnected
-
-True if the application is disconnected from the network - do not
-attempt to contact a SAP server for more data.
-
-=item assignHash
-
-Hash of feature IDs to functional assignments. Deleted features are removed, which
-means only features listed in this hash can be legally inserted into the database.
-
 =back
 
 =cut
 
 sub Load {
     # Get the parameters.
-    my ($sap, $genome, $directory, $disconnected) = @_;
+    my ($sap, $genome, $directory) = @_;
     # Create the loader object.
-    my $loaderObject = SaplingGenomeLoader->new($sap, $genome, $directory, $disconnected);
+    my $loaderObject = SaplingGenomeLoader->new($sap, $genome, $directory);
     # Load the contigs.
     Trace("Loading contigs for $genome.") if T(SaplingDataLoader => 2);
     $loaderObject->LoadContigs();
@@ -144,6 +136,7 @@ sub ClearGenome {
     my $subStats = $sap->Delete(Genome => $genome);
     # Accumulate the statistics from the delete.
     $stats->Accumulate($subStats);
+    Trace("Statistics for delete of $genome:\n" . $stats->Show()) if T(SaplingDataLoader => 3);
     # Return the statistics object.
     return $stats;
 }
@@ -168,12 +161,8 @@ ID of the genome whose  data is being loaded.
 
 =item directory
 
-Name of the directory containing the genome data files.
-
-=item disconnected
-
-True if the application is disconnected from the network - do not
-attempt to contact a SAP server for more data.
+Name of the directory containing the genome data files. If omitted, the
+genome will be deleted from the database.
 
 =item RETURN
 
@@ -185,13 +174,16 @@ Returns a statistics object describing the activity during the reload.
 
 sub Process {
     # Get the parameters.
-    my ($sap, $genome, $directory, $disconnected) = @_;
+    my ($sap, $genome, $directory) = @_;
     # Clear the existing data for the specified genome.
     my $stats = ClearGenome($sap, $genome);
-    # Load the new expression data from the specified directory.
-    my $newStats = Load($sap, $genome, $directory, $disconnected);
-    # Merge the statistics.
-    $stats->Accumulate($newStats);
+    # Load the new expression data from the specified directory (if one is
+    # specified).
+    if ($directory) {
+        my $newStats = Load($sap, $genome, $directory);
+        # Merge the statistics.
+        $stats->Accumulate($newStats);
+    }
     # Return the result.
     return $stats;
 }
@@ -201,7 +193,7 @@ sub Process {
 
 =head3 new
 
-    my $loaderObject = SaplingGenomeLoader->new($sap, $genome, $directory, $disconnected);
+    my $loaderObject = SaplingGenomeLoader->new($sap, $genome, $directory);
 
 Create a loader object that can be used to facilitate loading genome data from a
 directory.
@@ -219,12 +211,6 @@ ID of the genome being loaded.
 =item directory
 
 Name of the directory containing the genome information.
-
-=item disconnected
-
-Set to a true value if the application should be considered to be disconnected
-from the network - that is, do not attempt to connect to a Sapling server
-to load subsystem data.
 
 =back
 
@@ -258,7 +244,7 @@ L<Stats> object for tracking statistical information about the load.
 
 sub new {
     # Get the parameters.
-    my ($class, $sap, $genome, $directory, $disconnected) = @_;
+    my ($class, $sap, $genome, $directory) = @_;
     # Create the object.
     my $retVal = SaplingDataLoader::new($class, $sap, qw(contigs dna pegs rnas));
     # Add our specialized data.
@@ -266,7 +252,8 @@ sub new {
     $retVal->{directory} = $directory;
     # Leave the assignment hash undefined until we populate it.
     $retVal->{assignHash} = undef;
-    $retVal->{disconnected} = defined($disconnected) ? 1 : 0;
+    # Create an MD5 Computer for this genome.
+    $retVal->{md5} = MD5Computer->new();
     # Return the result.
     return $retVal;
 }
@@ -292,8 +279,10 @@ sub LoadContigs {
     # Get the genome ID.
     my $genome = $self->{genome};
     # These variables will contain the current contig ID, the current contig length,
-    # the ordinal of the current chunk, the accumulated DNA sequence, and its length.
-    my ($contigID, $contigLen, $ordinal, $chunk, $chunkLen) = (undef, 0, 0, '', 0);
+    # the accumulated DNA sequence for the current chunk, and its length.
+    my ($contigID, $contigLen, $chunk, $chunkLen) = (undef, 0, '', 0);
+    # This variable contains a list of the chunks, for use in computing the MD5.
+    my @chunks;
     # Loop through the contig file.
     while (! eof $ih) {
         # Get the current record.
@@ -304,19 +293,17 @@ sub LoadContigs {
             my $newContigID = $1;
             # Is there a current contig?
             if (defined $contigID) {
-                # Yes. Output the current chunk.
-                $self->OutputChunk($contigID, $ordinal, $chunk);
-                # Output the contig.
-                $self->OutputContig($contigID, $contigLen);
+                # Yes. Output the contig.
+                $self->OutputContig($contigID, $contigLen, $chunk, \@chunks);
             }
             # Compute the new contig ID. We need to insure it has a genome ID in front.
             $self->FixContig(\$newContigID);
             # Initialize the new contig.
             $contigID = $newContigID;
             $contigLen = 0;
-            $ordinal = 0;
             $chunk = '';
             $chunkLen = 0;
+            @chunks = ();
         } else {
             # Here we have more DNA in the current contig. Are we at the end of
             # the current chunk?
@@ -330,11 +317,11 @@ sub LoadContigs {
                 # Yes. Create the actual chunk.
                 $chunk .= substr($line, 0, $segmentLength - $chunkLen);
                 # Write it out.
-                $self->OutputChunk($contigID, $ordinal, $chunk);
+                $self->OutputChunk($contigID, scalar @chunks, $chunk);
                 # Set up the new chunk.
                 $chunk = substr($line, $segmentLength - $chunkLen);
-                $ordinal++;
                 $chunkLen = length($chunk);
+                push @chunks, $chunk;
             }
             # Update the contig length.
             $contigLen += $lineLen;
@@ -342,10 +329,8 @@ sub LoadContigs {
     }
     # Is there a current contig?
     if (defined $contigID) {
-        # Yes. Output the residual chunk.
-        $self->OutputChunk($contigID, $ordinal, $chunk);
-        # Output the contig itself.
-        $self->OutputContig($contigID, $contigLen);
+        # Yes. Output the contig itself.
+        $self->OutputContig($contigID, $contigLen, $chunk, \@chunks);
     }
 }
 
@@ -392,7 +377,7 @@ sub OutputChunk {
 
 =head3 OutputContig
 
-    $loaderObject->OutputContig($contigID, $contigLen);
+    $loaderObject->OutputContig($contigID, $contigLen, $chunk, \@chunks);
 
 Write out the current contig.
 
@@ -406,19 +391,35 @@ ID of the contig being written out.
 
 Length of the contig in base pairs.
 
+=item chunk
+
+Last DNA chunk of the contig.
+
+=item chunks
+
+Reference to a list of the DNA chunks up to (but not including) the last one.
+
 =back
 
 =cut
 
 sub OutputContig {
     # Get the parameters.
-    my ($self, $contigID, $contigLen) = @_;
+    my ($self, $contigID, $contigLen, $chunk, $chunks) = @_;
     # Get the sapling object.
     my $sap = $self->{sap};
+    # Get the MD5 computer.
+    my $md5C = $self->{md5};
+    # Output the last chunk.
+    $self->OutputChunk($contigID, scalar @$chunks, $chunk);
     # Connect the contig to the genome.
     $sap->InsertObject('IsMadeUpOf', from_link => $self->{genome}, to_link => $contigID);
+    # Compute the MD5.
+    push @$chunks, $chunk;
+    my $contigMD5 = $md5C->ProcessContig($contigID, $chunks);
     # Output the contig record.
-    $sap->InsertObject('Contig', id => $contigID, length => $contigLen);
+    $sap->InsertObject('Contig', id => $contigID, length => $contigLen,
+            md5_identifier => $contigMD5);
     # Record the contig.
     $self->{stats}->Add(contigs => 1);
     $self->{stats}->Add(dna => $contigLen);
@@ -591,10 +592,10 @@ sub LoadFeatureData {
     # This hash will track the features we've created. If a feature is found a second
     # time, it overwrites the original.
     my %fidHash;
-    # Finally, we need the timestamp hash. The initial feature population
+    # This hash tracks the deleted features. We don't want to update these.
+    my %deleted_features;
     # Insure we have a tbl file for this feature type.
     my $fileName = "$featureDir/$type/tbl";
-    my %deleted_features;
     if (-f $fileName) {
         # We have one, so we can read through it. First, however, we need to get the list
         # of deleted features and remove them from the assignment hash. This insures
@@ -607,7 +608,7 @@ sub LoadFeatureData {
                 if (exists $assignHash->{$deletedFid}) {
                     delete $assignHash->{$deletedFid};
                     $stats->Add(deletedFid => 1);
-		    $deleted_features{$deletedFid} = 1;
+                    $deleted_features{$deletedFid} = 1;
                 }
             }
         }
@@ -623,6 +624,9 @@ sub LoadFeatureData {
                 if ($fidHash{$fid}) {
                     $sap->Delete(Feature => $fid);
                     $stats->Add(duplicateFid => 1);
+                } else {
+                    # It doesn't exist, so record it in the statistics.
+                    $stats->Add($type => 1);
                 }
                 # If this is RNA, the alias list is always empty. Sometimes, the functional
                 # assignment is found there.
@@ -633,7 +637,7 @@ sub LoadFeatureData {
                     @aliases = ();
                 }
                 # Add the feature to the database.
-		my $function = $assignHash->{$fid} // "";
+                my $function = $assignHash->{$fid} || "";
                 $self->AddFeature($fid, $function, $locations, \@aliases,
                                   $protHash->{$fid}, $evHash->{$fid});
                 # Denote we've added this feature, so that if a duplicate occurs we're ready.
@@ -783,155 +787,115 @@ sub WriteProtein {
 
 =head3 LoadSubsystems
 
-    $loaderObject->LoadSubsystems();
+    $loaderObject->LoadSubsystems($subsysList);
 
-Load the subsystem data into the database. This includes all of the subsystems,
-their categories, roles, and the bindings that connect them to this genome's features.
+Load the subsystem data into the database. This requires looking through the
+bindings and using them to connect to the subsystems that already exist in the
+database. If the subsystem does not exist, its bindings will not be loaded.
+
+=over 4
+
+=item subsysList
+
+Reference to a list of subsystem IDs. If specified, only the subsystems in the
+list will be processed. This is useful when a particular set of subsystems
+has been replaced.
+
+=back
 
 =cut
 
 sub LoadSubsystems {
     # Get the parameters.
-    my ($self) = @_;
-
-    #
-    # If we are running in disconnected mode, do not actually load subsystems.
-    # They rely too much on information from the external sapling.
-    #
-    if ($self->{disconnected})
-    {
-	return;
-    }
-
+    my ($self, $subsysList) = @_;
     # Get the sapling object.
     my $sap = $self->{sap};
     # Get the statistics object.
     my $stats = $self->{stats};
     # Get the genome ID.
     my $genome = $self->{genome};
-    # Connect to the Sapling server so we can get the subsystem variant and role information.
-    my $sapO = SAPserver->new();
-    # This hash maps subsystem IDs to molecular machine IDs.
-    my %machines;
-    # This hash maps subsystem/role pairs to machine role IDs.
-    my %machineRoles;
-    # The first step is to create the subsystems themselves and connect them to the
-    # genome. A list is given in the subsystems file of the Subsystems directory.
-    my $ih = Open(undef, "<$self->{directory}/Subsystems/subsystems");
-    # Create the field hash for the subsystem query.
-    my @fields = qw(Subsystem(id) Subsystem(cluster-based) Subsystem(curator) Subsystem(description)
-                    Subsystem(experimental) Subsystem(notes) Subsystem(private) Subsystem(usable)
-                    Subsystem(version)
-                    Includes(from-link) Includes(to-link) Includes(abbreviation) Includes(auxiliary)
-                    Includes(sequence)
-                    Role(id) Role(hypothetical) Role(role-index));
-    my %fields = map { $_ => $_ } @fields;
-    # Loop through the subsystems in the file, insuring we have them in the database.
-    while (! eof $ih) {
-        # Get this subsystem.
-        my ($subsystem, $variant) = Tracer::GetLine($ih);
-        Trace("Processing subsystem $subsystem variant $variant.") if T(SaplingDataLoader => 3);
-        # Normalize the subsystem name.
-        $subsystem = $sap->SubsystemID($subsystem);
-        # Compute this subsystem's MD5.
-        my $subsystemMD5 = ERDB::DigestKey($subsystem);
-        # Insure the subsystem is in the database.
-        if (! $sap->Exists(Subsystem => $subsystem)) {
-            # The subsystem isn't present, so we need to read it. We get the subsystem,
-            # its roles, and its classification information. The variant will be added
-            # later if we need it.
-            my $roleList = $sapO->get(-objects => "Subsystem Includes Role",
-                                      -filter => {"Subsystem(id)" => ["=", $subsystem] },
-                                      -fields => \%fields);
-            # Only proceed if we found some roles.
-            if (@$roleList > 0) {
-                # Get the subsystem information from the first role and create the subsystem.
-                my $roleH = $roleList->[0];
-                my %subFields = SaplingDataLoader::ExtractFields(Subsystem => $roleH);
-                $sap->InsertObject('Subsystem', %subFields);
-                $stats->Add(subsystems => 1);
-                # Now loop through the roles. The Includes records are always inserted, but the
-                # roles are only inserted if they don't already exist.
-                for $roleH (@$roleList) {
-                    # Create the Includes record.
-                    my %incFields = SaplingDataLoader::ExtractFields(Includes => $roleH);
-                    $sap->InsertObject('Includes', %incFields);
-                    # Insure we have the role in place.
-                    my %roleFields = SaplingDataLoader::ExtractFields(Role => $roleH);
-                    my $roleID = $roleFields{id};
-                    delete $roleFields{id};
-                    $self->InsureEntity('Role', $roleID, %roleFields);
-                    # Compute the machine-role ID.
-                    my $machineRoleID = join(":", $subsystemMD5, $genome, $incFields{abbreviation});
+    # Compute the subsystem and binding file names.
+    my $subFileName = "$self->{directory}/Subsystems/subsystems";
+    my $bindFileName = "$self->{directory}/Subsystems/bindings";
+    # Only proceed if both exist.
+    if (! -f $subFileName || ! -f $bindFileName) {
+        Trace("Missing subsystem data for $genome.") if T(1);
+        $stats->Add(noSubsystems => 1);
+    } else {
+        # This hash maps subsystem IDs to molecular machine IDs.
+        my %machines;
+        # This hash maps subsystem/role pairs to machine role IDs.
+        my %machineRoles;
+        # This hash will contain the list of subsystems found in the database.
+        my %subsystems;
+        # We loop through the subsystems, looking for the ones already in the
+        # database. The list is given in the subsystems file of the Subsystems
+        # directory.
+        my $ih = Open(undef, "<$subFileName");
+        # Loop through the subsystems in the file, insuring we have them in the database.
+        while (! eof $ih) {
+            # Get this subsystem.
+            my ($subsystem, $variant) = Tracer::GetLine($ih);
+            Trace("Processing subsystem $subsystem variant $variant.") if T(SaplingDataLoader => 3);
+            # Normalize the subsystem name.
+            $subsystem = $sap->SubsystemID($subsystem);
+            # Insure the subsystem is in the database and is one we're interested in.
+            if ((! $subsysList || (grep { $_ eq $subsystem } @$subsysList)) &&
+                    $sap->Exists(Subsystem => $subsystem)) {
+                # We have the subsystem in the database. We need to compute the machine
+                # role IDs and create the molecular machine. First, we need to remember
+                # the subsystem.
+                $subsystems{$subsystem} = 1;
+                # Compute this subsystem's MD5.
+                my $subsystemMD5 = ERDB::DigestKey($subsystem);
+                my $rolePrefix = "$subsystemMD5:$genome";
+                # Loop through the roles.
+                my @roleList = $sap->GetAll('Includes', 'Includes(from-link) = ?',
+                        [$subsystem], "to-link abbreviation");
+                for my $roleTuple (@roleList) {
+                    my ($roleID, $abbr) = @$roleTuple;
+                    my $machineRoleID = $rolePrefix . '::' . $abbr;
                     $machineRoles{$subsystem}{$roleID} = $machineRoleID;
-                    $stats->Add(subsystemRoles => 1);
                 }
+                # Next we need the variant code and key.
+                my $variantCode = BaseSaplingLoader::Starless($variant);
+                my $variantKey = ERDB::DigestKey("$subsystem:$variantCode");
+                # Now we create the molecular machine connecting this genome to the
+                # subsystem variant.
+                my $machineID = ERDB::DigestKey("$subsystem:$variantCode:$genome");
+                $sap->InsertObject('Uses', from_link => $genome, to_link => $machineID);
+                $sap->InsertObject('MolecularMachine', id => $machineID, curated => 0, region => '');
+                $sap->InsertObject('IsImplementedBy', from_link => $variantKey, to_link => $machineID);
+                # Remember the machine ID.
+                $machines{$subsystem} = $machineID;
             }
-        } else {
-            # We already have the subsystem in the database, but we still need to compute the
-            # machine role IDs. We need information from the sapling server for this.
-            my $subHash = $sapO->subsystem_roles(-ids => $subsystem, -aux => 1, -abbr => 1);
-            # Loop through the roles.
-            my $roleList = $subHash->{$subsystem};
-            for my $roleTuple (@$roleList) {
-                my ($roleID, $abbr) = @$roleTuple;
-                my $machineRoleID = join(":", $subsystemMD5, $genome, $abbr);
-                $machineRoles{$subsystem}{$roleID} = $machineRoleID;
+        }
+        # Now we go through the bindings file. This file connects the subsystem
+        # roles to the molecular machines.
+        $ih = Open(undef, "<$bindFileName");
+        # Loop through the bindings.
+        while (! eof $ih) {
+            # Get the binding data.
+            my ($subsystem, $role, $fid) = Tracer::GetLine($ih);
+            # Normalize the subsystem name.
+            $subsystem = $sap->SubsystemID($subsystem);
+            # Insure the subsystem is in the database.
+            if ($subsystems{$subsystem}) {
+                # Compute the machine role.
+                my $machineRoleID = $machineRoles{$subsystem}{$role};
+                # Insure it exists.
+                my $created = $self->InsureEntity(MachineRole => $machineRoleID);
+                if ($created) {
+                    # We created the machine role, so connect it to the machine.
+                    my $machineID = $machines{$subsystem};
+                    $sap->InsertObject('IsMachineOf', from_link => $machineID, to_link => $machineRoleID);
+                    # Connect it to the role, too.
+                    $sap->InsertObject('IsRoleOf', from_link => $role, to_link => $machineRoleID);
+                }
+                # Connect the feature.
+                $sap->InsertObject('Contains', from_link => $machineRoleID, to_link => $fid);
             }
         }
-        # Now we need to connect the variant to the subsystem. First, we compute the real
-        # variant code by removing the asterisks.
-        my $variantCode = $variant;
-        $variantCode =~ s/^\*+//;
-        $variantCode =~ s/\*+$//;
-        # Compute the variant key.
-        my $variantKey = ERDB::DigestKey("$subsystem:$variantCode");
-        # Insure we have it in the database.
-        if (! $sap->Exists(Variant => $variantKey)) {
-            # Get the variant from the sapling server.
-            my $variantH = $sapO->get(-objects => "Variant",
-                                      -filter => {"Variant(id)" => ["=", $variantKey]},
-                                      -fields => {"Variant(code)" => "code",
-                                                  "Variant(comment)" => "comment",
-                                                  "Variant(type)" => "type",
-                                                  "Variant(role-rule)" => "role-rule"},
-                                      -firstOnly => 1);
-            $self->InsureEntity('Variant', $variantKey, %$variantH);
-            # Connect it to the subsystem.
-            $sap->InsertObject('Describes', from_link => $subsystem, to_link => $variantKey);
-            $stats->Add(subsystemVariants => 1);
-        }
-        # Now we create the molecular machine connecting this genome to the subsystem
-        # variant.
-        my $machineID = ERDB::DigestKey("$subsystem:$variantCode:$genome");
-        $sap->InsertObject('Uses', from_link => $genome, to_link => $machineID);
-        $sap->InsertObject('MolecularMachine', id => $machineID, curated => 0, region => '');
-        $sap->InsertObject('IsImplementedBy', from_link => $variantKey, to_link => $machineID);
-        # Remember the machine ID.
-        $machines{$subsystem} = $machineID;
-    }
-    # Now we go through the bindings file. This file connects the subsystem roles to
-    # the molecular machines.
-    $ih = Open(undef, "<$self->{directory}/Subsystems/bindings");
-    # Loop through the bindings.
-    while (! eof $ih) {
-        # Get the binding data.
-        my ($subsystem, $role, $fid) = Tracer::GetLine($ih);
-        # Normalize the subsystem name.
-        $subsystem = $sap->SubsystemID($subsystem);
-        # Compute the machine role.
-        my $machineRoleID = $machineRoles{$subsystem}{$role};
-        # Insure it exists.
-        my $created = $self->InsureEntity(MachineRole => $machineRoleID);
-        if ($created) {
-            # We created the machine role, so connect it to the machine.
-            my $machineID = $machines{$subsystem};
-            $sap->InsertObject('IsMachineOf', from_link => $machineID, to_link => $machineRoleID);
-            # Connect it to the role, too.
-            $sap->InsertObject('IsRoleOf', from_link => $role, to_link => $machineRoleID);
-        }
-        # Connect the feature.
-        $sap->InsertObject('Contains', from_link => $machineRoleID, to_link => $fid);
     }
 }
 
@@ -956,6 +920,8 @@ sub CreateGenome {
     my $dir = $self->{directory};
     # Get the sapling database.
     my $sap = $self->{sap};
+    # Get the MD5 computer.
+    my $md5C = $self->{md5};
     # We'll put the genome attributes in here.
     my %fields;
     # Check for a basic statistics file.
@@ -983,7 +949,7 @@ sub CreateGenome {
         $fields{'scientific-name'} = $line;
         # Get the taxonomy and extract the domain from it.
         $ih = Open(undef, "<$dir/TAXONOMY");
-        ($fields{domain}) = split /;/, <$ih>, 2;
+        ($fields{domain}) = split m/;/, <$ih>, 2;
     }
     # Get the counts from the statistics object.
     my $stats = $self->{stats};
@@ -1002,6 +968,8 @@ sub CreateGenome {
     }
     # Use the domain to determine whether or not the genome is prokaryotic.
     $fields{prokaryotic} = PROK_FLAG->{$fields{domain}} || 0;
+    # Compute the genome MD5.
+    $fields{md5_identifier} = $md5C->CloseGenome();
     # Finally, add the genome ID.
     $fields{id} = $self->{genome};
     # Create the genome record.

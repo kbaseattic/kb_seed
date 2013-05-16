@@ -145,7 +145,7 @@ sub CreateGenomeSets {
                 push @genomes, $genomeID;
                 # Remember it as the representative if it's the first in the set.
                 # Count the genus.
-                my ($genus) = split /\s/, $name, 2;
+                my ($genus) = split m/\s/, $name, 2;
                 $names{$genus}++;
             }
         }
@@ -289,7 +289,7 @@ sub CreateTaxonomies {
     # Loop through the genomes.
     for my $genomeID (keys %$genomeHash) {
         # Get this genome's taxonomic group.
-        my ($taxID) = split /\./, $genomeID, 2;
+        my ($taxID) = split m/\./, $genomeID, 2;
         # Check to see if we have this tax ID. If we don't, we check for a merge.
         if (! $primaryNames{$taxID}) {
             if ($merges{$taxID}) {

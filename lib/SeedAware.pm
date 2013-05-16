@@ -186,14 +186,13 @@ our @EXPORT_OK = qw(
 #
 # Bah. On Windows, redirecty stuff needs IPC::Run.
 #
+# I do not have the IPC::Run version of system_with_redirect() etc. correct -- GJO
+#
 
 our $have_ipc_run;
 if ($^O =~ /win32/i)
 {
-    eval {
-	require IPC::Run;
-	$have_ipc_run = 1;
-    };
+    $have_ipc_run = eval { require IPC::Run; };
 }
 
 
@@ -201,11 +200,9 @@ if ($^O =~ /win32/i)
 #  In case we are running in a SEED, pull in the FIG_Config
 #
 our $in_SEED;
-
 BEGIN
 {
-    $in_SEED = 0;
-    eval { require FIG_Config; $in_SEED = 1 };
+    $in_SEED = eval { require FIG_Config; };
 }
 
 
@@ -245,15 +242,47 @@ sub system_with_redirect
     @_ && defined $_[0] or return undef;
     my @cmd_and_args = ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
 
-    if ( $opts->{stdin}  ) { open IN0,  "<&STDIN";  open STDIN,  fixin($opts->{stdin})  }
-    if ( $opts->{stdout} ) { open OUT0, ">&STDOUT"; open STDOUT, fixout($opts->{stdout}) }
-    if ( $opts->{stderr} ) { open ERR0, ">&STDERR"; open STDERR, fixout($opts->{stderr}) }
+    @cmd_and_args && ( $cmd_and_args[0] = executable_for( $cmd_and_args[0] ) )
+        or return -1;
 
-    my $stat = system( @cmd_and_args );
+    my $stat;
+    if ( $have_ipc_run )
+    {
+        my @run_args = ( \@cmd_and_args );
+        push @run_args, ipc_run_stdin(  $opts->{stdin}  );
+        push @run_args, ipc_run_stdout( $opts->{stdout} );
+        push @run_args, ipc_run_stderr( $opts->{stderr} );
+        $stat = ! IPC::Run::run( @run_args );
+    }
+    else
+    {
+        my $pid;
 
-    if ( $opts->{stdin}  ) { open STDIN,  "<&IN0";  close IN0  }
-    if ( $opts->{stdout} ) { open STDOUT, ">&OUT0"; close OUT0 }
-    if ( $opts->{stderr} ) { open STDERR, ">&ERR0"; close ERR0 }
+        #  Parent process waits on its child
+        if ( $pid = fork )
+        {
+            wait;
+            $stat = $?;
+        }
+
+        #  Child process adjusts its file handles and does an exec()
+        elsif ( defined $pid )
+        {
+            #  Give the child its own file handles, modified as requested
+	    open STDIN,  fixin(  $opts->{stdin}  ) if defined $opts->{stdin};
+	    open STDOUT, fixout( $opts->{stdout} ) if defined $opts->{stdout};
+	    open STDERR, fixout( $opts->{stderr} ) if defined $opts->{stderr};
+            exec( @cmd_and_args );
+            # point of no return
+        }
+
+        else
+        {
+            my $cmd = join( ' ', @cmd_and_args );
+            print STDERR "Failed to fork '$cmd'.\n";
+            $stat = -1;
+        }
+    }
 
     $stat;
 }
@@ -268,15 +297,39 @@ sub write_to_pipe_with_redirect
     @_ && defined $_[0] or return undef;
     my @cmd_and_args = ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
 
-    if ( $opts->{stdout} ) { open OUT0, ">&STDOUT"; open STDOUT, fixout($opts->{stdout}) }
-    if ( $opts->{stderr} ) { open ERR0, ">&STDERR"; open STDERR, fixout($opts->{stderr}) }
+    @cmd_and_args && ( $cmd_and_args[0] = executable_for( $cmd_and_args[0] ) )
+        or return -1;
 
-    my $okay = open( FH, '|-', @cmd_and_args );
+    if ( $have_ipc_run )
+    {
+        my ( $fh, $output );
+        my @run_args = ( \@cmd_and_args, '<pipe', \*IPC_IN );
+        push @run_args, ipc_run_stdout( $opts->{stdout} );
+        push @run_args, ipc_run_stderr( $opts->{stderr} );
+        return \*IPC_IN if IPC::Run::run( @run_args );
+        my $cmd = join( ' ', @cmd_and_args );
+        print STDERR "Failed IPC::Run::run() of '$cmd'.\n";
+        return undef;
+    }
 
-    if ( $opts->{stdout} ) { open STDOUT, ">&OUT0"; close OUT0 }
-    if ( $opts->{stderr} ) { open STDERR, ">&ERR0"; close ERR0 }
+    #  Parent process returns file handle
+    my ( $pid, $fh );
+    return $fh if ( $pid = open( $fh, '|-' ) );
 
-    $okay ? \*FH : undef;
+    #  Child process adjusts its file handles and does an exec()
+    if ( defined $pid )
+    {
+        #  Give the child its own file handles, modified as requested
+        open STDOUT, fixout( $opts->{stdout} ) if defined $opts->{stdout};
+        open STDERR, fixout( $opts->{stderr} ) if defined $opts->{stderr};
+        exec( @cmd_and_args );
+        # point of no return
+    }
+
+    #  Fork failed
+    my $cmd = join( ' ', @cmd_and_args );
+    print STDERR "Failed to fork write to '$cmd'.\n";
+    return undef;
 }
 
 
@@ -289,25 +342,94 @@ sub read_from_pipe_with_redirect
     @_ && defined $_[0] or return undef;
     my @cmd_and_args = ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
 
-    if ( $opts->{stdin}  ) { open IN0,  "<&STDIN";  open STDIN,  fixin($opts->{stdin})  }
-    if ( $opts->{stderr} ) { open ERR0, ">&STDERR"; open STDERR, fixout($opts->{stderr}) }
+    @cmd_and_args && ( $cmd_and_args[0] = executable_for( $cmd_and_args[0] ) )
+        or return -1;
 
-    my $okay = open( FH, '-|', @cmd_and_args );
+    if ( $have_ipc_run )
+    {
+        my ( $fh, $output );
+        my @run_args = ( \@cmd_and_args, '>pipe', \*IPC_OUT );
+        push @run_args, ipc_run_stdin(  $opts->{stdin} );
+        push @run_args, ipc_run_stderr( $opts->{stderr} );
+        return \*IPC_OUT if IPC::Run::run( @run_args );
+        my $cmd = join( ' ', @cmd_and_args );
+        print STDERR "Failed IPC::Run::run() of '$cmd'.\n";
+        return undef;
+    }
 
-    if ( $opts->{stdin}  ) { open STDIN,  "<&IN0";  close IN0  }
-    if ( $opts->{stderr} ) { open STDERR, ">&ERR0"; close ERR0 }
+    #  Parent process returns file handle
+    my ( $pid, $fh );
+    return $fh if ( $pid = open( $fh, '-|' ) );
 
-    $okay ? \*FH : undef;
+    #  Child process adjusts its file handles and does an exec()
+    if ( defined $pid )
+    {
+        #  Give the child its own file handles, modified as requested
+        open STDIN,  fixin(  $opts->{stdin}  ) if defined $opts->{stdin};
+        open STDERR, fixout( $opts->{stderr} ) if defined $opts->{stderr};
+        exec( @cmd_and_args );
+        # point of no return
+    }
+
+    #  Fork failed
+    my $cmd = join( ' ', @cmd_and_args );
+    print STDERR "Failed to fork read from '$cmd'.\n";
+    return undef;
 }
+
 
 #  Format an input file request:
 
-sub fixin  { local $_ = shift; /^\+?</ ? $_ : "<$_" }
+sub fixin
+{
+    local $_ = shift;
+    return ( ! defined $_ )    ? '<-'
+         : /^(\+?<)\s*(\S.*)$/ ? "$1$2"
+         : /^(.+)$/            ? "<$1"
+         :                       '<-';
+}
 
 
 #  Format an output file request:
 
-sub fixout { local $_ = shift; /^\+?>/ ? $_ : ">$_" }
+sub fixout
+{
+    local $_ = shift;
+    return ( ! defined $_ )         ? '>-'
+         : /^(\+?>{1,2})\s*(\S.*)$/ ? "$1$2"
+         : /^(.+)$/                 ? ">$1"
+         :                            '>-';
+}
+
+
+#  Format file requests for IPC::Run:
+
+sub ipc_run_stdin
+{
+    local $_ = shift;
+    return ( ! defined $_ )  ? ()
+         : ref( $_ )         ? ( '<', $_ )
+         : /^\+?<\s*(\S.*)$/ ? ( '<', $1 )
+         : /^(.+)$/          ? ( '<', $1 )
+         :                     ();
+}
+
+sub ipc_run_stdout
+{
+    local $_ = shift;
+    return ( ! defined $_ )      ? ()
+         : ref( $_ )             ? ( '>', $_ )
+         : /^\+?(>>?)\s*(\S.*)$/ ? ( $1,  $2 )
+         : /^(.+)$/              ? ( '>', $1 )
+         :                         ();
+}
+
+sub ipc_run_stderr
+{
+    my @list = ipc_run_stdout( @_ );
+    $list[0] = "2$list[0]" if @list;
+    @list;
+}
 
 
 #===============================================================================
@@ -383,20 +505,20 @@ sub run_gathering_output
 
     if ($have_ipc_run)
     {
-	my $out;
-	my $ok = IPC::Run::run(\@cmd_and_args, '>', \$out);
-	if (wantarray)
-	{
-	    my @out;
-	    open(my $fh, "<", \$out);
-	    @out = <$fh>;
-	    close($fh);
-	    return @out;
-	}
-	else
-	{
-	    return $out;
-	}
+        my $out;
+        my $ok = IPC::Run::run(\@cmd_and_args, '>', \$out);
+        if (wantarray)
+        {
+            my @out;
+            open(my $fh, "<", \$out);
+            @out = <$fh>;
+            close($fh);
+            return @out;
+        }
+        else
+        {
+            return $out;
+        }
     }
 
     open( PROC_READ, '-|', @cmd_and_args ) || die "Could not execute '$name': $!\n";
@@ -416,7 +538,7 @@ sub run_gathering_output
         my $end =       0;
         my $read;
         while ( $read = read( PROC_READ, $out, $inc, $end ) ) { $end += $read }
-        close( PROC_READ ) or confess "FAILED: '$name' with error return $?";
+        close( PROC_READ ) or die "FAILED: '$name' with error return $?";
         return $out;
     }
 }
@@ -535,7 +657,7 @@ sub executable_for
     my ( $prog, $opts ) = @_;
 
     return undef if ! defined( $prog ) || $prog !~ /\S/;   # undefined or empty
-    return ( -x $prog ? $prog : undef ) if $prog =~ /\//;  # includes path
+    return ( -x $prog ? $prog : undef ) if $prog =~ /[\\\/]/;  # includes path
     $opts ||= {};
 
     if ( $in_SEED )
@@ -546,43 +668,36 @@ sub executable_for
         }
     }
 
-    #  If we can get the search path, require that it be there
+    #  If we cannot get the search path, return the program name
+
+    return $prog if ! $ENV{PATH};
 
     # Explicit windows support.
-    #
 
     if ($^O eq 'MSWin32')
     {
-	if ( $ENV{PATH} )
-	{
-	    foreach my $bin ( split /;/, $ENV{PATH} )
-	    {
-		next if $bin eq '' || ! -d $bin;
-		for my $suffix ('', '.exe', '.cmd', '.bat')
-		{
-		    my $tmp = "$bin\\$prog$suffix";
-		    if (-x $tmp)
-		    {
-			return $tmp;
-		    }
-		}
-	    }
-	    return undef;   # fall-through means it is not in the path
-	}
+        foreach my $bin ( split /;/, $ENV{PATH} )
+        {
+            next if $bin eq '' || ! -d $bin;
+            for my $suffix ('', '.exe', '.cmd', '.bat')
+            {
+                my $tmp = "$bin\\$prog$suffix";
+                if (-x $tmp)
+                {
+                    return $tmp;
+                }
+            }
+        }
     }
     else
     {
-	if ( $ENV{PATH} )
-	{
-	    foreach my $bin ( split /:/, $ENV{PATH} )
-	    {
-		return "$bin/$prog" if defined $bin && -d $bin && -x "$bin/$prog";
-	    }
-	    return undef;   # fall-through means it is not in the path
-	}
+        foreach my $bin ( split /:/, $ENV{PATH} )
+        {
+            return "$bin/$prog" if defined $bin && -d $bin && -x "$bin/$prog";
+        }
     }
 
-    return $prog;   # default to unadorned program name
+    return undef;   # fall-through means it is not in the path
 }
 
 
@@ -647,20 +762,19 @@ sub temporary_directory
     }
     else
     {
-        my $tmp = location_of_tmp( $options );
-        return ( wantarray ? () : undef ) if ! $tmp;
-
         $name = $options->{ name } if ! ( defined $name && $name ne '' );
 
         if ( defined $name && $name ne '' )
         {
+            my $tmp = location_of_tmp( $options );
+            return ( wantarray ? () : undef ) if ! $tmp;
             $tmp_dir = "$tmp/$name";
             $save_dir = $options->{ save_dir } = 1 if -d $tmp_dir;
         }
         else
         {
             my $base = $options->{ base } || 'tmp_dir';
-            $tmp_dir = tmp_file_name( $base, '', $tmp );
+            $tmp_dir = tmp_file_name( $base );
         }
     }
 
@@ -712,7 +826,10 @@ sub new_file_name
         my @args = ( $base, OPEN => 0 );
         push @args, ( SUFFIX => $ext ) if $ext;
         push @args, ( DIR    => $dir ) if $dir;
-        ( undef, $name ) = File::Temp::tempfile( @args );
+        {
+            no warnings;
+            ( undef, $name ) = File::Temp::tempfile( @args );
+        }
 
         $name =~ s/^.*[\/\\]//;  # Remove directory (unix or windows)
     }
@@ -770,7 +887,12 @@ sub tmp_file_name
 
         my @args = ( $base, OPEN => 0, DIR => $dir );
         push @args, ( SUFFIX => $ext ) if $ext;
-        ( undef, $name ) = File::Temp::tempfile( @args );
+        {
+            no warnings;
+            # print STDERR "1\n";
+            ( undef, $name ) = File::Temp::tempfile( @args );
+            # print STDERR "2\n";
+        }
     }
 
     #  Fall back to my old method if we do not have File::Temp

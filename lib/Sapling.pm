@@ -901,7 +901,7 @@ sub Taxonomy {
     # Get the parameters.
     my ($self, $genomeID, $format) = @_;
     # Get the genome's taxonomic group.
-    my ($taxon) = split /\./, $genomeID, 2;
+    my ($taxon) = split m/\./, $genomeID, 2;
     # We'll put the return data in here.
     my @retVal;
     # Loop until we hit a domain.
@@ -1041,11 +1041,13 @@ sub SubsystemID {
     # Get the parameters.
     my ($self, $subName) = @_;
     # Normalize the subsystem name by converting underscores to spaces.
-    # Underscores at the end are not converted.
+    # Underscores at the beginning and end are not converted.
     my $retVal = $subName;
     my $trailer = chop $retVal;
+    my $prefix = substr($retVal,0,1);
+    $retVal = substr($retVal, 1);
     $retVal =~ tr/_/ /;
-    $retVal .= $trailer;
+    $retVal = $prefix . $retVal . $trailer;
     # Return the result.
     return $retVal;
 }
@@ -1788,7 +1790,7 @@ sub GenomesInPairSet {
     while (my $pairData = $query->Fetch()) {
         # Record the genomes for the pegs in the pair. The pegs can be found
         # separated by a colon in the pairing ID.
-        for my $peg (split /:/, $pairData->PrimaryValue('to-link')) {
+        for my $peg (split m/:/, $pairData->PrimaryValue('to-link')) {
             $retVal{genome_of($peg)} = 1;
         }
     }

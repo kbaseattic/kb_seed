@@ -1821,6 +1821,43 @@ sub GetFlat {
     return @retVal;
 }
 
+=head3 IsUsed
+
+    my $flag = $erdb->IsUsed($relationName);
+
+Returns TRUE if the specified relation contains any records, else FALSE.
+
+=over 4
+
+=item relationName
+
+Name of the relation to check.
+
+=item RETURN
+
+Returns the number of records in the relation, which will be TRUE if the
+relation is nonempty and FALSE otherwise.
+
+=back
+
+=cut
+
+sub IsUsed {
+    # Get the parameters.
+    my ($self, $relationName) = @_;
+    # Get the data base handle.
+    my $dbh = $self->{_dbh};
+    # Construct a query to count the records in the relation.
+    my $cmd = "SELECT COUNT(*) FROM $self->{_quote}$relationName$self->{_quote}";
+    my $results = $dbh->SQL($cmd);
+    # We'll put the count in here.
+    my $retVal = 0;
+    if ($results && scalar @$results) {
+        $retVal = $results->[0][0];
+    }
+    # Return the count.
+    return $retVal;
+}
 
 =head2 Documentation and Metadata Methods
 
@@ -3323,6 +3360,7 @@ process will stay alive, but a message will be put into the statistics object.
 =back
 
 =cut
+
 sub LoadTable {
     # Get the parameters.
     my ($self, $fileName, $relationName, %options) = @_;
@@ -4247,6 +4285,146 @@ sub dbName {
     return $retVal;
 }
 
+=head3 FixEntity
+
+    my $stats = $erdb->FixEntity($name);
+
+This method scans an entity and insures that all of the instances
+connect to an owning relationship instance. Any entity that does
+not connect will be deleted.
+
+=over 4
+
+=item name
+
+Name of the one-to-many relationship that owns the entity.
+
+=item RETURN
+
+Returns a L<Stats> object describing the scan results.
+
+=back
+
+=cut
+
+sub FixEntity {
+    # Get the parameters.
+    my ($self, $name) = @_;
+    # Create the statistics object to return.
+    my $retVal = Stats->new();
+    # Compute the name of the to-entity.
+    my (undef, $toEntity) = $self->GetRelationshipEntities($name);
+    # Loop through the relationship instances, memorizing to-keys.
+    my %keys = map { $_ => 1 } $self->GetFlat($name, "", [], 'to-link');
+    $retVal->Add("$name-keysRead" => scalar keys %keys);
+    # Loop through the entity instances, checking the IDs against the
+    # relationship.
+    my $query = $self->Get($toEntity, "", []);
+    while (my $row = $query->Fetch()) {
+        # Get this instance's ID.
+        my ($id) = $row->Value('id');
+        $retVal->Add("$toEntity-rows" => 1);
+        # Check the relationship.
+        if (! $keys{$id}) {
+            # Not found, so delete the entity instance.
+            $retVal->Add("$name-KeyNotFound" => 1);
+            my $subStats = $self->Delete($toEntity, $id);
+            $retVal->Accumulate($subStats);
+        }
+    }
+    # Return the statistics.
+    return $retVal;
+}
+
+=head3 FixRelationship
+
+    my $stats = $erdb->FixRelationship($name);
+
+This method scans a relationship and insures that all of the
+instances connect to valid entities on both sides. If any instance
+fails to connect, it will be deleted. The process is fairly
+memory-intensive.
+
+=over 4
+
+=item name
+
+Name of the relationship to scan.
+
+=item RETURN
+
+Returns a L<Stats> object describing the scan results.
+
+=back
+
+=cut
+
+sub FixRelationship {
+    # Get the parameters.
+    my ($self, $name) = @_;
+    # Create the statistics object to return.
+    my $retVal = Stats->new();
+    # Compute the names of the entities on either side.
+    my ($fromEntity, $toEntity) = $self->GetRelationshipEntities($name);
+    my %entities = (from => $fromEntity, to => $toEntity);
+    # Loop through the relationship, saving the from and to
+    # entity ids.
+    my %idHash = (from => {}, to => {});
+    my $query = $self->Get($name, "", []);
+    while (my $row = $query->Fetch()) {
+        my ($from, $to) = $row->Values('from-link to-link');
+        $idHash{from}{$from} = 1;
+        $idHash{to}{$to} = 1;
+        $retVal->Add("${name}In" => 1);
+    }
+    # Now verify that the entities exist. We process each direction
+    # separately.
+    for my $dir (qw(from to)) {
+        my $entity = $entities{$dir};
+        $retVal->Add("${name}dir" => 1);
+        # Loop through the entity IDs in this direction.
+        # We process them in batches of 50.
+        my @idList = ();
+        for my $id (sort keys %{$idHash{$dir}}) {
+            $retVal->Add("key$name$dir" => 1);
+            push @idList, $id;
+            if (scalar(@idList) >= 50) {
+                $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList);
+                @idList = ();
+            }
+        }
+        # Process the residual batch (if any).
+        $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList);
+    }
+    # Return the statistics object with the results.
+    return $retVal;
+}
+
+# Utility method to process a batch for FixRelationship. The IDs are
+# checked to see if they are valid. If they are not, then the relevant
+# relationship rows are deleted.
+sub _ProcessFixRelationshipBatch {
+    # Get the parameters.
+    my ($self, $stats, $name, $entity, $dir, $idList) = @_;
+    # Construct a query to look up the entity IDs.
+    my $n = scalar(@$idList);
+    my $filter = "$entity(id) IN (" . join(", ", ('?') x $n) . ")";
+    my %keysFound = map { $_ => 1 } $self->GetFlat($entity, $filter,
+            $idList, 'id');
+    $stats->Add("$entity-keyFound" => scalar keys %keysFound);
+    $stats->Add("$entity-keyQuery" => 1);
+    # Now we format a delete filter for any key we DIDN'T find.
+    $filter = "$name($dir-link) = ?";
+    # Loop through all the keys.
+    for my $id (@$idList) {
+        if (! $keysFound{$id}) {
+            # Key was not found, so delete its relationship rows.
+            $stats->Add("$entity-keyNotFound" => 1);
+            my $count = $self->DeleteLike($name, $filter, [$id]);
+            $stats->Add("$name-delete$dir" => $count);
+        }
+    }
+}
 
 =head2 Database Update Methods
 
@@ -4546,14 +4724,14 @@ sub InsertObject {
         $statement .= join(', ', @markers) . ")";
         # We have the insert statement, so prepare it.
         my $sth = $dbh->prepare_command($statement);
-        Trace("Insert statement prepared: $statement") if T(3);
+        Trace("Insert statement prepared: $statement") if T(Insert => 3);
         # Execute the INSERT statement with the specified parameter list.
         $retVal = $sth->execute(@valueList);
         if (!$retVal) {
             my $errorString = $sth->errstr();
             Confess("Error inserting into $newObjectType: $errorString");
         } else {
-            Trace("Insert successful for $newObjectType.") if T(3);
+            Trace("Insert successful for $newObjectType.") if T(Insert => 3);
         }
     }
     # Is this object an entity?
@@ -4697,7 +4875,8 @@ The permissible options for this method are as follows.
 =item testMode
 
 If TRUE, then the delete statements will be traced, but no changes will be made
-to the database.
+to the database. If C<dump>, then the data is dumped to load files instead
+of being traced.
 
 =item keepRoot
 
@@ -4752,6 +4931,7 @@ sub Delete {
         my @stackedPath = @{$current};
         # Pull off the last item on the path. It will always be an entity.
         my $myEntityName = pop @stackedPath;
+        Trace("Processing entity $myEntityName with path (" . join(", ", @stackedPath) . ").") if T(Delete => 3);
         # Add it to the alreadyFound list.
         $alreadyFound{$myEntityName} = 1;
         # Figure out if we need to delete this entity.
@@ -4761,6 +4941,7 @@ sub Delete {
             # Loop through the entity's relations. A DELETE command will be
             # needed for each of them.
             my $relations = $entityData->{Relations};
+            Trace("Recording delete of relations for $myEntityName.") if T(Delete => 3);
             for my $relation (keys %{$relations}) {
                 my @augmentedList = (@stackedPath, $relation);
                 push @fromPathList, \@augmentedList;
@@ -4774,6 +4955,7 @@ sub Delete {
                 my $relationship = $relationshipList->{$relationshipName};
                 # Check the FROM field. We're only interested if it's us.
                 if ($relationship->{from} eq $myEntityName) {
+                    Trace("Relationship $relationshipName found from $myEntityName.") if T(Delete => 3);
                     # Add the path to this relationship.
                     my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
                     push @fromPathList, \@augmentedList;
@@ -4785,18 +4967,21 @@ sub Delete {
                         if (! exists $alreadyFound{$toEntity}) {
                             # Here we have a new entity that's dependent on
                             # the current entity, so we need to stack it.
+                            Trace("Stacking request for $toEntity.") if T(Delete => 3);
                             my @stackList = (@augmentedList, $toEntity);
-                            push @fromPathList, \@stackList;
                             push @todoList, \@stackList;
                         } else {
-                            Trace("$toEntity ignored because it occurred previously.") if T(4);
+                            Trace("$toEntity ignored because it occurred previously.") if T(Delete => 3);
                         }
                     }
                 }
                 # Now check the TO field. In this case only the relationship needs
                 # deletion, and only if it's not already in the path.
                 if ($relationship->{to} eq $myEntityName) {
-                    if (scalar(grep { $_ eq $relationshipName } @stackedPath) == 0) {
+                    Trace("Relationship $relationshipName found to $myEntityName.") if T(Delete => 3);
+                    if (scalar(grep { $_ eq $relationshipName } @stackedPath) != 0) {
+                        Trace("$relationshipName ignored because it's already in the path.") if T(Delete => 3);
+                    } else {
                         my @augmentedList = (@stackedPath, $myEntityName, $relationshipName);
                         push @toPathList, \@augmentedList;
                     }
@@ -4813,41 +4998,70 @@ sub Delete {
     for my $keyName ('to_link', 'from_link') {
         # Get the list for this key.
         my @pathList = @{$stackList{$keyName}};
-        Trace(scalar(@pathList) . " entries in path list for $keyName.") if T(3);
+        Trace(scalar(@pathList) . " entries in path list for $keyName.") if T(Delete => 3);
         # Loop through this list.
         while (my $path = pop @pathList) {
             # Get the table whose rows are to be deleted.
             my @pathTables = @{$path};
-            # Start the DELETE statement. We need to call DBKernel because the
-            # syntax of a DELETE-USING varies among DBMSs.
+            Trace("Processing delete path (" . join(", ", @pathTables) . ").") if T(Delete => 3);
+            # Get ready for the DELETE statement. First we need the table being
+            # deleted.
             my $target = $pathTables[$#pathTables];
-            my $stmt = $db->SetUsing(@pathTables);
-            # Now start the WHERE. The first thing is the ID field from the starting table. That
-            # starting table will either be the entity relation or one of the entity's
-            # sub-relations.
-            $stmt .= " WHERE $self->{_quote}$pathTables[0]$self->{_quote}.id = ?";
+            # We start with the WHERE. The first thing is the ID field from the starting 
+            # table. That starting table will either be the entity relation or one of 
+            # the entity's sub-relations.
+            my $stmt = " WHERE $self->{_quote}$pathTables[0]$self->{_quote}.id = ?";
             # Now we run through the remaining entities in the path, connecting them up.
             for (my $i = 1; $i <= $#pathTables; $i += 2) {
                 # Connect the current relationship to the preceding entity.
                 my ($entity, $rel) = @pathTables[$i-1,$i];
-                # The style of connection depends on the direction of the relationship.
-                $stmt .= " AND $self->{_quote}$entity$self->{_quote}.id = $self->{_quote}$rel$self->{_quote}.$keyName";
                 if ($i + 1 <= $#pathTables) {
-                    # Here there's a next entity, so connect that to the relationship's
-                    # to-link.
+                    # Here there's a next entity, so connect from the relationship's from-link
+                    # and through its to-link.
+                    $stmt .= " AND $self->{_quote}$entity$self->{_quote}.id = $self->{_quote}$rel$self->{_quote}.from_link";
                     my $entity2 = $pathTables[$i+1];
                     $stmt .= " AND $self->{_quote}$rel$self->{_quote}.to_link = $self->{_quote}$entity2$self->{_quote}.id";
+                } else {
+                    # Here theres no next entity, so we connect according to the style of the path.
+                    $stmt .= " AND $self->{_quote}$entity$self->{_quote}.id = $self->{_quote}$rel$self->{_quote}.$keyName";
                 }
             }
-            # Now we have our desired DELETE statement.
-            if ($options{testMode}) {
+            # Now we have the WHERE clause of our desired DELETE statement.
+            if ($options{testMode} eq 'dump') {
+                # Here the user wants to dump the data without deleting it.
+                # First we get the data.
+                $stmt = "SELECT $self->{_quote}$target$self->{_quote}.* FROM " .
+                    join(", ", map { $self->{_quote} . $_ . $self->{_quote} } @pathTables) .
+                    $stmt;
+                Trace("Executing dump from $target using '$idParameter': $stmt.") if T(Delete => 3);
+                my $rows = $db->SQL($stmt, 0, $idParameter);
+                # Compute the number of rows read.
+                my $count = scalar @$rows;
+                # If we found any rows, dump them.
+                if ($count > 0) {
+                    # Open the dump file.
+                    my $fileName = $self->LoadDirectory() . "/$target.dtx";
+                    my $oh = Tracer::Open(undef, ">>$fileName");
+                    # Write the rows.
+                    for my $row (@$rows) {
+                        my $line = join("\t", @$row);
+                        print $oh "$line\n";
+                        $retVal->Add("rows-$target" => 1);
+                        $retVal->Add("data-$target" => length $line);
+                    }
+                    # Close the file.
+                    close $oh;
+                }
+            } elsif ($options{testMode}) {
                 # Here the user wants to trace without executing.
+                $stmt = $db->SetUsing(@pathTables) . $stmt;
                 Trace($stmt) if T(0);
             } else {
                 # Here we can delete. Note that the SQL method dies with a confession
                 # if an error occurs, so we just go ahead and do it without handling
                 # errors afterward.
-                Trace("Executing delete from $target using '$idParameter'.") if T(3);
+                $stmt = $db->SetUsing(@pathTables) . $stmt;
+                Trace("Executing delete from $target using '$idParameter': $stmt.") if T(Delete => 3);
                 if ($options{'print'}) {
                     print "Deleting using '$idParameter': $stmt\n";
                 }
@@ -5528,15 +5742,14 @@ sub _FieldString {
     # Get the fixed-up name.
     my $fieldName = _FixName($descriptor->{name});
     # Compute the SQL type.
-    my $typeDescriptor = $TypeTable->{$descriptor->{type}};
-    my $fieldType = $typeDescriptor->sqlType($self->{_dbh});
+    my $fieldType = $self->_TypeString($descriptor);
     # Check for nulls. We need to insure that the field is null-capable if it
     # specifies nulls and that the nullability flag is prepared for the
     # declaration.
     my $nullFlag = "NOT NULL";
     if ($descriptor->{null}) {
         $nullFlag = "";
-        if (! $typeDescriptor->nullable()) {
+        if (! $TypeTable->{$descriptor->{type}}->nullable()) {
             Confess("Invalid DBD: field \"$fieldName\" is null, but not of a nullable type.");
         }
     }
@@ -5546,6 +5759,36 @@ sub _FieldString {
     return $retVal;
 }
 
+=head3 _TypeString
+
+    my $typeString = $erdb->_TypeString($descriptor);
+
+Determine the SQL type corresponding to a field from its descriptor in the
+relation table.
+
+=over 4
+
+=item descriptor
+
+Field descriptor containing the field's name and type.
+
+=item RETURN
+
+Returns the SQL type string for the field.
+
+=back
+
+=cut
+
+sub _TypeString {
+    # Get the parameters.
+    my ($self, $descriptor) = @_;
+    # Compute the SQL type.
+    my $typeDescriptor = $TypeTable->{$descriptor->{type}};
+    my $retVal = $typeDescriptor->sqlType($self->{_dbh});
+    # Return it.
+    return $retVal;
+}
 
 =head3 _Default
 

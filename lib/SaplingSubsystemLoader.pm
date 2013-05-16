@@ -128,7 +128,8 @@ name of the subsystem whose data is being loaded.
 
 =item directory
 
-Name of the directory containing the subsystem data files.
+Name of the directory containing the subsystem data files. If omitted,
+the subsystem will be deleted from the database.
 
 =item RETURN
 
@@ -143,10 +144,12 @@ sub Process {
     my ($sap, $subsystem, $directory) = @_;
     # Clear the existing data for the specified subsystem.
     my $stats = ClearSubsystem($sap, $subsystem);
-    # Load the new subsystem data from the specified directory.
-    my $newStats = Load($sap, $subsystem, $directory);
-    # Merge the statistics.
-    $stats->Accumulate($newStats);
+    if ($subsystem) {
+        # Load the new subsystem data from the specified directory.
+        my $newStats = Load($sap, $subsystem, $directory);
+        # Merge the statistics.
+        $stats->Accumulate($newStats);
+    }
     # Return the result.
     return $stats;
 }

@@ -340,7 +340,7 @@ sub GenerateSubsystemData {
             # Now we find the molecular machines for this subsystem/genome pair.
             my @rows = $ssData->get_genomes();
             for (my $gidx = 0; $gidx <= $#rows; $gidx++) {
-                my ($rowGenome, $regionString) = split /:/, $rows[$gidx], 2;
+                my ($rowGenome, $regionString) = split m/:/, $rows[$gidx], 2;
                 if ($rowGenome eq $genomeID) {
                     # Here we're positioned on a row for our genome. If it is
                     # a region-restricted molecular machine, then the region

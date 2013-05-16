@@ -1,6 +1,6 @@
 # This is a SAS component
 #
-# Copyright (c) 2003-2010 University of Chicago and Fellowship
+# Copyright (c) 2003-2013 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -204,7 +204,7 @@ sub align_with_mafft
                        [ $id, '', $seq ]
                      }
                  @$seqs;
-    gjoseqlib::print_alignment_as_fasta( $tmpin, \@clnseq );
+    gjoseqlib::write_fasta( $tmpin, \@clnseq );
 
     #  Adding one sequence is a special case of profile alignment
 
@@ -225,7 +225,7 @@ sub align_with_mafft
                           }
                       @$profile;
 
-        gjoseqlib::print_alignment_as_fasta( $tmpin2, \@clnseq );
+        gjoseqlib::write_fasta( $tmpin2, \@clnseq );
     }
 
     my @params = $profile ? ( '--seed', $tmpin, '--seed', $tmpin2, '/dev/null')
@@ -395,7 +395,7 @@ sub align_with_muscle
                        [ $id, '', $seq ]
                      }
                  @$seqs;
-    gjoseqlib::print_alignment_as_fasta( $tmpin, \@clnseq );
+    gjoseqlib::write_fasta( $tmpin, \@clnseq );
 
     #  Adding one sequence is a special case of profile alignment
 
@@ -416,7 +416,7 @@ sub align_with_muscle
                           }
                       @$profile;
 
-        gjoseqlib::print_alignment_as_fasta( $tmpin2, \@clnseq );  # The zero is "do not compress"
+        gjoseqlib::write_fasta( $tmpin2, \@clnseq );  # The zero is "do not compress"
     }
 
     my @params = $profile ? ( '-in1', $tmpin, '-in2', $tmpin2, '-out', $tmpout, '-profile' )
@@ -493,7 +493,7 @@ sub align_with_clustal
     my $outfile = SeedAware::tmp_file_name( "align_fasta",  'aln',   $tmpdir );
     my $dndfile = SeedAware::tmp_file_name( "align_fasta",  'dnd',   $tmpdir );
 
-    gjoseqlib::print_alignment_as_fasta( $seqfile, \@seqs2 );
+    gjoseqlib::write_fasta( $seqfile, \@seqs2 );
 
     my $clustalw = SeedAware::executable_for( $opts->{ clustalw } || $opts->{ program } || 'clustalw' )
         or print STDERR "Could not locate executable file for 'clustalw'.\n"
@@ -615,8 +615,8 @@ sub add_to_alignment
     my $outfile = SeedAware::tmp_file_name( "add_to_align",   'aln',   $tmpdir );
     ( my $dndfile = $profile ) =~ s/fasta$/dnd/;  # The program ignores our name
 
-    gjoseqlib::print_alignment_as_fasta( $profile, \@relevant );
-    gjoseqlib::print_alignment_as_fasta( $seqfile, [ $clnseq ] );
+    gjoseqlib::write_fasta( $profile, \@relevant );
+    gjoseqlib::write_fasta( $seqfile, [ $clnseq ] );
     #
     #  I would have thought that the profile tree file should be -newtree1, but
     #  that fails.  -newtree works fine at putting the file where we want it.
@@ -770,9 +770,9 @@ sub add_to_alignment_v2
 
         @prof_ali = clustal_profile_alignment_0( $ali_on, $clnseq );
 
-        # gjoseqlib::print_alignment_as_fasta( "add_2_align_clean_$cycle.aln", $clnseq );
-        # gjoseqlib::print_alignment_as_fasta( "add_2_align_prof_$cycle.aln",  $ali_on );
-        # gjoseqlib::print_alignment_as_fasta( "add_2_align_raw_$cycle.aln", \@prof_ali ); ++$cycle;
+        # gjoseqlib::write_fasta( "add_2_align_clean_$cycle.aln", $clnseq );
+        # gjoseqlib::write_fasta( "add_2_align_prof_$cycle.aln",  $ali_on );
+        # gjoseqlib::write_fasta( "add_2_align_raw_$cycle.aln", \@prof_ali ); ++$cycle;
 
         $added = pop @prof_ali;
 
@@ -1020,7 +1020,7 @@ sub add_to_alignment_v2a
         print STDERR "   Aligning on a profile of $n sequences.\n" if ! $silent;
 
         @prof_ali = clustal_profile_alignment_0( \@relevant, $clnseq );
-        # gjoseqlib::print_alignment_as_fasta( "add_2_align_raw_$cycle.aln", \@prof_ali ); ++$cycle;
+        # gjoseqlib::write_fasta( "add_2_align_raw_$cycle.aln", \@prof_ali ); ++$cycle;
 
         $added = pop @prof_ali;
 
@@ -1182,8 +1182,8 @@ sub clustal_profile_alignment_0
     ( my $dndfile = $profile ) =~ s/fasta$/dnd/;  # The program ignores our name
 
     $seqs2 = [ $seqs2 ] if ! ( ref $seqs2->[0] );
-    gjoseqlib::print_alignment_as_fasta( $profile, $seqs1 );
-    gjoseqlib::print_alignment_as_fasta( $seqfile, $seqs2 );
+    gjoseqlib::write_fasta( $profile, $seqs1 );
+    gjoseqlib::write_fasta( $seqfile, $seqs2 );
 
     my $clustalw = SeedAware::executable_for( 'clustalw' )
         or print STDERR "Could not locate executable file for 'clustalw'.\n"
@@ -1266,7 +1266,7 @@ sub fract_identity
     $s1 =~ s/[^A-Za-z]+//g;
     $s2 = $seq2->[2];
     $s2 =~ s/[^A-Za-z]+//g;
-    gjoseqlib::print_alignment_as_fasta( $infile, [ [ "s1", "", $s1 ], [ "s2", "", $s2 ] ] );
+    gjoseqlib::write_fasta( $infile, [ [ "s1", "", $s1 ], [ "s2", "", $s2 ] ] );
 
     my $clustalw = SeedAware::executable_for( 'clustalw' )
         or print STDERR "Could not locate executable file for 'clustalw'.\n"
@@ -1379,8 +1379,8 @@ sub trim_with_blastall
     my $blastfile = SeedAware::tmp_file_name( "trim_blastdb", $tmpdir );
     my $seqfile   = SeedAware::tmp_file_name( "trim_query",   $tmpdir );
 
-    gjoseqlib::print_alignment_as_fasta( $blastfile, scalar gjoseqlib::pack_sequences( $clnali ) );
-    gjoseqlib::print_alignment_as_fasta( $seqfile,   scalar gjoseqlib::pack_sequences( $clnseq ) );
+    gjoseqlib::write_fasta( $blastfile, scalar gjoseqlib::pack_sequences( $clnali ) );
+    gjoseqlib::write_fasta( $seqfile,   scalar gjoseqlib::pack_sequences( $clnseq ) );
 
     $type = guess_seq_type( $clnseq->[2] ) if ! $type;
     my ( $is_prot, $prog, @opt ) = ( $type =~ m/^n/i ) ? qw( f blastn -r 1 -q -1 )

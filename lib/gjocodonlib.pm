@@ -89,24 +89,6 @@ package gjocodonlib;
 #     @cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
 #    \@cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
 #
-#  Get codon usage counts for genes from the sapling server.
-#  Requires SAPserver.pm, or a SAPserver object.
-#
-#     @cnts = labeled_counts_from_sapling( $gid, \%opts )
-#    \@cnts = labeled_counts_from_sapling( $gid, \%opts )
-#
-#  Get codon usage counts for genes from the KBase server
-#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
-#
-#     @cnts = labeled_counts_from_kbase( $gid, \%opts )
-#    \@cnts = labeled_counts_from_kbase( $gid, \%opts )
-#
-#  Get codon usage counts for genes from the a local SEED
-#  Requires FIG.pm, or a FIG object.
-#
-#     @cnts = labeled_counts_from_seed( $gid, \%opts )
-#    \@cnts = labeled_counts_from_seed( $gid, \%opts )
-#
 #  Print counts:
 #     One space between synonymous codons, two spaces between amino acids
 #     Counts can be followed by a tab and a label.
@@ -131,15 +113,47 @@ package gjocodonlib;
 #     $freq = average_freq( \@count_hashes )
 #     $freq = average_freq( \@count_hashes, $pseudocount )
 #
-#     $freq                 = split_frequencies( $codon_freq_string )
-#   ( $freq, $scr, $label ) = split_frequencies( $codon_freq_string )
+#  Set the minimum codon usage frequencies value in a set of frequencies.
+#  (avoid those divide by zero errors):
 #
 #     $freq = set_minimum_frequency( $freq, $min_codon_frequency )
+#
+#-------------------------------------------------------------------------------
+#  Parsing and formatting frequencies data.
 #
 #  Formatted frequencies data:
 #     Comma between synonymous codons, and vertical bar between amino acids.
 #     Frequencies can be preceded by a numeric score and tab.
 #     Frequencies can be followed by a tab and text label.
+#-------------------------------------------------------------------------------
+#  Basic splitting:
+#
+#     $freq                 = split_frequencies( $codon_freq_string )
+#   ( $freq, $scr, $label ) = split_frequencies( $codon_freq_string )
+#
+#  Convert text frequencies to a 4 or 5 part structure by further splitting
+#  the label. The score, if present, is discarded.
+#
+#  [ $gid, $gdesc, $type,              $freq ] = structure_freq_text_4( $freq_text_line );
+#  [ $gid, $gdesc, $stdtype, $subtype, $freq ] = structure_freq_text_5( $freq_text_line );
+#
+#      $gid     is the first word in the codon frequencies description
+#      $gdesc   is the rest of the description, up to a ' -- ' delimiter
+#      $type    is the text after a ' -- ' delimiter, if present
+#      $stdtype is is a fixed vocabulary codon usage type
+#      $subtype is a possible qualifier of the type
+#
+#  Current types are:
+#
+#      average
+#      high_expr  (*)
+#      modal
+#      nonnative  (*)
+#
+#  The types followed by (*) can include a subtype (generally related to the
+#  iterations in their calculation).
+#
+#  Format frequencies data:
 #
 #     $codon_freq_string = frequencies_as_string( $freq )
 #
@@ -174,6 +188,66 @@ package gjocodonlib;
 #  ( $freq, $scr, $descr ) = read_next_frequencies( )       # D = STDIN
 #    $freq                 = read_next_frequencies( \*FH )
 #  ( $freq, $scr, $descr ) = read_next_frequencies( \*FH )
+#
+#-------------------------------------------------------------------------------
+#  Raw codon usages are typed codon usages, intended for a more robust exchange.
+#  Types / subtype combinations are:
+#
+#  -------------------------------------------------------------------------
+#  Type          Subtype   Description
+#  -------------------------------------------------------------------------
+#  Current types
+#  -------------------------------------------------------------------------
+#  average                 genome avearge codon usage
+#  modal                   genome modal codon usage
+#  high_expr        0      modal usage of high expression candidates
+#  high_expr        1      modal usage of high expression candidates
+#                               differing from mode
+#  high_expr        2      iterated modal usage of high expression
+#                               candidates differing from mode
+#  nonnative               modal usage of nonnative genes
+#  -------------------------------------------------------------------------
+#  Anticipated types
+#  -------------------------------------------------------------------------
+#  genome        average   genome avearge codon usage (synonym)
+#  genome         modal    genome modal codon usage (synonym)
+#  mito          average   mitochondion
+#  mito           modal    mitochondion
+#  nonnative     average   average usage of nonnative genes
+#  nonnative      modal    modal usage of nonnative genes (synonym)
+#  plasmid:id    average   plasmid (with optional element id)
+#  plasmid:id     modal    plasmid (with optional element id)
+#  plastid       average   plastid
+#  plastid        modal    plastid
+#  prophage:id   average   prophage (with optional element id)
+#  prophage:id    modal    prophage (with optional element id)
+#  region:id     average   genomic region (with optional element id)
+#  region:id      modal    genomic region (with optional element id)
+#  shared        average   average usage for core genes of species
+#  shared         modal    modal usage for core genes of species
+#  unique        average   average usage for genes unique to a strain
+#  unigue         modal    modal usage for genes unique to a strain
+#  -------------------------------------------------------------------------
+#
+#  Raw codon usages file format (file extension .rawcu)
+#
+#      "$freqstr\t$gencode\t$gid\t$type\t$subtype\t$gname\n"
+#
+#  Read and write raw usages:
+#
+#       @usages = read_genome_codon_usages( $file )
+#      \@usages = read_genome_codon_usages( $file )
+#       @usages = read_genome_codon_usages( )          # STDIN
+#      \@usages = read_genome_codon_usages( )          # STDIN
+#
+#      $n_written = write_genome_codon_usages( $file,  @usages )
+#      $n_written = write_genome_codon_usages( $file, \@usages )
+#      $n_written = write_genome_codon_usages(         @usages )   # STDOUT
+#      $n_written = write_genome_codon_usages(        \@usages )   # STDOUT
+#
+#  $file can be a filename, a filehandle, a string reference, '', or undef
+#
+#  @usages = ( [ $gid, $gname, $type, $subtype, $freqs, $gencode ], ... )
 #
 #-------------------------------------------------------------------------------
 #  Evaluating counts versus frequencies.
@@ -364,12 +438,6 @@ our @EXPORT = qw(
         entry_labeled_codon_count_package
         entry_labeled_codon_count_package_20
 
-        labeled_counts_from_file
-        labeled_counts_from_ffn
-        labeled_counts_from_sapling
-        labeled_counts_from_kbase
-        labeled_counts_from_seed
-        
         n_codon
         sum_counts
 
@@ -387,6 +455,11 @@ our @EXPORT = qw(
         split_frequencies
         codon_counts_2_aa_counts
         simulate_genome
+
+        read_genome_codon_usages
+        write_genome_codon_usages
+
+        genome_axes_from_usages
 
         modal_codon_usage
         score_codon_frequencies
@@ -897,46 +970,26 @@ sub labeled_counts_from_ffn
     my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
                $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
 
-    my $ffnfile = shift || $opts->{ ffn };
+    my $ffn = shift || $opts->{ ffn } || \*STDIN;
 
-    my @seqs = gjoseqlib::read_fasta( $ffnfile );
+    my @seqs = gjoseqlib::read_fasta( $ffn );
     my @cnts = entry_labeled_codon_count_package( @seqs );
 
+    $opts->{ dna }    = \@seqs;
     $opts->{ counts } = \@cnts;
+
     wantarray ? @cnts : \@cnts;
 }
 
 
 #-------------------------------------------------------------------------------
-#  Get codon usage counts for genes from the sapling server.
-#  Requires SAPserver.pm, or a SAPserver object.
+#  These access routings should not be usad. Go straight to SaplingCodonUsage.pm
+#  Get codon usage counts for genes from the Sapling server.
 #
 #   @cnts = labeled_counts_from_sapling( $gid, \%opts )
 #  \@cnts = labeled_counts_from_sapling( $gid, \%opts )
 #
-#  Options:
-#
-#    gid => $gid        # Alternative to supplying the gid in arg list
-#    sap => $SAPserver  # Supply the server object
-#
-#-------------------------------------------------------------------------------
-sub labeled_counts_from_sapling
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my @seqs = coding_sequences_from_sapling( $gid, $opts );
-    my @cnts = entry_labeled_codon_count_package( @seqs );
-
-    $opts->{ counts } = \@cnts;
-    wantarray ? @cnts : \@cnts;
-}
-
-
-#-------------------------------------------------------------------------------
-#  Get coding sequences from the sapling server
+#  Get coding sequences from the Sapling server.
 #
 #   @seqs = coding_sequences_from_sapling( $gid, \%opts )
 #  \@seqs = coding_sequences_from_sapling( $gid, \%opts )
@@ -947,85 +1000,28 @@ sub labeled_counts_from_sapling
 #    sap => $SAPserver  # Supply the server object
 #
 #-------------------------------------------------------------------------------
+sub labeled_counts_from_sapling
+{
+    eval { require SaplingCodonUsage; } ? SaplingCodonUsage::labeled_counts( @_ )
+                                        : wantarray ? () : [];
+}
+
+
 sub coding_sequences_from_sapling
 {
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my $sap = sap_object( $opts ) or return wantarray ? () : [];
-
-    my $funcH = $sap->feature_assignments( { -genome => $gid, -type => 'peg' } );
-    my $fids  = [ keys %$funcH ];
-    my $locH  = $sap->fid_locations( { -ids => $fids } );
-    my $seqH  = $sap->ids_to_sequences( { -ids => $fids } );
-
-    my @seqs = map  { $seqH->{$_} ? [ $_, $funcH->{$_} || '', $seqH->{$_} ] : () }
-               map  { $_->[0] }
-               sort { lc $a->[1] cmp lc $b->[1] || $a->[2] <=> $b->[2] }
-               map  { my @mid = midpoint( $locH->{$_} ); @mid ? [ $_, @mid ] : () }
-               keys %$locH;
-
-    wantarray ? @seqs : \@seqs;
+    eval { require SaplingCodonUsage; } ? SaplingCodonUsage::coding_sequences( @_ )
+                                        : wantarray ? () : [];
 }
 
 
 #-------------------------------------------------------------------------------
-#  Get a Sapling server object
-#
-#   $sapObject = sap_object( \%opts )
-#
-#  Options:
-#
-#    sap => $sapObject  # This will be used if it already exists.
-#
-#-------------------------------------------------------------------------------
-sub sap_object
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $sap = $opts->{ sap };
-    return $sap if ( $sap && eval { $sap->isa( 'SAPserver' ) } );
-
-    eval { require SAPserver } or return undef;
-
-    $opts->{ sap } = SAPserver->new();
-}
-
-
-#-------------------------------------------------------------------------------
+#  These access routings should not be usad. Go straight to KBaseCodonUsage.pm
 #  Get codon usage counts for genes from the KBase server.
-#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
 #
 #   @cnts = labeled_counts_from_kbase( $gid, \%opts )
 #  \@cnts = labeled_counts_from_kbase( $gid, \%opts )
 #
-#  Options:
-#
-#    gid   => $gid          # Alternative to supplying the gid in arg list
-#    kbase => $KBaseClient  # Supply the client object
-#
-#-------------------------------------------------------------------------------
-sub labeled_counts_from_kbase
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my @seqs = coding_sequences_from_kbase( $gid, $opts );
-    my @cnts = gjocodonlib::entry_labeled_codon_count_package( @seqs );
-
-    $opts->{ counts } = \@cnts;
-    wantarray ? @cnts : \@cnts;
-}
-
-
-#-------------------------------------------------------------------------------
 #  Get coding sequences from the KBase server.
-#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
 #
 #   @seqs = coding_sequences_from_kbase( $gid, \%opts )
 #  \@seqs = coding_sequences_from_kbase( $gid, \%opts )
@@ -1036,92 +1032,28 @@ sub labeled_counts_from_kbase
 #    kbase => $KBaseClient  # Supply the client object
 #
 #-------------------------------------------------------------------------------
+sub labeled_counts_from_kbase
+{
+    eval { require KBaseCodonUsage; } ? KBaseCodonUsage::labeled_counts( @_ )
+                                      : wantarray ? () : [];
+}
+
+
 sub coding_sequences_from_kbase
 {
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-    $gid =~ s/^g\./kb|g./;
-    $gid =~ m/^kb\|g\.\d+$/ or return wantarray ? () : [];
-
-    my $kbase = kbase_object( $opts ) or return wantarray ? () : [];
-
-    my $fidsH = $kbase->genomes_to_fids( [$gid], ['CDS'] ) || {};
-
-    my $fidsL = $fidsH->{ $gid } || [];
-
-    my $funcH = $kbase->fids_to_functions( $fidsL ) || {};
-
-    my $seqH  = $kbase->fids_to_dna_sequences( $fidsL ) || {};
-
-    my $locH  = $kbase->fids_to_locations( $fidsL ) || {};
-
-    my @seqs = map  { $seqH->{$_} ? [ $_, $funcH->{$_} || '', $seqH->{$_} ] : () }
-               map  { $_->[0] }
-               sort { lc $a->[1] cmp lc $b->[1] || $a->[2] <=> $b->[2] }
-               map  { my @mid = midpoint_kbase( $locH->{$_} ); @mid ? [ $_, @mid ] : () }
-               keys %$locH;
-
-    wantarray ? @seqs : \@seqs;
+    eval { require KBaseCodonUsage; } ? KBaseCodonUsage::coding_sequences( @_ )
+                                      : wantarray ? () : [];
 }
 
 
 #-------------------------------------------------------------------------------
-#  Get a KBase server object
-#
-#   $KBObject = kbase_object( \%opts )
-#
-#  Options:
-#
-#    kbase => $KBObject  # This will be used if it already exists.
-#
-#-------------------------------------------------------------------------------
-sub kbase_object
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $kbase = $opts->{ kbase };
-    return $kbase if ( $kbase && eval { $kbase->isa( "Bio::KBase::CDMI::Client" ) } );
-
-    eval { require Bio::KBase } or return undef;
-
-    $opts->{ kbase } = Bio::KBase->central_store();
-}
-
-
-#-------------------------------------------------------------------------------
+#  These access routings should not be usad. Go straight to SeedCodonUsage.pm
 #  Get codon usage counts for genes from the a local SEED.
-#  Requires FIG.pm, or a FIG object.
 #
 #   @cnts = labeled_counts_from_seed( $gid, \%opts )
 #  \@cnts = labeled_counts_from_seed( $gid, \%opts )
 #
-#  Options:
-#
-#    fig => $figObject  # This will be used if set
-#    gid => $gid        # Alternative to supplying the gid in arg list
-#
-#-------------------------------------------------------------------------------
-sub labeled_counts_from_seed
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my @seqs = coding_sequences_from_seed( $gid, $opts );
-    my @cnts = entry_labeled_codon_count_package( @seqs );
-
-    $opts->{ counts } = \@cnts;
-    wantarray ? @cnts : \@cnts;
-}
-
-
-#-------------------------------------------------------------------------------
 #  Get coding sequences from the local SEED.
-#  Requires FIG.pm, or a FIG object.
 #
 #   @seqs = coding_sequences_from_seed( $gid, \%opts )
 #  \@seqs = coding_sequences_from_seed( $gid, \%opts )
@@ -1132,190 +1064,37 @@ sub labeled_counts_from_seed
 #    gid => $gid        # Alternative to supplying the gid in arg list
 #
 #-------------------------------------------------------------------------------
+sub labeled_counts_from_seed
+{
+    eval { require SeedCodonUsage; } ? SeedCodonUsage::labeled_counts( @_ )
+                                     : wantarray ? () : [];
+}
+
+
 sub coding_sequences_from_seed
 {
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my $fig = fig_object( $opts ) or return wantarray ? () : [];
-
-    my @fids  = $fig->all_features( $gid, 'peg' );
-    my $funcH = $fig->function_of_bulk( \@fids );
-
-    #
-    #  Separate locations by contig. For each contig, the list elements are
-    #  [ $fid, $loc, $midpoint ]
-    #
-    my %locH;
-    foreach ( $fig->feature_location_bulk( \@fids ) )
-    {
-        my ( $contig, $midpoint ) = midpoint( $_->[1] );
-        push @{ $locH{ $contig } }, [ @$_, $midpoint ] if $midpoint;
-    }
-
-    #
-    #  Collect sequences one contig at a time
-    #
-    my @seqs;
-    foreach my $contig ( sort { lc $a cmp lc $b } keys %locH )
-    {
-        my $len = $fig->contig_ln( $gid, $contig ) or next;
-        my $seq = $fig->get_dna( $gid, $contig, 1, $len ) or next;
-
-        #
-        #  Add the fid sequences, sorted by midpoint
-        #
-        foreach ( sort { $a->[2] <=> $b->[2] } @{ $locH{ $contig } } )
-        {
-            my $fid = $_->[0];
-            my @subseq = map { [ /^(.+)_(\d+)_(\d+)$/ ] } split /,/, $_->[1];
-            next if grep { $_->[0] ne $contig } @subseq;
-
-            my @parts;
-            foreach ( @subseq )
-            {
-                push @parts, DNA_subseq( \$seq, $_->[1], $_->[2] );
-            }
-            push @seqs, [ $fid, ($funcH->{$fid} || ''), join('', @parts) ];
-        }
-    }
-
-    wantarray ? @seqs : \@seqs;
+    eval { require SeedCodonUsage; } ? SeedCodonUsage::coding_sequences( @_ )
+                                     : wantarray ? () : [];
 }
 
 
-#-------------------------------------------------------------------------------
-#  Get a SEED FIG object
+#===============================================================================
+#  Codon usages axes (modal, high_expression, nonnative) from various sources
 #
-#   $fig = fig_object( \%opts )
+#     @axes = ( $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype )
 #
-#  Options:
-#
-#    fig => $figObject  # This will be used if it already exists.
-#
-#-------------------------------------------------------------------------------
-sub fig_object
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $fig = $opts->{ fig };
-    return $fig if ( $fig && eval { $fig->isa( 'FIG' ) } );
-
-    eval { require FIG } or return undef;
-
-    $opts->{ fig } = FIG->new();
-}
-
-
-#-------------------------------------------------------------------------------
-#  Auxiliary function for ordering coding sequences from Sapling or SEED
-#
-#  ( $contig, $midpoint ) = midpoint( $seed_or_sap_location )
-#
-#-------------------------------------------------------------------------------
-sub midpoint
-{
-    $_[0] or return ();
-    my $c;
-    my @ends = sort { $a <=> $b }
-               map  { ( $c ||= $_->[0] ) eq $_->[0] ? @$_[1,2] : () }
-               map  { /^(.+)_(\d+)\_(\d+)$/ ? [ $1, $2, $3        ] :
-                      /^(.+)_(\d+)\+(\d+)$/ ? [ $1, $2, $2+($3-1) ] :
-                      /^(.+)_(\d+)\-(\d+)$/ ? [ $1, $2, $2-($3-1) ] : ()
-                    }
-               ref($_[0]) eq 'ARRAY' ? @{$_[0]} : split /,/, $_[0];
-
-    $c && @ends ? ( $c, 0.5*( $ends[0] + $ends[-1] ) ) : ();
-}
-
-
-#-------------------------------------------------------------------------------
-#  Auxiliary function for ordering coding sequences from KBase
-#
-#  ( $contig, $midpoint ) = midpoint_kbase( $kbase_api_location )
-#
-#-------------------------------------------------------------------------------
-sub midpoint_kbase
-{
-    $_[0] && ref $_[0] eq 'ARRAY' && @{$_[0]} or return ();
-
-    my $c;
-    my @ends = sort { $a <=> $b }
-               map  { ( $c ||= $_->[0] ) eq $_->[0] ? @$_[1,2] : () }
-               map  { [ @$_[0,1], $_->[2] eq '+' ? $_->[1]+($_->[3]-1) : $_->[1]+($_->[3]-1) ] }
-               @{$_[0]};
-
-    $c && @ends ? ( $c, 0.5*( $ends[0] + $ends[-1] ) ) : ();
-}
-
-
-#-------------------------------------------------------------------------------
+#===============================================================================
 #  Get available codon usages for a genome from GenomeCodonUsages.pm
 #
-#  ( $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype ) = codon_usages_from_module( $gid );
-#  [ $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype ] = codon_usages_from_module( $gid );
+#     @axes = genome_axes_from_module( $gid );
+#    \@axes = genome_axes_from_module( $gid );
 #
 #-------------------------------------------------------------------------------
 
-sub codon_usages_from_module
+sub genome_axes_from_module
 {
-    eval { require GenomeCodonUsages } ? GenomeCodonUsages::genome_axes(@_) : wantarray ? () : [];
-}
-
-
-#-------------------------------------------------------------------------------
-#  Get available codon usages for a genome from KBase server
-#
-#  ( $gname, $mode, $high_expr, $he_type, $nonnative ) = codon_usages_from_kbase( $gid, \%opts );
-#  [ $gname, $mode, $high_expr, $he_type, $nonnative ] = codon_usages_from_kbase( $gid, \%opts );
-#
-#-------------------------------------------------------------------------------
-
-sub codon_usages_from_kbase
-{
-    my $opts = $_[ 0] && ref($_[ 0]) eq 'HASH' ? shift :
-               $_[-1] && ref($_[-1]) eq 'HASH' ? pop   : {};
-
-    my $gid = $opts->{ gid } ||= shift or return wantarray ? () : [];
-
-    my $kbase = kbase_object( $opts ) or return wantarray ? () : [];
-
-    my ( $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type );
-
-    my $usagesL = $kbase->get_relationship_UsesCodons( [ $gid ],
-                                                       [ 'scientific_name' ],
-                                                       [],
-                                                       [ 'frequencies', 'type', 'subtype' ]
-                                                     ) || [];
-    foreach ( @$usagesL )
-    {
-        $gname ||= $_->[0]->{ scientific_name } || '';
-        my $cu      = $_->[2];
-        my $type    = $cu->{ type } or next;
-        my $subtype = $cu->{ subtype };
-        my $freq = scalar gjocodonlib::split_frequencies( $cu->{ frequencies } || next );
-        if    ( $type eq 'modal' )
-        {
-            $mode      = $freq;
-            $md_type   = $subtype;
-        }
-        elsif ( $type eq 'nonnative' )
-        {
-            $nonnative = $freq;
-            $nn_type   = $subtype;
-        }
-        elsif ( $type eq 'high-expression' )
-        {
-            $high_expr = $freq;
-            $he_type   = $cu->{ subtype };
-        }
-    }
-
-    wantarray ? ( $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type )
-              : [ $gname, $mode, $md_type, $high_expr, $he_type, $nonnative, $nn_type ];
+    eval { require GenomeCodonUsages } ? GenomeCodonUsages::genome_axes(@_)
+                                       : wantarray ? () : [];
 }
 
 
@@ -1568,6 +1347,298 @@ sub read_next_frequencies
     my ( $fh ) = @_;
     $fh ||= \*STDIN;
     split_frequencies( scalar <$fh> );
+}
+
+
+#-------------------------------------------------------------------------------
+#  The following collection of functions is for a structured representation of
+#  codon usage frequencies text, particularly as output by native_codon_usage().
+#  They standardize the terms for some codon usage types and subtypes.
+#-------------------------------------------------------------------------------
+#  Convert text frequencies to a 4 or 5 part structure. I am converging on the
+#  5-part form, plus a sixth field for genetic code (which is not currently
+#  supported by anything, but should be).
+#
+#  [ $gid, $gdesc, $type,              $freq ] = structure_freq_text_4( $freq_text_line );
+#  [ $gid, $gdesc, $stdtype, $subtype, $freq ] = structure_freq_text_5( $freq_text_line );
+#
+#      $gid     is the first word in the codon frequencies description
+#      $gdesc   is the rest of the description, up to a ' -- ' delimiter
+#      $type    is the text after a ' -- ' delimiter, if present
+#      $stdtype is is a fixed vocabulary codon usage type
+#      $subtype is a possible qualifier of the type
+#
+#  Type / subtype combinations are:
+#  -------------------------------------------------------------------------
+#  Type          Subtype   Description
+#  -------------------------------------------------------------------------
+#  Current types
+#  -------------------------------------------------------------------------
+#  average                 genome avearge codon usage
+#  modal                   genome modal codon usage
+#  high_expr        0      modal usage of high expression candidates
+#  high_expr        1      modal usage of high expression candidates
+#                               differing from mode
+#  high_expr        2      iterated modal usage of high expression
+#                               candidates differing from mode
+#  nonnative               modal usage of nonnative genes
+#  -------------------------------------------------------------------------
+#  Anticipated types
+#  -------------------------------------------------------------------------
+#  genome        average   genome avearge codon usage (synonym)
+#  genome         modal    genome modal codon usage (synonym)
+#  mito          average   mitochondion
+#  mito           modal    mitochondion
+#  nonnative     average   average usage of nonnative genes
+#  nonnative      modal    modal usage of nonnative genes (synonym)
+#  plasmid:id    average   plasmid (with optional element id)
+#  plasmid:id     modal    plasmid (with optional element id)
+#  plastid       average   plastid
+#  plastid        modal    plastid
+#  prophage:id   average   prophage (with optional element id)
+#  prophage:id    modal    prophage (with optional element id)
+#  region:id     average   genomic region (with optional element id)
+#  region:id      modal    genomic region (with optional element id)
+#  shared        average   average usage for core genes of species
+#  shared         modal    modal usage for core genes of species
+#  unique        average   average usage for genes unique to a strain
+#  unigue         modal    modal usage for genes unique to a strain
+#-------------------------------------------------------------------------------
+sub structure_freq_text_4
+{
+    my ( $freq, undef, $desc ) = $_[0] ? gjocodonlib::split_frequencies( $_[0] ) : ();
+    $freq ? [ split_mode_description_3( $desc ), $freq ] : ();
+}
+
+
+sub structure_freq_text_5
+{
+    my ( $freq, undef, $desc ) = $_[0] ? gjocodonlib::split_frequencies( $_[0] ) : ();
+    $freq ? [ split_mode_description_4( $desc ), $freq ] : ();
+}
+
+
+sub split_mode_description_3
+{
+    local $_ = shift;
+    $_ = '' unless defined $_;
+    # ( gen_id, gen_desc, usage_type )
+    my @desc = /^\s*(\S+)(\s+(.*\S))? +-- +(.+)$/  ? ( $1, $3, $4 )
+             : /^\s*(\S+)(\s+(.*\S))?$/            ? ( $1, $2, undef )
+             :                                       ( $_, undef, undef );
+    #  Just in case
+    $desc[2] =~ s/^Alien/Nonnative/ if $desc[2];
+
+    wantarray ? @desc : \@desc;
+}
+
+
+sub split_mode_description_4
+{
+    my @desc = split_mode_description_3( $_[0] );
+    splice @desc, 2, 1, stdtype_subtype( $desc[2] );
+
+    wantarray ? @desc : \@desc;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Make standard [ stdtype, subtype ] pairs from the type text produced by
+#  native_codon_usage. The stdtype is the key for storing the corresponding
+#  frequencies, as in:
+#
+#      $data->{ $stdtype } = $freq;
+#
+#  The subtype is a value that is keyed according to the stdtype, as in:
+#
+#      $data->{ $subtype_key{ $stdtype } } = $subtype;
+#
+#-------------------------------------------------------------------------------
+sub stdtype_subtype
+{
+    local $_ = shift;
+
+    return ! defined $_   ? ( ''        => undef         )
+         : /^Genome mode/ ? ( modal     => undef         )
+         : /^Genome av/   ? ( average   => undef         )
+         : /^High expr/   ? ( high_expr => subtype( $_ ) )
+         : /^Nonnative/   ? ( nonnative => subtype( $_ ) )
+         : /^Alien/       ? ( nonnative => subtype( $_ ) )
+         :                  ( $_        => undef         );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Function to find numeric subtype code:
+#-------------------------------------------------------------------------------
+sub subtype
+{
+    local $_ = shift;
+
+    return ( ! $_ )          ? undef
+         : /those matching/  ? 0
+         : /mode 0/          ? 1
+         : /mode [12]/       ? 2
+         :                     undef;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Genome codon usages are typed codon usages, intended for simple exchange and
+#  text file storage of codon usage frequencies. Note that the order in a file
+#  is NOT the same as the order in the array. The file will tend to do a better
+#  job of lining up the columns for viewing. The array order has more of a
+#  logical hierarchy to it.
+#
+#  Genome codon usage array:
+#
+#      $usage = [ $gid, $gname, $type, $subtype, $freqs, $gencode ]
+#
+#  Genome codon usage file format (file extension .gcu) has lines of the form:
+#
+#      "$freqstr\t$gencode\t$gid\t$type\t$subtype\t$gname\n"
+#
+#  A type should always be specified.
+#  An undef or empty string subtype is allowed. Note that subtype 0 can have a
+#      specific meaning and is not necessarily that same as '' or undef.
+#  A missing, blank or undefined genetic code is 1 or 11.
+#
+#  Functions to read and write genome codon usages:
+#
+#      @usages = read_genome_codon_usages( $file )
+#     \@usages = read_genome_codon_usages( $file )
+#      @usages = read_genome_codon_usages( )          #  STDIN
+#     \@usages = read_genome_codon_usages( )          #  STDIN
+#
+#      $n_written = write_genome_codon_usages( $file,  @usages )
+#      $n_written = write_genome_codon_usages( $file, \@usages )
+#      $n_written = write_genome_codon_usages(         @usages )  #  STDOUT
+#      $n_written = write_genome_codon_usages(        \@usages )  #  STDOUT
+#
+#  $file can be a filename, a filehandle, a string reference, '', or undef
+#-------------------------------------------------------------------------------
+sub read_genome_codon_usages
+{
+    my $file = ( ( ! defined( $_[0] ) ) || ( ref( $_[0] ) ne 'HASH' ) ) ? shift : undef;
+    my ( $fh, $close ) = input_handle( $file );
+    my @usages;
+    while ( <$fh> )
+    {
+        chomp;
+        my ( $freqstr, $gencode, $gid, $type, $subtype, $gname ) = split /\t/;
+        next unless $freqstr && $type;
+        my $freq = gjocodonlib::split_frequencies( $freqstr );
+        $freq and @$freq 
+           or next;
+        push @usages, [ $gid, $gname, $type, $subtype, $freq, $gencode ];
+    }
+
+    close( $fh ) if $close;
+
+    wantarray ? @usages : \@usages;
+}
+
+
+sub write_genome_codon_usages
+{
+    my $file = ( ! defined( $_[0] ) || ( ref( $_[0] ) ne 'ARRAY' ) ) ? shift : undef;
+    my ( $fh, $close ) = output_handle( $file );
+    $fh or return 0;
+
+    my $n = 0;
+    foreach ( is_array_of_cnts_or_freqs($_[0]) ? @{$_[0]} : @_ )
+    {
+        my ( $gid, $gname, $type, $subtype, $freq, $gencode ) = @$_;
+        $freq && ref( $freq ) eq 'ARRAY' && @$freq
+            or next;
+        my $freqstr = frequencies_as_string( $freq )
+            or next;
+        my @data = map { defined $_ ? $_ : '' }
+                   ( $freqstr, $gencode, $gid, $type, $subtype, $gname );
+        print $fh join( "\t", @data ), "\n";
+        $n++;
+    }
+
+    close( $fh ) if $close;
+
+    $n;
+}
+
+
+#===============================================================================
+#  Build a description of codon usage axes from a list of codon usages. If
+#  modal codon usage is not available, the average codon usage will be used.
+#
+#      @axes = genome_axes_from_usages(  @usages, \%opts );
+#      @axes = genome_axes_from_usages( \@usages, \%opts );
+#     \@axes = genome_axes_from_usages(  @usages, \%opts );
+#     \@axes = genome_axes_from_usages( \@usages, \%opts );
+#
+#  Where:
+#
+#      @axes = ( $gname, $mode,      $md_subtype,
+#                        $high_expr, $he_subtype,
+#                        $nonnative, $nn_subtype
+#              )
+#
+#      @usages = ( [ $gid, $gname, $type, $subtype, $freqs, $gencode ], ... )
+#
+#  Options:
+#
+#      genus_species => $gname     #  Supply the genome name
+#      gname         => $gname     #  Supply the genome name
+#-------------------------------------------------------------------------------
+sub genome_axes_from_usages
+{
+    my $opts = ( $_[ 0] && ( ref( $_[ 0] ) eq 'HASH' ) ) ? shift
+             : ( $_[-1] && ( ref( $_[-1] ) eq 'HASH' ) ) ? pop
+             :                                             {};
+
+    @_ or return wantarray ? () : [];
+
+    my $name = $opts->{ gname } || $opts->{ genus_species } || undef;
+    my ( $modal,     $md_subtype,
+         $high_expr, $he_subtype,
+         $nonnative, $nn_subtype
+       );
+
+    foreach ( is_array_of_cnts_or_freqs($_[0]) ? @{$_[0]} : @_ )
+    {
+        $_ && ref( $_ ) eq 'ARRAY' or next;
+
+        my ( $gid, $gname, $type, $subtype, $freq ) = @$_;
+        $type && $freq or next;
+
+        if    ( $type =~ /^modal/i )
+        {
+            $modal      = $freq;
+            $md_subtype = defined( $subtype ) ? $subtype : '';
+        }
+        elsif ( $type =~ /^high_?expr/i )
+        {
+            $high_expr  = $freq;
+            $he_subtype = defined( $subtype ) ? $subtype : '';
+        }
+        elsif ( $type =~ /^non-?native/i )
+        {
+            $nonnative  = $freq;
+            $nn_subtype = defined( $subtype ) ? $subtype : '';
+        }
+        elsif ( $type =~ /^average/i && ! $modal )
+        {
+            $modal      = $freq;
+            $md_subtype = 'average';
+        }
+        $name ||= $gname || $gid;
+    }
+
+
+    my @axes  = ( $name, $modal,     $md_subtype,
+                         $high_expr, $he_subtype,
+                         $nonnative, $nn_subtype
+                );
+
+    wantarray ? @axes : \@axes;
 }
 
 
@@ -4516,6 +4587,30 @@ sub input_handle
     return (  $in,    0 ) if ( ref $in eq 'GLOB' );
     my $fh;
     return (  $fh,    1 ) if ( ref $in eq 'SCALAR' || -f $in ) && open( $fh, "<", $in );
+    return (  undef,  0 );
+}
+
+
+#------------------------------------------------------------------------------
+#  Provide an open output file handle from undef (STDIN), empty string (STDIN),
+#  glob reference, string reference or file name:
+#
+#   ( $fh, $close ) = output_handle( )        # STDIN
+#   ( $fh, $close ) = output_handle(  '' )    # STDIN
+#   ( $fh, $close ) = output_handle( \*FH )
+#   ( $fh, $close ) = output_handle( \$string )
+#   ( $fh, $close ) = output_handle(  $filename )
+#
+#  $close is true if the output parameter is a file name or scalar reference,
+#  indicating that the handle should be closed upon completion of the write.
+#------------------------------------------------------------------------------
+sub output_handle
+{
+    my $out = shift;
+    return ( \*STDOUT, 0 ) if ( ! defined $out ) || ( $out eq '' );
+    return (  $out,    0 ) if ( ref $out eq 'GLOB' );
+    my $fh;
+    return (  $fh,    1 ) if ( ref $out eq 'SCALAR' || $out ) && open( $fh, ">", $out );
     return (  undef,  0 );
 }
 

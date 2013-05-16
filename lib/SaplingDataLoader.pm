@@ -134,7 +134,7 @@ sub DeleteRelatedRecords {
     for my $target (@targets) {
         # Delete the relationship instance.
         $sap->DeleteRow($relName, $genome, $target);
-        $stats->Add($relName => 1);
+        $stats->Add("delete-$relName" => 1);
         # Delete the entity instance.
         my $subStats = $sap->Delete($entityName, $target);
         # Roll up the statistics.
@@ -558,7 +558,7 @@ sub AddFeature {
         # This will record the total number of base pairs.
         my $dnaLength = 0;
         # Process the locations.
-        for my $loc (split /\s*,\s*/, $locations) {
+        for my $loc (split m/\s*,\s*/, $locations) {
             # Parse the location.
             unless ($loc =~ /^(.+)_(\d+)_(\d+)$/) {
                 # Here the location is invalid.
@@ -646,7 +646,7 @@ sub AddFeature {
             }
             # Add the evidence codes (if any).
             if ($evidence) {
-                for my $evCode (split /\s*,\s*/, $evidence) {
+                for my $evCode (split m/\s*,\s*/, $evidence) {
                     $sap->InsertValue($fid, 'Feature(evidence-code)', $evCode);
                     $stats->Add(addEvidenceCode => 1);
                 }

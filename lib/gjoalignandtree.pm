@@ -239,7 +239,6 @@ sub print_alignment_as_pseudoclustal
                                        map { $case < 0 ? lc $_ : $case > 0 ? uc $_ : $_ }  # map sequence only
                                        $_->[2] =~ m/.{1,$line_len}/g
                                      ] }
-                
                 @$align;
 
     my $ngroup = @{ $lines[0] };
@@ -290,8 +289,8 @@ sub read_pseudoclustal
 
 #-------------------------------------------------------------------------------
 #  The profile 'query' sequence:
-#     1. No terminal gaps, if possible
-#        1.1 Otherwise, no gaps at start
+#
+#     1. Minimum terminal gaps
 #     2. Longest sequence passing above
 #
 #    $prof_rep = representative_for_profile( $align )
@@ -302,24 +301,26 @@ sub representative_for_profile
     $align && ref $align eq 'ARRAY' && @$align
         or die "representative_for_profile called with invalid sequence list.\n";
 
-    my @cand;
-    @cand = grep { $_->[2] =~ /^[^-].*[^-]$/ } @$align;            # No end gaps
-    @cand = grep { $_->[2] =~ /^[^-]/ }        @$align if ! @cand; # No start gaps
-    @cand = @$align if ! @cand;   
+    my ( $r0 ) = map  { $_->[0] }                                      # sequence entry
+                 sort { $a->[1] <=> $b->[1] || $b->[2] <=> $a->[2] }   # min terminal gaps, max aas
+                 map  { my $tgap = ( $_->[2] =~ /^(-+)/ ? length( $1 ) : 0 )
+                                 + ( $_->[2] =~ /(-+)$/ ? length( $1 ) : 0 );
+                        my $naa = $_->[2] =~ tr/ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy//;
+                        [ $_, $tgap, $naa ]
+                      }
+                 @$align;
 
-    my ( $rep ) = map  { $_->[0] }                     # sequence entry
-                  sort { $b->[1] <=> $a->[1] }         # max nongaps
-                  map  { [ $_, $_->[2] =~ tr/-//c ] }  # count nongaps
-                  @cand;
+    my $rep = [ @$r0 ];             # Make a copy
+    $rep->[2] =~ s/[^A-Za-z]+//g;   # Compress to letters
 
-    $rep = [ @$rep ];       # Make a copy
-    $rep->[2] =~ s/-+//g;   # Compress sequence
-
-    return $rep;
+    $rep;
 }
 
 
 #-------------------------------------------------------------------------------
+#  Use a profile to extract a region from a sequence. By default, the hsps
+#  can be chained together, walking both directions from the highest scoring
+#  hsp. Only one region will be extracted per database sequence.
 #
 #    \@seq             = extract_with_psiblast( $db, $profile, \%opts )
 #  ( \@seq, \%report ) = extract_with_psiblast( $db, $profile, \%opts )
@@ -338,11 +339,15 @@ sub representative_for_profile
 #
 #  Options:
 #
+#     best_hsp      =>  $bool           #  only report the best hsp (no merging)
 #     e_value       =>  $max_e_value    #  maximum blastpgp E-value (D = 0.01)
 #     max_e_value   =>  $max_e_value    #  maximum blastpgp E-value (D = 0.01)
-#     max_q_uncov   =>  $aa_per_end     #  maximum unmatched query (D = 20)
-#     max_q_uncov_c =>  $aa_per_end     #  maximum unmatched query, c-term (D = 20)
-#     max_q_uncov_n =>  $aa_per_end     #  maximum unmatched query, n-term (D = 20)
+#     max_gap       =>  $max_gap_size   #  maximum region unmatched in both query and subject (D = 100)
+#     max_offset    =>  $max_offset     #  maximum asymmetry in query and subject gap size (D = 1000)
+#                                       #      (i.e., very large insertions are allowed)
+#     max_q_uncov   =>  $aa_per_end     #  maximum unmatched query, per end (D = 20)
+#     max_q_uncov_c =>  $aa_per_end     #  maximum unmatched query, C-term (D = 20)
+#     max_q_uncov_n =>  $aa_per_end     #  maximum unmatched query, N-term (D = 20)
 #     min_ident     =>  $frac_ident     #  minimum fraction identity (D =  0.15)
 #     min_positive  =>  $frac_positive  #  minimum fraction positive scoring (D = 0.20)
 #     min_frac_cov  =>  $frac_cov       #  minimum fraction coverage of query and subject sequence (D = 0.20)
@@ -351,13 +356,15 @@ sub representative_for_profile
 #     n_result      =>  $max_results    #  maxiumn restuls returned (D = 1000)
 #     n_cpu         =>  $n_thread       #  number of blastpgp threads (D = 2)
 #     n_thread      =>  $n_thread       #  number of blastpgp threads (D = 2)
+#     one_hsp       =>  $bool           #  only report the best hsp (no merging)
 #     query         =>  $q_file_name    #  query sequence file (D = most complete)
 #     query         => \@q_seq_entry    #  query sequence (D = most complete)
-#     query_used    => \@q_seq_entry    #  output
+#     query_used    => \@q_seq_entry    #  output of the query sequence used
 #     stderr        =>  $file           #  blastpgp stderr (D = /dev/stderr)
+#     strict        =>  $bool           #  only report matches that are unique
+#                                       #      and continuous (one hsp)
 #
-#  If supplied, query must be identical to a profile sequence, but no gaps.
-#
+#  If supplied, the query must be identical to a profile sequence, but with no gaps.
 #-------------------------------------------------------------------------------
 
 sub extract_with_psiblast
@@ -366,35 +373,44 @@ sub extract_with_psiblast
 
     $opts && ref $opts eq 'HASH' or $opts = {};
 
-    $opts->{ e_value }  ||= $opts->{ max_e_val } || $opts->{ max_e_value } || 0.01;
-    $opts->{ n_result } ||= $opts->{ nresult }   || 1000;
-    $opts->{ n_thread } ||= $opts->{ nthread }   || $opts->{ n_cpu } || $opts->{ ncpu } || 2;
+    #  These 3 options set parameters for blastpgp:
+
+    $opts->{ e_value }  ||= $opts->{ max_e_val }  || $opts->{ max_e_value } || 0.01;
+    $opts->{ n_result } ||= $opts->{ nresult }    || 1000;
+    $opts->{ n_thread } ||= $opts->{ nthread }    || $opts->{ n_cpu } || $opts->{ ncpu } || 4;
+
+    #  These options set values used in this routine:
+
     my $max_q_uncov_c = $opts->{ max_q_uncov_c  } || $opts->{ max_q_uncov }  || 20;
     my $max_q_uncov_n = $opts->{ max_q_uncov_n  } || $opts->{ max_q_uncov }  || 20;
     my $min_q_cov     = $opts->{ min_q_cov }      || $opts->{ min_frac_cov } || 0.50;
     my $min_s_cov     = $opts->{ min_s_cov }      || $opts->{ min_frac_cov } || 0.01;
-    my $min_ident     = $opts->{ min_ident }      ||  0.15;
-    my $min_pos       = $opts->{ min_positive }   ||  0.20;
+    my $min_ident     = $opts->{ min_ident }      || $opts->{ min_identity } || 0.15;
+    my $min_pos       = $opts->{ min_positive }                              || 0.20;
+    my $strict        = $opts->{ strict }                                    || 0;
+    my $best_hsp      = $opts->{ best_hsp }       || $opts->{ one_hsp }      || 0;
 
     my $blast = blastpgp( $seqs, $profile, $opts );
-    $blast && @$blast or return ();
+    $blast && @$blast
+        or return wantarray ? ( [], {} ) : [];
 
     my ( $qid, $qdef, $qlen, $qhits ) = @{ $blast->[0] };
 
     my @trimmed;
+    my %seqs;
     my %report;
 
     foreach my $sdata ( @$qhits )
     {
         my ( $sid, $sdef, $slen, $hsps ) = @$sdata;
 
-        if ( one_real_hsp( $hsps ) )
+        my $hsp0;
+        if ( $hsp0 = $strict ? one_real_hsp( $hsps ) : $best_hsp ? $hsps->[0] : pseudo_hsp( $hsps, $opts ) )
         {
             #  [ scr, exp, p_n, pval, nmat, nid, nsim, ngap, dir, q1, q2, qseq, s1, s2, sseq ]
             #     0    1    2    3     4     5    6     7     8   9   10   11   12  13   14
 
-            my $hsp0 = $hsps->[0];
-            my ( $scr, $exp, $nmat, $nid, $npos, $q1, $q2, $qseq, $s1, $s2, $sseq ) = ( @$hsp0 )[ 0, 1, 4, 5, 6, 9, 10, 11, 12, 13, 14 ];
+            my ( $scr, $exp, $nmat, $nid, $npos, $q1, $q2, $s1, $s2, $sseq ) = @$hsp0[ 0, 1, 4, 5, 6, 9, 10, 12, 13, 14 ];
 
             my $status;
             if    ( $q1-1     > $max_q_uncov_n )     { $status = 'missing start' }
@@ -405,7 +421,30 @@ sub extract_with_psiblast
             elsif ( ($s2-$s1+1)/$slen < $min_s_cov ) { $status = 'long subject' }
             else
             {
-                $sseq =~ s/-+//g;
+                if ( $sseq )
+                {
+                    $sseq =~ s/-+//g;
+                }
+                else
+                {
+                    if ( ! keys %seqs )
+                    {
+                        if ( ref( $seqs ) eq 'ARRAY' )
+                        {
+                            %seqs = map { $_->[0] => $_ } @$seqs;
+                        }
+                        elsif ( -f $seqs )
+                        {
+                            %seqs = map { $_->[0] => $_ } gjoseqlib::read_fasta( $seqs );
+                        }
+                        else
+                        {
+                            print STDERR "extract_with_psiblast could not locate sequences.\n";
+                            return wantarray ? ( [], {} ) : [];
+                        }
+                    }
+                    $sseq = substr( $seqs{$sid}->[2] || '', $s1, $s2-$s1+1 );
+                }
                 $sdef .= " ($s1-$s2/$slen)" if ( ( $s1 > 1 ) || ( $s2 < $slen ) );
                 push @trimmed, [ $sid, $sdef, $sseq ];
                 $status = 'included';
@@ -423,29 +462,153 @@ sub extract_with_psiblast
 
 
 #-------------------------------------------------------------------------------
+#  Allow fragmentary matches inside of the highest-scoring hsp (or extending
+#  at most 10 amino acids beyond):
 #
-#  Allow fragmentary matches inside of the highest-scoring hsp:
+#     $hsp = one_real_hsp( \@hsps )
 #
 #-------------------------------------------------------------------------------
 
 sub one_real_hsp
 {
     my ( $hsps ) = @_;
-    return 0 if ! ( $hsps && ( ref( $hsps ) eq 'ARRAY' ) && @$hsps );
-    return 1 if  @$hsps == 1;
+    return undef if ! ( $hsps && ( ref( $hsps ) eq 'ARRAY' ) && @$hsps );
+    return $hsps->[0] if  @$hsps == 1;
 
-    my ( $q1_0, $q2_0 ) = ( @{ $hsps->[0] } )[9, 10];
-    for ( my $i = 1; $i < @$hsps; $i++ )
+    my $hsp0 = $hsps->[0];
+    my $q1_min = $hsp0->[ 9] - 10;
+    my $q2_max = $hsp0->[10] + 10;
+    foreach my $hsp ( @$hsps[ 1 .. (@$hsps-1) ] )
     {
-        my ($q1, $q2) = ( @{ $hsps->[$i] } )[9, 10];
-        return 0 if $q1 < $q1_0 || $q2 > $q2_0;
+        return undef if ( $hsp->[ 9] < $q1_min ) || ( $hsp->[10] > $q2_max );
     }
 
-    return 1;
+    $hsp0;
 }
 
 
 #-------------------------------------------------------------------------------
+#  Assemble a pseudo HSP from discontinuous BLAST HSPs:
+#
+#      $hsp = pseudo_hsp( \@hsps, \%options )
+#
+#-------------------------------------------------------------------------------
+sub pseudo_hsp
+{
+    my ( $hsps, $options ) = @_;
+    return undef if ! ( $hsps && ( ref( $hsps ) eq 'ARRAY' ) && @$hsps );
+    return $hsps->[0] if  @$hsps == 1;
+    $options ||= {};
+    my $max_gap = $options->{ max_gap } ||  100;                              # Maximum unmatched region
+    my $max_off = $options->{ max_off } || $options->{ max_offset } || 1000;  # Maximum offset
+
+    my @hsps = sort { s_mid( $a ) <=> s_mid( $b ) } @$hsps;
+    my $i0  = 0;
+    my $scr = 0;
+    my $s;
+    for ( my $i = 0; $i < @hsps; $i++ )
+    {
+        if ( ( $s = $hsps[$i]->[0] ) > $scr ) { $i0 = $i; $scr = $s }
+    }
+
+    my $hsp0 = [ @{$hsps[$i0]} ];
+
+    for ( my $i = $i0 - 1; $i >= 0; $i-- )
+    {
+        my ( $q1, $q2, $s1, $s2 ) = @$hsp0[ 9, 10, 12, 13 ];
+        my $hsp = $hsps[$i];
+        next unless $hsp->[9] < $q1 && $hsp->[12] < $s1;
+        my $q_gap = $q1 - $hsp->[10] - 1;
+        my $s_gap = $s1 - $hsp->[13] - 1;
+        last if ( $q_gap > $max_gap ) && ( $s_gap > $max_gap );
+        last if ( abs( $q_gap - $s_gap ) > $max_off );
+
+        #  It is not worth trying to maintain the subject sequence
+
+        $hsp0->[14] = '';
+
+        #  If there is overlap, prorate the scores
+
+        my $factor = 1;
+        my $gap = $q_gap < $s_gap ? $q_gap : $s_gap;
+        if ( $q_gap < 0 || $s_gap < 0 )
+        {
+            if ( $q_gap < $s_gap )
+            {
+                my $len = $hsp->[10] - $hsp->[9] + 1;
+                $factor = ( $len + $q_gap ) / $len;
+            }
+            else
+            {
+                my $len = $hsp->[13] - $hsp->[12] + 1;
+                $factor = ( $len + $s_gap ) / $len;
+            }
+        }
+
+        $hsp0->[ 0] += $factor * $hsp->[0];
+        $hsp0->[ 2] += $factor * $hsp->[2];
+        $hsp0->[ 3] += $factor * $hsp->[3];
+        $hsp0->[ 4] += $factor * $hsp->[4];
+        $hsp0->[ 9]  = $hsp->[ 9];
+        $hsp0->[12]  = $hsp->[12];
+    }
+
+    for ( my $i = $i0 + 1; $i < @hsps; $i++ )
+    {
+        my ( $q1, $q2, $s1, $s2 ) = @$hsp0[ 9, 10, 12, 13 ];
+        my $hsp = $hsps[$i];
+        next unless $hsp->[10] > $q2 && $hsp->[13] > $s2;
+        my $q_gap = $hsp->[ 9] - $q2 - 1;
+        my $s_gap = $hsp->[12] - $s2 - 1;
+        last if ( $q_gap > $max_gap ) && ( $s_gap > $max_gap );
+        last if ( abs( $q_gap - $s_gap ) > $max_off );
+
+        #  It is not worth trying to maintain the subject sequence
+
+        $hsp0->[14] = '';
+
+        #  If there is overlap, prorate the scores
+
+        my $factor = 1;
+        my $gap = $q_gap < $s_gap ? $q_gap : $s_gap;
+        if ( $q_gap < 0 || $s_gap < 0 )
+        {
+            if ( $q_gap < $s_gap )
+            {
+                my $len = $hsp->[10] - $hsp->[9] + 1;
+                $factor = ( $len + $q_gap ) / $len;
+            }
+            else
+            {
+                my $len = $hsp->[13] - $hsp->[12] + 1;
+                $factor = ( $len + $s_gap ) / $len;
+            }
+        }
+
+        my $bitscr   = $factor * $hsp->[0];
+        $hsp0->[ 0] += $bitscr;
+        $hsp0->[ 1] *= 0.5 ** $bitscr;
+        $hsp0->[ 2] += $factor * $hsp->[2];
+        $hsp0->[ 3] += $factor * $hsp->[3];
+        $hsp0->[ 4] += $factor * $hsp->[4];
+        $hsp0->[10]  = $hsp->[10];
+        $hsp0->[13]  = $hsp->[13];
+    }
+
+    $hsp0->[0] = int( $hsp0->[0] );
+    $hsp0->[2] = int( $hsp0->[2] );
+    $hsp0->[3] = int( $hsp0->[3] );
+    $hsp0->[4] = int( $hsp0->[4] );
+
+    $hsp0;
+}
+
+
+sub s_mid { $_[0]->[12] + $_[0]->[13] }
+
+
+#-------------------------------------------------------------------------------
+#  Do a PSI-BLAST search:
 #
 #   $structured_blast = blastpgp(  $dbfile,  $profilefile, \%options )
 #   $structured_blast = blastpgp( \@dbseq,   $profilefile, \%options )
@@ -462,7 +625,7 @@ sub one_real_hsp
 #     e_value     =>  $max_e_value   # maximum E-value of matches (D = 0.01)
 #     max_e_value =>  $max_e_value   # maximum E-value of matches (D = 0.01)
 #     n_result    =>  $max_results   # maximum matches returned (D = 1000)
-#     n_thread    =>  $n_thread      # number of blastpgp threads (D = 2)
+#     n_thread    =>  $n_thread      # number of blastpgp threads (D = 4)
 #     stderr      =>  $file          # place to send blast stderr (D = /dev/null)
 #     query       =>  $q_file_name   # most complete
 #     query       => \@q_seq_entry   # most complete
@@ -483,8 +646,10 @@ sub blastpgp
             && @$db
             || print STDERR "blastpgp requires one or more database sequences.\n"
                && return undef;
-        $dbfile = SeedAware::new_file_name( "$tmp/blastpgp_db" );
-        gjoseqlib::print_alignment_as_fasta( $dbfile, $db );
+        my $dbfh;
+        ( $dbfh, $dbfile ) = SeedAware::open_tmp_file( "blastpgp_db", '', $tmp );
+        gjoseqlib::write_fasta( $dbfh, $db );
+        close( $dbfh );
         $rm_db = 1;
     }
     elsif ( defined $db && -f $db )
@@ -502,10 +667,13 @@ sub blastpgp
     {
         ref $profile eq 'ARRAY'
             && @$profile
-            || print STDERR "blastpgp requires one or more profile sequences.\n"
-               && return undef;
-        $proffile = SeedAware::new_file_name( "$tmp/blastpgp_profile" );
-        &print_alignment_as_pseudoclustal( $profile,  { file => $proffile, upper => 1 } );
+            or print STDERR "blastpgp requires one or more profile sequences.\n"
+               and return undef;
+        my $proffh;
+        ( $proffh, $proffile ) = SeedAware::open_tmp_file( "blastpgp_profile", '', $tmp );
+        #  Uppercase is critical to the behavior of blastpgp
+        &print_alignment_as_pseudoclustal( $profile,  { file => $proffh, upper => 1 } );
+        close( $proffh );
         $rm_profile = 1;
     }
     elsif ( defined $profile && -f $profile )
@@ -514,7 +682,8 @@ sub blastpgp
     }
     else
     {
-        die "blastpgp requires profile.";
+        print STDERR "blastpgp requires a profile."
+            and return undef;
     }
 
     my ( $qfile, $rm_query );
@@ -525,32 +694,42 @@ sub blastpgp
             or print STDERR "blastpgp invalid query sequence.\n"
                and return undef;
 
-        $qfile = SeedAware::new_file_name( "$tmp/blastpgp_query" );
-        gjoseqlib::print_alignment_as_fasta( $qfile, [$query] );
+        my $qfh;
+        ( $qfh, $qfile ) = SeedAware::open_tmp_file( "blastpgp_query", '', $tmp );
+        gjoseqlib::write_fasta( $qfh, [$query] );
+        close( $qfh );
         $rm_query = 1;
     }
     elsif ( defined $query && -f $query )
     {
         $qfile = $query;
         ( $query ) = gjoseqlib::read_fasta( $qfile );
+        $query
+            or print STDERR "blastpgp failed to get query from '$qfile'."
+                and return undef;
     }
     elsif ( $profile )    #  Build it from profile
     {
-        $query = &representative_for_profile( $profile );
-        $qfile = SeedAware::new_file_name( "$tmp/blastpgp_query" );
-        gjoseqlib::print_alignment_as_fasta( $qfile, [$query] );
+        $query = &representative_for_profile( $profile )
+            or print STDERR "blastpgp failed to get query from the profile."
+                and return undef;
+        my $qfh;
+        ( $qfh, $qfile ) = SeedAware::open_tmp_file( "blastpgp_query", '', $tmp );
+        gjoseqlib::write_fasta( $qfh, [$query] );
+        close( $qfh );
         $rm_query = 1;
     }
     else
     {
-        die "blastpgp requires database.";
+        print STDERR "blastpgp requires a query."
+            and return undef;
     }
 
     $opts->{ query_used } = $query;
 
-    my $e_val = $opts->{ e_value }  || $opts->{ max_e_val } || $opts->{ max_e_value }            ||    0.01;
-    my $n_cpu = $opts->{ n_thread } || $opts->{ nthread } || $opts->{ n_cpu } || $opts->{ ncpu } ||    2;
-    my $nkeep = $opts->{ n_result } || $opts->{ nresult }                                        || 1000;
+    my $e_val = $opts->{ e_value }  || $opts->{ max_e_val } || $opts->{ max_e_value }              ||    0.01;
+    my $n_cpu = $opts->{ n_thread } || $opts->{ nthread }   || $opts->{ n_cpu } || $opts->{ ncpu } ||    4;
+    my $nkeep = $opts->{ n_result } || $opts->{ nresult }                                          || 1000;
 
     my $blastpgp = SeedAware::executable_for( 'blastpgp' )
         or print STDERR "Could not find executable for program 'blastpgp'.\n"
@@ -607,7 +786,7 @@ sub blastpgp
 #     max_e_val  =>  $max_e_value   # D = 0.01
 #     n_cpu      =>  $n_cpu         # synonym of n_thread
 #     n_result   =>  $max_seq       # D = 1000
-#     n_thread   =>  $n_cpu         # D = 1
+#     n_thread   =>  $n_cpu         # D = 4
 #     query      =>  $q_file_name   # most complete
 #     query      => \@q_seq_entry   # most complete
 #     query_used => \@q_seq_entry   # output
@@ -626,8 +805,8 @@ sub blastpgpn
     my $tmp = SeedAware::location_of_tmp( $opts );
 
     $opts->{ aa_db_file } ||= $opts->{ prot_file } if defined $opts->{ prot_file };
-    my $dbfile =   $opts->{ aa_db_file } || SeedAware::new_file_name( "$tmp/blastpgpn_db" );
-    my $rm_db  = ! $opts->{ aa_db_file };
+    my $dbfile = $opts->{ aa_db_file };
+    my $rm_db  = ! ( $dbfile && -f $dbfile );
     if ( defined $dbfile && -f $dbfile && -s $dbfile )
     {
         #  The tranaslated sequence database exists
@@ -640,25 +819,45 @@ sub blastpgpn
                 && @$ndb
                 || print STDERR "Bad sequence reference passed to blastpgpn.\n"
                    && return undef;
-            my @pdb = map { six_translations( $_ ) } @$ndb;
-            gjoseqlib::print_alignment_as_fasta( $dbfile, \@pdb );
+            my $dbfh;
+            if ( $dbfile )
+            {
+                open( $dbfh, '>', $dbfile );
+            }
+            else
+            {
+                ( $dbfh, $dbfile ) = SeedAware::open_tmp_file( "blastpgpn_db", '', $tmp );
+            }
+            $dbfh or print STDERR 'Could not open $dbfile.'
+                and return undef;
+            foreach ( @$ndb )
+            {
+                gjoseqlib::write_alignment_as_fasta( $dbfh, six_translations( $_ ) );
+            }
+            close( $dbfh );
         }
         elsif ( -f $ndb && -s $ndb )
         {
-            open( PDB, ">$dbfile" )
+            my $dbfh;
+            open( $dbfh, '>', $dbfile )
                 or print STDERR "Could not open protein database file '$dbfile'.\n"
                     and return undef;
             my $entry;
             while ( $entry = gjoseqlib::next_fasta_entry( $ndb ) )
             {
-                gjoseqlib::write_alignment_as_fasta( \*PDB, six_translations( $entry ) );
+                gjoseqlib::write_alignment_as_fasta( $dbfh, six_translations( $entry ) );
             }
-            close PDB;
+            close( $dbfh );
         }
         else
         {
-            die "blastpgpn requires a sequence database.";
+            print STDERR "blastpgpn requires a sequence database."
+                and return undef;
         }
+    }
+    else
+    {
+        die "blastpgpn requires a sequence database.";
     }
     verify_db( $dbfile, 'P' );  # protein
 
@@ -669,8 +868,10 @@ sub blastpgpn
             && @$profile
             || print STDERR "blastpgpn requires one or more profile sequences.\n"
                && return undef;
-        $proffile = SeedAware::new_file_name( "$tmp/blastpgpn_profile" );
-        &print_alignment_as_pseudoclustal( $profile,  { file => $proffile, upper => 1 } );
+        my $proffh;
+        ( $proffh, $proffile ) = SeedAware::open_tmp_file( "blastpgpn_profile", '', $tmp );
+        &print_alignment_as_pseudoclustal( $proffh,  { file => $proffile, upper => 1 } );
+        close( $proffh );
         $rm_profile = 1;
     }
     elsif ( defined $profile && -f $profile )
@@ -679,7 +880,8 @@ sub blastpgpn
     }
     else
     {
-        die "blastpgpn requires profile.";
+        print STDERR "blastpgpn requires profile."
+            and return undef;
     }
 
     my ( $qfile, $rm_query );
@@ -690,8 +892,10 @@ sub blastpgpn
             or print STDERR "blastpgpn invalid query sequence.\n"
                and return undef;
 
-        $qfile = SeedAware::new_file_name( "$tmp/blastpgpn_query" );
-        gjoseqlib::print_alignment_as_fasta( $qfile, [$query] );
+        my $qfh;
+        ( $qfh, $qfile ) = SeedAware::open_tmp_file( "blastpgpn_query", '', $tmp );
+        gjoseqlib::write_fasta( $qfh, [$query] );
+        close( $qfh );
         $rm_query = 1;
     }
     elsif ( defined $query && -f $query )
@@ -702,20 +906,23 @@ sub blastpgpn
     elsif ( $profile )    #  Build it from profile
     {
         $query = &representative_for_profile( $profile );
-        $qfile = SeedAware::new_file_name( "$tmp/blastpgpn_query" );
-        gjoseqlib::print_alignment_as_fasta( $qfile, [$query] );
+        my $qfh;
+        ( $qfh, $qfile ) = SeedAware::open_tmp_file( "blastpgpn_query", '', $tmp );
+        gjoseqlib::write_fasta( $qfh, [$query] );
+        close( $qfh );
         $rm_query = 1;
     }
     else
     {
-        die "blastpgpn requires database.";
+        print STDERR "blastpgpn requires a query."
+            and return undef;
     }
 
     $opts->{ query_used } = $query;
 
-    my $e_val = $opts->{ e_value }  || $opts->{ max_e_val } || $opts->{ max_e_value }            ||    0.01;
-    my $n_cpu = $opts->{ n_thread } || $opts->{ nthread } || $opts->{ n_cpu } || $opts->{ ncpu } ||    2;
-    my $nkeep = $opts->{ n_result } || $opts->{ nresult }                                        || 1000;
+    my $e_val = $opts->{ e_value }  || $opts->{ max_e_val } || $opts->{ max_e_value }              ||    0.01;
+    my $n_cpu = $opts->{ n_thread } || $opts->{ nthread }   || $opts->{ n_cpu } || $opts->{ ncpu } ||    4;
+    my $nkeep = $opts->{ n_result } || $opts->{ nresult }                                          || 1000;
 
     my $blastpgp = SeedAware::executable_for( 'blastpgp' )
         or print STDERR "Could not find executable for program 'blastpgp'.\n"

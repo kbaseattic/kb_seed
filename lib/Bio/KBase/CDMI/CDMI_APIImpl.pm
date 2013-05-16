@@ -5040,13 +5040,15 @@ sub fids_to_feature_data
         my $function = $function{$fid}     || '';
         my $pubrefs  = $publications{$fid} || [];
         my $loc      = $location{$fid} || [];
-        my @locO     = map { [$_->Contig, $_->Begin, $_->Dir, $_->Length] } Bio::KBase::CDMI::CDMI::FormatLocations(@$loc);
+       # my @locO     = map { [$_->Contig, $_->Begin, $_->Dir, $_->Length] } Bio::KBase::CDMI::CDMI::FormatLocations(@$loc);
+        
         $return->{$fid} = { feature_id           => $fid,
                             genome_name          => $genome{$fid},
                             feature_function     => $function,
                             feature_length       => $len{$fid},
                             feature_publications => $pubrefs,
-                            feature_location     => \@locO
+                            feature_location     => \@$loc
+                            #feature_location     => \@locO
                            };
     }
     return($return);

@@ -4890,4 +4890,89 @@ sub set_difference
 }
 
 
+#-----------------------------------------------------------------------------
+#  Find a subset of tips to represent the tree.
+#  A tip that is not close to any other tip is kept as a representative tip.
+#
+#    @rep_tips = representative_tips( $tree, \%options )
+#   \@rep_tips = representative_tips( $tree, \%options )
+#
+#  Options:
+#
+#     dist => tip-to-tip distance threshold   # D = 0.1
+#
+#-----------------------------------------------------------------------------
+sub representative_tips
+{
+    my ($tree, $opts) = @_;
+    $opts->{dist} ||= 0.1;
+
+    my ( $solid, $shaky ) = rep_tips_with_dist( $tree, $opts );
+    my @rep_tips = ( @$solid, map { $_->[1] } @$shaky );
+
+    wantarray ? @rep_tips : \@rep_tips;
+}
+
+sub rep_tips_with_dist
+{
+    my ($node,$args) = @_;
+
+    my $solid = [];
+    my $shaky = [];
+    my $cutoffD = $args->{dist} || $args->{close} || 0.1;
+
+    my $parentD = newick_x($node);
+    my $lbl = newick_lbl($node);
+
+    if (node_is_tip($node))
+    {
+	if ($cutoffD <= $parentD)
+	{
+	    push(@$solid,$lbl);
+	}
+	else
+	{
+	    push(@$shaky,[$parentD,$lbl]);
+	}
+    }
+    else
+    {
+	my @desc = newick_desc_list($node);
+	my @pool_of_shaky;
+	foreach my $d (@desc)
+	{
+	    my ($solidD,$shakyD) = rep_tips_with_dist($d,$args);
+	    push(@$solid,@$solidD);
+	    push(@pool_of_shaky,@$shakyD);
+	}
+	@pool_of_shaky = sort { $a->[0] <=> $b->[0] } @pool_of_shaky;
+	while ((@pool_of_shaky > 1) && (($pool_of_shaky[0]->[0] + $pool_of_shaky[1]->[0]) < $cutoffD))
+	{
+	    my $eliminate = shift @pool_of_shaky;
+	    $pool_of_shaky[0]->[1] = $eliminate->[1];
+	}
+	foreach my $tuple (@pool_of_shaky)
+	{
+	    my ($currentD,$lbl) = @$tuple;
+	    rep_tips_keep($solid,$shaky,$parentD,$cutoffD,$lbl,$currentD);
+	}
+    }
+    return ($solid,$shaky);
+}
+	   
+sub rep_tips_keep
+{
+    my ($solid,$shaky,$parentD,$cutoffD,$lbl,$currentD) = @_;
+
+    if (($currentD + $parentD) > $cutoffD)
+    {
+	push(@$solid,$lbl);
+    }
+    else
+    {
+	push(@$shaky,[$currentD+$parentD,$lbl]);
+    }
+}
+
+
 1;

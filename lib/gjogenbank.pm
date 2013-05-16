@@ -1240,7 +1240,10 @@ sub genbank_loc_2_cbdl
     return gb_loc_position( $loc, $acc )   if $loc =~ /^$position$/;
 
     my $paranthetical;
+    {
+       no warnings;
        $paranthetical = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    }
     my $complement = qr/(?:$contigid:)?complement$paranthetical/;
     return gb_loc_complement( $loc, $acc ) if $loc =~ /^$complement$/;
 
@@ -1333,7 +1336,10 @@ sub gb_loc_complement
     my ( $loc, $acc ) = @_;
 
     my $paranthetical;
-       $paranthetical    = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    {
+       no warnings;
+       $paranthetical = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    }
     my $contigid         = qr/[^\s:(),]+/;
     my $complement_parts = qr/(?:($contigid):)?complement($paranthetical)/;
 
@@ -1357,7 +1363,10 @@ sub gb_loc_join
     my ( $loc, $acc ) = @_;
 
     my $paranthetical;
-       $paranthetical    = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    {
+       no warnings;
+       $paranthetical = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    }
     my $contigid         = qr/[^\s:(),]+/;
     my $complement       = qr/(?:$contigid:)?complement$paranthetical/;
     my $join             = qr/(?:$contigid:)?join$paranthetical/;
@@ -1392,7 +1401,10 @@ sub gb_loc_order
     my ( $loc, $acc ) = @_;
 
     my $paranthetical;
-       $paranthetical    = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    {
+       no warnings;
+       $paranthetical = qr/\([^()]*(?:(??{$paranthetical})[^()]*)*\)/;
+    }
     my $contigid         = qr/[^\s:(),]+/;
     my $complement       = qr/(?:$contigid:)?complement$paranthetical/;
     my $join             = qr/(?:$contigid:)?join$paranthetical/;

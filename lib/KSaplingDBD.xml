@@ -35,9 +35,16 @@
     <Region name="GenoPheno">
       <Notes>The Genotype to Phenotype region contains data about the relationship between experimentally determined alleles in a DNA sequence and observed traits for plants.</Notes>
     </Region>
-    <Region name="MicrobePheno">
-      <Notes>The Microbial Phenotype region contains data about experiments performed on microbial organisms
-      in order to determine how each one reacts to certain conditions.</Notes>
+    <Region name="Experiment">
+      <Notes>The Experiment region contains general experimental data. More
+      specialized experimental data, such as expression data, links to
+      ExperimentalUnit such that multiple experiment types (e.g. fitness
+      and gene expression) may be tracked as part of one overarching
+      experiment.</Notes>
+    </Region>
+    <Region name="Strain">
+      <Notes>The Strain region contains data modeling strains of organisms derived
+      from a parent genome and their relationships.</Notes>
     </Region>
   </Regions>
   <Diagram height="800" width="700" ratio="0.7" size="90"
@@ -229,7 +236,7 @@
       <DisplayInfo theme="navy">
         <RegionInfo name="Expression" row="7" col="6" />
         <RegionInfo name="Models" row="9" col="1" />
-        <RegionInfo name="MicrobePheno" row="7" col="4" />
+        <RegionInfo name="Experiment" row="7" col="3" />
       </DisplayInfo>
       <Notes>A media describes the chemical content of the solution in which cells
       are grown in an experiment or for the purposes of a model. The key is the
@@ -243,9 +250,19 @@
         <Field name="name" type="string">
           <Notes>descriptive name of the media</Notes>
         </Field>
-        <Field name="is-minimal" type="boolean">
+        <Field name="is-minimal" type="semi-boolean">
           <Notes>TRUE if this is a minimal media, else FALSE</Notes>
         </Field>
+        <Field name="description" type="string">
+          <Notes>description of the media condition</Notes>
+        </Field>
+	<Field name="solid" type="semi-boolean">
+          <Notes>Whether the media is solid (True) or liquid (False).</Notes>
+        </Field>
+        <Field name="is-defined" type="semi-boolean">
+          <Notes>TRUE if this media condition is defined (all components explicitly
+          known)</Notes>
+         </Field>
         <Field name="source-id" type="string">
           <Notes>The ID of the media used by the data source.</Notes>
         </Field>
@@ -253,6 +270,29 @@
           <Notes>The general category of the media.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          media by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for a media
+          by solidity.</Notes>
+          <IndexFields>
+            <IndexField name="solid" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for a media
+          by whether it is defined.</Notes>
+          <IndexFields>
+            <IndexField name="is-defined" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Location" keyType="string">
       <DisplayInfo theme="navy">
@@ -282,7 +322,7 @@
       <DisplayInfo theme="navy">
         <RegionInfo name="Chemistry" row="1" col="2" />
         <RegionInfo name="Models" col="1" row="7" />
-        <RegionInfo name="MicrobePheno" row="7" col="6" />
+        <RegionInfo name="Experiment" row="7" col="5" />
       </DisplayInfo>
       <Notes>A compound is a chemical that participates in a reaction. Both
       ligands and reaction components are treated as compounds.</Notes>
@@ -518,7 +558,7 @@
     <Entity name="Publication" keyType="string">
       <DisplayInfo theme="green">
         <RegionInfo name="" row="1" col="1" />
-        <RegionInfo name="MicrobePheno" row="1" col="6" />
+        <RegionInfo name="Experiment" row="1" col="5" />
       </DisplayInfo>
       <Notes>Experimenters attach publications to experiments and
       protocols. Annotators attach publications to ProteinSequences.
@@ -722,7 +762,7 @@
         <RegionInfo name="Expression" row="7" col="2" />
         <RegionInfo name="Models" row="1" col="5" />
         <RegionInfo name="GenoPheno" row="1" col="4" />
-        <RegionInfo name="MicrobePheno" row="7" col="3" />
+        <RegionInfo name="Strain" row="5" col="1" />
         <RegionInfo name="Alignments" row="6" col="6" />
       </DisplayInfo>
       <Notes>The Kbase houses a large and growing set of genomes.  We
@@ -1030,7 +1070,8 @@
         <RegionInfo name="Subsystem" col="3" row="7" />
         <RegionInfo name="Annotations" col="3" row="3" />
         <RegionInfo name="Expression" col="2" row="2" />
-        <RegionInfo name="MicrobePheno" row="7" col="1" />
+        <RegionInfo name="Strain" row="1" col="1" />
+        <RegionInfo name="Experiment" row="7" col="7" />
         <RegionInfo name="Models" row="3" col="5" />
       </DisplayInfo>
       <Notes>A feature (sometimes also called a gene) is a part of a
@@ -1562,12 +1603,17 @@
     </Entity>
     <Entity name="Strain" keyType="string">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="1" row="5" />
+        <RegionInfo name="Experiment" col="1" row="3" />
+        <RegionInfo name="Strain" col="1" row="3" />
       </DisplayInfo>
       <Notes>This entity represents an organism derived from a genome or
       another organism with one or more modifications to the organism's
       genome.</Notes>
       <Fields>
+        <Field name="name" type="string">
+          <Notes>The common or laboratory name of the strain, e.g. DH5a or
+          JMP1004.</Notes>
+        </Field>
         <Field name="description" type="string">
           <Notes>A description of the strain, e.g. knockout/modification
           methods, resulting phenotypes, etc.</Notes>
@@ -1575,16 +1621,52 @@
         <Field name="source-id" type="string">
           <Notes>The ID of the strain used by the data source.</Notes>
         </Field>
-        <Field name="aggregateData" type="boolean">
+        <Field name="aggregateData" type="semi-boolean">
           <Notes>Denotes whether this entity represents a physical strain
           (False) or aggregate data calculated from one or more strains
           (True).</Notes>
         </Field>
+        <Field name="wildtype" type="semi-boolean">
+          <Notes>Denotes this strain is presumably identical to the parent
+          genome.</Notes>
+        </Field>
+        <Field name="referenceStrain" type="semi-boolean">
+          <Notes>Denotes whether this strain is a reference strain; e.g. it
+          is identical to the genome it's related to (True) or not (False).
+          In contrast to wildtype, a referenceStrain is abstract and does
+          not physically exist and is used for data that refers to a genome
+          but not a particular strain. There should only exist one reference
+          strain per genome and all reference strains are wildtype.
+          </Notes>
+        </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          strain by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for a strain
+          by whether it is a wildtype strain.</Notes>
+          <IndexFields>
+            <IndexField name="wildtype" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for a strain
+          by whether it represents aggregate data.</Notes>
+          <IndexFields>
+            <IndexField name="aggregateData" order="ascending" />
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="ExperimentalUnit" keyType="string">
       <DisplayInfo theme="gray" caption="Experimental\nUnit">
-        <RegionInfo name="MicrobePheno" col="1" row="3" />
+        <RegionInfo name="Experiment" col="1" row="3" />
       </DisplayInfo>
       <Notes>An ExperimentalUnit is a subset of an experiment consisting of
       a Strain, an Environment, and one or more Measurements on that
@@ -1595,102 +1677,205 @@
           <Notes>The ID of the experimental unit used by the data source.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          experimental unit by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
+    </Entity>
+    <Entity name="ExperimentalUnitGroup" keyType="string">
+      <DisplayInfo theme="gray" caption="Experimental\nUnitGroup">
+      	<RegionInfo name="Experiment" col="1" row="7" />
+      </DisplayInfo>
+      <Notes>An ExperimentalUnitGroup allows for grouping related experimental units
+      and their measurements - for instance measurements that were in the same plate.
+      </Notes>
+      <Fields>
+        <Field name="source-id" type="string">
+          <Notes>The ID of the experimental unit group used by the data source.</Notes>
+        </Field>
+        <Field name="name" type="string">
+          <Notes>The name of this group, if any.</Notes>
+        </Field>
+        <Field name="comments" type="string">
+          <Notes>Any comments about this group.</Notes>
+        </Field>
+        <Field name="groupType" type="string">
+          <Notes>The type of this grouping, for example '24 well plate', '96 well plate',
+          '384 well plate', 'microarray'.</Notes>
+        </Field>
+      </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          experimental unit group by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
+    </Entity>
+    <Entity name="TimeSeries" keyType="string">
+      <DisplayInfo theme="gray" caption="TimeSeries">
+      	<RegionInfo name="Experiment" col="1" row="5" />
+      </DisplayInfo>
+      <Notes>A TimeSeries provides a means to specify a series of experimental data
+      over time by ordering multiple ExperimentalUnits.
+      </Notes>
+      <Fields>
+        <Field name="source-id" type="string">
+          <Notes>The ID of the time series used by the data source.</Notes>
+        </Field>
+        <Field name="name" type="string">
+          <Notes>The name of this time series, if any.</Notes>
+        </Field>
+        <Field name="comments" type="string">
+          <Notes>Any comments regarding this time series.</Notes>
+        </Field>
+        <Field name="timeUnits" type="string">
+          <Notes>The units of time for this time series, e.g. 'seconds', 'hours', or more
+          abstractly, 'number of times culture grown to saturation.'</Notes>
+        </Field>
+      </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          time series by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Measurement" keyType="string">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="4" row="3" />
+        <RegionInfo name="Experiment" col="5" row="3" />
       </DisplayInfo>
       <Notes>A Measurement is a value generated by performing a protocol to
-      evaluate a phenotype on an ExperimentalUnit - e.g. a strain in an
+      evaluate a value on an ExperimentalUnit - e.g. a strain in an
       environment.</Notes>
       <Fields>
-        <Field name="timeSeries" type="string">
-          <Notes>A string containing time series data in the following
-          format: time1,value1;time2,value2;...timeN,valueN.</Notes>
-        </Field>
         <Field name="source-id" type="string">
           <Notes>The ID of the measurement used by the data source.</Notes>
         </Field>
         <Field name="value" type="float" null="1">
           <Notes>The value of the measurement.</Notes>
         </Field>
-        <Field name="mean" type="float">
+        <Field name="mean" type="float" null="1">
           <Notes>The mean of multiple replicates if they are included in the
           measurement.</Notes>
         </Field>
-        <Field name="median" type="float">
+        <Field name="median" type="float" null="1">
           <Notes>The median of multiple replicates if they are included in
           the measurement.</Notes>
         </Field>
-        <Field name="stddev" type="float">
+        <Field name="stddev" type="float" null="1">
           <Notes>The standard deviation of multiple replicates if they are
           included in the measurement.</Notes>
         </Field>
-        <Field name="N" type="float">
+        <Field name="N" type="int" null="1">
           <Notes>The number of replicates if they are included in the
           measurement.</Notes>
         </Field>
-        <Field name="p-value" type="float">
+        <Field name="p-value" type="float" null="1">
           <Notes>The p-value of multiple replicates if they are included in
           the measurement. The exact meaning of the p-value is specified in
-          the Phenotype object for this measurement.</Notes>
+          the MeasurementDescription object for this measurement.</Notes>
         </Field>
-        <Field name="Z-score" type="float">
+        <Field name="Z-score" type="float" null="1">
           <Notes>The Z-score of multiple replicates if they are included in
-          the measurement. The exact meaning of the p-value is specified in
-          the Phenotype object for this measurement.</Notes>
+          the measurement. The exact meaning of the Z-score is specified in
+          the MeasurementDescription object for this measurement.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          measurement by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
-    <Entity name="PhenotypeDescription" keyType="string">
-      <DisplayInfo theme="gray" caption="Phenotype\nDescription">
-        <RegionInfo name="MicrobePheno" col="6" row="5" />
+    <Entity name="MeasurementDescription" keyType="string">
+      <DisplayInfo theme="gray" caption="Measurement\nDescription">
+        <RegionInfo name="Experiment" col="7" row="3" />
       </DisplayInfo>
-      <Notes>A Phenotype is a measurable characteristic of an organism.</Notes>
+      <Notes>A MeasurementDescription provides information about a
+      measurement value.</Notes>
       <Fields>
         <Field name="name" type="string">
-          <Notes>The name of the phenotype.</Notes>
+          <Notes>The name of the measurement.</Notes>
         </Field>
-        <Field name="description" type="string">
-          <Notes>The description of the physical phenotype, how it is
+        <Field name="description" type="text">
+          <Notes>The description of the measurement, how it is
           measured, and what the measurement statistics mean.</Notes>
         </Field>
         <Field name="unitOfMeasure" type="string">
-          <Notes>The units of the measurement of the phenotype.</Notes>
+          <Notes>The units of the measurement.</Notes>
         </Field>
-		<Field name="source-id" type="string">
-          <Notes>The ID of the phenotype description used by the data source.</Notes>
+        <Field name="category" type="string">
+          <Notes>The category the measurement fits into, for example
+          phenotype, experimental input, environment.</Notes>
+        </Field>
+	<Field name="source-id" type="string">
+          <Notes>The ID of the measurement description used by the data source.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          measurement description by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
-    <Entity name="PhenotypeExperiment" keyType="string">
-      <DisplayInfo theme="gray" caption="Phenotype\nExperiment">
-        <RegionInfo name="MicrobePheno" col="4" row="1" />
+    <Entity name="ExperimentMeta" keyType="string">
+      <DisplayInfo theme="gray" caption="ExperimentMeta">
+        <RegionInfo name="Experiment" col="3" row="1" />
       </DisplayInfo>
-      <Notes>A PhenotypeExperiment, consisting of (potentially) multiple
-      strains, enviroments, and measurements of phenotypic information on
+      <Notes>An Experiment consists of (potentially) multiple
+      strains, environments, and measurements on
       those strains and environments.</Notes>
       <Fields>
-        <Field name="description" type="string">
-          <Notes> Design of the experiment including the numbers and types of
-          experimental units, phenotypes, replicates, sampling plan, and
-          analyses that are planned.</Notes>
+	<Field name="title" type="string">
+          <Notes> Title of the experiment.</Notes>
+        </Field>
+        <Field name="description" type="text">
+          <Notes> Description of the experiment including the experimental
+          plan, general results, and conclusions, if possible.</Notes>
         </Field>
         <Field name="source-id" type="string">
-          <Notes>The ID of the phenotype experiment used by the data source.</Notes>
+          <Notes>The ID of the experiment used by the data source.</Notes>
         </Field>
-        <Field name="dateUploaded" type="date">
-          <Notes>The date this experiment was loaded into the database</Notes>
+        <Field name="startDate" type="date">
+          <Notes>The date this experiment was started.</Notes>
         </Field>
-        <Field name="metadata" type="string">
+        <Field name="comments" type="text">
           <Notes>Any data describing the experiment that is not covered by
           the description field.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          experiment meta object by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Person" keyType="string">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="1" row="1" />
+        <RegionInfo name="Experiment" col="1" row="1" />
       </DisplayInfo>
       <Notes>A person represents a human affiliated in some way with Kbase.</Notes>
       <Fields>
@@ -1711,11 +1896,11 @@
         </Field>
       </Fields>
       <Indexes>
-        <Index>
+        <Index unique="1">
           <Notes>This index allows the user to search for a
           person by source ID.</Notes>
           <IndexFields>
-            <IndexField name="source-id" order="ascending" />
+            <IndexField name="source-id" order="ascending"/>
           </IndexFields>
         </Index>
         <Index>
@@ -1730,7 +1915,7 @@
     </Entity>
     <Entity name="Protocol" keyType="string">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="6" row="3" />
+        <RegionInfo name="Experiment" col="7" row="1" />
       </DisplayInfo>
       <Notes>A Protocol is a step by step set of instructions for
       performing a part of an experiment.</Notes>
@@ -1738,20 +1923,29 @@
         <Field name="name" type="string">
           <Notes>The name of the protocol.</Notes>
         </Field>
-        <Field name="description" type="string">
+        <Field name="description" type="text">
           <Notes>The step by step instructions for performing the experiment,
           including measurement details, materials, and equipment. A
           researcher should be able to reproduce the experimental results
           with this information.</Notes>
         </Field>
-		<Field name="source-id" type="string">
+	<Field name="source-id" type="string">
           <Notes>The ID of the protocol used by the data source.</Notes>
         </Field>
       </Fields>
+      <Indexes>
+        <Index unique="1">
+          <Notes>This index allows the user to search for a
+          protocol by source ID.</Notes>
+          <IndexFields>
+            <IndexField name="source-id" order="ascending"/>
+          </IndexFields>
+        </Index>
+      </Indexes>
     </Entity>
     <Entity name="Environment" keyType="string">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="4" row="5" />
+        <RegionInfo name="Experiment" col="5" row="3" />
       </DisplayInfo>
       <Notes>An Environment is a set of conditions for microbial growth,
       including temperature, aerobicity, media, and supplementary
@@ -1760,14 +1954,16 @@
         <Field name="temperature" type="float">
           <Notes>The temperature in Kelvin.</Notes>
         </Field>
-		<Field name="description" type="string">
+	<Field name="description" type="string">
           <Notes>A description of the environment.</Notes>
         </Field>
-        <Field name="anaerobic" type="boolean">
-          <Notes>Whether the environment is anaerobic (True) or aerobic
-          (False).</Notes>
+        <Field name="oxygenConcentration" type="float">
+          <Notes>The oxygen concentration in the environment in Molar (mol/L).
+          A value of -1 indicates that there is oxygen in the environment
+          but the concentration is not known, (e.g. an open air shake flask
+          experiment).</Notes>
         </Field>
-        <Field name="pH" type="float">
+        <Field name="pH" type="float" null="1">
           <Notes>The pH of the media used in the environment.</Notes>
         </Field>
         <Field name="source-id" type="string">
@@ -1775,14 +1971,42 @@
         </Field>
       </Fields>
       <Indexes>
-        <Index>
+        <Index unique="1">
           <Notes>This index allows the user to search for an
           environment by source ID.</Notes>
           <IndexFields>
             <IndexField name="source-id" order="ascending" />
           </IndexFields>
         </Index>
+        <Index>
+          <Notes>This index allows the user to search for an environment
+          by temperature.</Notes>
+          <IndexFields>
+            <IndexField name="temperature" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for an environment
+          by pH.</Notes>
+          <IndexFields>
+            <IndexField name="pH" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the user to search for an environment
+          by oxygen concentration.</Notes>
+          <IndexFields>
+            <IndexField name="oxygenConcentration" order="ascending" />
+          </IndexFields>
+        </Index>
       </Indexes>
+    </Entity>
+    <Entity name="Parameter" keyType="string">
+      <DisplayInfo theme="gray">
+        <RegionInfo name="Experiment" col="5" row="5" />
+      </DisplayInfo>
+      <Notes>A parameter is the name of some quantity that has a value.
+      </Notes>
     </Entity>
   </Entities>
   <Relationships>
@@ -1845,110 +2069,109 @@
         </Field>
       </Fields>
     </Relationship>
-    <Relationship name="DerivedFromStrain" from="Strain"
-      to="Strain" arity="1M" converse="StrainParentOf">
+    <Relationship name="StrainParentOf" from="Strain"
+      to="Strain" arity="1M" converse="DerivedFromStrain">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" col="2" row="5" fixed="1"
-                    caption="Derived\nFrom Strain" />
+        <RegionInfo name="Strain" caption="Strain\nParentOf" />
       </DisplayInfo>
-      <Notes>The recursive DerivedFromStrain relationship organizes derived
+      <Notes>The recursive StrainParentOf relationship organizes derived
       organisms into a tree based on parent/child relationships.</Notes>
     </Relationship>
     <Relationship name="GenomeParentOf" from="Genome"
       to="Strain" arity="1M" converse="DerivedFromGenome">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Derived\nFrom Genome"/>
+        <RegionInfo name="Strain" caption="Genome\nParentOf"/>
       </DisplayInfo>
-      <Notes>The DerivedFromGenome relationship specifies the direct child
+      <Notes>The GenomeParentOf relationship specifies the direct child
       strains of a specific genome.</Notes>
     </Relationship>
     <Relationship name="HasKnockoutIn" from="Strain" to="Feature"
       arity="MM" converse="KnockedOutIn">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Has\nKnockout\nIn"/>
+        <RegionInfo name="Strain" caption="Has\nKnockout\nIn"/>
       </DisplayInfo>
       <Notes>The HasKnockoutIn relationship specifies the gene knockouts in
       a particular strain.</Notes>
     </Relationship>
-    <Relationship name="BelongsTo" from="Strain" to="ExperimentalUnit"
+    <Relationship name="EvaluatedIn" from="Strain" to="ExperimentalUnit"
       arity="1M" converse="IncludesStrain">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Includes\nStrain"/>
+        <RegionInfo name="Experiment" caption="Evaluated\nIn"/>
       </DisplayInfo>
-      <Notes>The BelongsTo relationship specifies the experimental
+      <Notes>The EvaluatedIn relationship specifies the experimental
       units performed on a particular strain.</Notes>
     </Relationship>
     <Relationship name="HasMeasurement" from="ExperimentalUnit"
       to="Measurement" arity="1M" converse="IsMeasureOf">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Has\nMeasurement"/>
+        <RegionInfo name="Experiment" caption="Has\nMeasurement"/>
       </DisplayInfo>
-      <Notes>The HasMeasurement relationship specifies a measurement
+      <Notes>The HasMeasurement relationship specifies a measurement(s)
       performed on a particular experimental unit.</Notes>
     </Relationship>
-    <Relationship name="HasAssociatedMeasurement" from="PhenotypeDescription"
-      to="Measurement" arity="1M" converse="MeasuresPhenotype">
+    <Relationship name="DescribesMeasurement" from="MeasurementDescription"
+      to="Measurement" arity="1M" converse="IsDefinedBy">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Measures\nPhenotype"/>
+        <RegionInfo name="Experiment" caption="Describes\nMeasurement"/>
       </DisplayInfo>
-      <Notes>The HasAssociatedMeasurement relationship specifies a measurement that
-      measures a phenotype.</Notes>
+      <Notes>The DescribesMeasurement relationship specifies a description
+      for a particular measurement.</Notes>
     </Relationship>
-    <Relationship name="HasExperimentalUnit" from="PhenotypeExperiment"
+    <Relationship name="HasExperimentalUnit" from="ExperimentMeta"
       to="ExperimentalUnit" arity="1M" converse="IsExperimentalUnitOf">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno"  caption="Has\nExperimental\nUnit"/>
+        <RegionInfo name="Experiment"  caption="Has\nExperimental\nUnit"/>
       </DisplayInfo>
       <Notes>The HasExperimentalUnit relationship describes which
-      ExperimentalUnits are part of a PhenotypeExperiment.</Notes>
+      ExperimentalUnits are part of a Experiment.</Notes>
     </Relationship>
     <Relationship name="PublishedExperiment" from="Publication"
-      to="PhenotypeExperiment" arity="MM" converse="ExperimentPublishedIn">
+      to="ExperimentMeta" arity="MM" converse="ExperimentPublishedIn">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Experiment\nPublished In"/>
+        <RegionInfo name="Experiment" caption="Published\nExperiment"/>
       </DisplayInfo>
-      <Notes>The ExperimentPublishedIn relationship describes where a
+      <Notes>The PublishedExperiment relationship describes where a
       particular experiment was published.</Notes>
     </Relationship>
     <Relationship name="IsMeasurementMethodOf" from="Protocol"
       to="Measurement" arity="1M" converse="WasMeasuredBy">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Was\nMeasured\nBy"/>
+        <RegionInfo name="Experiment" caption="IsMeasurement\nMethodOf"/>
       </DisplayInfo>
       <Notes>The IsMeasurementMethodOf relationship describes which protocol
-      was used to make a measurement.</Notes>
+      was used to take a measurement.</Notes>
     </Relationship>
     <Relationship name="PublishedProtocol" from="Publication"
       to="Protocol" arity="1M" converse="ProtocolPublishedIn">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Published\nProtocol"/>
+        <RegionInfo name="Experiment" caption="Published\nProtocol"/>
       </DisplayInfo>
       <Notes>The ProtocolPublishedIn relationship describes where a
       particular protocol was published.</Notes>
     </Relationship>
-    <Relationship name="UsedInExperimentalUnit" from="Environment"
+    <Relationship name="IsContextOf" from="Environment"
       to="ExperimentalUnit" arity="1M" converse="HasEnvironment">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Has\nEnvironment"/>
+        <RegionInfo name="Experiment" caption="IsContextOf"/>
       </DisplayInfo>
-      <Notes>The HasEnvironment relationship describes the enviroment a
-      subexperiment defined by Experimental unit was performed in.</Notes>
+      <Notes>The IsContextOf relationship describes the enviroment a
+      subexperiment defined by an ExperimentalUnit was performed in.</Notes>
     </Relationship>
-    <Relationship name="UsedBy" from="Media" to="Environment"
-      arity="1M" converse="UsesMedia">
+    <Relationship name="UsedIn" from="Media" to="Environment"
+      arity="1M" converse="HasMedia">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Uses\nMedia"/>
+        <RegionInfo name="Experiment" caption="UsedIn"/>
       </DisplayInfo>
-      <Notes>The UsesMedia relationship defines which media is used by an
+      <Notes>The UsedIn relationship defines which media is used by an
       Environment.</Notes>
     </Relationship>
     <Relationship name="PerformedExperiment" from="Person"
-      to="PhenotypeExperiment" arity="MM" converse="PerformedBy">
+      to="ExperimentMeta" arity="MM" converse="PerformedBy">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Performed\nExperiment"/>
+        <RegionInfo name="Experiment" caption="Performed\nExperiment"/>
       </DisplayInfo>
       <Notes>Denotes that a Person was associated with a
-      PhenotypeExperiment in some role.</Notes>
+      Experiment in some role.</Notes>
       <Fields>
         <Field name="role" type="string">
           <Notes>Describes the role the person played in the experiment.
@@ -1960,34 +2183,39 @@
       arity="MM" converse="IsPresentIn">
       <DisplayInfo theme="navy">
         <RegionInfo name="Models" caption="Is\nPresent\nIn" />
-        <RegionInfo name="MicrobePheno" caption="Has\nPresence\nOf"/>
+        <RegionInfo name="Experiment" caption="Has\nPresence\nOf"/>
       </DisplayInfo>
       <Notes>This relationship connects a media to the compounds that
       occur in it. The intersection data describes how much of each
       compound can be found.</Notes>
       <Fields>
-        <Field name="concentration" type="float">
-          <Notes>concentration of the compound in the media</Notes>
+        <Field name="concentration" type="float" null="1">
+          <Notes>The concentration of the compound in the media.
+          A null value indicates that although the compound is
+          present in the media, its concentration is not specified.
+          This is typically the case for model medias which do not
+          have physical analogs.</Notes>
         </Field>
-        <Field name="maximum-flux" type="float">
-          <Notes>maximum allowed increase in this compound</Notes>
-        </Field>
-        <Field name="minimum-flux" type="float">
-          <Notes>maximum allowed decrease in this compound</Notes>
+        <Field name="units" type="string">
+          <Notes>vol%, g/L, or molar (mol/L).</Notes>
         </Field>
       </Fields>
     </Relationship>
     <Relationship name="IncludesAdditionalCompounds" from="Environment"
       to="Compound" arity="MM" converse="IncludedIn">
       <DisplayInfo theme="gray">
-        <RegionInfo name="MicrobePheno" caption="Includes\nAdditional\nCompounds"/>
+        <RegionInfo name="Experiment" caption="Includes\nAdditional\nCompounds"/>
       </DisplayInfo>
       <Notes>This relationship connects a environment to the compounds that
       occur in it. The intersection data describes how much of each
       compound can be found.</Notes>
       <Fields>
-        <Field name="concentration" type="float">
-          <Notes>concentration of the compound in the environment</Notes>
+        <Field name="concentration" type="float" null="1">
+          <Notes>The concentration of the compound in the environment.
+          A null value indicates that although the compound is
+          present in the environment, its concentration is not specified.
+          This is typically the case for model environments which do not
+          have physical analogs.</Notes>
         </Field>
         <Field name="units" type="string">
           <Notes>vol%, g/L, or molar (mol/L).</Notes>
@@ -2359,7 +2587,7 @@
     <Relationship name="ConsistsOfCompounds" from="Compound"
       to="Compound" arity="MM" converse="ComponentOf">
       <DisplayInfo theme="navy">
-        <RegionInfo name="MicrobePheno" caption="Consists Of\nCompounds"
+        <RegionInfo name="Experiment" caption="Consists Of\nCompounds"
                     row="8" col="6" fixed="1"/>
       </DisplayInfo>
       <Notes>This relationship defines the subcompounds that make up a
@@ -3213,14 +3441,17 @@
       <DisplayInfo theme="green">
         <RegionInfo name="" caption="Is\nLocated\nIn" />
       </DisplayInfo>
-      <Notes>A feature is a set of DNA sequence fragments. Most features
-      are a single contiquous fragment, so they are located in only one
-      DNA sequence; however, fragments have a maximum length, so even a
-      single contiguous feature may participate in this relationship
-      multiple times. A few features belong to multiple DNA sequences. In
-      that case, however, all the DNA sequences belong to the same genome.
-      A DNA sequence itself will frequently have thousands of features
-      connected to it.</Notes>
+      <Notes>A feature is a set of DNA sequence fragments, the location of
+      which are specified by the fields of this relationship. Most features
+      are a single contiguous fragment, so they are located in only one
+      DNA sequence; however, for search optimization reasons, fragments
+      have a maximum length, so even a single contiguous feature may
+      participate in this relationship multiple times. Thus, it is better
+      to use the CDMI API methods to get feature positions and sequences
+      as those methods rejoin the fragements for contiguous features. A few
+      features belong to multiple DNA sequences. In that case, however, all
+      the DNA sequences belong to the same genome. A DNA sequence itself
+      will frequently have thousands of features connected to it.</Notes>
       <Fields>
         <Field name="ordinal" type="int">
           <Notes>Sequence number of this segment, starting from 1
@@ -3272,6 +3503,72 @@
       <Notes>The recursive IsGroupFor relationship organizes
       taxonomic groupings into a hierarchy based on the standard organism
       taxonomy.</Notes>
+    </Relationship>
+    <Relationship name="ContainsExperimentalUnit" from="ExperimentalUnitGroup"
+      to="ExperimentalUnit" arity="1M" converse="GroupedBy">
+      <DisplayInfo theme="gray" caption="Contains\nExperimentalUnit">
+        <RegionInfo name="Experiment" />
+      </DisplayInfo>
+      <Notes>Experimental units may be collected into groups, such as assay
+      plates. This relationship describes which experimenal units belong to
+      which groups.</Notes>
+      <Fields>
+        <Field name="location" type="string">
+          <Notes>The location, if any, of the experimental unit in the group.
+          Often a plate locator, e.g. 'G11' for 96 well plates.</Notes>
+        </Field>
+        <Field name="groupMeta" type="semi-boolean">
+          <Notes>Denotes that the associated ExperimentalUnit's data measures
+          the group as a whole - for example, summary statistics.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="OrdersExperimentalUnit" from="TimeSeries"
+      to="ExperimentalUnit" arity="1M" converse="IsTimepointOf">
+      <DisplayInfo theme="gray" caption="Orders\nExperimentalUnit">
+        <RegionInfo name="Experiment" />
+      </DisplayInfo>
+      <Notes>Experimental units may be ordered into time series. This
+      relationship describes which experimenal units belong to
+      which time series.</Notes>
+      <Fields>
+        <Field name="time" type="float">
+          <Notes>The time at which the associated ExperimentUnit's data
+          was taken.</Notes>
+        </Field>
+        <Field name="timeMeta" type="semi-boolean">
+          <Notes>Denotes that the associated ExperimentalUnit's data measures
+          the time series as a whole - for example, lag and doubling times
+          for bacterial growth curves.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+    <Relationship name="CompoundMeasuredBy" from="Compound"
+      to="Measurement" arity="1M" converse="MeasuresCompound">
+      <DisplayInfo theme="gray" caption="Compound\nMeasuredBy">
+        <RegionInfo name="Experiment"/>
+      </DisplayInfo>
+      <Notes>Denotes the compound that a measurement quantifies.</Notes>
+    </Relationship>
+    <Relationship name="FeatureMeasuredBy" from="Feature"
+      to="Measurement" arity="1M" converse="MeasuresFeature">
+      <DisplayInfo theme="gray" caption="Feature\nMeasuredBy">
+        <RegionInfo name="Experiment" />
+      </DisplayInfo>
+      <Notes>Denotes the feature that a measurement quantifies.</Notes>
+    </Relationship>
+    <Relationship name="HasParameter" from="Environment"
+      to="Parameter" arity="MM" converse="OfEnvironment">
+      <DisplayInfo theme="gray" caption="HasParameter">
+        <RegionInfo name="Experiment" />
+      </DisplayInfo>
+      <Notes>This relationship denotes which parameters each environment has,
+      as well as the value of the parameter.</Notes>
+      <Fields>
+        <Field name="value" type="string">
+          <Notes>The value of the parameter.</Notes>
+        </Field>
+      </Fields>
     </Relationship>
   </Relationships>
   <Shapes>

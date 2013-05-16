@@ -769,6 +769,57 @@ sub get_tables {
     return @ret;
 }
 
+=head3 table_columns
+
+    my @cols = $db->table_columns($table);
+
+Return a list of the columns in the specified table.
+
+NOTE: this has only been tested with MySQL so far, though it's supposed
+to work with all of the DBMS types.
+
+=over 4
+
+=item table
+
+Name of the table whose columns are desired.
+
+=item RETURN
+
+Returns a list of 3-tuples containing the name, SQL type, and
+nullability flag for each column of the table.
+
+=back
+
+=cut
+
+sub table_columns {
+    # Get the parameters.
+    my ($self, $table) = @_;
+    # Get a statement handle for the specified table.
+    my $sth = $self->{_dbh}->column_info(undef, $table, undef, undef);
+    # The results will go in here.
+    my @retVal;
+    # Loop through the columns.
+    while (my $row = $sth->fetchrow_hashref) {
+        # Get the column name.
+        my $name = $row->{COLUMN_NAME};
+        # Compute the data type.
+        my $type = $row->{TYPE_NAME};
+        if ($type =~ /CHAR$/i) {
+            $type .= "(" . $row->{COLUMN_SIZE} . ")";
+        }
+        # Compute the nullability.
+        my $nullable = ($row->{IS_NULLABLE} eq 'YES');
+        # Compute the column's position.
+        my $pos = $row->{ORDINAL_POSITION} - 1;
+        # Store all this information.
+        $retVal[$pos] = [$name, $type, $nullable];
+    }
+    # Return the result.
+    return @retVal;
+}
+
 =head3 table_exists
 
     my $existFlag = $db->table_exists($table);

@@ -40,6 +40,8 @@ package gjoseqlib;
 #
 #  ( $id, $def ) = parse_fasta_title( $title )
 #  ( $id, $def ) = split_fasta_title( $title )
+#  @id_def_org   = nr_def_as_id_def_org( $nr_seq_title )
+#  @id_def_org   = split_id_def_org( @seq_titles );
 #
 #  Write a fasta format file from sequences.
 #
@@ -218,6 +220,8 @@ our @EXPORT = qw(
         read_clustal
         parse_fasta_title
         split_fasta_title
+        nr_def_as_id_def_org
+        split_id_def_org
         print_seq_list_as_fasta
         print_alignment_as_fasta
         write_fasta
@@ -620,6 +624,84 @@ sub parse_fasta_title
 
 sub split_fasta_title { parse_fasta_title( @_ ) }
 
+
+#-------------------------------------------------------------------------------
+#  Some functions to split fasta file def lines into [id, definition, organism]
+#  These forms DO NOT want a > at the beinging of the line (it will become part
+#  of the id).
+#
+#     @id_def_org = nr_def_as_id_def_org( $nr_seq_title )
+#     @id_def_org = split_id_def_org( @seq_titles );
+#
+#-------------------------------------------------------------------------------
+#
+#  @id_def_org = nr_def_as_id_def_org( $nr_id_def_line );
+#
+sub nr_def_as_id_def_org
+{
+    defined($_[0]) ? split_id_def_org( split /\001/, $_[0] ) : ();
+}
+ 
+
+#
+#  @id_def_org = split_id_def_org( @id_def_org_lines );
+#
+sub split_id_def_org
+{
+    map { ! defined( $_ )                           ? ()              
+        : ! /^\s*\S/                                ? ()              
+        : /^\s*(\S+)\s+(.*\S)\s+\[([^\[\]]+)\]\s*$/ ? [ $1, $2, $3 ]  # id def org
+        : /^\s*(\S+)\s+\[([^\[\]]+)\]\s*$/          ? [ $1, '', $2 ]  # id     org
+        : /^\s*(\S+)\s+(.*[^\]\s])\s*$/             ? [ $1, $2, '' ]  # id def
+        : /^\s*(\S+)\s*$/                           ? [ $1, '', '' ]  # id
+        :                                             split_id_def_org_2( $_ );
+        } @_;
+}
+
+
+#
+#  @id_def_org = split_id_def_org( @id_def_org_lines );
+#
+sub split_id_def_org_2
+{
+    local $_ = $_[0];
+    s/^\s+//;
+    s/\s+$//;
+    # split into segments starting with [ or ]
+    my @parts = grep { defined($_) && length($_) } split /([\]\[][^\]\[]*)/;
+    my $n = 0;
+    for ( my $i = @parts-1; $i > 0; $i-- )
+    {
+        # a part starts with [ or ].
+        if    ( $parts[$i] =~ /^\[/ )
+        {
+            $n--;
+            #  If the open bracket balances, and there
+            #  is white space before, we are done
+            if ( $n == 0 && $parts[$i-1] =~ s/\s+$// )
+            {
+                my $def = join( '', @parts[  0 .. $i-1 ] );
+                $parts[$i]       =~ s/^\[\s*//;  # remove open bracket
+                $parts[@parts-1] =~ s/\s*\]$//;  # remove close bracket
+                my $org = join( '', @parts[ $i .. @parts-1 ] );
+                return $def =~ /^(\S+)\s+(\S.*)$/ ? [ $1, $2, $org ] : [ $def, '', $org ];
+            }
+        }
+        elsif ( $parts[$i] =~ /^\]/ )
+        {
+            $n++;
+        }
+        else
+        {
+            carp "Logic error in split_id_def_org_2()";
+            return /^(\S+)\s+(\S.*)$/ ? [ $1, $2, '' ] : [ $_, '', '' ];
+        }
+    }
+
+    #  Fall through means that we failed to balance organism brackets
+
+    /^(\S+)\s+(\S.*)$/ ? [ $1, $2, '' ] : [ $_, '', '' ];
+}
 
 #-----------------------------------------------------------------------------
 #  Helper function for defining an output filehandle:
