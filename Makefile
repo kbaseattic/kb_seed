@@ -17,6 +17,8 @@ SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVICE_PORT = 7032
 
 CLIENT_TESTS = $(wildcard t/client-tests/*.t)
+SERVER_TESTS = $(wildcard t/server-tests/*.t)
+PROD_TESTS = $(wildcard t/prod-tests/*.t)
 
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
@@ -100,7 +102,7 @@ java.out/built_flag: lib/CDMI-API.spec lib/CDMI-EntityAPI.spec
 	cd java.out; $(JAR) cf $(JAR) @tmp.files
 	touch java.out/built_flag
 
-test: test-client 
+test: test-client
 	echo "running client and script tests"
 
 # What does it mean to test a client. This is a test of a client
@@ -110,9 +112,33 @@ test: test-client
 # to the test-client target if it makes sense to you. This test
 # example assumes there is already a tested running server.
 test-client:
-	# run each test
+	# run each client test
 	for t in $(CLIENT_TESTS) ; do \
 		if [ -f $$t ] ; then \
+			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
+	
+test-server:
+	# run each server test
+	for t in $(SERVER_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			echo Running $$t ; \
+			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
+	
+test-prod-server:
+	# run each prod test
+	for t in $(PROD_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			echo Running $$t ; \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
 			if [ $$? -ne 0 ] ; then \
 				exit 1 ; \

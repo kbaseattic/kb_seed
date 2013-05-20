@@ -983,5 +983,55 @@ module CDMI_API : CDMI_API {
 
      funcdef alignment_by_id(aln_id) returns (alignment);
      funcdef tree_by_id(tree_id) returns (newick_tree);
+     
+     typedef string entity_name;
+     typedef list<entity_name> entity_names;
+     typedef string relationship_name;
+     typedef list<relationship_name> relationship_names;
+     typedef string field_name;
+     typedef int boolean;
+     
+     /* Returns a list of all entities in the database. */
+     funcdef all_entities() returns (entity_names);
+     
+     /* Returns a list of all relationships in the database. */
+     funcdef all_relationships() returns (relationship_names);
+     
+     /* Information about a field in the database. Includes the name of the 
+        field, any associated formatted notes, and the type. */
+     typedef structure {
+     	string name;
+     	string notes;
+     	string type;
+     } field_info;
+     
+     /* Information about an entity in the database, including the entity name
+        and its relationships and fields. */
+     typedef structure {
+	string name;
+	list<tuple<string rel_name, string entity_name>> relationships;
+	mapping<field_name, field_info> fields;
+     } entity_info;
 
+     /* Information about a relationship in the database, including the 
+        entities it relates, its name and converse name, and its fields.
+        The real_table boolean designates that the relationship is a real
+        table in the database rather than the converse relationship to that
+        table. */
+     typedef structure {
+	string name;
+	string from_entity;
+	string to_entity;
+	boolean real_table;
+	string converse;
+	mapping<field_name, field_info> fields;
+     } relationship_info;
+
+     /* Returns information about a set of entities in the database. Invalid
+        entity names are ignored. */
+     funcdef get_entity(entity_names) returns (mapping<string, entity_info>);
+     
+     /* Returns information about a set of relationships in the database. 
+        Invalid relationship names are ignored. */
+     funcdef get_relationship(relationship_names) returns (mapping<string, relationship_info>);
 };
