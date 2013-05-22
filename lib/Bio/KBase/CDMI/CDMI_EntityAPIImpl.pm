@@ -2860,8 +2860,7 @@ sub _get_relationship
 
     if (@$from_relfields)
     {
-	my %ids = keys %from_keys_for_rel;
-	my @ids = keys %ids;
+	my @ids = keys %from_keys_for_rel;
 
 	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
 
@@ -2885,8 +2884,7 @@ sub _get_relationship
 
     if (@$to_relfields)
     {
-	my %ids = keys %to_keys_for_rel;
-	my @ids = keys %ids;
+	my @ids = keys %to_keys_for_rel;
 
 	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
 
