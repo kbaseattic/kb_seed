@@ -39,7 +39,7 @@ is given below.
 
 =item regulons.###.tab
 
-Contains the Microbes Online gene ID of each gene in the regulon.
+Contains the ID of each gene in the regulon.
 
 =item binding_sites.###.tab
 
@@ -48,7 +48,7 @@ factors. There will generally be more than one such location.
 
 =item transcription_factors.###.tab
 
-Contains the Microbes Online gene ID of the regulon's transcription
+Contains the ID of the regulon's transcription
 factor.
 
 =back
@@ -69,6 +69,10 @@ L<Bio::KBase::CDMI::CDMI/new_for_script>, it supports the following.
 
 Re-create the four tables before beginning the load.
 
+=item source
+
+Source database for the IDs. If omitted, the IDs are assumed to be Kbase IDs.
+
 =back
 
 =cut
@@ -76,15 +80,18 @@ Re-create the four tables before beginning the load.
 # Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database using the command-line options.
-my $clear;
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear);
+my ($clear, $source);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear,
+        "source=s" => \$source);
 if (! $cdmi) {
     print "usage: CDMILoadRegPrecise [options] inDirectory\n";
 } else {
     # Create the loader object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    # Denote that IDs are from Microbes Online.
-    $loader->SetSource('MOL');
+    # Denote that IDs are from the specified source (if any).
+    if ($source) {
+        $loader->SetSource($source);
+    }
     # Extract the statistics object.
     my $stats = $loader->stats;
     # Get the input directory
@@ -116,12 +123,12 @@ if (! $cdmi) {
         $loader->SetRelations(@tables);
         # Get the regulon files.
         opendir(TMP, $inDirectory) || die "Could not open $inDirectory.\n";
-        my @regFiles = sort grep { $_ =~ /^regulons\.\d+\.tab$/ } readdir(TMP);
+        my @regFiles = sort grep { $_ =~ /^regulons\..+\.tab$/ } readdir(TMP);
         print scalar(@regFiles) . " regulon files found in $inDirectory.\n";
         # Loop through the files, processing each group of three.
         for my $regFile (@regFiles) {
-            # Extract the genome number.
-            my ($genome) = ($regFile =~ /regulons\.(\d+)/);
+            # Extract the genome ID.
+            my ($genome) = ($regFile =~ /regulons\.(.+)\.tab/);
             $stats->Add(genomes => 1);
             # Read in the three files. The first hash tracks the actual
             # data for each regulon. The second will track all of the
@@ -151,9 +158,16 @@ if (! $cdmi) {
                     }
                 }
             }
-            # Now we get the KBase feature IDs.
-            print "Interrogating ID server for $genome.\n";
-            my $idMap = $loader->FindKBaseIDs('Feature', [keys %features]);
+            # Now we get the KBase feature IDs, if necessary.
+            my $idMap;
+            if ($source) {
+                print "Interrogating ID server for $genome.\n";
+                $idMap = $loader->FindKBaseIDs('Feature', [keys %features]);
+            } else {
+                print "KBase IDs used for $genome.\n";
+                my %idMap = map { $_ => $_ } keys %features;
+                $idMap = \%idMap;
+            }
             # And now the KBase regulon IDs. Unlike the feature IDs, these don't
             # need to already exist in the database.
             my @regulons = keys %regData;
@@ -186,6 +200,7 @@ if (! $cdmi) {
                     for my $feature (@$features) {
                         my $kbFid = $idMap->{$feature};
                         if (! $kbFid) {
+                            print STDERR "Could not find member feature $feature for $genome.\n";
                             $stats->Add(memberFeatureNotFound => 1);
                         } else {
                             $loader->InsertObject('IsRegulatedIn', from_link => $kbFid,
@@ -201,6 +216,7 @@ if (! $cdmi) {
                     for my $factor (@$factors) {
                         my $kbFid = $idMap->{$factor};
                         if (! $kbFid) {
+                            print STDERR "Could not find factor feature $factor for $genome.\n";
                             $stats->Add(factorFeatureNotFound => 1);
                         } else {
                             $loader->InsertObject('Controls', from_link => $kbFid,

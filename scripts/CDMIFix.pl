@@ -9,16 +9,20 @@ use Data::Dumper;
     $| = 1; # Prevent buffering on STDOUT.
     my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
     my $stats = Stats->new();
-    # Get all the model links.
-    my @links = $cdmi->GetAll('IsModeledBy', "", [], 'to-link from-link');
-    $stats->Add(linesIn => scalar @links);
-    # Clear the table.
-    $cdmi->TruncateTable('IsModeledBy');
-    # Reload it with the links inverted.
-    for my $link (@links) {
-    	$cdmi->InsertObject('IsModeledBy', from_link => $link->[0], to_link => $link->[1]);
-    	$stats->Add(newLine => 1);
+    my %genomes;
+    my $query = $cdmi->Get("IsComposedOf", "ORDER BY IsComposedOf(from-link)", []);
+    while (my $row = $query->Fetch()) {
+        my ($from, $to) = $row->Values("from-link to-link");
+        $stats->Add(linkRow => 1);
+        if (substr($to, 0, length $from) ne $from) {
+            print "Contig $to does not match genome $from.\n";
+            $stats->Add(badLink => 1);
+            if (! $genomes{$from}) {
+                $stats->Add(badGenome => 1);
+                $genomes{$from} = 1;
+            }
+        }
     }
-    # All print.
+    # All done.
     print "All done:\n" . $stats->Show();
 

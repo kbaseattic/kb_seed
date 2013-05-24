@@ -685,7 +685,12 @@ sub LoadFeatures {
     my $batchSize = 0;
     while (defined $fid1) {
         # Compute the function for this feature.
-        my $fidFunction = $funcs{$fid1} || "";
+        my $fidFunction = $funcs{$fid1};
+        if (! defined $fidFunction) {
+            print STDERR "No function found for $fid1.\n";
+            $fidFunction = "";
+            $stats->Add(missingFunction => 1);
+        }
         # If this feature has aliases, save them.
         if (@aliases) {
             $aliasMap->{$fid1} = [@aliases];
@@ -817,7 +822,7 @@ sub ProcessFeatureBatch {
     }
     if ($validate) {
         # If we are validating, we simply insert the IDs into the
-        # ID map with a valud of 1.
+        # ID map with a value of 1.
         for my $type (keys %typemap) {
             for my $fid (@{$typemap{$type}}) {
                 $id_mapping->{$fid} = 1;

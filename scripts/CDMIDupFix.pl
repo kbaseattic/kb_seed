@@ -8,32 +8,30 @@ use Data::Dumper;
 
     $| = 1; # Prevent buffering on STDOUT.
     my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
-    my @genomes = $cdmi->GetFlat('Genome', '', [], 'id');
+    my @locComps = $cdmi->GetFlat('LocalizedCompound', '', [], 'id');
     my $stats = Stats->new();
-    for my $genome (@genomes) {
-        print "Processing $genome.\n";
-        my @locs = $cdmi->GetAll('IsLocatedIn', "IsLocatedIn(from-link) LIKE ? ORDER BY IsLocatedIn(from-link), IsLocatedIn(ordinal)", ["$genome%"],
-            "from-link ordinal begin dir len to-link");
-        my ($oldFid, $oldOrdinal, $oldBegin, $oldDir, $oldLen, $oldContig) =
-            ("", "", "", "", "", "", "");
-        print scalar(@locs) . " location records found for $genome.\n";
+    for my $locComp (@locComps) {
+        print "Processing $locComp.\n";
+        my @rows = $cdmi->GetAll('Involves', "Involves(to-link) = ? ORDER BY Involves(from-link), Involves(coefficient)", ["$locComp"],
+            "from-link coefficient to-link");
+        my ($oldFrom, $oldCoeff, $oldTo) =
+            ("", "", "");
+        print scalar(@rows) . " Involves records found for $locComp.\n";
         my $dups = 0;
-        for my $loc (@locs) {
-            my ($fid, $ordinal, $begin, $dir, $len, $contig) = @$loc;
-            if ($fid eq $oldFid && $begin eq $oldBegin && $ordinal eq $oldOrdinal) {
+        for my $row (@rows) {
+            my ($from, $coeff, $to) = @$row;
+            if ($from eq $oldFrom && $coeff eq $oldCoeff && $to eq $oldTo) {
                 $dups++;
                 # We need to delete one of the duplicates, but our only choice
                 # is to delete both, so we add one back afterward.
-                $cdmi->DeleteRow('IsLocatedIn', $fid, $contig, {ordinal => $ordinal});
-                $cdmi->InsertObject('IsLocatedIn', from_link => $fid,
-                    to_link => $contig, ordinal => $ordinal, begin => $begin,
-                    dir => $dir, len => $len);
+                $cdmi->DeleteRow('Involves', $from, $to, {coefficient => $coeff});
+                $cdmi->InsertObject('Involves', from_link => $from,
+                    to_link => $to, coefficient => $coeff);
             }
-            ($oldFid, $oldOrdinal, $oldBegin, $oldDir, $oldLen, $oldContig) =
-                ($fid, $ordinal, $begin, $dir, $len, $contig);
+            ($oldFrom, $oldCoeff, $oldTo) = ($from, $coeff, $to);
         }
-        print "$dups duplicates fixed in $genome.\n";
-        $stats->Add(genomes => 1);
+        print "$dups duplicates fixed in $locComp.\n";
+        $stats->Add(locComps => 1);
         $stats->Add(dups => $dups);
     }
     print "All done:\n" . $stats->Show();

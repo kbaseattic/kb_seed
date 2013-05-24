@@ -2668,6 +2668,8 @@ sub _get_entity
 {
     my($self, $ctx, $tbl, $ids, $fields) = @_;
 
+    return {} if @$ids == 0;
+
     my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
     
     my $filter = "id IN (" . join(", ", map { '?' } @$ids) . ")";
@@ -2754,6 +2756,8 @@ sub _get_entity
 sub _get_relationship
 {
     my($self, $ctx, $relationship, $table, $is_converse, $ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    return [] if @$ids == 0;
 
     my($from_tbl, $to_tbl) = @{$relationship_entities->{$relationship}};
     if (!$from_tbl)

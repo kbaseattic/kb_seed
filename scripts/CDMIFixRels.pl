@@ -20,26 +20,37 @@
     use strict;
     use Stats;
     use SeedUtils;
-    use Data::Dumper;
     use Bio::KBase::CDMI::CDMI;
-    use Bio::KBase::CDMI::CDMILoader;
 
+=head1 CDMI Relationship Integrity Check
 
-=head1 CDMI Test Script
+    CDMIFixRels [options] rel1 rel2 ...
 
-    CDMITest [options]
+This script analyzes relationships in a CDMI and deletes instances that
+link to entities that do not exist.
 
-The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>. There are
-no positional parameters.
+The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>.
+
+The positional parameters are the relationship names.
 
 =cut
 
+# Prevent buffering on STDOUT.
 $| = 1;
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
-    print "usage: CDMITest [options]\n";
+    print "usage: CDMIFixRels [options] rel1 rel2 ... \n";
 } else {
-    my $count = $cdmi->GetCount("Diagram", "", []);
-    print "Count = '$count'\n";
+    # Create the statistics object.
+    my $stats = Stats->new();
+    # Loop through the list of relationships.
+    for my $rel (@ARGV) {
+        print "Processing $rel.\n";
+        my $subStats = $cdmi->FixRelationship($rel);
+        print "Statistics for $rel:\n" . $subStats->Show();
+        $stats->Accumulate($subStats);
+    }
+    # Denote we're done.
+    print "All done.\n" . $stats->Show();
 }
