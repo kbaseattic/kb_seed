@@ -1,0 +1,11 @@
+OVERVIEW
+--------
+
+The kb_seed module contains an import of a large body of code from the SEED project. These
+imports are performed on a periodic basis as new features developed on the SEED side
+are required in the KBase codebase.
+
+VERSION - 1.057 - May 24, 2013.
+-------------------------------
+
+Latest import fixes KB bug 65.
