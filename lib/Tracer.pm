@@ -509,7 +509,7 @@ sub Trace {
         # Convert the message to HTML.
         my $escapedMessage = CGI::escapeHTML($stripped);
         # The stuff after the first line feed should be pre-formatted.
-        my @lines = split /\s*\n/, $escapedMessage;
+        my @lines = split m/\s*\n/, $escapedMessage;
         # Get the normal portion.
         my $line1 = shift @lines;
         print "<p>$timeStamp $LastCategory $LastLevel: $line1</p>\n";
@@ -1067,7 +1067,7 @@ sub LongMess {
     # Declare the return variable.
     my @retVal = ();
     my $confession = longmess("");
-    for my $line (split /\s*\n/, $confession) {
+    for my $line (split m/\s*\n/, $confession) {
         unless ($line =~ /Tracer\.pm/) {
             # Here we have a line worth keeping. Push it onto the result list.
             push @retVal, $line;

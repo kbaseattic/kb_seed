@@ -817,6 +817,9 @@ sub LoadSubsystems {
     # Compute the subsystem and binding file names.
     my $subFileName = "$self->{directory}/Subsystems/subsystems";
     my $bindFileName = "$self->{directory}/Subsystems/bindings";
+    # Get a hash of the molecular machines already connected to this genome.
+    my %machinesOld = map { $_ => 1 } $sap->GetFlat('Uses', 'Uses(from-link) = ?',
+            [$genome], 'to-link');
     # Only proceed if both exist.
     if (! -f $subFileName || ! -f $bindFileName) {
         Trace("Missing subsystem data for $genome.") if T(1);
@@ -863,9 +866,16 @@ sub LoadSubsystems {
                 # Now we create the molecular machine connecting this genome to the
                 # subsystem variant.
                 my $machineID = ERDB::DigestKey("$subsystem:$variantCode:$genome");
-                $sap->InsertObject('Uses', from_link => $genome, to_link => $machineID);
-                $sap->InsertObject('MolecularMachine', id => $machineID, curated => 0, region => '');
-                $sap->InsertObject('IsImplementedBy', from_link => $variantKey, to_link => $machineID);
+                # Does it already exist?
+                if ($machinesOld{$machineID}) {
+                    # Yes. Output a warning.
+                    Trace("Machine $machineID already found for $subsystem and genome $genome.") if T(1);
+                    $stats->Add(duplicateMachine => 1);
+                } else {
+                    $sap->InsertObject('Uses', from_link => $genome, to_link => $machineID);
+                    $sap->InsertObject('MolecularMachine', id => $machineID, curated => 0, region => '');
+                    $sap->InsertObject('IsImplementedBy', from_link => $variantKey, to_link => $machineID);
+                }
                 # Remember the machine ID.
                 $machines{$subsystem} = $machineID;
             }

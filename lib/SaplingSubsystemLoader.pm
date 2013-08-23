@@ -443,7 +443,7 @@ sub ParseSpreadsheet {
             my $curated = ($variant =~ /^\s*\*/ ? 0 : 1);
             my $realVariant = Starless($variant);
             # Check for a region string.
-            my ($genomeID, $regionString) = split /:/, $genome;
+            my ($genomeID, $regionString) = split m/:/, $genome;
             $regionString ||= "";
             # Compute the variant and molecular machine IDs.
             my $variantID = ERDB::DigestKey("$subsystem:$realVariant");
@@ -482,7 +482,7 @@ sub ParseSpreadsheet {
                     $sap->InsertObject('IsRoleOf', from_link => $roleHash{$abbr},
                                        to_link => $machineRoleID);
                     # Connect the pegs in this cell to it.
-                    for my $pegN (split /\s*,\s*/, $cell) {
+                    for my $pegN (split m/\s*,\s*/, $cell) {
                         $sap->InsertObject('Contains', from_link => $machineRoleID,
                                            to_link => "fig|$genomeID.peg.$pegN");
                     }

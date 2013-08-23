@@ -2294,7 +2294,7 @@ sub unlabel_internal_nodes {
     my $ptrs = $tree->[2];
     if (@$ptrs == 1) { return }
     my $i;
-    $tree->[0] = 0;
+    $tree->[0] = '';
     for ($i=1; ($i < @$ptrs); $i++)
     {
 	&unlabel_internal_nodes($ptrs->[$i]);

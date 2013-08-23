@@ -353,9 +353,10 @@ sub LoadExperiments {
         for (my $seqNo = 0; $seqNo < $expCount; $seqNo++) {
             my $name = $experiments[$seqNo];
             $expHash{$name} = $seqNo;
-            $sap->InsertObject('HasResultsIn', from_link => $self->{chip}, to_link => $name,
+            $sap->InsertObject('HasResultsIn', from_link => $self->{chip}, 
+                                to_link => "$self->{chip}:$name",
                                 sequence => $seqNo);
-            $sap->InsertObject('Experiment', id => $name, source => '');
+            $sap->InsertObject('Experiment', id => "$self->{chip}:$name", source => '');
             $stats->Add(experiments => 1);
         }
         # We'll use this to hold our input file handles.
@@ -376,8 +377,8 @@ sub LoadExperiments {
             for my $exp (@exps) {
                 if (! exists $expHash{$exp}) {
                     $sap->InsertObject('HasResultsIn', from_link => $self->{chip},
-                                        to_link => $exp, sequence => -1);
-                    $sap->InsertObject('Experiment', id => $exp, source => '');
+                                        to_link => "$self->{chip}:$exp", sequence => -1);
+                    $sap->InsertObject('Experiment', id => "$self->{chip}:$exp", source => '');
                     $stats->Add(extraExperiment => 1);
                 }
             }
@@ -411,7 +412,8 @@ sub LoadExperiments {
                     for (my $i = 0; $i <= $#exps; $i++) {
                         if (defined $signals->[$i]) {
                             # Here we have a signal for this experiment.
-                            $sap->InsertObject('HasIndicatedSignalFrom', to_link => $exps[$i],
+                            $sap->InsertObject('HasIndicatedSignalFrom', 
+                                                to_link => "$self->{chip}:$exps[$i]",
                                                 from_link => $fid, rma_value => $signals->[$i],
                                                 level => $onOffs[$i]);
                             $stats->Add(signalX => 1);
@@ -470,7 +472,7 @@ sub LoadExperiments {
                     my ($fidList, $desc) = Tracer::GetLine($ih);
                     $stats->Add(coregulations => 1);
                     # Compute the list of features in this set.
-                    my @fids = split /,/, $fidList;
+                    my @fids = split m/,/, $fidList;
                     # Create an ID for it.
                     my $setID = ERDB::DigestKey(join("-", sort @fids));
                     # Create the record for the set, if it's new.
@@ -519,7 +521,7 @@ sub LoadExperiments {
             # Compute the real regulon ID.
             my $realID = "$genome:$id";
             # Extract the expression levels.
-            my @levels = split /\s*,\s*/, $levelList;
+            my @levels = split m/\s*,\s*/, $levelList;
             my $levelCount = scalar @levels;
             if ($levelCount != $expCount) {
                 Trace("Vector $id for $genome has $levelCount levels for $expCount experiments.") if T(SaplingDataLoader => 2);
@@ -534,7 +536,8 @@ sub LoadExperiments {
                 if ($i >= $expCount) {
                     $stats->Add(extraExpressionVectorElement => 1);
                 } else {
-                    $sap->InsertObject('AffectsLevelOf', from_link => $experiments[$i],
+                    $sap->InsertObject('AffectsLevelOf', 
+                                        from_link => "$self->{chip}:$experiments[$i]",
                                         to_link => $realID, level => $levels[$i]);
                 }
             }

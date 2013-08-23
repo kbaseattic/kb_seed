@@ -1,8 +1,10 @@
-package gjoparseblast;
+﻿package gjoparseblast;
 
 # This is a SAS component
 #
 
+#===============================================================================
+#  2013-07-09  Fixed to handle blast+
 #===============================================================================
 #  This is a set of functions for reading blast output from a file, a pipe or
 #  an array reference (D = \*STDIN), and providing various perl interfaces.
@@ -594,6 +596,7 @@ sub next_blast_record
         if ( $hsp_ok && ( /^Query=/
                        || /^>/
                        || /^Parameters:/
+                       || /^Lambda +K +H +a +alpha/
                        || /^ +Score = /
                        || /^ +Plus Strand HSPs:/
                        || /^ +Minus Strand HSPs:/
@@ -640,11 +643,11 @@ sub next_blast_record
 
             while ( defined( $_ = nextline( $input ) ) )
             {
-                s/\s+$//;                       # trailing space
+                s/\s+$//;                       # trailing white space
 
                  #  Query length marks end of description
 
-                if ( /^  +\(([1-9][\d,]*) letters.*\)/ )
+                if ( /^  +\(([1-9][\d,]*) letters.*\)/ || /^Length=([1-9][\d,]*)$/ )
                 {
                     $qlen = $1;                 # grab query length
                     $qlen =~ s/,//g;            # get rid of commas
@@ -653,15 +656,20 @@ sub next_blast_record
                     return [ 'Query=', $qid, $qdef, $qlen ];   # return query description
                 }
 
-                #  Database before length is an error
+                #  Some error conditions
 
-                elsif ( /^Database:/ ) { last; }
+                elsif ( /^Database:/
+                     || /^Sequences producing significant alignments/
+                      )
+                {
+                    last;
+                }
 
                 #  Otherwise this is a continuation of the query description.
-                #  Remove leading white space.
+                #  Remove leading white space (blastall).
 
                 s/^\s+//;
-                $qdef .= ( $qdef =~ /-$/ ) ? $_ : " $_";
+                $qdef .= ( $qdef =~ /-$/ ) ? $_ : " $_" if /\S/;
             }
 
             #  Failed to get query length?
@@ -669,9 +677,9 @@ sub next_blast_record
             if ( ! $qlen )
             {
                 $_ || ( $_ = defined($_) ? "" : "[EOF]" );
-                print STDERR "Error parsing query definition for sequence length:\n";
-                print STDERR "$qid $qdef\n<<<here>>>\n$_\n\n";
-                print STDERR "Flushing this query sequence\n\n";
+                print STDERR "Error parsing query definition for sequence length:\n"
+                           . "$qid $qdef\n<<<here>>>\n$_\n\n"
+                           . "Flushing this query sequence\n\n";
                 next;
             }
         }
@@ -687,11 +695,11 @@ sub next_blast_record
 
             while ( defined( $_ = nextline( $input ) ) )
             {
-                chomp;
+                s/\s+$//;     # trailing white space
 
                 #  Length marks end of subject sequence description
 
-                if ( /^ +Length = ([1-9][\d,]*)/ )
+                if ( /^ +Length = ([1-9][\d,]*)/ || /^Length=([1-9][\d,]*)$/ )
                 {  
                     $slen = $1;
                     $slen =~ s/,//g;
@@ -704,16 +712,24 @@ sub next_blast_record
                     last;
                 }
 
-                #  Multiple spaces marks a continuation
+                #  Change in continuation means we need error check early
 
-                elsif ( s/^  +// )
+                elsif ( /^ Score =/ || /^Query= / )
                 {
-                    $sdef .= ( $sdef =~ /-$/ ) ? $_ : " $_";
+                    last;
                 }
 
-                #  Merged nr entries start with one space
+                #  Multiple spaces (blastall) or no space (blast+) mark continuation
 
-                elsif ( s/^ /\001/ ) {
+                elsif ( s/^  +// || /^\S/ )
+                {
+                    $sdef .= ( $sdef =~ /-$/ ) ? $_ : " $_" if /\S/;
+                }
+
+                #  Merged nr entries start with exactly one space (blastall)
+
+                elsif ( s/^ /\001/ )
+                {
                     $sdef .= $_;
                 }
 
@@ -738,7 +754,7 @@ sub next_blast_record
             $hsp_ok = 0;
 
             $s = $1;
-            if ( ! /Expect = +([^ ,]+)/ && ! /Expect[(]\d+[)] = +([^ ,]+)/ )
+            if ( ! /Expect(?:\(\d+\))? = +([^ ,]+)/ )
             {
                 print STDERR "Error parsing Score line for Expect:\n";
                 print STDERR "Query = $qid; Subject = $sid\n<<<here>>>\n$_\n";
@@ -750,7 +766,7 @@ sub next_blast_record
             $n = /Expect\((\d+)\)/ ? $1
                : /P\((\d+)\)/      ? $1
                :                      1;
-            $p = / = +(\S+)$/ ? $1 : $e;
+            $p = /P(?:\(\d+\))? += +(\S+)$/ ? $1 : $e;
 
             if ( ! defined( $_ = nextline( $input ) ) )
             {
@@ -759,7 +775,7 @@ sub next_blast_record
                 print STDERR "Flushing this HSP\n\n";
                 next;
             }
-            chomp;
+            s/\s+$//;
 
             if ( ! /^ Identities = +(\d+)\/(\d+)/ )
             {
@@ -786,23 +802,17 @@ sub next_blast_record
             $frame = $1;
         }
 
-        #  Query sequence data -------------------------------------------------
+        #  Alignment data ------------------------------------------------------
 
-        elsif ( $hsp_ok && s/^Query: +// )
+        elsif ( $hsp_ok && /^Query:? +(\d+)\s*([^\d\s]+)\s*(\d+)$/ )
         {
-            my ($t1, $t2, $t3) = /(\d+)\s*([^\d\s]*)\s*(\d+)/;
+            #  Query sequence data ---------------------------------------------
 
-            #  First fragment of alignment?
+            my ( $t1, $t2, $t3 ) = ( $1, $2, $3 );
 
-            if ( ! $q1 )
-            {
-                $q1 = $t1;
-            }
-
-            #  Additional fragment of alignment:
-            #  Changed to handle entire row of gaps -- GJO 
-
-            elsif ( abs( $t1 - $q2 ) > 1 )
+            $q1 ||= $t1;      #  First residue number
+            push @qseq, $t2;  #  Append sequence
+            if ( $q2 && abs( $t1 - $q2 ) != 1 )  #  Adjacent to previous fragment?
             {
                 print STDERR "Warning: Query position $t1 follows $q2\n";
                 print STDERR "Query = $qid; Subject = $sid\n";
@@ -810,52 +820,46 @@ sub next_blast_record
                 $hsp_ok = 0;
                 next;
             }
-
-            push @qseq, $t2;  #  Append sequence
-            $q2       = $t3;  #  New last residue number
+            $q2 = $t3;        #  New last residue number
 
             #  Flush the alignment match symbol line
 
-            if ( ! defined( $_ = nextline( $input ) ) )
-            {
-                print STDERR "End-of-file while reading alignment:\n";
-                print STDERR "Query = $qid; Subject = $sid\n";
-                print STDERR "Flushing this HSP\n\n";
-                $hsp_ok = 0;
-            }
-        }
-
-        #  Subject sequence data -----------------------------------------------
-
-        elsif ( $hsp_ok && s/^Sbjct: +// )
-        {
-            my ( $t1,  $t2, $t3 ) = /(\d+)\s*([^\d\s]*)\s*(\d+)/;
-
-            #  First fragment of alignment?
-
-            if ( ! $s1 )
-            {
-                $s1 = $t1;
-            }
-
-            #  Additional fragment of alignment:
-            #  Changed to handle entire row of gaps -- GJO 
-
-            elsif ( abs( $t1 - $s2 ) > 1 )
-            {
-                print STDERR "Warning: Subject position $t1 follows $s2\n";
-                print STDERR "Query = $qid; Subject = $sid\n";
-                print STDERR "$_\nFlushing this HSP\n\n";
-                $hsp_ok = 0;
-                next;
-            }
-
-            push @sseq, $t2;  #  Append sequence
-            $s2       = $t3;  #  New last residue number
-
-            #  Flush the blank line
-
             nextline( $input );
+
+            #  Subject sequence data -------------------------------------------
+
+            if ( defined( $_ = nextline( $input ) ) )
+            {
+                s/\s+$//;
+            }
+            else
+            {
+                print STDERR "End-of-file while reading alignment:\n"
+                           . "Query = $qid; Subject = $sid\n"
+                           . "Flushing this HSP\n\n";
+                $hsp_ok = 0;
+            }
+
+            if ( $hsp_ok && /^Sbjct:? +(\d+)\s*([^\d\s]+)\s*(\d+)$/ )
+            {
+                my ( $t1, $t2, $t3 ) = ( $1, $2, $3 );
+
+                $s1 ||= $t1;
+                push @sseq, $t2;  #  Append sequence
+                if ( $s2 && abs( $t1 - $s2 ) != 1 )  #  Adjacent to previous fragment?
+                {
+                    print STDERR "Warning: Subject position $t1 follows $s2\n";
+                    print STDERR "Query = $qid; Subject = $sid\n";
+                    print STDERR "$_\nFlushing this HSP\n\n";
+                    $hsp_ok = 0;
+                    next;
+                }
+                $s2 = $t3;        #  New last residue number
+
+                #  Flush the blank line
+
+                nextline( $input );
+            }
         }
 
         #  Back up to the top to read another line -----------------------------

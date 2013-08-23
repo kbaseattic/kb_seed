@@ -381,8 +381,8 @@ sub genomeMD5 {
 	# Get the parameters.
 	my ($self) = @_;
 
-  # Return the genome MD5 computed at close time. If the close never took place,
-  # this value will be undefined.
+        # Return the genome MD5 computed at close time. If the close never 
+        # took place, this value will be undefined.
 	return $self->{genome};
 }
 

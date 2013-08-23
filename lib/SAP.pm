@@ -1326,7 +1326,7 @@ sub _ids_to_functions_opt1
     my $q = $self->{db}->{_dbh}->quote();
     my $out = $self->_memcache_accelerate($ids, "f", sub {
 	my($self, $id_hash, $out, $upd) = @_;
-    
+
 	my @ids = keys %$id_hash;
 	my $qs = join(", ", map { "?" } 0..$#ids);
 	my $res = $self->{db}->{_dbh}->SQL(qq(SELECT id, function
@@ -1437,7 +1437,7 @@ sub _memcache_accelerate_list
 	    {
 		push(@update, [$k, join($;, @$vlist), $timeout]);
 	    }
-	    
+
 	    $mc->set_multi(@update);
 	}
 	else
@@ -5561,7 +5561,7 @@ sub _fids_to_proteins_opt1
 	    $out->{$id} = $md5;
 	    push(@$upd, ["f2md5:$id", $md5, 12 * 60 * 60]) if $upd;
 	}
-	
+
     });
     return $out;
 }
@@ -6121,7 +6121,7 @@ sub _ids_to_genomes_opt1
 
     my $out = $self->_memcache_accelerate($ids, "f", sub {
 	my($self, $id_hash, $out, $upd) = @_;
-    
+
 	my @ids = keys %$id_hash;
 	my $qs = join(", ", map { "?" } 0..$#ids);
 	my $res = $self->{db}->{_dbh}->SQL(qq(SELECT id, function
@@ -6503,7 +6503,7 @@ sub _proteins_to_fids_opt1
 	    push(@{$out->{$md5}}, $id);
 	    push(@{$upd->{"md52f:$md5"}}, $id);
 	}
-	
+
     });
     return $out;
 }
@@ -8509,7 +8509,7 @@ sub genome_domain {
 
 =head3 genome_fid_md5s
 
-    my $genomeHash =        $sapObject->genome_contig_md5s({
+    my $genomeHash =        $sapObject->genome_fid_md5s({
                                 -ids => [$genome1, $genome2, ...]
                             });
 

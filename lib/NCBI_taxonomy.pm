@@ -329,7 +329,11 @@ sub taxonomy_xml
     my $pass = 0;
     my @return = #  Remove XML header
                  grep { /./ && ! /^<[?!]/ && ! /^<\/?pre>/ }
-                 grep { if ( /^<pre>/ ) { $pass = 1 } elsif ( /^<\/pre>/ ) { $pass = 0 }; $pass }
+                 # map { print STDERR Dumper( $_ ); $_ }
+                 #  NCBI has now removed the HTML wrapper
+                 # grep { if ( /^<pre>/ ) { $pass = 1 } elsif ( /^<\/pre>/ ) { $pass = 0 }; $pass }
+                 #  NCBI has now put <TaxaSet><Taxon> as a single line
+                 map  { /^(<\w+>)(<\w+>)$/ ? ( $1, $2 ) : $_ }
                  map  { xml_unescape( $_ ) }         # Decode HTML body content
                  map  { chomp; s/^\s+//; s/\s+$//; $_ }
                  SeedAware::run_gathering_output( $curl, '-s', "$url?$request" );
