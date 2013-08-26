@@ -1,0 +1,759 @@
+
+#BEGIN_HEADER
+
+use Bio::KBase::CDMI::CDMI;
+
+our $entity_field_defs = {
+[% FOREACH entity IN entities -%]
+    '[% entity.name %]' => {
+	id => 1,
+	[% FOREACH fent IN entity.field_map -%]
+	    '[% fent.name %]' => 1,
+	[% END %]
+    },
+[% END %]
+};
+
+our $entity_field_rels = {
+[% FOREACH entity IN entities -%]
+    '[% entity.name %]' => {
+[% FOREACH fent IN entity.field_map -%]
+[% IF fent.field_rel -%]
+	    '[% fent.name %]' => '[% fent.field_rel %]',
+[% END -%]
+[% END -%]
+    },
+[% END %]
+};
+
+our $relationship_field_defs = {
+[% FOREACH rel IN relationships -%]
+    '[% rel.name %]' => {
+	to_link => 1, from_link => 1,
+	[% FOREACH fent IN rel.field_map -%]
+	    '[% fent.name %]' => 1,
+	[% END %]
+    },
+[% END %]
+};
+
+our $relationship_field_rels = {
+[% FOREACH relationship IN relationships -%]
+    '[% relationship.name %]' => {
+[% FOREACH fent IN relationship.field_map -%]
+[% IF fent.field_rel -%]
+	    '[% fent.name %]' => '[% fent.field_rel %]',
+[% END -%]
+[% END -%]
+    },
+[% END %]
+};
+
+our $relationship_entities = {
+[% FOREACH rel IN relationships -%]
+    '[% rel.name %]' => [ '[% rel.from %]', '[% rel.to %]' ],
+[% END %]
+};
+
+#sub _init_instance
+#{
+#    my($self) = @_;
+#    $self->{db} = CDMI->new(dbhost => 'seed-db-read', sock => '', DBD => '/home/parrello/FIGdisk/dist/releases/current/WinBuild/KSaplingDBD.xml');
+#}
+
+sub _validate_fields_for_entity
+{
+    my($self, $tbl, $fields, $ensure_id) = @_;
+
+    my $valid_fields = $entity_field_defs->{$tbl};
+
+    my $have_id;
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my @rel_fields;
+    my @qfields;
+    my @sfields;
+    my @bad_fields;
+    for my $field (@$fields)
+    {
+	$field =~ s/-/_/g;
+	if (!$valid_fields->{$field})
+	{
+	    push(@bad_fields, $field);
+	    next;
+	}
+	if (my $rel = $entity_field_rels->{$tbl}->{$field})
+	{
+	    push(@rel_fields, [$field, $rel]);
+	}
+	else
+	{
+	    push(@sfields, $field);
+	    my $qfield = $q . $field . $q;
+	    $have_id = 1 if $field eq 'id';
+	    push(@qfields, $qfield);
+	}
+    }
+
+    if (@bad_fields)
+    {
+	die "The following fields are invalid in entity $tbl: @bad_fields";
+    }
+
+    if (!$have_id && ($ensure_id || @rel_fields))
+    {
+	unshift(@sfields, 'id');
+	unshift(@qfields, $q . 'id' . $q);
+    }
+
+    return(\@sfields, \@qfields, \@rel_fields);
+}
+
+sub _validate_fields_for_relationship
+{
+    my($self, $tbl, $fields, $link_field) = @_;
+
+    my $valid_fields = $relationship_field_defs->{$tbl};
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my $have_id = 0;
+    my @qfields;
+    my @sfields;
+    my @bad_fields;
+    for my $field (@$fields)
+    {
+	$field =~ s/-/_/g;
+	if (!$valid_fields->{$field})
+	{
+	    push(@bad_fields, $field);
+	    next;
+	}
+
+	$have_id = 1 if $field eq $link_field;
+	push(@sfields, $field);
+	my $qfield = $q . $field . $q;
+	push(@qfields, $qfield);
+    }
+
+    if (!$have_id)
+    {
+	unshift(@sfields, $link_field);
+	unshift(@qfields, $q . $link_field . $q);
+    }
+
+    if (@bad_fields)
+    {
+	die "The following fields are invalid in relationship $tbl: @bad_fields";
+    }
+
+    return(\@sfields, \@qfields);
+}
+
+sub _query_entity
+{
+    my($self, $ctx, $tbl, $qry, $fields) = @_;
+
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+
+    my @filter;
+    my @filter_params;
+
+    my $valid_fields = $entity_field_defs->{$tbl};
+    my $field_rels = $entity_field_rels->{$tbl};
+    
+    #IN violates the typespec since it requires an array as the $value rather than a string
+    my %valid_ops = map { $_ => 1 } ('IS NULL', 'IS NOT NULL', 'LIKE', '<', '>', '=', '>=', '<='); # 'IN');
+    my @bad_q;
+    for my $q (@$qry)
+    {
+        my($field, $op, $value) = @$q;
+	$field =~ s/-/_/g;
+        if (!$valid_fields->{$field})
+        {
+            push(@bad_q, "Field $field does not exist in $tbl");
+            next;
+        }
+        if ($field_rels->{$field})
+        {
+            push(@bad_q, "Field $field is stored in a secondary relation; this is not yet supported for queries.");
+            next;
+        }
+        if (!$valid_ops{uc($op)})
+        {
+            push(@bad_q, "Operator $op is not allowed");
+               next;
+        }
+        if ($op eq 'IN')
+        {
+            if (! ref $value eq 'ARRAY')
+            {
+                push(@bad_q, "Associated value for operator $op must be an array");
+                next;
+            } else {
+                my $quest = '(' . join(', ', ('?') x @$value) . ')';
+                push(@filter, "$field $op $quest");
+                push(@filter_params, @$value);
+            }
+        }
+        elsif ($op eq 'IS NOT NULL' or $op eq 'IS NULL')
+        {
+            push(@filter, "$field $op");
+        } else {
+            push(@filter, "$field $op ?");
+            push(@filter_params, $value);
+        }
+    } 
+
+    if (@bad_q)
+    {
+        die "Errors found in query:\n" . join("\n", @bad_q);
+    }
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my $qstr = join(", ", @$qfields);
+
+    my $filter = join(" AND ", map { "(" . $_ . ")" } @filter);
+    my $qry = "SELECT $qstr FROM $q$tbl$q WHERE $filter";
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+    }
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute(@filter_params);
+    my $out = $sth->fetchall_hashref('id');
+
+    my @ids = keys %$out;
+
+    if (@ids)
+    {
+	my $rel_filter = "id IN (" . join(", ", map { "?" } @ids) . ")";
+	#
+	# Now query for the fields that are in separate relations.
+	#
+	for my $ent (@$rel_fields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $rel_filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+		push(@{$out->{$id}->{$field}}, $val);
+	    }
+	}
+    }
+    return $out;
+}    
+
+sub _get_entity
+{
+    my($self, $ctx, $tbl, $ids, $fields) = @_;
+
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+    
+    my $filter = "id IN (" . join(", ", map { '?' } @$ids) . ")";
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my $qstr = join(", ", @$qfields);
+    my $qry = "SELECT $qstr FROM $q$tbl$q WHERE $filter";
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+    }
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute(@$ids);
+    my $out = $sth->fetchall_hashref('id');
+
+    #
+    # Now query for the fields that are in separate relations.
+    #
+    for my $ent (@$rel_fields)
+    {
+	my($field, $rel) = @$ent;
+	my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	$sth->execute(@$ids);
+	while (my $row = $sth->fetchrow_arrayref())
+	{
+	    my($id, $val) = @$row;
+	    push(@{$out->{$id}->{$field}}, $val);
+	}
+    }
+    return $out;
+}    
+
+# sub _add_entities
+# {
+#     my($self, $ctx, $tbl, $fields, $data) = @_;
+
+#     my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+    
+#     my $cdmi = $self->{db};
+#     my $q = $cdmi->{_dbh}->quote;
+
+#     my $qstr = join(", ", @$qfields);
+#     my $qry = "SELECT $qstr FROM $q$tbl$q WHERE $filter";
+
+#     my $attrs = {};
+#     my $dbk = $cdmi->{_dbh};
+#     if ($dbk->dbms eq 'mysql')
+#     {
+# 	$attrs->{mysql_use_result} = 1;
+#     }
+#     XXXXXXX
+
+#     my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+#     # print STDERR "$qry\n";
+#     $sth->execute(@$ids);
+#     my $out = $sth->fetchall_hashref('id');
+
+#     #
+#     # Now query for the fields that are in separate relations.
+#     #
+#     for my $ent (@$rel_fields)
+#     {
+# 	my($field, $rel) = @$ent;
+# 	my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+# 	$sth->execute(@$ids);
+# 	while (my $row = $sth->fetchrow_arrayref())
+# 	{
+# 	    my($id, $val) = @$row;
+# 	    push(@{$out->{$id}->{$field}}, $val);
+# 	}
+#     }
+#     return $out;
+# }    
+
+sub _get_relationship
+{
+    my($self, $ctx, $relationship, $table, $is_converse, $ids, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my($from_tbl, $to_tbl) = @{$relationship_entities->{$relationship}};
+    if (!$from_tbl)
+    {
+	die "Unknown relationship $relationship";
+    }
+
+    my %link_name_map;
+    my($from_link, $to_link);
+    if ($is_converse)
+    {
+	($from_link, $to_link) = qw(to_link from_link);
+	%link_name_map = ( from_link => 'to_link', to_link => 'from_link');
+    }
+    else
+    {
+	($from_link, $to_link) = qw(from_link to_link);
+	%link_name_map = ( from_link => 'from_link', to_link => 'to_link');
+    }
+    for my $f (@$rel_fields)
+    {
+	if (!exists $link_name_map{$f})
+	{
+	    $link_name_map{$f} = $f;
+	}
+    }
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my($from_sfields, $from_qfields, $from_relfields) = $self->_validate_fields_for_entity($from_tbl, $from_fields, 0);
+    my($to_sfields, $to_qfields, $to_relfields) = $self->_validate_fields_for_entity($to_tbl, $to_fields, 0);
+
+    my @trans_rel_fields = map { $link_name_map{$_} } @$rel_fields;
+    my($rel_sfields, $rel_qfields) = $self->_validate_fields_for_relationship($relationship, \@trans_rel_fields, $from_link);
+    
+    my $filter = "$from_link IN (" . join(", ", map { '?' } @$ids) . ")";
+
+    my $from = "$q$table$q r ";
+    if (@$from_qfields)
+    {
+	$from .= "JOIN $q$from_tbl$q f ON f.id = r.$from_link ";
+    }
+    if (@$to_qfields)
+    {
+	$from .= "JOIN $q$to_tbl$q t ON t.id = r.$to_link ";
+    }
+
+    my $qstr = join(", ",
+		    (map { "f.$_" } @$from_qfields),
+		    (map { "t.$_" }  @$to_qfields),
+		    (map { "r.$_" } @$rel_qfields));
+
+    my $qry = "SELECT $qstr FROM $from WHERE $filter";
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+    }
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute(@$ids);
+    my $res = $sth->fetchall_arrayref();
+
+    my $out = [];
+
+    my(%from_keys_for_rel, %to_keys_for_rel);
+    for my $ent (@$res)
+    {
+	my($fout, $rout, $tout) = ({}, {}, {});
+	for my $fld (@$from_sfields)
+	{
+	    my $v = shift @$ent;
+	    $fout->{$fld} = $v;
+	}
+	for my $fld (@$to_sfields)
+	{
+	    my $v = shift @$ent;
+	    $tout->{$fld} = $v;
+	}
+	for my $fld (@$rel_sfields)
+	{
+	    my $v = shift @$ent;
+	    $rout->{$link_name_map{$fld}} = $v;
+	}
+	my $row = [$fout, $rout, $tout];
+
+	if (@$from_relfields)
+	{
+	    push(@{$from_keys_for_rel{$fout->{id}}}, $row);
+	}
+
+	if (@$to_relfields)
+	{
+	    push(@{$to_keys_for_rel{$tout->{id}}}, $row);
+	}
+
+	push(@$out, $row);
+    }
+
+    if (@$from_relfields)
+    {
+	my %ids = keys %from_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$from_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$from_keys_for_rel{$id}})
+		{
+		    push(@{$row->[0]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+    if (@$to_relfields)
+    {
+	my %ids = keys %to_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$to_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$to_keys_for_rel{$id}})
+		{
+		    push(@{$row->[2]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+
+    return $out;
+}    
+
+sub _all_entities
+{
+    my($self, $ctx, $tbl, $start, $count, $fields) = @_;
+
+    my($sfields, $qfields, $rel_fields) = $self->_validate_fields_for_entity($tbl, $fields, 1);
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my $qstr = join(", ", @$qfields);
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    my $limit;
+    
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+	$limit = "LIMIT $start, $count";
+    }
+    elsif ($dbk->dbms eq 'Pg')
+    {
+	$limit = "ORDER BY id LIMIT $count OFFSET $start";
+    }
+
+    my $qry = "SELECT $qstr FROM $q$tbl$q $limit";
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute();
+    my $out = $sth->fetchall_hashref('id');
+
+    #
+    # Now query for the fields that are in separate relations.
+    #
+    my @ids = keys %$out;
+    if (@ids)
+    {
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+	
+	for my $ent (@$rel_fields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+		push(@{$out->{$id}->{$field}}, $val);
+	    }
+	}
+    }
+
+    return $out;
+}    
+
+#END_HEADER
+
+sub new
+{
+    my($class, @args) = @_;
+    my $self = {
+    };
+    bless $self, $class;
+    #BEGIN_CONSTRUCTOR
+
+    my($cdmi) = @args;
+    if (! $cdmi) {
+		my %params;
+		if (my $e = $ENV{KB_DEPLOYMENT_CONFIG})
+		{
+	    	my $service = $ENV{KB_SERVICE_NAME};
+	    	my $c = Config::Simple->new();
+	    	$c->read($e);
+	    	my @params = qw(DBD dbName sock userData dbhost port dbms develop);
+	    	for my $p (@params)
+	    	{
+				my $v = $c->param("$service.$p");
+				if ($v)
+				{
+		    		$params{$p} = $v;
+				}
+	    	}
+		}
+        $cdmi = Bio::KBase::CDMI::CDMI->new(%params);
+    }
+    $self->{db} = $cdmi;
+
+    #END_CONSTRUCTOR
+    
+    if ($self->can('_init_instance'))
+    {
+	$self->_init_instance();
+    }
+    return $self;
+}
+
+=head2 get_all
+
+  $result_set = $obj->get_all($object_names, $filter_clause, $parameters, $fields, $count)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$object_names is a string
+$filter_clause is a string
+$parameters is a reference to a list where each element is a string
+$fields is a string
+$count is an int
+$result_set is a reference to a list where each element is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$object_names is a string
+$filter_clause is a string
+$parameters is a reference to a list where each element is a string
+$fields is a string
+$count is an int
+$result_set is a reference to a list where each element is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+Wrapper for the GetAll function documented L<here|http://pubseed.theseed.org/sapling/server.cgi?pod=ERDB#GetAll>.
+Note that the object_names and fields arguments must be strings; array references are not allowed.
+
+=back
+
+=cut
+
+sub get_all
+{
+    my $self = shift;
+    my($object_names, $filter_clause, $parameters, $fields, $count) = @_;
+
+    my @_bad_arguments;
+    (!ref($object_names)) or push(@_bad_arguments, "Invalid type for argument \"object_names\" (value was \"$object_names\")");
+    (!ref($filter_clause)) or push(@_bad_arguments, "Invalid type for argument \"filter_clause\" (value was \"$filter_clause\")");
+    (ref($parameters) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"parameters\" (value was \"$parameters\")");
+    (!ref($fields)) or push(@_bad_arguments, "Invalid type for argument \"fields\" (value was \"$fields\")");
+    (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_all:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all');
+    }
+
+    my $ctx = $XServer::CallContext;
+    my($result_set);
+    #BEGIN get_all
+
+    $result_set = [$self->{db}->GetAll($object_names, $filter_clause, $parameters, $fields, $count)];
+
+    #END get_all
+    my @_bad_returns;
+    (ref($result_set) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"result_set\" (value was \"$result_set\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_all:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all');
+    }
+    return($result_set);
+}
+
+
+[% FOREACH entity IN entities %]
+
+# sub add_entities_[% entity.name %]
+# {
+#     my($self, $ctx, $fields, $data) = @_;
+
+#     my $return;
+#     #BEGIN add_entities_[% entity.name %]
+
+#     $return = $self->_add_entities($ctx, '[% entity.name %]', $fields, $data);
+
+#     #END add_entities_[% entity.name %]
+#     return $return;
+# }
+
+sub get_entity_[% entity.name %]
+{
+    my($self, $ctx, $ids, $fields) = @_;
+
+    my $return;
+    #BEGIN get_entity_[% entity.name %]
+
+    $return = $self->_get_entity($ctx, '[% entity.name %]', $ids, $fields);
+
+    #END get_entity_[% entity.name %]
+    return $return;
+}
+
+sub query_entity_[% entity.name %]
+{
+    my($self, $ctx, $qry, $fields) = @_;
+
+    my $return;
+    #BEGIN query_entity_[% entity.name %]
+
+    $return = $self->_query_entity($ctx, '[% entity.name %]', $qry, $fields);
+
+    #END query_entity_[% entity.name %]
+    return $return;
+}
+
+sub all_entities_[% entity.name %]
+{
+    my($self, $ctx, $start, $count, $fields) = @_;
+
+    my $return;
+    #BEGIN all_entities_[% entity.name %]
+
+    $return = $self->_all_entities($ctx, '[% entity.name %]', $start, $count, $fields);
+
+    #END all_entities_[% entity.name %]
+    return $return;
+}
+[% END %]
+
+[% FOREACH relationship IN relationships %]
+
+sub get_relationship_[% relationship.name %]
+{
+    my($self, $ids, $from_fields, $rel_fields, $to_fields) = @_;
+    my $ctx = $CDMI_EntityAPIServer::CallContext;
+    my($return);
+
+    #BEGIN get_relationship_[% relationship.name %]
+
+    $return = $self->_get_relationship($ctx, '[% relationship.name %]', '[% relationship.relation %]', [% relationship.is_converse %], $ids, $from_fields, $rel_fields, $to_fields);
+	
+    #END get_relationship_[% relationship.name %]
+    return $return;
+}
+
+[% END %]

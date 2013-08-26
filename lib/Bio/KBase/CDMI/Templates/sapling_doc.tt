@@ -1,0 +1,63 @@
+<h1>KBase ERDB Documentation</h1>
+
+<h2>Entity Documentation</h2>
+
+[% FOR entity IN entities -%]
+
+<a name="entity_[% entity.name %]"><h3>[% entity.name %]</h3></a>
+
+[% entity.comment %]
+
+[% IF entity.field_map.size > 0 -%]
+
+This entity has the following fields:
+
+<dl>
+[% FOR field IN entity.field_map -%]
+<dt>[% field.mapped_type %] <b>[% field.name %]</b></dt>
+<dd>
+[% field.notes %]
+</dd>
+[% END -%]
+</dl>
+[% END -%]
+
+<p>It connects to the following relationships:
+<p>
+<ul>
+[% FOR rel IN entity.relationships -%]
+<li><a href="#rel_[% rel.name %]">[% rel.name %]</a>
+[% END %]
+</ul>
+
+[% END %]
+
+<h2>Relationship Documentation</h2>
+
+[% FOR relationship IN relationships -%]
+
+<a name="rel_[% relationship.name %]"><h3>[% relationship.name %]</h3></a>
+
+[% relationship.comment %]
+
+<p>
+[% IF relationship.field_map.size > 0 -%]
+This relationship has the following fields:
+
+[% FOR field IN relationship.field_map -%]
+<dl>
+<dt>[% field.mapped_type %] <b>[% field.name %]</b></dt>
+<dd>
+[% field.notes %]
+</dd>
+[% END -%]
+</dl>
+[% END -%]
+
+It connects from entity
+<a href="#entity_[% relationship.from %]">[% relationship.from %]<a>
+to entity
+<a href="#entity_[% relationship.to %]">[% relationship.to %]<a>.
+
+[% END %]
+

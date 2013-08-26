@@ -1,0 +1,136 @@
+{"name":"kbase_[% deploy.name %]",
+ "parallelism":"SERIAL",
+ "version":[% deploy.version %],
+ "helpURI":"http://kbase.science.energy.gov/",
+ "label":"",
+ "shortDescription":"[% deploy.name %]",
+ "longDescription":[% item.comment %],
+ "author":[% deploy.author %],
+ "datePublished":[% deploy.datePublished %],
+ "tags":["kbase","cdm"],
+ "ontology":["http://sswapmeet.sswap.info/agave/apps/Application"],
+ "executionHost":[% deploy.executionHost %],
+ "executionType":[% deploy.executionType %],
+ "deploymentPath":[% deploy.deploymentPath %],
+ "templatePath":"templates/[% deploy.name %].template",
+ "testPath":"templates/[% deploy.name %].test.sh",
+ "checkpointable":"false",
+ "modules":[% deploy.modules %],
+ "inputs":[],
+[% IF deploy.type == 'get_entity' -%]
+ "parameters": [
+    [% deploy.fields -%],
+    {"id":"a",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"bool"},
+     "details":
+        {"label":"Return all available fields",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:boolean"]}},
+    {"id":"c",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"number"},
+     "details":
+        {"label":"Specify the column to use for the id lookup",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:integer"]}},
+    {"id":"show-fields",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"bool"},
+     "details":
+        {"label":"List the available fields",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:boolean"]}}],
+[% ELSIF deploy.type == 'all_entities' -%]
+ "parameters": [
+    [% deploy.fields -%],
+    {"id":"a",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"bool"},
+     "details":
+        {"label":"Return all available fields",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:boolean"]}},
+    {"id":"show-fields",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"bool"},
+     "details":
+        {"label":"List the available fields",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:boolean"]}}],
+[% ELSIF deploy.type == 'get_relationship' -%]
+ "parameters": [
+    [% deploy.from_fields -%],
+    [% deploy.rel_fields -%],
+    [% deploy.to_fields -%],
+    {"id":"c",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"number"},
+     "details":
+        {"label":"Specify the column to use for the id lookup",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:integer"]}},
+    {"id":"show-fields",
+     "value":
+        {"default":false,
+         "validator":"",
+         "required":false,
+         "visible":true,
+         "type":"bool"},
+     "details":
+        {"label":"List the available fields",
+         "description":""},
+     "semantics":
+        {"ontology":["xs:boolean"]}}],
+[% ELSIF deploy.type == 'script' -%]
+"parameters": [% deploy.script_params %],
+[% END %]
+[% IF deploy.type == 'script' -%]
+"parameters": [% deploy.script_outputs %],
+[% ELSE -%]
+ "outputs":[
+    {"id":"stdout_[% deploy.name %]",
+     "value":
+        {"default":"stdout_[% deploy.name %]",
+         "validator":"",
+         "required":true,
+         "visible":true},
+     "details":
+        {"label":"Output of [% deploy.name %]",
+         "description":""},
+     "semantics":
+        {"ontology":["http://sswapmeet.sswap.info/mime/text/Tab-separated-values"],
+         "minCardinality":1,
+         "fileTypes":["tab-0"]}}]
+[% END -%]
+}

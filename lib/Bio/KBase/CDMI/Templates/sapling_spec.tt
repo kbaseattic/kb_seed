@@ -1,0 +1,105 @@
+module [% service %] : [% module %] {
+    typedef string diamond;
+    typedef string countVector;
+    typedef string rectangle;
+
+    /*
+    Wrapper for the GetAll function documented L<here|http://pubseed.theseed.org/sapling/server.cgi?pod=ERDB#GetAll>.
+    Note that the object_names and fields arguments must be strings; array references are not allowed.
+    */
+    funcdef get_all(string object_names,
+		    string filter_clause,
+		    list<string> parameters,
+		    string fields,
+		    int count) returns(list<list<string>> result_set);
+
+
+
+[% FOR entity IN entities -%]
+
+    typedef structure {
+        string id;
+[% FOR field IN entity.field_map -%]
+[% IF field.field_rel -%]
+	list<[% field.mapped_type %]> [% field.name %];
+[% ELSE -%]
+	[% field.mapped_type %] [% field.name %];
+[% END -%]
+[% END -%]
+    } fields_[% entity.name %];
+
+    /*
+[% entity.comment %]
+
+It has the following fields:
+
+=over 4
+
+[% FOR field IN entity.field_map -%]
+=item [% field.name %]
+
+[% field.notes %]
+
+[% END -%]
+
+=back
+    */
+
+    funcdef get_entity_[% entity.name %](list<string> ids, list<string> fields)
+	returns(mapping<string, fields_[% entity.name %]>);
+    funcdef query_entity_[% entity.name %](list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_[% entity.name %]>);
+    funcdef all_entities_[% entity.name %](int start, int count, list<string> fields)
+	returns(mapping<string, fields_[% entity.name %]>);
+	
+[% END -%]
+
+[% FOR relationship IN relationships -%]
+[% IF NOT relationship.is_converse -%]
+
+    typedef structure {
+        [% relationship.from_type %] from_link;
+	[% relationship.to_type %] to_link;
+[% FOR field IN relationship.field_map -%]
+[% IF field.field_rel -%]
+	list<[% field.mapped_type %]> [% field.name %];
+[% ELSE -%]
+	[% field.mapped_type %] [% field.name %];
+[% END -%]
+[% END -%]
+    } fields_[% relationship.name %];
+
+    /*
+[% relationship.comment %]
+
+It has the following fields:
+
+=over 4
+
+[% FOR field IN relationship.field_map -%]
+=item [% field.name %]
+
+[% field.notes %]
+
+[% END -%]
+
+=back
+    */
+
+    funcdef get_relationship_[% relationship.name %](list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_[% relationship.from_data.name %],
+			   fields_[% relationship.name %],
+			   fields_[% relationship.to_data.name %]>>);
+		     
+	
+    funcdef get_relationship_[% relationship.converse_name %](list<string> ids, list<string> fields)
+        returns(list<tuple<fields_[% relationship.to_data.name %],
+			   fields_[% relationship.name %],
+			   fields_[% relationship.from_data.name %]>>);
+	
+[% END -%]
+[% END -%]
+
+
+
+};
