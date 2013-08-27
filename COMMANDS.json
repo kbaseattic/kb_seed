@@ -12,7 +12,7 @@
                 {"pattern": "scripts/(query_entity.*).pl", "group-name": "er"}
             ],
         "commands": [
-		{"command-name": "er-get-entitiy-Tree", "group-name": "er"}
+		{"command-name": "er-get-entity-Tree", "group-name": "er"}
 	    ]
 	},
 
