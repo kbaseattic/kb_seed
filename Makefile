@@ -87,7 +87,8 @@ compile-typespec:
 	-rm -r lib/CDMI_EntityAPIImpl.py
 
 # target which compiles ERDB xml specification, and outputs the resulting spec and scripts
-# note that it cleans the entire scripts-er directory, so any manual changes will be lost!
+# note: that it cleans the entire scripts-er directory, so any manual changes will be lost!
+# note: there is no rule to deploy these scripts yet...
 compile-dbd:
 	rm -rf scripts-er
 	mkdir -p scripts-er
@@ -98,6 +99,13 @@ compile-dbd:
 		lib/$(SERVICE_NAME)-EntityAPI.spec \
 		lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)_EntityAPIImpl.pm \
 		scripts-er
+
+deploy-script-wrappers:
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS.json \
+		--irisCommandsFile COMMANDS.old.format \
+		--target $(TARGET) \
+		--devContainerToolsDir $(TOP_DIR)/tools
 
 java-client: java.out/built_flag
 
