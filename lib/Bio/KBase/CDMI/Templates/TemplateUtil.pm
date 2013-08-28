@@ -1,6 +1,6 @@
 #
 # This directory contains templates used to automatically generate the Entity-Relationship
-# API and scripts using compile-dbd-to-typespec.  These emplates previously existed in
+# API and scripts using compile-dbd-to-typespec.  These templates previously existed in
 # the typecomp repository.  This simple module simply allows you to fetch the installed
 # location of this directory so that 
 #

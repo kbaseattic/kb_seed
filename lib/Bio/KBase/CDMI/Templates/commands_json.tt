@@ -21,8 +21,7 @@
                     "file-name": "[% command.file_name %]",
                     "lang":"perl",
                     "deploy-to-iris":true,
-                    "new-command-name": "[% command.new_style_name %]",
-                    "warning-mssg": "blah blah blah"
+                    "new-command-name": "[% command.new_style_name %]"
                 }
             [% END %]
             ]
