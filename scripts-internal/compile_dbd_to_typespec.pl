@@ -309,9 +309,11 @@ if ($doc_file)
 }
 
 # we now require a prefix before script names; here we add the prefix, but generate
-# a list of script names in the old deprecated style -msneddon
+# a list of script names in the old deprecated style which can be used to generate
+# the new COMMANDS.json format -msneddon
 my $prefix = 'er';
-open(my $deprecated_list_fh, ">", "$bin_dir/ER_DEPRECATED_SCRIPT_LIST.txt") or die "cannot write $bin_dir/er_deprecated_script_list.txt: $!";
+my $deprecated_cmd_list = [];
+
 
 for my $entity (@{$entities})
 {
@@ -319,17 +321,29 @@ for my $entity (@{$entities})
     $d{entity} = $entity;
     
     open(my $fh, ">", "$bin_dir/$prefix-get-entity-$entity->{name}.pl") or die "cannot write $bin_dir/$prefix-get-entity-$entity->{name}.pl: $!";
-    print $deprecated_list_fh "get_entity_$entity->{name}\t$prefix-get-entity-$entity->{name}\n";
+    push(@$deprecated_cmd_list, {
+                                 old_style_name=>"get_entity_$entity->{name}",
+                                 new_style_name=>"$prefix-get-entity-$entity->{name}",
+                                 file_name=>"$bin_dir/$prefix-get-entity-$entity->{name}.pl",
+                                 } );
     $tmpl->process("$tmpl_dir/get_entity.tt", \%d, $fh) || die Template->error;
     close($fh);
     
     open(my $fh, ">", "$bin_dir/$prefix-all-entities-$entity->{name}.pl") or die "cannot write $bin_dir/$prefix-all-entities-$entity->{name}.pl: $!";
-    print $deprecated_list_fh "all_entities_$entity->{name}\t$prefix-all-entities-$entity->{name}\n";
+    push(@$deprecated_cmd_list, {
+                                 old_style_name=>"all_entities_$entity->{name}",
+                                 new_style_name=>"$prefix-all-entities-$entity->{name}",
+                                 file_name=>"$bin_dir/$prefix-all-entities-$entity->{name}.pl",
+                                 } );
     $tmpl->process("$tmpl_dir/all_entities.tt", \%d, $fh) || die Template->error;
     close($fh);
     
     open(my $fh, ">", "$bin_dir/$prefix-query-entity-$entity->{name}.pl") or die "cannot write $bin_dir/$prefix-query-entity-$entity->{name}.pl: $!";
-    print $deprecated_list_fh "query_entity_$entity->{name}\t$prefix-query-entity-$entity->{name}\n";
+    push(@$deprecated_cmd_list, {
+                                 old_style_name=>"query_entity_$entity->{name}",
+                                 new_style_name=>"$prefix-query-entity-$entity->{name}",
+                                 file_name=>"$bin_dir/$prefix-query-entity-$entity->{name}.pl",
+                                 } );
     $tmpl->process("$tmpl_dir/query_entity.tt", \%d, $fh) || die Template->error;
     close($fh);
 }
@@ -339,12 +353,20 @@ for my $rel (@{$relationships})
     my %d = %$template_data;
     $d{relationship} = $rel;
     open(my $fh, ">", "$bin_dir/$prefix-get-relationship-$rel->{name}.pl") or die "cannot write $bin_dir/$prefix-get-relationship-$rel->{name}.pl: $!";
-    print $deprecated_list_fh "get_relationship_$rel->{name}\t$prefix-get-relationship-$rel->{name}\n";
+    push(@$deprecated_cmd_list, {
+                                 old_style_name=>"get_relationship_$rel->{name}",
+                                 new_style_name=>"$prefix-get-relationship-$rel->{name}",
+                                 file_name=>"$bin_dir/$prefix-get-relationship-$rel->{name}.pl",
+                                 } );
     $tmpl->process("$tmpl_dir/get_relationship.tt", \%d, $fh) || die Template->error;
     close($fh);
 }
 $tmpl->process("$tmpl_dir/sapling_impl.tt", $template_data, \*IMPL) || die Template->error;
 
-close($deprecated_list_fh);
+# finally, we use the deprecated file list to generate the COMMANDS.json file -msneddon
+my $deprecated_cmd_data = {deprecated_cmd_list=>$deprecated_cmd_list};
+open(my $deprecated_list_fh, ">", "COMMANDS.json") or die "cannot write COMMANDS.json: $!";
+$tmpl->process("$tmpl_dir/commands_json.tt",$deprecated_cmd_data, $deprecated_list_fh) || die Template->error;
+
 
 __DATA__

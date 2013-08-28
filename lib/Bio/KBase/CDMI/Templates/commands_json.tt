@@ -1,0 +1,29 @@
+{
+    "iris": {
+        "group-names":  [
+                {"group-name": "cs", "description": "Central Store Scripts"},
+                {"group-name": "er", "description": "Entity Relationship Scripts"}
+            ]
+    },
+
+    "cli": {
+        "commands": [
+                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl", "iris-group-name": "er"}
+            ],
+        "deprecated-commands": [ [% is_first = 1 %]
+            [% FOREACH command IN deprecated_cmd_list %][% IF is_first == 1 %][% is_first = 0 %][% ELSE %] , [% END %]
+                {
+                    "deprecated-name": "[% command.old_style_name %]",
+                    "file-name": "[% command.file_name %]",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "[% command.new_style_name %]",
+                    "warning-mssg": "blah blah blah"
+                }
+            [% END %]
+            ]
+    }
+}
