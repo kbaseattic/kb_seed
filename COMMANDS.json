@@ -3,25 +3,15 @@
 	"group-names":  [
                 {"group-name": "cs", "description": "Central Store Scripts"},
                 {"group-name": "er", "description": "Entity Relationship Scripts"}
-            ],
-        "command-sets": [
-                {"pattern": "scripts/([a-z].*).pl", "group-name": "cs"},
-                {"pattern": "scripts/(get_relationship.*).pl", "group-name": "er"},
-                {"pattern": "scripts/(get_entity.*).pl", "group-name": "er"},
-                {"pattern": "scripts/(all_entities.*).pl", "group-name": "er"},
-                {"pattern": "scripts/(query_entity.*).pl", "group-name": "er"}
-            ],
-        "commands": [
-		{"command-name": "er-get-entity-Tree", "group-name": "er"}
-	    ]
+            ]
 	},
 
     "cli": {
         "commands": [
-                {"file": "scripts-er/er-all-entities*.pl", "lang":"perl", "iris-group-name": "er"},
-                {"file": "scripts-er/er-get-relationship*.pl", "lang":"perl", "iris-group-name": "er"},
-                {"file": "scripts-er/er-get-entity*.pl", "lang":"perl", "iris-group-name": "er"},
-                {"file": "scripts-er/er-query-entity*.pl", "lang":"perl", "iris-group-name": "er"}
+                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl", "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl", "iris-group-name": "er"}
             ],
         "deprecated-commands": [
                 {
