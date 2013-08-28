@@ -29,8 +29,9 @@ TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --d
 
 JARFILE = $(PWD)/dist/lib/cdmi.jar
 
-all: bin compile-typespec
+#all: bin compile-typespec
 #all: bin jar
+all: build-dev-container-script-wrappers compile-typespec
 
 bin: $(BIN_PERL)
 
@@ -39,7 +40,8 @@ jar:
 
 deploy: deploy-all
 deploy-all: deploy-client deploy-service
-deploy-client: compile-typespec deploy-libs deploy-scripts deploy-docs
+#deploy-client: compile-typespec deploy-libs deploy-scripts deploy-docs
+deploy-client: compile-typespec deploy-libs deploy-script-wrappers deploy-docs 
 
 deploy-service: deploy-dir deploy-monit deploy-sphinx
 	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
@@ -99,14 +101,6 @@ compile-dbd:
 		lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)_EntityAPIImpl.pm \
 		scripts-er
 
-# deploys scripts to target
-deploy-script-wrappers:
-	$(TOOLS_DIR)/deploy-wrappers \
-		--jsonCommandsFile COMMANDS.json \
-		--irisCommandsFile COMMANDS.old.format \
-		--target $(TARGET) \
-		--devContainerToolsDir $(TOOLS_DIR)
-
 # deploys scripts to dev_container
 build-dev-container-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
@@ -115,6 +109,16 @@ build-dev-container-script-wrappers:
 		--target $(TOP_DIR) \
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR)
+
+
+# deploys scripts to target
+deploy-script-wrappers:
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS.json \
+		--irisCommandsFile COMMANDS.old.format \
+		--target $(TARGET) \
+		--devContainerToolsDir $(TOOLS_DIR) \
+		--undeploy
 
 
 java-client: java.out/built_flag
