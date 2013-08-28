@@ -92,7 +92,7 @@ compile-typespec:
 compile-dbd:
 	rm -rf scripts-er
 	mkdir -p scripts-er
-	perl scripts-internal/compile_dbd_to_typespec.pl \
+	$(KB_RUNTIME)/bin/perl scripts-internal/compile_dbd_to_typespec.pl \
 		$(SERVICE_NAME)_API \
 		$(SERVICE_NAME)_EntityAPI \
 		lib/KSaplingDBD.xml \
@@ -105,7 +105,7 @@ deploy-script-wrappers:
 		--jsonCommandsFile COMMANDS.json \
 		--irisCommandsFile COMMANDS.old.format \
 		--target $(TARGET) \
-		--devContainerToolsDir $(TOP_DIR)/tools
+		--devContainerToolsDir $(TOOLS_DIR)
 
 java-client: java.out/built_flag
 

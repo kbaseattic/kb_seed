@@ -8,10 +8,11 @@
 
     "cli": {
         "commands": [
-                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl", "iris-group-name": "er"}
+                {"file-spec": "scripts-cs/cs-*.pl",                 "lang":"perl",   "iris-group-name": "cs"},
+                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl",   "iris-group-name": "er"}
             ],
         "deprecated-commands": [ [% is_first = 1 %]
             [% FOREACH command IN deprecated_cmd_list %][% IF is_first == 1 %][% is_first = 0 %][% ELSE %] , [% END %]

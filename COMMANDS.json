@@ -1,27 +1,3828 @@
 {
     "iris": {
-	"group-names":  [
+        "group-names":  [
                 {"group-name": "cs", "description": "Central Store Scripts"},
                 {"group-name": "er", "description": "Entity Relationship Scripts"}
             ]
-	},
+    },
 
     "cli": {
         "commands": [
-                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl", "iris-group-name": "er"},
-                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl", "iris-group-name": "er"}
+                {"file-spec": "scripts-cs/cs-*.pl",                 "lang":"perl",   "iris-group-name": "cs"},
+                {"file-spec": "scripts-er/er-all-entities*.pl",     "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-relationship*.pl", "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-get-entity*.pl",       "lang":"perl",   "iris-group-name": "er"},
+                {"file-spec": "scripts-er/er-query-entity*.pl",     "lang":"perl",   "iris-group-name": "er"}
             ],
-        "deprecated-commands": [
+        "deprecated-commands": [ 
+            
                 {
-                    "deprecated-name": "all_entities_genome",
+                    "deprecated-name": "get_entity_Alignment",
+                    "file-name": "scripts-er/er-get-entity-Alignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Alignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Alignment",
+                    "file-name": "scripts-er/er-all-entities-Alignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Alignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Alignment",
+                    "file-name": "scripts-er/er-query-entity-Alignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Alignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_AlignmentAttribute",
+                    "file-name": "scripts-er/er-get-entity-AlignmentAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-AlignmentAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_AlignmentAttribute",
+                    "file-name": "scripts-er/er-all-entities-AlignmentAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-AlignmentAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_AlignmentAttribute",
+                    "file-name": "scripts-er/er-query-entity-AlignmentAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-AlignmentAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_AlignmentRow",
+                    "file-name": "scripts-er/er-get-entity-AlignmentRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-AlignmentRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_AlignmentRow",
+                    "file-name": "scripts-er/er-all-entities-AlignmentRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-AlignmentRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_AlignmentRow",
+                    "file-name": "scripts-er/er-query-entity-AlignmentRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-AlignmentRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_AlleleFrequency",
+                    "file-name": "scripts-er/er-get-entity-AlleleFrequency.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-AlleleFrequency",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_AlleleFrequency",
+                    "file-name": "scripts-er/er-all-entities-AlleleFrequency.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-AlleleFrequency",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_AlleleFrequency",
+                    "file-name": "scripts-er/er-query-entity-AlleleFrequency.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-AlleleFrequency",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Annotation",
+                    "file-name": "scripts-er/er-get-entity-Annotation.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Annotation",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Annotation",
+                    "file-name": "scripts-er/er-all-entities-Annotation.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Annotation",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Annotation",
+                    "file-name": "scripts-er/er-query-entity-Annotation.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Annotation",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Assay",
+                    "file-name": "scripts-er/er-get-entity-Assay.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Assay",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Assay",
+                    "file-name": "scripts-er/er-all-entities-Assay.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Assay",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Assay",
+                    "file-name": "scripts-er/er-query-entity-Assay.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Assay",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_AtomicRegulon",
+                    "file-name": "scripts-er/er-get-entity-AtomicRegulon.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-AtomicRegulon",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_AtomicRegulon",
+                    "file-name": "scripts-er/er-all-entities-AtomicRegulon.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-AtomicRegulon",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_AtomicRegulon",
+                    "file-name": "scripts-er/er-query-entity-AtomicRegulon.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-AtomicRegulon",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Attribute",
+                    "file-name": "scripts-er/er-get-entity-Attribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Attribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Attribute",
+                    "file-name": "scripts-er/er-all-entities-Attribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Attribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Attribute",
+                    "file-name": "scripts-er/er-query-entity-Attribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Attribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Biomass",
+                    "file-name": "scripts-er/er-get-entity-Biomass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Biomass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Biomass",
+                    "file-name": "scripts-er/er-all-entities-Biomass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Biomass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Biomass",
+                    "file-name": "scripts-er/er-query-entity-Biomass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Biomass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_CodonUsage",
+                    "file-name": "scripts-er/er-get-entity-CodonUsage.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-CodonUsage",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_CodonUsage",
+                    "file-name": "scripts-er/er-all-entities-CodonUsage.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-CodonUsage",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_CodonUsage",
+                    "file-name": "scripts-er/er-query-entity-CodonUsage.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-CodonUsage",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Complex",
+                    "file-name": "scripts-er/er-get-entity-Complex.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Complex",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Complex",
+                    "file-name": "scripts-er/er-all-entities-Complex.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Complex",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Complex",
+                    "file-name": "scripts-er/er-query-entity-Complex.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Complex",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Compound",
+                    "file-name": "scripts-er/er-get-entity-Compound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Compound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Compound",
+                    "file-name": "scripts-er/er-all-entities-Compound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Compound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Compound",
+                    "file-name": "scripts-er/er-query-entity-Compound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Compound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_CompoundInstance",
+                    "file-name": "scripts-er/er-get-entity-CompoundInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-CompoundInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_CompoundInstance",
+                    "file-name": "scripts-er/er-all-entities-CompoundInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-CompoundInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_CompoundInstance",
+                    "file-name": "scripts-er/er-query-entity-CompoundInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-CompoundInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Contig",
+                    "file-name": "scripts-er/er-get-entity-Contig.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Contig",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Contig",
+                    "file-name": "scripts-er/er-all-entities-Contig.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Contig",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Contig",
+                    "file-name": "scripts-er/er-query-entity-Contig.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Contig",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ContigChunk",
+                    "file-name": "scripts-er/er-get-entity-ContigChunk.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ContigChunk",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ContigChunk",
+                    "file-name": "scripts-er/er-all-entities-ContigChunk.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ContigChunk",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ContigChunk",
+                    "file-name": "scripts-er/er-query-entity-ContigChunk.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ContigChunk",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ContigSequence",
+                    "file-name": "scripts-er/er-get-entity-ContigSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ContigSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ContigSequence",
+                    "file-name": "scripts-er/er-all-entities-ContigSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ContigSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ContigSequence",
+                    "file-name": "scripts-er/er-query-entity-ContigSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ContigSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_CoregulatedSet",
+                    "file-name": "scripts-er/er-get-entity-CoregulatedSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-CoregulatedSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_CoregulatedSet",
+                    "file-name": "scripts-er/er-all-entities-CoregulatedSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-CoregulatedSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_CoregulatedSet",
+                    "file-name": "scripts-er/er-query-entity-CoregulatedSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-CoregulatedSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Diagram",
+                    "file-name": "scripts-er/er-get-entity-Diagram.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Diagram",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Diagram",
+                    "file-name": "scripts-er/er-all-entities-Diagram.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Diagram",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Diagram",
+                    "file-name": "scripts-er/er-query-entity-Diagram.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Diagram",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_EcNumber",
+                    "file-name": "scripts-er/er-get-entity-EcNumber.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-EcNumber",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_EcNumber",
+                    "file-name": "scripts-er/er-all-entities-EcNumber.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-EcNumber",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_EcNumber",
+                    "file-name": "scripts-er/er-query-entity-EcNumber.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-EcNumber",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Environment",
+                    "file-name": "scripts-er/er-get-entity-Environment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Environment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Environment",
+                    "file-name": "scripts-er/er-all-entities-Environment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Environment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Environment",
+                    "file-name": "scripts-er/er-query-entity-Environment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Environment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Experiment",
+                    "file-name": "scripts-er/er-get-entity-Experiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Experiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Experiment",
+                    "file-name": "scripts-er/er-all-entities-Experiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Experiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Experiment",
+                    "file-name": "scripts-er/er-query-entity-Experiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Experiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ExperimentMeta",
+                    "file-name": "scripts-er/er-get-entity-ExperimentMeta.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ExperimentMeta",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ExperimentMeta",
+                    "file-name": "scripts-er/er-all-entities-ExperimentMeta.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ExperimentMeta",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ExperimentMeta",
+                    "file-name": "scripts-er/er-query-entity-ExperimentMeta.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ExperimentMeta",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ExperimentalUnit",
+                    "file-name": "scripts-er/er-get-entity-ExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ExperimentalUnit",
+                    "file-name": "scripts-er/er-all-entities-ExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ExperimentalUnit",
+                    "file-name": "scripts-er/er-query-entity-ExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ExperimentalUnitGroup",
+                    "file-name": "scripts-er/er-get-entity-ExperimentalUnitGroup.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ExperimentalUnitGroup",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ExperimentalUnitGroup",
+                    "file-name": "scripts-er/er-all-entities-ExperimentalUnitGroup.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ExperimentalUnitGroup",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ExperimentalUnitGroup",
+                    "file-name": "scripts-er/er-query-entity-ExperimentalUnitGroup.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ExperimentalUnitGroup",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Family",
+                    "file-name": "scripts-er/er-get-entity-Family.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Family",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Family",
+                    "file-name": "scripts-er/er-all-entities-Family.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Family",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Family",
+                    "file-name": "scripts-er/er-query-entity-Family.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Family",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Feature",
+                    "file-name": "scripts-er/er-get-entity-Feature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Feature",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Feature",
+                    "file-name": "scripts-er/er-all-entities-Feature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Feature",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Feature",
+                    "file-name": "scripts-er/er-query-entity-Feature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Feature",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Genome",
+                    "file-name": "scripts-er/er-get-entity-Genome.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Genome",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Genome",
                     "file-name": "scripts-er/er-all-entities-Genome.pl",
                     "lang":"perl",
                     "deploy-to-iris":true,
                     "new-command-name": "er-all-entities-Genome",
                     "warning-mssg": "blah blah blah"
                 }
+             , 
+                {
+                    "deprecated-name": "query_entity_Genome",
+                    "file-name": "scripts-er/er-query-entity-Genome.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Genome",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Locality",
+                    "file-name": "scripts-er/er-get-entity-Locality.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Locality",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Locality",
+                    "file-name": "scripts-er/er-all-entities-Locality.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Locality",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Locality",
+                    "file-name": "scripts-er/er-query-entity-Locality.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Locality",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_LocalizedCompound",
+                    "file-name": "scripts-er/er-get-entity-LocalizedCompound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-LocalizedCompound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_LocalizedCompound",
+                    "file-name": "scripts-er/er-all-entities-LocalizedCompound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-LocalizedCompound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_LocalizedCompound",
+                    "file-name": "scripts-er/er-query-entity-LocalizedCompound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-LocalizedCompound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Location",
+                    "file-name": "scripts-er/er-get-entity-Location.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Location",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Location",
+                    "file-name": "scripts-er/er-all-entities-Location.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Location",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Location",
+                    "file-name": "scripts-er/er-query-entity-Location.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Location",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_LocationInstance",
+                    "file-name": "scripts-er/er-get-entity-LocationInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-LocationInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_LocationInstance",
+                    "file-name": "scripts-er/er-all-entities-LocationInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-LocationInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_LocationInstance",
+                    "file-name": "scripts-er/er-query-entity-LocationInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-LocationInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Measurement",
+                    "file-name": "scripts-er/er-get-entity-Measurement.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Measurement",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Measurement",
+                    "file-name": "scripts-er/er-all-entities-Measurement.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Measurement",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Measurement",
+                    "file-name": "scripts-er/er-query-entity-Measurement.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Measurement",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_MeasurementDescription",
+                    "file-name": "scripts-er/er-get-entity-MeasurementDescription.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-MeasurementDescription",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_MeasurementDescription",
+                    "file-name": "scripts-er/er-all-entities-MeasurementDescription.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-MeasurementDescription",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_MeasurementDescription",
+                    "file-name": "scripts-er/er-query-entity-MeasurementDescription.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-MeasurementDescription",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Media",
+                    "file-name": "scripts-er/er-get-entity-Media.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Media",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Media",
+                    "file-name": "scripts-er/er-all-entities-Media.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Media",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Media",
+                    "file-name": "scripts-er/er-query-entity-Media.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Media",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Model",
+                    "file-name": "scripts-er/er-get-entity-Model.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Model",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Model",
+                    "file-name": "scripts-er/er-all-entities-Model.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Model",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Model",
+                    "file-name": "scripts-er/er-query-entity-Model.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Model",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_OTU",
+                    "file-name": "scripts-er/er-get-entity-OTU.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-OTU",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_OTU",
+                    "file-name": "scripts-er/er-all-entities-OTU.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-OTU",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_OTU",
+                    "file-name": "scripts-er/er-query-entity-OTU.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-OTU",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ObservationalUnit",
+                    "file-name": "scripts-er/er-get-entity-ObservationalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ObservationalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ObservationalUnit",
+                    "file-name": "scripts-er/er-all-entities-ObservationalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ObservationalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ObservationalUnit",
+                    "file-name": "scripts-er/er-query-entity-ObservationalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ObservationalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_PairSet",
+                    "file-name": "scripts-er/er-get-entity-PairSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-PairSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_PairSet",
+                    "file-name": "scripts-er/er-all-entities-PairSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-PairSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_PairSet",
+                    "file-name": "scripts-er/er-query-entity-PairSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-PairSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Pairing",
+                    "file-name": "scripts-er/er-get-entity-Pairing.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Pairing",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Pairing",
+                    "file-name": "scripts-er/er-all-entities-Pairing.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Pairing",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Pairing",
+                    "file-name": "scripts-er/er-query-entity-Pairing.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Pairing",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Parameter",
+                    "file-name": "scripts-er/er-get-entity-Parameter.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Parameter",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Parameter",
+                    "file-name": "scripts-er/er-all-entities-Parameter.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Parameter",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Parameter",
+                    "file-name": "scripts-er/er-query-entity-Parameter.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Parameter",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Person",
+                    "file-name": "scripts-er/er-get-entity-Person.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Person",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Person",
+                    "file-name": "scripts-er/er-all-entities-Person.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Person",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Person",
+                    "file-name": "scripts-er/er-query-entity-Person.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Person",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ProbeSet",
+                    "file-name": "scripts-er/er-get-entity-ProbeSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ProbeSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ProbeSet",
+                    "file-name": "scripts-er/er-all-entities-ProbeSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ProbeSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ProbeSet",
+                    "file-name": "scripts-er/er-query-entity-ProbeSet.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ProbeSet",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ProteinSequence",
+                    "file-name": "scripts-er/er-get-entity-ProteinSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ProteinSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ProteinSequence",
+                    "file-name": "scripts-er/er-all-entities-ProteinSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ProteinSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ProteinSequence",
+                    "file-name": "scripts-er/er-query-entity-ProteinSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ProteinSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Protocol",
+                    "file-name": "scripts-er/er-get-entity-Protocol.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Protocol",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Protocol",
+                    "file-name": "scripts-er/er-all-entities-Protocol.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Protocol",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Protocol",
+                    "file-name": "scripts-er/er-query-entity-Protocol.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Protocol",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Publication",
+                    "file-name": "scripts-er/er-get-entity-Publication.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Publication",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Publication",
+                    "file-name": "scripts-er/er-all-entities-Publication.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Publication",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Publication",
+                    "file-name": "scripts-er/er-query-entity-Publication.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Publication",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Reaction",
+                    "file-name": "scripts-er/er-get-entity-Reaction.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Reaction",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Reaction",
+                    "file-name": "scripts-er/er-all-entities-Reaction.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Reaction",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Reaction",
+                    "file-name": "scripts-er/er-query-entity-Reaction.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Reaction",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_ReactionInstance",
+                    "file-name": "scripts-er/er-get-entity-ReactionInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-ReactionInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_ReactionInstance",
+                    "file-name": "scripts-er/er-all-entities-ReactionInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-ReactionInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_ReactionInstance",
+                    "file-name": "scripts-er/er-query-entity-ReactionInstance.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-ReactionInstance",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Role",
+                    "file-name": "scripts-er/er-get-entity-Role.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Role",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Role",
+                    "file-name": "scripts-er/er-all-entities-Role.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Role",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Role",
+                    "file-name": "scripts-er/er-query-entity-Role.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Role",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_SSCell",
+                    "file-name": "scripts-er/er-get-entity-SSCell.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-SSCell",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_SSCell",
+                    "file-name": "scripts-er/er-all-entities-SSCell.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-SSCell",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_SSCell",
+                    "file-name": "scripts-er/er-query-entity-SSCell.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-SSCell",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_SSRow",
+                    "file-name": "scripts-er/er-get-entity-SSRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-SSRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_SSRow",
+                    "file-name": "scripts-er/er-all-entities-SSRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-SSRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_SSRow",
+                    "file-name": "scripts-er/er-query-entity-SSRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-SSRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Scenario",
+                    "file-name": "scripts-er/er-get-entity-Scenario.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Scenario",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Scenario",
+                    "file-name": "scripts-er/er-all-entities-Scenario.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Scenario",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Scenario",
+                    "file-name": "scripts-er/er-query-entity-Scenario.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Scenario",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Source",
+                    "file-name": "scripts-er/er-get-entity-Source.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Source",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Source",
+                    "file-name": "scripts-er/er-all-entities-Source.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Source",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Source",
+                    "file-name": "scripts-er/er-query-entity-Source.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Source",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Strain",
+                    "file-name": "scripts-er/er-get-entity-Strain.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Strain",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Strain",
+                    "file-name": "scripts-er/er-all-entities-Strain.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Strain",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Strain",
+                    "file-name": "scripts-er/er-query-entity-Strain.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Strain",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_StudyExperiment",
+                    "file-name": "scripts-er/er-get-entity-StudyExperiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-StudyExperiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_StudyExperiment",
+                    "file-name": "scripts-er/er-all-entities-StudyExperiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-StudyExperiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_StudyExperiment",
+                    "file-name": "scripts-er/er-query-entity-StudyExperiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-StudyExperiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Subsystem",
+                    "file-name": "scripts-er/er-get-entity-Subsystem.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Subsystem",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Subsystem",
+                    "file-name": "scripts-er/er-all-entities-Subsystem.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Subsystem",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Subsystem",
+                    "file-name": "scripts-er/er-query-entity-Subsystem.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Subsystem",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_SubsystemClass",
+                    "file-name": "scripts-er/er-get-entity-SubsystemClass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-SubsystemClass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_SubsystemClass",
+                    "file-name": "scripts-er/er-all-entities-SubsystemClass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-SubsystemClass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_SubsystemClass",
+                    "file-name": "scripts-er/er-query-entity-SubsystemClass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-SubsystemClass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_TaxonomicGrouping",
+                    "file-name": "scripts-er/er-get-entity-TaxonomicGrouping.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-TaxonomicGrouping",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_TaxonomicGrouping",
+                    "file-name": "scripts-er/er-all-entities-TaxonomicGrouping.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-TaxonomicGrouping",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_TaxonomicGrouping",
+                    "file-name": "scripts-er/er-query-entity-TaxonomicGrouping.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-TaxonomicGrouping",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_TimeSeries",
+                    "file-name": "scripts-er/er-get-entity-TimeSeries.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-TimeSeries",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_TimeSeries",
+                    "file-name": "scripts-er/er-all-entities-TimeSeries.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-TimeSeries",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_TimeSeries",
+                    "file-name": "scripts-er/er-query-entity-TimeSeries.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-TimeSeries",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Trait",
+                    "file-name": "scripts-er/er-get-entity-Trait.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Trait",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Trait",
+                    "file-name": "scripts-er/er-all-entities-Trait.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Trait",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Trait",
+                    "file-name": "scripts-er/er-query-entity-Trait.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Trait",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Tree",
+                    "file-name": "scripts-er/er-get-entity-Tree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Tree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Tree",
+                    "file-name": "scripts-er/er-all-entities-Tree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Tree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Tree",
+                    "file-name": "scripts-er/er-query-entity-Tree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Tree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_TreeAttribute",
+                    "file-name": "scripts-er/er-get-entity-TreeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-TreeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_TreeAttribute",
+                    "file-name": "scripts-er/er-all-entities-TreeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-TreeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_TreeAttribute",
+                    "file-name": "scripts-er/er-query-entity-TreeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-TreeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_TreeNodeAttribute",
+                    "file-name": "scripts-er/er-get-entity-TreeNodeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-TreeNodeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_TreeNodeAttribute",
+                    "file-name": "scripts-er/er-all-entities-TreeNodeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-TreeNodeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_TreeNodeAttribute",
+                    "file-name": "scripts-er/er-query-entity-TreeNodeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-TreeNodeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_entity_Variant",
+                    "file-name": "scripts-er/er-get-entity-Variant.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-entity-Variant",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "all_entities_Variant",
+                    "file-name": "scripts-er/er-all-entities-Variant.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-all-entities-Variant",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "query_entity_Variant",
+                    "file-name": "scripts-er/er-query-entity-Variant.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-query-entity-Variant",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_AffectsLevelOf",
+                    "file-name": "scripts-er/er-get-relationship-AffectsLevelOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-AffectsLevelOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAffectedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsAffectedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAffectedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Aligned",
+                    "file-name": "scripts-er/er-get-relationship-Aligned.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Aligned",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasAlignedBy",
+                    "file-name": "scripts-er/er-get-relationship-WasAlignedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasAlignedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_AssertsFunctionFor",
+                    "file-name": "scripts-er/er-get-relationship-AssertsFunctionFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-AssertsFunctionFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasAssertedFunctionFrom",
+                    "file-name": "scripts-er/er-get-relationship-HasAssertedFunctionFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasAssertedFunctionFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_CompoundMeasuredBy",
+                    "file-name": "scripts-er/er-get-relationship-CompoundMeasuredBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-CompoundMeasuredBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_MeasuresCompound",
+                    "file-name": "scripts-er/er-get-relationship-MeasuresCompound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-MeasuresCompound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Concerns",
+                    "file-name": "scripts-er/er-get-relationship-Concerns.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Concerns",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsATopicOf",
+                    "file-name": "scripts-er/er-get-relationship-IsATopicOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsATopicOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ConsistsOfCompounds",
+                    "file-name": "scripts-er/er-get-relationship-ConsistsOfCompounds.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ConsistsOfCompounds",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ComponentOf",
+                    "file-name": "scripts-er/er-get-relationship-ComponentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ComponentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Contains",
+                    "file-name": "scripts-er/er-get-relationship-Contains.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Contains",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsContainedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsContainedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsContainedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ContainsAlignedDNA",
+                    "file-name": "scripts-er/er-get-relationship-ContainsAlignedDNA.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ContainsAlignedDNA",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAlignedDNAComponentOf",
+                    "file-name": "scripts-er/er-get-relationship-IsAlignedDNAComponentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAlignedDNAComponentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ContainsAlignedProtein",
+                    "file-name": "scripts-er/er-get-relationship-ContainsAlignedProtein.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ContainsAlignedProtein",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAlignedProteinComponentOf",
+                    "file-name": "scripts-er/er-get-relationship-IsAlignedProteinComponentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAlignedProteinComponentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ContainsExperimentalUnit",
+                    "file-name": "scripts-er/er-get-relationship-ContainsExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ContainsExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_GroupedBy",
+                    "file-name": "scripts-er/er-get-relationship-GroupedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-GroupedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Controls",
+                    "file-name": "scripts-er/er-get-relationship-Controls.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Controls",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsControlledUsing",
+                    "file-name": "scripts-er/er-get-relationship-IsControlledUsing.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsControlledUsing",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Describes",
+                    "file-name": "scripts-er/er-get-relationship-Describes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Describes",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDescribedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsDescribedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDescribedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DescribesAlignment",
+                    "file-name": "scripts-er/er-get-relationship-DescribesAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DescribesAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasAlignmentAttribute",
+                    "file-name": "scripts-er/er-get-relationship-HasAlignmentAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasAlignmentAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DescribesMeasurement",
+                    "file-name": "scripts-er/er-get-relationship-DescribesMeasurement.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DescribesMeasurement",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDefinedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsDefinedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDefinedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DescribesTree",
+                    "file-name": "scripts-er/er-get-relationship-DescribesTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DescribesTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasTreeAttribute",
+                    "file-name": "scripts-er/er-get-relationship-HasTreeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasTreeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DescribesTreeNode",
+                    "file-name": "scripts-er/er-get-relationship-DescribesTreeNode.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DescribesTreeNode",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasNodeAttribute",
+                    "file-name": "scripts-er/er-get-relationship-HasNodeAttribute.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasNodeAttribute",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Displays",
+                    "file-name": "scripts-er/er-get-relationship-Displays.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Displays",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDisplayedOn",
+                    "file-name": "scripts-er/er-get-relationship-IsDisplayedOn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDisplayedOn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Encompasses",
+                    "file-name": "scripts-er/er-get-relationship-Encompasses.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Encompasses",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsEncompassedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsEncompassedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsEncompassedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_EvaluatedIn",
+                    "file-name": "scripts-er/er-get-relationship-EvaluatedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-EvaluatedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludesStrain",
+                    "file-name": "scripts-er/er-get-relationship-IncludesStrain.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludesStrain",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_FeatureMeasuredBy",
+                    "file-name": "scripts-er/er-get-relationship-FeatureMeasuredBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-FeatureMeasuredBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_MeasuresFeature",
+                    "file-name": "scripts-er/er-get-relationship-MeasuresFeature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-MeasuresFeature",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Formulated",
+                    "file-name": "scripts-er/er-get-relationship-Formulated.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Formulated",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasFormulatedBy",
+                    "file-name": "scripts-er/er-get-relationship-WasFormulatedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasFormulatedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_GeneratedLevelsFor",
+                    "file-name": "scripts-er/er-get-relationship-GeneratedLevelsFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-GeneratedLevelsFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasGeneratedFrom",
+                    "file-name": "scripts-er/er-get-relationship-WasGeneratedFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasGeneratedFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_GenomeParentOf",
+                    "file-name": "scripts-er/er-get-relationship-GenomeParentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-GenomeParentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DerivedFromGenome",
+                    "file-name": "scripts-er/er-get-relationship-DerivedFromGenome.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DerivedFromGenome",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasCompoundAliasFrom",
+                    "file-name": "scripts-er/er-get-relationship-HasCompoundAliasFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasCompoundAliasFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_UsesAliasForCompound",
+                    "file-name": "scripts-er/er-get-relationship-UsesAliasForCompound.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-UsesAliasForCompound",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasExperimentalUnit",
+                    "file-name": "scripts-er/er-get-relationship-HasExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsExperimentalUnitOf",
+                    "file-name": "scripts-er/er-get-relationship-IsExperimentalUnitOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsExperimentalUnitOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasIndicatedSignalFrom",
+                    "file-name": "scripts-er/er-get-relationship-HasIndicatedSignalFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasIndicatedSignalFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IndicatesSignalFor",
+                    "file-name": "scripts-er/er-get-relationship-IndicatesSignalFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IndicatesSignalFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasKnockoutIn",
+                    "file-name": "scripts-er/er-get-relationship-HasKnockoutIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasKnockoutIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_KnockedOutIn",
+                    "file-name": "scripts-er/er-get-relationship-KnockedOutIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-KnockedOutIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasMeasurement",
+                    "file-name": "scripts-er/er-get-relationship-HasMeasurement.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasMeasurement",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsMeasureOf",
+                    "file-name": "scripts-er/er-get-relationship-IsMeasureOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsMeasureOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasMember",
+                    "file-name": "scripts-er/er-get-relationship-HasMember.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasMember",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsMemberOf",
+                    "file-name": "scripts-er/er-get-relationship-IsMemberOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsMemberOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasParameter",
+                    "file-name": "scripts-er/er-get-relationship-HasParameter.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasParameter",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_OfEnvironment",
+                    "file-name": "scripts-er/er-get-relationship-OfEnvironment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-OfEnvironment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasParticipant",
+                    "file-name": "scripts-er/er-get-relationship-HasParticipant.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasParticipant",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ParticipatesIn",
+                    "file-name": "scripts-er/er-get-relationship-ParticipatesIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ParticipatesIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasPresenceOf",
+                    "file-name": "scripts-er/er-get-relationship-HasPresenceOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasPresenceOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsPresentIn",
+                    "file-name": "scripts-er/er-get-relationship-IsPresentIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsPresentIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasProteinMember",
+                    "file-name": "scripts-er/er-get-relationship-HasProteinMember.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasProteinMember",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsProteinMemberOf",
+                    "file-name": "scripts-er/er-get-relationship-IsProteinMemberOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsProteinMemberOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasReactionAliasFrom",
+                    "file-name": "scripts-er/er-get-relationship-HasReactionAliasFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasReactionAliasFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_UsesAliasForReaction",
+                    "file-name": "scripts-er/er-get-relationship-UsesAliasForReaction.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-UsesAliasForReaction",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasRepresentativeOf",
+                    "file-name": "scripts-er/er-get-relationship-HasRepresentativeOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasRepresentativeOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRepresentedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsRepresentedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRepresentedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasRequirementOf",
+                    "file-name": "scripts-er/er-get-relationship-HasRequirementOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasRequirementOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsARequirementOf",
+                    "file-name": "scripts-er/er-get-relationship-IsARequirementOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsARequirementOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasResultsIn",
+                    "file-name": "scripts-er/er-get-relationship-HasResultsIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasResultsIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasResultsFor",
+                    "file-name": "scripts-er/er-get-relationship-HasResultsFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasResultsFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasSection",
+                    "file-name": "scripts-er/er-get-relationship-HasSection.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasSection",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSectionOf",
+                    "file-name": "scripts-er/er-get-relationship-IsSectionOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSectionOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasStep",
+                    "file-name": "scripts-er/er-get-relationship-HasStep.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasStep",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsStepOf",
+                    "file-name": "scripts-er/er-get-relationship-IsStepOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsStepOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasTrait",
+                    "file-name": "scripts-er/er-get-relationship-HasTrait.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasTrait",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Measures",
+                    "file-name": "scripts-er/er-get-relationship-Measures.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Measures",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasUnits",
+                    "file-name": "scripts-er/er-get-relationship-HasUnits.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasUnits",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsLocated",
+                    "file-name": "scripts-er/er-get-relationship-IsLocated.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsLocated",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasUsage",
+                    "file-name": "scripts-er/er-get-relationship-HasUsage.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasUsage",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsUsageOf",
+                    "file-name": "scripts-er/er-get-relationship-IsUsageOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsUsageOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasValueFor",
+                    "file-name": "scripts-er/er-get-relationship-HasValueFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasValueFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasValueIn",
+                    "file-name": "scripts-er/er-get-relationship-HasValueIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasValueIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasVariationIn",
+                    "file-name": "scripts-er/er-get-relationship-HasVariationIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasVariationIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsVariedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsVariedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsVariedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Impacts",
+                    "file-name": "scripts-er/er-get-relationship-Impacts.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Impacts",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsImpactedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsImpactedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsImpactedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ImplementsReaction",
+                    "file-name": "scripts-er/er-get-relationship-ImplementsReaction.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ImplementsReaction",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ImplementedBasedOn",
+                    "file-name": "scripts-er/er-get-relationship-ImplementedBasedOn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ImplementedBasedOn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Includes",
+                    "file-name": "scripts-er/er-get-relationship-Includes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Includes",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsIncludedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsIncludedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsIncludedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludesAdditionalCompounds",
+                    "file-name": "scripts-er/er-get-relationship-IncludesAdditionalCompounds.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludesAdditionalCompounds",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludedIn",
+                    "file-name": "scripts-er/er-get-relationship-IncludedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludesAlignmentRow",
+                    "file-name": "scripts-er/er-get-relationship-IncludesAlignmentRow.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludesAlignmentRow",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAlignmentRowIn",
+                    "file-name": "scripts-er/er-get-relationship-IsAlignmentRowIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAlignmentRowIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludesPart",
+                    "file-name": "scripts-er/er-get-relationship-IncludesPart.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludesPart",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsPartOf",
+                    "file-name": "scripts-er/er-get-relationship-IsPartOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsPartOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IndicatedLevelsFor",
+                    "file-name": "scripts-er/er-get-relationship-IndicatedLevelsFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IndicatedLevelsFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasLevelsFrom",
+                    "file-name": "scripts-er/er-get-relationship-HasLevelsFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasLevelsFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Involves",
+                    "file-name": "scripts-er/er-get-relationship-Involves.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Involves",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInvolvedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsInvolvedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInvolvedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAnnotatedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsAnnotatedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAnnotatedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Annotates",
+                    "file-name": "scripts-er/er-get-relationship-Annotates.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Annotates",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAssayOf",
+                    "file-name": "scripts-er/er-get-relationship-IsAssayOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAssayOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsAssayedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsAssayedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsAssayedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsClassFor",
+                    "file-name": "scripts-er/er-get-relationship-IsClassFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsClassFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInClass",
+                    "file-name": "scripts-er/er-get-relationship-IsInClass.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInClass",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsCollectionOf",
+                    "file-name": "scripts-er/er-get-relationship-IsCollectionOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsCollectionOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsCollectedInto",
+                    "file-name": "scripts-er/er-get-relationship-IsCollectedInto.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsCollectedInto",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsComposedOf",
+                    "file-name": "scripts-er/er-get-relationship-IsComposedOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsComposedOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsComponentOf",
+                    "file-name": "scripts-er/er-get-relationship-IsComponentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsComponentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsComprisedOf",
+                    "file-name": "scripts-er/er-get-relationship-IsComprisedOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsComprisedOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Comprises",
+                    "file-name": "scripts-er/er-get-relationship-Comprises.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Comprises",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsConfiguredBy",
+                    "file-name": "scripts-er/er-get-relationship-IsConfiguredBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsConfiguredBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ReflectsStateOf",
+                    "file-name": "scripts-er/er-get-relationship-ReflectsStateOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ReflectsStateOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsConsistentWith",
+                    "file-name": "scripts-er/er-get-relationship-IsConsistentWith.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsConsistentWith",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsConsistentTo",
+                    "file-name": "scripts-er/er-get-relationship-IsConsistentTo.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsConsistentTo",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsContextOf",
+                    "file-name": "scripts-er/er-get-relationship-IsContextOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsContextOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasEnvironment",
+                    "file-name": "scripts-er/er-get-relationship-HasEnvironment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasEnvironment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsCoregulatedWith",
+                    "file-name": "scripts-er/er-get-relationship-IsCoregulatedWith.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsCoregulatedWith",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasCoregulationWith",
+                    "file-name": "scripts-er/er-get-relationship-HasCoregulationWith.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasCoregulationWith",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsCoupledTo",
+                    "file-name": "scripts-er/er-get-relationship-IsCoupledTo.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsCoupledTo",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsCoupledWith",
+                    "file-name": "scripts-er/er-get-relationship-IsCoupledWith.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsCoupledWith",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDeterminedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsDeterminedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDeterminedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Determines",
+                    "file-name": "scripts-er/er-get-relationship-Determines.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Determines",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDividedInto",
+                    "file-name": "scripts-er/er-get-relationship-IsDividedInto.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDividedInto",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsDivisionOf",
+                    "file-name": "scripts-er/er-get-relationship-IsDivisionOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsDivisionOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsExecutedAs",
+                    "file-name": "scripts-er/er-get-relationship-IsExecutedAs.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsExecutedAs",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsExecutionOf",
+                    "file-name": "scripts-er/er-get-relationship-IsExecutionOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsExecutionOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsExemplarOf",
+                    "file-name": "scripts-er/er-get-relationship-IsExemplarOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsExemplarOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasAsExemplar",
+                    "file-name": "scripts-er/er-get-relationship-HasAsExemplar.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasAsExemplar",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsFamilyFor",
+                    "file-name": "scripts-er/er-get-relationship-IsFamilyFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsFamilyFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DeterminesFunctionOf",
+                    "file-name": "scripts-er/er-get-relationship-DeterminesFunctionOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DeterminesFunctionOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsFormedOf",
+                    "file-name": "scripts-er/er-get-relationship-IsFormedOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsFormedOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsFormedInto",
+                    "file-name": "scripts-er/er-get-relationship-IsFormedInto.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsFormedInto",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsFunctionalIn",
+                    "file-name": "scripts-er/er-get-relationship-IsFunctionalIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsFunctionalIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasFunctional",
+                    "file-name": "scripts-er/er-get-relationship-HasFunctional.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasFunctional",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsGroupFor",
+                    "file-name": "scripts-er/er-get-relationship-IsGroupFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsGroupFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInGroup",
+                    "file-name": "scripts-er/er-get-relationship-IsInGroup.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInGroup",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsImplementedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsImplementedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsImplementedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Implements",
+                    "file-name": "scripts-er/er-get-relationship-Implements.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Implements",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInPair",
+                    "file-name": "scripts-er/er-get-relationship-IsInPair.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInPair",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsPairOf",
+                    "file-name": "scripts-er/er-get-relationship-IsPairOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsPairOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInstantiatedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsInstantiatedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInstantiatedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInstanceOf",
+                    "file-name": "scripts-er/er-get-relationship-IsInstanceOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInstanceOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsLocatedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsLocatedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsLocatedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsLocusFor",
+                    "file-name": "scripts-er/er-get-relationship-IsLocusFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsLocusFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsMeasurementMethodOf",
+                    "file-name": "scripts-er/er-get-relationship-IsMeasurementMethodOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsMeasurementMethodOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasMeasuredBy",
+                    "file-name": "scripts-er/er-get-relationship-WasMeasuredBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasMeasuredBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsModeledBy",
+                    "file-name": "scripts-er/er-get-relationship-IsModeledBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsModeledBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Models",
+                    "file-name": "scripts-er/er-get-relationship-Models.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Models",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsModifiedToBuildAlignment",
+                    "file-name": "scripts-er/er-get-relationship-IsModifiedToBuildAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsModifiedToBuildAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsModificationOfAlignment",
+                    "file-name": "scripts-er/er-get-relationship-IsModificationOfAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsModificationOfAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsModifiedToBuildTree",
+                    "file-name": "scripts-er/er-get-relationship-IsModifiedToBuildTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsModifiedToBuildTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsModificationOfTree",
+                    "file-name": "scripts-er/er-get-relationship-IsModificationOfTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsModificationOfTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsOwnerOf",
+                    "file-name": "scripts-er/er-get-relationship-IsOwnerOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsOwnerOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsOwnedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsOwnedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsOwnedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsParticipatingAt",
+                    "file-name": "scripts-er/er-get-relationship-IsParticipatingAt.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsParticipatingAt",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ParticipatesAt",
+                    "file-name": "scripts-er/er-get-relationship-ParticipatesAt.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ParticipatesAt",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsProteinFor",
+                    "file-name": "scripts-er/er-get-relationship-IsProteinFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsProteinFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Produces",
+                    "file-name": "scripts-er/er-get-relationship-Produces.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Produces",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsReagentIn",
+                    "file-name": "scripts-er/er-get-relationship-IsReagentIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsReagentIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Targets",
+                    "file-name": "scripts-er/er-get-relationship-Targets.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Targets",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRealLocationOf",
+                    "file-name": "scripts-er/er-get-relationship-IsRealLocationOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRealLocationOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasRealLocationIn",
+                    "file-name": "scripts-er/er-get-relationship-HasRealLocationIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasRealLocationIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsReferencedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsReferencedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsReferencedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_UsesReference",
+                    "file-name": "scripts-er/er-get-relationship-UsesReference.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-UsesReference",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRegulatedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsRegulatedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRegulatedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRegulatedSetOf",
+                    "file-name": "scripts-er/er-get-relationship-IsRegulatedSetOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRegulatedSetOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRelevantFor",
+                    "file-name": "scripts-er/er-get-relationship-IsRelevantFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRelevantFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRelevantTo",
+                    "file-name": "scripts-er/er-get-relationship-IsRelevantTo.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRelevantTo",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRepresentedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsRepresentedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRepresentedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DefinedBy",
+                    "file-name": "scripts-er/er-get-relationship-DefinedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DefinedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRoleOf",
+                    "file-name": "scripts-er/er-get-relationship-IsRoleOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRoleOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasRole",
+                    "file-name": "scripts-er/er-get-relationship-HasRole.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasRole",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRowOf",
+                    "file-name": "scripts-er/er-get-relationship-IsRowOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRowOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsRoleFor",
+                    "file-name": "scripts-er/er-get-relationship-IsRoleFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsRoleFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSequenceOf",
+                    "file-name": "scripts-er/er-get-relationship-IsSequenceOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSequenceOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasAsSequence",
+                    "file-name": "scripts-er/er-get-relationship-HasAsSequence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasAsSequence",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSubInstanceOf",
+                    "file-name": "scripts-er/er-get-relationship-IsSubInstanceOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSubInstanceOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Validates",
+                    "file-name": "scripts-er/er-get-relationship-Validates.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Validates",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSummarizedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsSummarizedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSummarizedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Summarizes",
+                    "file-name": "scripts-er/er-get-relationship-Summarizes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Summarizes",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSuperclassOf",
+                    "file-name": "scripts-er/er-get-relationship-IsSuperclassOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSuperclassOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSubclassOf",
+                    "file-name": "scripts-er/er-get-relationship-IsSubclassOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSubclassOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsTaxonomyOf",
+                    "file-name": "scripts-er/er-get-relationship-IsTaxonomyOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsTaxonomyOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsInTaxa",
+                    "file-name": "scripts-er/er-get-relationship-IsInTaxa.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsInTaxa",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsTerminusFor",
+                    "file-name": "scripts-er/er-get-relationship-IsTerminusFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsTerminusFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasAsTerminus",
+                    "file-name": "scripts-er/er-get-relationship-HasAsTerminus.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasAsTerminus",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsTriggeredBy",
+                    "file-name": "scripts-er/er-get-relationship-IsTriggeredBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsTriggeredBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Triggers",
+                    "file-name": "scripts-er/er-get-relationship-Triggers.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Triggers",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsUsedToBuildTree",
+                    "file-name": "scripts-er/er-get-relationship-IsUsedToBuildTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsUsedToBuildTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsBuiltFromAlignment",
+                    "file-name": "scripts-er/er-get-relationship-IsBuiltFromAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsBuiltFromAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Manages",
+                    "file-name": "scripts-er/er-get-relationship-Manages.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Manages",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsManagedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsManagedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsManagedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_OperatesIn",
+                    "file-name": "scripts-er/er-get-relationship-OperatesIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-OperatesIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsUtilizedIn",
+                    "file-name": "scripts-er/er-get-relationship-IsUtilizedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsUtilizedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_OrdersExperimentalUnit",
+                    "file-name": "scripts-er/er-get-relationship-OrdersExperimentalUnit.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-OrdersExperimentalUnit",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsTimepointOf",
+                    "file-name": "scripts-er/er-get-relationship-IsTimepointOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsTimepointOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Overlaps",
+                    "file-name": "scripts-er/er-get-relationship-Overlaps.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Overlaps",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IncludesPartOf",
+                    "file-name": "scripts-er/er-get-relationship-IncludesPartOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IncludesPartOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ParticipatesAs",
+                    "file-name": "scripts-er/er-get-relationship-ParticipatesAs.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ParticipatesAs",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsParticipationOf",
+                    "file-name": "scripts-er/er-get-relationship-IsParticipationOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsParticipationOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_PerformedExperiment",
+                    "file-name": "scripts-er/er-get-relationship-PerformedExperiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-PerformedExperiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_PerformedBy",
+                    "file-name": "scripts-er/er-get-relationship-PerformedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-PerformedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ProducedResultsFor",
+                    "file-name": "scripts-er/er-get-relationship-ProducedResultsFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ProducedResultsFor",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HadResultsProducedBy",
+                    "file-name": "scripts-er/er-get-relationship-HadResultsProducedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HadResultsProducedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Provided",
+                    "file-name": "scripts-er/er-get-relationship-Provided.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Provided",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasProvidedBy",
+                    "file-name": "scripts-er/er-get-relationship-WasProvidedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasProvidedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_PublishedExperiment",
+                    "file-name": "scripts-er/er-get-relationship-PublishedExperiment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-PublishedExperiment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ExperimentPublishedIn",
+                    "file-name": "scripts-er/er-get-relationship-ExperimentPublishedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ExperimentPublishedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_PublishedProtocol",
+                    "file-name": "scripts-er/er-get-relationship-PublishedProtocol.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-PublishedProtocol",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_ProtocolPublishedIn",
+                    "file-name": "scripts-er/er-get-relationship-ProtocolPublishedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-ProtocolPublishedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Shows",
+                    "file-name": "scripts-er/er-get-relationship-Shows.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Shows",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsShownOn",
+                    "file-name": "scripts-er/er-get-relationship-IsShownOn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsShownOn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_StrainParentOf",
+                    "file-name": "scripts-er/er-get-relationship-StrainParentOf.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-StrainParentOf",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_DerivedFromStrain",
+                    "file-name": "scripts-er/er-get-relationship-DerivedFromStrain.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-DerivedFromStrain",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Submitted",
+                    "file-name": "scripts-er/er-get-relationship-Submitted.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Submitted",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_WasSubmittedBy",
+                    "file-name": "scripts-er/er-get-relationship-WasSubmittedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-WasSubmittedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_SupersedesAlignment",
+                    "file-name": "scripts-er/er-get-relationship-SupersedesAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-SupersedesAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSupersededByAlignment",
+                    "file-name": "scripts-er/er-get-relationship-IsSupersededByAlignment.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSupersededByAlignment",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_SupersedesTree",
+                    "file-name": "scripts-er/er-get-relationship-SupersedesTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-SupersedesTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsSupersededByTree",
+                    "file-name": "scripts-er/er-get-relationship-IsSupersededByTree.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsSupersededByTree",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Treed",
+                    "file-name": "scripts-er/er-get-relationship-Treed.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Treed",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsTreeFrom",
+                    "file-name": "scripts-er/er-get-relationship-IsTreeFrom.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsTreeFrom",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_UsedIn",
+                    "file-name": "scripts-er/er-get-relationship-UsedIn.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-UsedIn",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_HasMedia",
+                    "file-name": "scripts-er/er-get-relationship-HasMedia.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-HasMedia",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_Uses",
+                    "file-name": "scripts-er/er-get-relationship-Uses.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-Uses",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_IsUsedBy",
+                    "file-name": "scripts-er/er-get-relationship-IsUsedBy.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-IsUsedBy",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_UsesCodons",
+                    "file-name": "scripts-er/er-get-relationship-UsesCodons.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-UsesCodons",
+                    "warning-mssg": "blah blah blah"
+                }
+             , 
+                {
+                    "deprecated-name": "get_relationship_AreCodonsFor",
+                    "file-name": "scripts-er/er-get-relationship-AreCodonsFor.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "er-get-relationship-AreCodonsFor",
+                    "warning-mssg": "blah blah blah"
+                }
+            
             ]
     }
 }
