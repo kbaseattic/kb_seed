@@ -110,6 +110,14 @@ build-dev-container-script-wrappers:
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR)
 
+clean-dev-container-script-wrappers:
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS.json \
+		--irisCommandsFile COMMANDS.old.format \
+		--target $(TOP_DIR) \
+		--no-copyScripts \
+		--devContainerToolsDir $(TOOLS_DIR) \
+		--undeploy
 
 # deploys scripts to target
 deploy-script-wrappers:
@@ -117,9 +125,15 @@ deploy-script-wrappers:
 		--jsonCommandsFile COMMANDS.json \
 		--irisCommandsFile COMMANDS.old.format \
 		--target $(TARGET) \
+		--devContainerToolsDir $(TOOLS_DIR)
+
+undeploy-script-wrappers:
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS.json \
+		--irisCommandsFile COMMANDS.old.format \
+		--target $(TARGET) \
 		--devContainerToolsDir $(TOOLS_DIR) \
 		--undeploy
-
 
 java-client: java.out/built_flag
 
