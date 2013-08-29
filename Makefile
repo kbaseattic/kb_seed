@@ -101,11 +101,16 @@ compile-dbd:
 		lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)_EntityAPIImpl.pm \
 		scripts-er
 
-# deploys scripts to dev_container
+# deploys scripts to dev_container (including CDMI Internal Scripts)
 build-dev-container-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
 		--irisCommandsFile COMMANDS.old.format \
+		--target $(TOP_DIR) \
+		--no-copyScripts \
+		--devContainerToolsDir $(TOOLS_DIR)
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS-INTERNAL.json \
 		--target $(TOP_DIR) \
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR)
@@ -114,6 +119,12 @@ clean-dev-container-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
 		--irisCommandsFile COMMANDS.old.format \
+		--target $(TOP_DIR) \
+		--no-copyScripts \
+		--devContainerToolsDir $(TOOLS_DIR) \
+		--undeploy
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS-INTERNAL.json \
 		--target $(TOP_DIR) \
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR) \

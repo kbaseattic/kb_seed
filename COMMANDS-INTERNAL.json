@@ -1,0 +1,10 @@
+{
+    "iris": { "group-names":  [] },
+
+    "cli": {
+        "commands": [
+                {"file-spec": "scripts-internal/*.pl", "lang":"perl"}
+            ],
+        "deprecated-commands": []
+    }
+}
