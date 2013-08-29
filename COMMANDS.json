@@ -3400,6 +3400,614 @@
                     "new-command-name": "er-get-relationship-AreCodonsFor"
                 }
             
+             ,
+                {
+                    "deprecated-name": "aliases_to_fids",
+                    "file-name": "scripts-cs/cs-aliases-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-aliases-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "all_roles_used_in_models",
+                    "file-name": "scripts-cs/cs-all-roles-used-in-models.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-all-roles-used-in-models"
+                }
+             ,
+                {
+                    "deprecated-name": "all_roles_used_in_models_and_subsystems",
+                    "file-name": "scripts-cs/cs-all-roles-used-in-models-and-subsystems.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-all-roles-used-in-models-and-subsystems"
+                }
+             ,
+                {
+                    "deprecated-name": "alleles_to_bp_locs",
+                    "file-name": "scripts-cs/cs-alleles-to-bp-locs.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-alleles-to-bp-locs"
+                }
+             ,
+                {
+                    "deprecated-name": "alleles_to_traits",
+                    "file-name": "scripts-cs/cs-alleles-to-traits.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-alleles-to-traits"
+                }
+             ,
+                {
+                    "deprecated-name": "atomic_regulons_to_fids",
+                    "file-name": "scripts-cs/cs-atomic-regulons-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-atomic-regulons-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "close_genomes",
+                    "file-name": "scripts-cs/cs-close-genomes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-close-genomes"
+                }
+             ,
+                {
+                    "deprecated-name": "co_occurrence_evidence",
+                    "file-name": "scripts-cs/cs-co-occurrence-evidence.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-co-occurrence-evidence"
+                }
+             ,
+                {
+                    "deprecated-name": "complexes_to_complex_data",
+                    "file-name": "scripts-cs/cs-complexes-to-complex-data.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-complexes-to-complex-data"
+                }
+             ,
+                {
+                    "deprecated-name": "complexes_to_roles",
+                    "file-name": "scripts-cs/cs-complexes-to-roles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-complexes-to-roles"
+                }
+             ,
+                {
+                    "deprecated-name": "contigs_to_lengths",
+                    "file-name": "scripts-cs/cs-contigs-to-lengths.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-contigs-to-lengths"
+                }
+             ,
+                {
+                    "deprecated-name": "contigs_to_md5s",
+                    "file-name": "scripts-cs/cs-contigs-to-md5s.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-contigs-to-md5s"
+                }
+             ,
+                {
+                    "deprecated-name": "contigs_to_sequences",
+                    "file-name": "scripts-cs/cs-contigs-to-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-contigs-to-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "corresponds",
+                    "file-name": "scripts-cs/cs-corresponds.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-corresponds"
+                }
+             ,
+                {
+                    "deprecated-name": "equiv_sequence_assertions",
+                    "file-name": "scripts-cs/cs-equiv-sequence-assertions.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-equiv-sequence-assertions"
+                }
+             ,
+                {
+                    "deprecated-name": "external_ids_to_fids",
+                    "file-name": "scripts-cs/cs-external-ids-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-external-ids-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_annotations",
+                    "file-name": "scripts-cs/cs-fids-to-annotations.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-annotations"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_atomic_regulons",
+                    "file-name": "scripts-cs/cs-fids-to-atomic-regulons.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-atomic-regulons"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_co_occurring_fids",
+                    "file-name": "scripts-cs/cs-fids-to-co-occurring-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-co-occurring-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_coexpressed_fids",
+                    "file-name": "scripts-cs/cs-fids-to-coexpressed-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-coexpressed-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_dna_sequences",
+                    "file-name": "scripts-cs/cs-fids-to-dna-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-dna-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_feature_data",
+                    "file-name": "scripts-cs/cs-fids-to-feature-data.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-feature-data"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_functions",
+                    "file-name": "scripts-cs/cs-fids-to-functions.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-functions"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_genomes",
+                    "file-name": "scripts-cs/cs-fids-to-genomes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-genomes"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_literature",
+                    "file-name": "scripts-cs/cs-fids-to-literature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-literature"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_locations",
+                    "file-name": "scripts-cs/cs-fids-to-locations.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-locations"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_protein_families",
+                    "file-name": "scripts-cs/cs-fids-to-protein-families.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-protein-families"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_protein_sequences",
+                    "file-name": "scripts-cs/cs-fids-to-protein-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-protein-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_proteins",
+                    "file-name": "scripts-cs/cs-fids-to-proteins.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-proteins"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_regulon_data",
+                    "file-name": "scripts-cs/cs-fids-to-regulon-data.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-regulon-data"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_roles",
+                    "file-name": "scripts-cs/cs-fids-to-roles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-roles"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_subsystem_data",
+                    "file-name": "scripts-cs/cs-fids-to-subsystem-data.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-subsystem-data"
+                }
+             ,
+                {
+                    "deprecated-name": "fids_to_subsystems",
+                    "file-name": "scripts-cs/cs-fids-to-subsystems.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-fids-to-subsystems"
+                }
+             ,
+                {
+                    "deprecated-name": "genome_to_intergenic_regions",
+                    "file-name": "scripts-cs/cs-genome-to-intergenic-regions.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genome-to-intergenic-regions"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_contigs",
+                    "file-name": "scripts-cs/cs-genomes-to-contigs.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-contigs"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_fids",
+                    "file-name": "scripts-cs/cs-genomes-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_genome_data",
+                    "file-name": "scripts-cs/cs-genomes-to-genome-data.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-genome-data"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_md5s",
+                    "file-name": "scripts-cs/cs-genomes-to-md5s.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-md5s"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_subsystems",
+                    "file-name": "scripts-cs/cs-genomes-to-subsystems.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-subsystems"
+                }
+             ,
+                {
+                    "deprecated-name": "genomes_to_taxonomies",
+                    "file-name": "scripts-cs/cs-genomes-to-taxonomies.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-genomes-to-taxonomies"
+                }
+             ,
+                {
+                    "deprecated-name": "get",
+                    "file-name": "scripts-cs/cs-get.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-get"
+                }
+             ,
+                {
+                    "deprecated-name": "get_abundance_profile",
+                    "file-name": "scripts-cs/cs-get-abundance-profile.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-get-abundance-profile"
+                }
+             ,
+                {
+                    "deprecated-name": "locations_to_dna_sequences",
+                    "file-name": "scripts-cs/cs-locations-to-dna-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-locations-to-dna-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "locations_to_fids",
+                    "file-name": "scripts-cs/cs-locations-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-locations-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "md5s_to_genomes",
+                    "file-name": "scripts-cs/cs-md5s-to-genomes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-md5s-to-genomes"
+                }
+             ,
+                {
+                    "deprecated-name": "otu_members",
+                    "file-name": "scripts-cs/cs-otu-members.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-otu-members"
+                }
+             ,
+                {
+                    "deprecated-name": "otus_to_representatives",
+                    "file-name": "scripts-cs/cs-otus-to-representatives.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-otus-to-representatives"
+                }
+             ,
+                {
+                    "deprecated-name": "ous_with_trait",
+                    "file-name": "scripts-cs/cs-ous-with-trait.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-ous-with-trait"
+                }
+             ,
+                {
+                    "deprecated-name": "protein_families_to_co_occurring_families",
+                    "file-name": "scripts-cs/cs-protein-families-to-co-occurring-families.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-protein-families-to-co-occurring-families"
+                }
+             ,
+                {
+                    "deprecated-name": "protein_families_to_fids",
+                    "file-name": "scripts-cs/cs-protein-families-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-protein-families-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "protein_families_to_functions",
+                    "file-name": "scripts-cs/cs-protein-families-to-functions.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-protein-families-to-functions"
+                }
+             ,
+                {
+                    "deprecated-name": "protein_families_to_proteins",
+                    "file-name": "scripts-cs/cs-protein-families-to-proteins.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-protein-families-to-proteins"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_fids",
+                    "file-name": "scripts-cs/cs-proteins-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_functions",
+                    "file-name": "scripts-cs/cs-proteins-to-functions.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-functions"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_literature",
+                    "file-name": "scripts-cs/cs-proteins-to-literature.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-literature"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_protein_families",
+                    "file-name": "scripts-cs/cs-proteins-to-protein-families.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-protein-families"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_roles",
+                    "file-name": "scripts-cs/cs-proteins-to-roles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-roles"
+                }
+             ,
+                {
+                    "deprecated-name": "proteins_to_sequences",
+                    "file-name": "scripts-cs/cs-proteins-to-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-proteins-to-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "reaction_strings",
+                    "file-name": "scripts-cs/cs-reaction-strings.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-reaction-strings"
+                }
+             ,
+                {
+                    "deprecated-name": "reactions_to_complexes",
+                    "file-name": "scripts-cs/cs-reactions-to-complexes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-reactions-to-complexes"
+                }
+             ,
+                {
+                    "deprecated-name": "region_to_alleles",
+                    "file-name": "scripts-cs/cs-region-to-alleles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-region-to-alleles"
+                }
+             ,
+                {
+                    "deprecated-name": "region_to_fids",
+                    "file-name": "scripts-cs/cs-region-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-region-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "regulons_to_fids",
+                    "file-name": "scripts-cs/cs-regulons-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-regulons-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "representative",
+                    "file-name": "scripts-cs/cs-representative.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-representative"
+                }
+             ,
+                {
+                    "deprecated-name": "representative_sequences",
+                    "file-name": "scripts-cs/cs-representative-sequences.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-representative-sequences"
+                }
+             ,
+                {
+                    "deprecated-name": "roles_to_complexes",
+                    "file-name": "scripts-cs/cs-roles-to-complexes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-roles-to-complexes"
+                }
+             ,
+                {
+                    "deprecated-name": "roles_to_fids",
+                    "file-name": "scripts-cs/cs-roles-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-roles-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "roles_to_protein_families",
+                    "file-name": "scripts-cs/cs-roles-to-protein-families.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-roles-to-protein-families"
+                }
+             ,
+                {
+                    "deprecated-name": "roles_to_proteins",
+                    "file-name": "scripts-cs/cs-roles-to-proteins.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-roles-to-proteins"
+                }
+             ,
+                {
+                    "deprecated-name": "roles_to_subsystems",
+                    "file-name": "scripts-cs/cs-roles-to-subsystems.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-roles-to-subsystems"
+                }
+             ,
+                {
+                    "deprecated-name": "subsystems_to_fids",
+                    "file-name": "scripts-cs/cs-subsystems-to-fids.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-subsystems-to-fids"
+                }
+             ,
+                {
+                    "deprecated-name": "subsystems_to_genomes",
+                    "file-name": "scripts-cs/cs-subsystems-to-genomes.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-subsystems-to-genomes"
+                }
+             ,
+                {
+                    "deprecated-name": "subsystems_to_roles",
+                    "file-name": "scripts-cs/cs-subsystems-to-roles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-subsystems-to-roles"
+                }
+             ,
+                {
+                    "deprecated-name": "subsystems_to_spreadsheets",
+                    "file-name": "scripts-cs/cs-subsystems-to-spreadsheets.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-subsystems-to-spreadsheets"
+                }
+             ,
+                {
+                    "deprecated-name": "text_search",
+                    "file-name": "scripts-cs/cs-text-search.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-text-search"
+                }
+             ,
+                {
+                    "deprecated-name": "traits_to_alleles",
+                    "file-name": "scripts-cs/cs-traits-to-alleles.pl",
+                    "lang":"perl",
+                    "deploy-to-iris":true,
+                    "new-command-name": "cs-traits-to-alleles"
+                }
             ]
     }
 }
