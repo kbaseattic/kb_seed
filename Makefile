@@ -89,6 +89,7 @@ compile-typespec:
 	-rm -r lib/CDMI_EntityAPIImpl.py
 
 # target which compiles ERDB xml specification, and outputs the resulting spec and scripts
+# this also calls deploy-wrappers to regenerate the old COMMAND file
 # note: that it cleans the entire scripts-er directory, so any manual changes will be lost!
 compile-dbd:
 	rm -rf scripts-er
@@ -100,12 +101,15 @@ compile-dbd:
 		lib/$(SERVICE_NAME)-EntityAPI.spec \
 		lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)_EntityAPIImpl.pm \
 		scripts-er
+	$(TOOLS_DIR)/deploy-wrappers \
+		--jsonCommandsFile COMMANDS.json \
+		--irisCommandsFile COMMANDS \
+		--devContainerToolsDir $(TOOLS_DIR)
 
 # deploys scripts to dev_container (including CDMI Internal Scripts)
 build-dev-container-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
-		--irisCommandsFile COMMANDS.old.format \
 		--target $(TOP_DIR) \
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR)
@@ -118,7 +122,6 @@ build-dev-container-script-wrappers:
 clean-dev-container-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
-		--irisCommandsFile COMMANDS.old.format \
 		--target $(TOP_DIR) \
 		--no-copyScripts \
 		--devContainerToolsDir $(TOOLS_DIR) \
@@ -134,14 +137,12 @@ clean-dev-container-script-wrappers:
 deploy-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
-		--irisCommandsFile COMMANDS.old.format \
 		--target $(TARGET) \
 		--devContainerToolsDir $(TOOLS_DIR)
 
 undeploy-script-wrappers:
 	$(TOOLS_DIR)/deploy-wrappers \
 		--jsonCommandsFile COMMANDS.json \
-		--irisCommandsFile COMMANDS.old.format \
 		--target $(TARGET) \
 		--devContainerToolsDir $(TOOLS_DIR) \
 		--undeploy
