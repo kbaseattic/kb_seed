@@ -165,10 +165,10 @@ test-prod-server:
 clean:
 	ant clean
 
-$(BIN_DIR)/%: service-scripts/%.pl: $(TOP_DIR)/user-env.sh
+$(BIN_DIR)/%: service-scripts/%.pl $(TOP_DIR)/user-env.sh
 	$(WRAP_PERL_SCRIPT) '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
-$(BIN_DIR)/%: service-scripts/%.py: $(TOP_DIR)/user-env.sh
+$(BIN_DIR)/%: service-scripts/%.py $(TOP_DIR)/user-env.sh
 	$(WRAP_PYTHON_SCRIPT) '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
 include $(TOP_DIR)/tools/Makefile.common.rules
