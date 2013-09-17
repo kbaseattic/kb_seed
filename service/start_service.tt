@@ -7,6 +7,8 @@ export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_name %]
 export KB_SPHINX_PORT=[% kb_sphinx_port %]
 export KB_SPHINX_HOST=[% kb_sphinx_host %]
 export CDMIDBD=$KB_TOP/lib/KSaplingDBD.xml
+export KB_DEPLOYMENT_CONFIG=$KB_TOP/deployment.cfg
+export KB_SERVICE_NAME=[% kb_service_name %]
 
 pid_file=$KB_SERVICE_DIR/service.pid
 

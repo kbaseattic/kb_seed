@@ -19,6 +19,8 @@ SERVICE_NAME_PY = cdmi
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVICE_PORT = 7032
 
+SERVICE_URL = http://10.0.16.68:$(SERVICE_PORT)
+
 CLIENT_TESTS = $(wildcard t/client-tests/*.t)
 SERVER_TESTS = $(wildcard t/server-tests/*.t)
 PROD_TESTS = $(wildcard t/prod-tests/*.t)
@@ -75,7 +77,7 @@ deploy-sphinx:
 	chmod +x $(TARGET)/services/$(SERVICE)/start_sphinx
 	$(TPAGE) $(TPAGE_ARGS) service/stop_sphinx.tt > $(TARGET)/services/$(SERVICE)/stop_sphinx
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_sphinx
-	$(DEPLOY_RUNTIME)/bin/perl scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
+	$(DEPLOY_RUNTIME)/bin/perl service-scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
 
 deploy-monit:
 	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
@@ -85,7 +87,7 @@ deploy-docs: deploy-dir
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
 
-compile-typespec:
+compile-typespec: Makefile
 	mkdir -p lib/biokbase/$(SERVICE_NAME_PY)
 	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
 	touch lib/biokbase/$(SERVICE_NAME_PY)/__init__.py 
@@ -97,6 +99,7 @@ compile-typespec:
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME_PY)/client \
 		--js javascript/$(SERVICE_NAME)/Client \
+		--url $(SERVICE_URL) \
 		lib/$(SERVICE_NAME)-API.spec lib/$(SERVICE_NAME)-EntityAPI.spec lib
 	-rm -r lib/$(SERVER_MODULE)Server.py
 	-rm -r lib/$(SERVER_MODULE)Impl.py

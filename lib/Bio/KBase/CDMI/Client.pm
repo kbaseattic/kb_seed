@@ -107,6 +107,10 @@ sub new
 {
     my($class, $url, @args) = @_;
     
+    if (!defined($url))
+    {
+	$url = 'http://10.0.16.68:7032';
+    }
 
     my $self = {
 	client => Bio::KBase::CDMI::Client::RpcClient->new,
