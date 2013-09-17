@@ -6,8 +6,11 @@ TARGET ?= /kb/deployment
 
 SRC_PERL = $(wildcard scripts/*.pl)
 BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
-
 DEPLOY_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
+
+SRC_SERVICE_PERL = $(wildcard service-scripts/*.pl)
+BIN_SERVICE_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_SERVICE_PERL))))
+DEPLOY_SERVICE_PERL = $(addprefix $(SERVICE_DIR)/bin/,$(basename $(notdir $(SRC_SERVICE_PERL))))
 
 SERVER_MODULE = CDMI_API
 SERVICE = cdmi_api
@@ -32,7 +35,7 @@ JARFILE = $(PWD)/dist/lib/cdmi.jar
 all: bin compile-typespec
 #all: bin jar
 
-bin: $(BIN_PERL)
+bin: $(BIN_PERL) $(BIN_SERVICE_PERL)
 
 jar: 
 	ant -Djar_file=$(JARFILE) -Dkb_top=$(KB_TOP) dist
@@ -41,11 +44,24 @@ deploy: deploy-all
 deploy-all: deploy-client deploy-service
 deploy-client: compile-typespec deploy-libs deploy-scripts deploy-docs
 
-deploy-service: deploy-dir deploy-monit deploy-sphinx
+deploy-service: deploy-dir deploy-monit deploy-sphinx deploy-service-scripts
 	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE)/start_service
 	chmod +x $(TARGET)/services/$(SERVICE)/start_service
 	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE)/stop_service
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
+
+deploy-service-scripts:
+        export KB_TOP=$(TARGET); \
+        export KB_RUNTIME=$(DEPLOY_RUNTIME); \
+        export KB_PERL_PATH=$(TARGET)/lib ; \
+        for src in $(SRC_PERL) ; do \
+                basefile=`basename $$src`; \
+                base=`basename $$src .pl`; \
+                echo install $$src $$base ; \
+                cp $$src $(TARGET)/plbin ; \
+                $(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(SERVICE_DIR)/bin/$$base ; \
+        done
+
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
@@ -68,7 +84,7 @@ deploy-docs: deploy-dir
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Application API" lib/Bio/KBase/CDMI/CDMI_APIImpl.pm > doc/application_api.html
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Central Store Entity/Relationship API" lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm > doc/er_api.html
 	cp doc/*html $(SERVICE_DIR)/webroot/.
-	
+
 compile-typespec:
 	mkdir -p lib/biokbase/$(SERVICE_NAME_PY)
 	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
@@ -121,7 +137,7 @@ test-client:
 			fi \
 		fi \
 	done
-	
+
 test-server:
 	# run each server test
 	for t in $(SERVER_TESTS) ; do \
@@ -133,7 +149,7 @@ test-server:
 			fi \
 		fi \
 	done
-	
+
 test-prod-server:
 	# run each prod test
 	for t in $(PROD_TESTS) ; do \
@@ -148,5 +164,11 @@ test-prod-server:
 
 clean:
 	ant clean
+
+$(BIN_DIR)/%: service-scripts/%.pl: $(TOP_DIR)/user-env.sh
+	$(WRAP_PERL_SCRIPT) '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
+
+$(BIN_DIR)/%: service-scripts/%.py: $(TOP_DIR)/user-env.sh
+	$(WRAP_PYTHON_SCRIPT) '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
 include $(TOP_DIR)/tools/Makefile.common.rules

@@ -24,9 +24,12 @@ no warnings 'redefine';
 use strict;
 use DB_File;
 use File::Basename;
-use FIG;
 
-use Tracer;
+our $have_fig;
+eval {
+    require FIG;
+    $have_fig = 1;
+};
 
 use ProtSims;
 
@@ -169,7 +172,7 @@ sub new {
 
     $figfams->{friH}  = \%fr_hash;
     $figfams->{setiH} = \%set_hash;
-    $figfams->{fig} = new FIG;
+    $figfams->{fig} = new FIG if $have_fig;
 
 
     bless $figfams,$class;

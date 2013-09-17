@@ -41,13 +41,14 @@ sub add_feature {
     my $genomeTO = $self;
     print STDERR (Dumper($parms), qq(\n\n)) if $ENV{DEBUG};
     
-    my $id_server  = $parms->{-id_server}  or die "No -id_server";
-    my $id_prefix  = $parms->{-id_prefix}  or die "No -id_prefix";
-    my $type       = $parms->{-type}       or die "No feature-type -type";
-    my $location   = $parms->{-location}   or die "No feature location -location";
-    my $function   = $parms->{-function};
-    my $annotator  = $parms->{-annotator}  || q(Nobody);
-    my $annotation = $parms->{-annotation} || q(Add feature);
+    my $id_client   = $parms->{-id_client}  or die "No -id_client";
+    my $id_prefix   = $parms->{-id_prefix}  or die "No -id_prefix";
+    my $type        = $parms->{-type}       or die "No feature-type -type";
+    my $location    = $parms->{-location}   or die "No feature location -location";
+    my $function    = $parms->{-function};
+    my $annotator   = $parms->{-annotator}  || q(Nobody);
+    my $annotation  = $parms->{-annotation} || q(Add feature);
+    my $translation = $parms->{-protein_translation};
     
     if (not defined $genomeTO->{features}) {
 	$genomeTO->{features} = [];
@@ -55,7 +56,7 @@ sub add_feature {
     my $features  = $genomeTO->{features};
     
     my $typed_prefix = "$id_prefix.$type";
-    my $next_num     = $id_server->allocate_id_range($typed_prefix, 1);
+    my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
 #   print STDERR Dumper($typed_prefix, $next_num);
     
     if ($next_num) {
@@ -72,8 +73,19 @@ sub add_feature {
 				       $annotator,
 				       time(),
 				       ]],
-		 };
-    if ($function)   { $feature->{function} = $function; }
+    };
+    
+    if ($function) {
+	$feature->{function} = $function;
+	push @ { $feature->{annotations} }, [ "Set function to $function",
+					      $annotator,
+					      time(),
+	                                      ];
+    }
+    
+    if ($translation) {
+	$feature->{protein_translation} = $translation;
+    }
     
     push @$features, $feature;
     

@@ -24,7 +24,11 @@ no warnings 'redefine';
 use Sim;
 use strict;
 use DB_File;
-use FIG;
+our $have_fig;
+eval {
+    require FIG;
+    $have_fig = 1;
+};
 use SeedUtils;
 use ANNOserver;
 
@@ -46,8 +50,10 @@ sub new {
     defined($fam_data) || return undef;
     $figfams->{dir} = $fam_data;
     $figfams->{blast_dir} = $fam_data;
-    #$figfams->{fig} = $fig;    #(defined $fig ? $fig : new FIG);
-    $figfams->{fig} = (defined $fig ? $fig : new FIG);
+    if ($have_fig && !$fig)
+    {
+	$figfams->{fig} = new FIG;
+    }
 
     # If the tables are not installed, we really don't need to fail 8 times -- GJO
     $figfams->{function2families} = &SeedUtils::open_berk_table("$fam_data/function2families.db", -results_as_list => 1);
