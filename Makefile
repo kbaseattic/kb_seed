@@ -53,16 +53,16 @@ deploy-service: deploy-dir deploy-monit deploy-sphinx deploy-service-scripts
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_service
 
 deploy-service-scripts:
-        export KB_TOP=$(TARGET); \
-        export KB_RUNTIME=$(DEPLOY_RUNTIME); \
-        export KB_PERL_PATH=$(TARGET)/lib ; \
-        for src in $(SRC_PERL) ; do \
-                basefile=`basename $$src`; \
-                base=`basename $$src .pl`; \
-                echo install $$src $$base ; \
-                cp $$src $(TARGET)/plbin ; \
-                $(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(SERVICE_DIR)/bin/$$base ; \
-        done
+	export KB_TOP=$(TARGET); \
+	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
+	export KB_PERL_PATH=$(TARGET)/lib ; \
+	for src in $(SRC_PERL) ; do \
+	        basefile=`basename $$src`; \
+	        base=`basename $$src .pl`; \
+	        echo install $$src $$base ; \
+	        cp $$src $(TARGET)/plbin ; \
+	        $(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(SERVICE_DIR)/bin/$$base ; \
+	done
 
 
 deploy-dir:
