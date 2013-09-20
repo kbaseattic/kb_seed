@@ -28,16 +28,30 @@ PROD_TESTS = $(wildcard t/prod-tests/*.t)
 SPHINX_PORT = 7038
 SPHINX_HOST = localhost
 
+STARMAN_WORKERS = 8
+STARMAN_MAX_REQUESTS = 100
+
 TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE) \
 	--define kb_service_port=$(SERVICE_PORT) --define kb_service_dir=$(SERVICE_DIR) \
-	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST)
+	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST) \
+	--define kb_starman_workers=$(STARMAN_WORKERS) \
+	--define kb_starman_max_requests=$(STARMAN_MAX_REQUESTS)
 
 JARFILE = $(PWD)/dist/lib/cdmi.jar
 
 all: bin compile-typespec
 #all: bin jar
 
+SAPLING_XML = lib/KSaplingDBD.xml
+
 bin: $(BIN_PERL) $(BIN_SERVICE_PERL)
+
+build-erdb: lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm lib/CDMI-EntityAPI.spec
+
+lib/CDMI-EntityAPI.spec lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm: $(SAPLING_XML)
+	compile_dbd_to_typespec CDMI_API CDMI_EntityAPI $(SAPLING_XML) CDMI-EntityAPI.spec  \
+		lib/Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm scripts
+	mv CDMI-EntityAPI.spec lib/CDMI-EntityAPI.spec
 
 jar: 
 	ant -Djar_file=$(JARFILE) -Dkb_top=$(KB_TOP) dist
@@ -56,18 +70,19 @@ deploy-service-scripts:
 	export KB_TOP=$(TARGET); \
 	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
 	export KB_PERL_PATH=$(TARGET)/lib ; \
-	for src in $(SRC_PERL) ; do \
+	for src in $(SRC_SERVICE_PERL) ; do \
 	        basefile=`basename $$src`; \
 	        base=`basename $$src .pl`; \
 	        echo install $$src $$base ; \
 	        cp $$src $(TARGET)/plbin ; \
-	        $(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(SERVICE_DIR)/bin/$$base ; \
+	        $(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/services/$(SERVICE)/bin/$$base ; \
 	done
 
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
 	if [ ! -d $(SERVICE_DIR)/webroot ] ; then mkdir $(SERVICE_DIR)/webroot ; fi
+	if [ ! -d $(SERVICE_DIR)/bin ] ; then mkdir $(SERVICE_DIR)/bin ; fi
 	if [ ! -d $(SERVICE_DIR)/sphinx ] ; then mkdir $(SERVICE_DIR)/sphinx ; fi
 
 deploy-sphinx:
@@ -77,7 +92,7 @@ deploy-sphinx:
 	chmod +x $(TARGET)/services/$(SERVICE)/start_sphinx
 	$(TPAGE) $(TPAGE_ARGS) service/stop_sphinx.tt > $(TARGET)/services/$(SERVICE)/stop_sphinx
 	chmod +x $(TARGET)/services/$(SERVICE)/stop_sphinx
-	$(DEPLOY_RUNTIME)/bin/perl service-scripts/gen_cdmi_sphinx_conf.pl lib/KSaplingDBD.xml lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
+	$(DEPLOY_RUNTIME)/bin/perl service-scripts/gen_cdmi_sphinx_conf.pl $(SAPLING_XML) lib/sphinx.conf.tt $(TPAGE_ARGS) > $(TARGET)/services/$(SERVICE)/sphinx.conf
 
 deploy-monit:
 	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE).tt > $(TARGET)/services/$(SERVICE)/process.$(SERVICE)
@@ -118,7 +133,7 @@ java.out/built_flag: lib/CDMI-API.spec lib/CDMI-EntityAPI.spec
 	cd java.out; find us -type f -name \*.java -print > tmp.files
 	cd java.out; $(JAVAC) $(JAVAC_FLAGS) @tmp.files
 	cd java.out; find us -type f -name \*.class -print > tmp.files
-	cd java.out; $(JAR) cf $(JAR) @tmp.files
+	cd java.out; $(JAR) cf cdmi.jar @tmp.files
 	touch java.out/built_flag
 
 test: test-client

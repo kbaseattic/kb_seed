@@ -12,4 +12,19 @@ export KB_SERVICE_NAME=[% kb_service_name %]
 
 pid_file=$KB_SERVICE_DIR/service.pid
 
-exec $KB_RUNTIME/bin/perl $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/CDMI.psgi
+[% IF kb_starman_workers -%]
+workers="--workers [% kb_starman_workers %]"
+[% END -%]
+[% IF kb_starman_max_requests -%]
+max_requests="--max-requests [% kb_starman_max_requests %]"
+[% END -%]
+
+starman_params="--listen :[% kb_service_port %] --pid $pid_file $workers $max_requests"
+
+starman_params="$starman_params --error-log $KB_SERVICE_DIR/error.log"
+starman_params="$starman_params --access-log $KB_SERVICE_DIR/access.log"
+
+starman_params="$starman_params --daemonize"
+
+exec $KB_RUNTIME/bin/perl $KB_RUNTIME/bin/starman $starman_params $KB_TOP/lib/CDMI.psgi
+
