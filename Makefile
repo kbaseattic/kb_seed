@@ -19,7 +19,8 @@ SERVICE_NAME_PY = cdmi
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVICE_PORT = 7032
 
-SERVICE_URL = http://10.0.16.68:$(SERVICE_PORT)
+SERVICE_URL = http://kbase.us/services/$(SERVICE)
+#SERVICE_URL = http://10.0.16.68:$(SERVICE_PORT)
 
 CLIENT_TESTS = $(wildcard t/client-tests/*.t)
 SERVER_TESTS = $(wildcard t/server-tests/*.t)
