@@ -67,6 +67,7 @@ sub align_sequences {
     } else {
         ($seqs, $opts) = @_;
     }
+    
     $opts->{version} or $seqs && ref $seqs eq 'ARRAY' && @$seqs
         or die "align_sequences called with invalid sequences.\n";
 
@@ -456,7 +457,7 @@ sub trim_alignment {
 #
 #     $profile can be $profile_file_name or \@profile_seqs
 #     $db      can be $db_file_name      or \@db_seqs, or
-#              'SEED', 'PSEED' or 'PUBSEED', for protein seqs in complete genomes in annotator's SEED, PSEED or PUBLIC-PSEED
+#              'SEED', 'PSEED' or 'PUBSEED', for protein seqs in genomes in annotator's SEED, PSEED or PUBLIC-PSEED
 #
 #     If supplied as file, profile is pseudoclustal
 #
@@ -510,7 +511,7 @@ sub psiblast_search {
     $opts->{stderr}  ||= '/dev/null';
 
     $profile ||= $opts->{profile};
-    $db      ||= $opts->{db} || 'SEED';
+    $db      ||= $opts->{db} || 'PUBSEED';
 
     # my $org_dir = "/home/fangfang/FIGdisk/FIG/Data/Organisms";
     # my $org_dir = ${FIG_Config::data};  # does not work on bio-big
@@ -539,8 +540,10 @@ sub db_name_to_file {
     my $org_dir = "/vol/public-pseed/FIGdisk/FIG/Data/Organisms"; # complete genomes only
     my $psi_dir = "/home/fangfang/WB/PsiblastDB/";
     if ($db =~ /^(\d+\.\d+)$/)  { $db = "$org_dir/$1/Features/peg/fasta" }
-    elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/public-pseed.complete" }
-    elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/public-pseed.complete" }
+    elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013
+    elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013
+    elsif (uc $db eq 'PPSEED.complete')  { $db = "$psi_dir/public-pseed.complete" }
+    elsif (uc $db eq 'PUBSEED.complete') { $db = "$psi_dir/public-pseed.complete" }
     elsif (uc $db eq 'PSEED')   { $db = "$psi_dir/ppseed.NR" }
     elsif (uc $db eq 'SEED')    { $db = "$psi_dir/SEED.complete.fasta" }
     return $db;

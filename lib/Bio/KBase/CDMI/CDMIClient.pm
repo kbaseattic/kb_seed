@@ -111,6 +111,7 @@ sub new_for_script_with_type
     my ($local, $url);
     my($help);
 
+    $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
 
     # Parse the command line.
     my $rc = GetOptions(%options,
@@ -214,6 +215,7 @@ sub new_with_type
     my $retVal;
     my ($url);
 
+    $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
 
     if ($local)
     {

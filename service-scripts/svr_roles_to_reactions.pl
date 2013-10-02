@@ -1,7 +1,3 @@
-use strict;
-use SeedUtils;
-use SAPserver;
-use ScriptThing;
 
 #
 # This is a SAS Component
@@ -10,59 +6,89 @@ use ScriptThing;
 
 =head1 svr_roles_to_reactions
 
-Extend a set of roles to include the associated reactions
+Get the reactions potentially supported by a set of functional roles
 
-=head2 Introduction
+------
 
-Examples:
+Example:
 
-    svr_roles_to_reactions < table.with.roles.as.last.column > extended.table
+    svr_roles_to_reactions < roles.in.genome > reactions.possibly.supported
 
-=head2 Command-Line Arguments
 
-=over 4
+would produce a 2-column table.  The first column would contain
+a role and the second a reaction id (i.e., a Model SEED reaction ID).
 
-=item -c=Column
+------
 
-Specifies the column in the input table that is believed to contain the role.
+=head2 Output Format
 
-=back
-
-=head2 Output
-
-A table with 1 added columnn containing reactions IDs. Since some roles trigger
-multiple reactions, there may be more output lines than input lines. Those roles
-that do not trigger any reactions will be missing from the output.
+The standard output is a tab-delimited file. It consists of the input
+file with an extra column added (the function associated with the PEG).
 
 =cut
+  
+#########################################################################
+# Janaka N Edirisinghe                                                  #
+# This progragram take a single role per line as an input               #
+# and proudce the mapping reactions based on the template model         #
+#                                                                       #
+# usage input file - functional roles (one per line)                    #
+# perl roles_to_reaction < input.txt                                    #
+#########################################################################
 
-use Getopt::Long;
-my $usage = "svr_roles_to_reactions [-c Column] < table.with.roles > extended.table\n";
+use strict;
+use Data::Dumper;
+use Try::Tiny;
+use Bio::KBase::fbaModelServices::Client;
+my $client = Bio::KBase::fbaModelServices::Client->new('http://140.221.85.73:4043');
 
-my $column;
-my $url = '';
+my $comp;
+$comp->{workspace} = 'KBaseTemplateModels';
+$comp->{templateModel} = 'GramPosModelTemplate';
 
-my $rc = GetOptions( 
-                     "c=i" => \$column,
-                     "url=s" => \$url
-                   );
 
-$rc or print STDERR $usage and exit;
+my $biochem = $client->role_to_reactions($comp);
 
-# Get the server object.
-my $sapServer = SAPserver->new(url => $url);
-# The main loop processes chunks of input, 1000 lines at a time.
-while (my @tuples = ScriptThing::GetBatch(\*STDIN, undef, $column)) {
-    # Ask the server for the reactions.
-    my $roleHash = $sapServer->role_reactions(-ids => [map { $_->[0] } @tuples]);
-    # Output the results for these roles.
-    for my $tuple (@tuples) {
-        # Get this line and the relevant role.
-        my ($role, $line) = @$tuple;
-        # Get this role's reactions.
-        for my $reaction (@{$roleHash->{$role}}) {
-            # Output the line with the subsystem and classification appended.
-            print "$line\t$reaction\n";
-        }
+my %hash1;
+my %hash2;
+for(my $i =0; $i< @{$biochem}; $i++){
+
+  my $comp = $biochem->[$i]->{complexes};
+  my $role = $biochem->[$i]->{name};
+    
+    for (my $j =0; $j< @{$comp}; $j++){
+
+       my $comp_id = $comp->[$j]->{complex};
+       my $rxns = $comp->[$j]->{reactions};
+          for (my $k =0; $k< @{$rxns}; $k++){
+        
+             my $rxn_id = $rxns->[$k]->{reaction};
+             $hash1{$role}->{$rxn_id} = 1;
+             push(@{$hash2{$role}},$rxn_id);
+
+         }
     }
+
 }
+
+
+while (defined($_ = <STDIN>)){
+
+    chomp;
+    $_ =~ s/^\s+//;
+    $_ =~ s/\s+$//;
+
+    foreach my $k(sort keys(%hash1)) {
+
+        foreach my $k2 (keys(%{$hash1{$k}})) {
+       
+            if($k eq $_){
+                print "$_\t$k2\n";
+            }
+
+        }
+
+    }
+
+}
+

@@ -89,6 +89,42 @@ package gjocodonlib;
 #     @cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
 #    \@cnts = labeled_counts_from_ffn(        \%opts )  # $opts{ffn} || STDIN
 #
+#  Get codon usage counts for genes from the sapling server.
+#  Requires SAPserver.pm, or a SAPserver object.
+#
+#     @cnts = labeled_counts_from_sapling( $gid, \%opts )
+#    \@cnts = labeled_counts_from_sapling( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the KBase server
+#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
+#
+#     @cnts = labeled_counts_from_kbase( $gid, \%opts )
+#    \@cnts = labeled_counts_from_kbase( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the a local SEED
+#  Requires FIG.pm, or a FIG object.
+#
+#     @cnts = labeled_counts_from_seed( $gid, \%opts )
+#    \@cnts = labeled_counts_from_seed( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the sapling server.
+#  Requires SAPserver.pm, or a SAPserver object.
+#
+#     @cnts = labeled_counts_from_sapling( $gid, \%opts )
+#    \@cnts = labeled_counts_from_sapling( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the KBase server
+#  Requires Bio::KBase.pm, or a Bio::KBase::CDMI::Client object.
+#
+#     @cnts = labeled_counts_from_kbase( $gid, \%opts )
+#    \@cnts = labeled_counts_from_kbase( $gid, \%opts )
+#
+#  Get codon usage counts for genes from the a local SEED
+#  Requires FIG.pm, or a FIG object.
+#
+#     @cnts = labeled_counts_from_seed( $gid, \%opts )
+#    \@cnts = labeled_counts_from_seed( $gid, \%opts )
+#
 #  Print counts:
 #     One space between synonymous codons, two spaces between amino acids
 #     Counts can be followed by a tab and a label.
@@ -360,7 +396,15 @@ package gjocodonlib;
 #  \@x_p = codon_counts_x_and_p( $f0, $f1, \%opts, \@$cnts );
 #
 #-------------------------------------------------------------------------------
-#  Some earlier versions:
+#  If two sets of frequencies were drawn from the same distribution, what would
+#  be the expected distance between them?  Found by analysis of random suffles
+#  of the members between the two input sets.
+#
+#      $distance            = null_distance( \@cnt1, \@cnt2, \%options )
+#    ( $distance, $stddev ) = null_distance( \@cnt1, \@cnt2, \%options )
+#
+#===============================================================================
+#  Some earlier routines:
 #
 #  \@freqs             = packaged_count_to_freq( \@counts [, $pseudocount ] )
 #  \@total_counts      = sum_packaged_counts( \@per_gene_pakaged_counts )
@@ -375,14 +419,14 @@ package gjocodonlib;
 
 use strict;
 use Carp qw( croak );
-use Data::Dumper qw( Dumper );
+# use Data::Dumper;
 
 use IPC::Open2 qw( open2 );
 
 use SeedAware  qw(
         executable_for
         location_of_tmp
-        new_file_name
+        open_tmp_file
         run_gathering_output
         );
 
@@ -438,6 +482,15 @@ our @EXPORT = qw(
         entry_labeled_codon_count_package
         entry_labeled_codon_count_package_20
 
+        labeled_counts_from_file
+        labeled_counts_from_ffn
+        labeled_counts_from_sapling
+        labeled_counts_from_kbase
+        labeled_counts_from_seed
+
+        report_counts
+        split_counts
+        
         n_codon
         sum_counts
 
@@ -448,8 +501,6 @@ our @EXPORT = qw(
         count_to_freq
         average_freq
         codon_usage_p_values
-        report_counts
-        split_counts
         report_frequencies
         frequencies_as_string
         split_frequencies
@@ -477,6 +528,8 @@ our @EXPORT = qw(
         project_freq_on_axis_by_dist
         project_on_axis_by_chi_sqr
         codon_counts_x_and_p
+
+        null_distance
 
         packaged_count_to_freq
         sum_packaged_counts
@@ -587,9 +640,10 @@ sub codon_count_list
 
 #-----------------------------------------------------------------------------
 #  Convert a codon count hash to a list of counts bundled by amino acid.
-#  Default version omits M and W.
+#  In the first form, M and W are skipped; in the second form they are included.
 #
 #     \@counts = codon_count_package( \%counts )
+#     \@counts = codon_count_package_20( \%counts )
 #
 #  \@counts = [ [ n(GCA), n(GCG), n(GCT), n(GCC) ], # A
 #               [ n(TGT), n(TGC) ],                 # C
@@ -598,6 +652,19 @@ sub codon_count_list
 #               .
 #               .
 #               [ n(TAT), n(TAC) ]                  # Y
+#             ];
+#
+#  or
+#
+#  \@counts = [ [ n(GCA), n(GCG), n(GCT), n(GCC) ], # A
+#               [ n(TGT), n(TGC) ],                 # C
+#               [ n(GAT), n(GAC) ],                 # D
+#               .
+#               .
+#               .
+#               [ n(TAT), n(TAC) ]                  # Y
+#               [ n(ATG) ]                          # M
+#               [ n(TGA) ]                          # W
 #             ];
 #-----------------------------------------------------------------------------
 sub codon_count_package
@@ -613,22 +680,6 @@ sub codon_count_package
 }
 
 
-#-----------------------------------------------------------------------------
-#  Convert a codon count hash to a list of counts bundled by amino acid.
-#
-#     \@counts = codon_count_package_20( \%counts )
-#
-#  \@counts = [ [ n(GCA), n(GCG), n(GCT), n(GCC) ], # A
-#               [ n(TGT), n(TGC) ],                 # C
-#               [ n(GAT), n(GAC) ],                 # D
-#               .
-#               .
-#               .
-#               [ n(TAT), n(TAC) ]                  # Y
-#               [ n(ATG) ]                          # M
-#               [ n(TGA) ]                          # W
-#             ];
-#-----------------------------------------------------------------------------
 sub codon_count_package_20
 {
     my $cnts = shift;
@@ -643,30 +694,11 @@ sub codon_count_package_20
 
 
 #-----------------------------------------------------------------------------
-#  Split counts with amino acids separated by 2 spaces, and codons within the
-#  amino acid separated by 1 space.  If an id is present, it is separated by a
-#  tab.
-#
-#       \@counts           = split_counts( $codon_count_string )
-#     ( \@counts, $label ) = split_counts( $codon_count_string )
-#
-#-----------------------------------------------------------------------------
-sub split_counts
-{   my ( $string ) = shift;
-    chomp $string;
-    my ( $data, $label ) = split /\t/, $string;
-
-    my $cnts = [ map { [ map { $_ + 0 } split / / ] } split /  /, $data ];
-
-    wantarray ? ( $cnts, $label ) : $cnts;
-}
-
-
-#-----------------------------------------------------------------------------
 #  Compile and package codon usage of one or more sequence entries.
-#  M and W are skipped.
+#  In the first form, M and W are skipped; in the second form they are included.
 #
 #     @count_sets = entry_codon_count_package( @seq_entrys )
+#     @count_sets = entry_codon_count_package_20( @seq_entrys )
 #
 #-----------------------------------------------------------------------------
 sub entry_codon_count_package
@@ -675,12 +707,6 @@ sub entry_codon_count_package
 }
 
 
-#-----------------------------------------------------------------------------
-#  Compile and package codon usage of one or more sequence entries.
-#
-#     @count_sets = entry_codon_count_package_20( @seq_entrys )
-#
-#-----------------------------------------------------------------------------
 sub entry_codon_count_package_20
 {
     map { ref $_ eq 'ARRAY' ? codon_count_package_20( seq_codon_count( $_->[2] ) ) : undef } @_;
@@ -689,9 +715,10 @@ sub entry_codon_count_package_20
 
 #-----------------------------------------------------------------------------
 #  Compile and package codon usage of one or more sequences.
-#  M and W are skipped.
+#  In the first form, M and W are skipped; in the second form they are included.
 #
 #     @count_sets = seq_codon_count_package( @seqs )
+#     @count_sets = seq_codon_count_package_20( @seqs )
 #
 #-----------------------------------------------------------------------------
 sub seq_codon_count_package
@@ -700,12 +727,6 @@ sub seq_codon_count_package
 }
 
 
-#-----------------------------------------------------------------------------
-#  Compile and package codon usage of one or more sequences.
-#
-#     @count_sets = seq_codon_count_package_20( @seqs )
-#
-#-----------------------------------------------------------------------------
 sub seq_codon_count_package_20
 {
     map { codon_count_package_20( seq_codon_count( $_ ) ) } @_;
@@ -714,13 +735,15 @@ sub seq_codon_count_package_20
 
 #-----------------------------------------------------------------------------
 #  Compile and package codon usage of one or more sequence entries.
-#  M and W are skipped.
+#  In the first form, M and W are skipped; in the second form they are included.
 #
 #     @labeled_count_sets = entry_labeled_codon_count_package( @seq_entrys )
+#     @labeled_count_sets = entry_labeled_codon_count_package_20( @seq_entrys )
 #
 #  To make a hash of the counts:
 #
 #     %count_package = map { $_->[1] => $_->[0] } entry_labeled_codon_count_package( @seq_entrys );
+#     %count_package = map { $_->[1] => $_->[0] } entry_labeled_codon_count_package_20( @seq_entrys );
 #
 #-----------------------------------------------------------------------------
 sub entry_labeled_codon_count_package
@@ -731,164 +754,11 @@ sub entry_labeled_codon_count_package
 }
 
 
-#-----------------------------------------------------------------------------
-#  Compile and package codon usage of one or more sequence entries.
-#
-#     @labeled_count_sets = entry_labeled_codon_count_package_20( @seq_entrys )
-#
-#  To make a hash of the counts:
-#
-#     %count_package_20 = map { $_->[1] => $_->[0] } entry_labeled_codon_count_package_20( @seq_entrys );
-#
-#-----------------------------------------------------------------------------
 sub entry_labeled_codon_count_package_20
 {
     return map { [ seq_codon_count_package_20( $_->[2] ), $_->[1] ? "$_->[0] $_->[1]" : $_->[0] ] }
            grep { $_ && ref $_ eq 'ARRAY' }
            @_;
-}
-
-
-#-----------------------------------------------------------------------------
-#  Count the total codons in a gene.
-#
-#     $n_codon = n_codon(   \@counts )
-#     $n_codon = n_codon( [ \@counts, $id ] )
-#     $n_codon = n_codon(   \%counts )
-#
-#-----------------------------------------------------------------------------
-sub n_codon
-{
-    my $cnts = shift;
-    $cnts = codon_count_package( $cnts ) if ( ref $cnts eq 'HASH' );  # Form 3
-    return undef if ( ref $cnts ne 'ARRAY' );
-    $cnts = $cnts->[0] if ( ! ref $cnts->[1] );                       # Form 2
-    my $n = 0; foreach ( @$cnts ) { foreach ( @$_ ) { $n += $_ } }
-
-    $n;
-}
-
-
-#-----------------------------------------------------------------------------
-#  Sum codon counts across genes.
-#
-#     \@total_counts = sum_counts( \@per_gene_count_arrays )
-#     \@total_counts = sum_counts( \@gene_1_counts, \@gene_2_counts, ... )
-#
-#     \%total_counts = sum_counts( \@per_gene_count_hashes )
-#     \%total_counts = sum_counts( \%gene_1_counts, \%gene_2_counts, ... )
-#
-#-----------------------------------------------------------------------------
-sub sum_counts
-{
-    return undef unless @_;
-
-    #  Are counts in arrays?
-
-    if ( ref $_[0] eq 'ARRAY' && ref $_[0]->[0] eq 'ARRAY' )
-    {
-        my @ttl_cnt;
-        foreach my $gene_data ( ref $_[0]->[0]->[0] eq 'ARRAY' ? @{$_[0]} : @_ )
-        {
-            my $i = 0;
-            foreach my $gene_aa_data ( @$gene_data )
-            {
-                my $ttl_aa_cnts = $ttl_cnt[ $i++ ] ||= [ (0) x @$gene_aa_data ];
-                my $j = 0;
-                foreach my $gene_codon_cnt ( @$gene_aa_data )
-                {
-                    $ttl_aa_cnts->[ $j++ ] += $gene_codon_cnt;
-                }
-            }
-        }
-        return \@ttl_cnt;
-    }
-
-    #  Are counts in hash?
-
-    if ( ref $_[0] eq 'HASH' || ref $_[0]->[0] eq 'HASH' )
-    {
-        my %ttl_cnt;
-        foreach my $gene_data ( ref $_[0] eq 'HASH' ? $_ : @{$_[0]} )
-        {
-            foreach ( keys %$gene_data ) { $ttl_cnt{ $_ } += $gene_data->{ $_ } }
-        }
-        return \%ttl_cnt;
-    }
-
-    #  I don't understand args
-
-    return undef;
-}
-
-
-#-----------------------------------------------------------------------------
-#---------------------------- Use sum_counts() -------------------------------
-#-----------------------------------------------------------------------------
-#
-#  Sum codon counts across genes.  Handles any nested arrays of counts.
-#
-#     \@total_counts = sum_packaged_counts( \@per_gene_pakaged_counts )
-#
-#-----------------------------------------------------------------------------
-sub sum_packaged_counts
-{
-    my $gene_counts = shift;
-    ref( $gene_counts ) eq 'ARRAY'                     # array of genes
-        and ref( $gene_counts->[0] ) eq 'ARRAY'        # array of amino acids
-        and ref( $gene_counts->[0]->[0] ) eq 'ARRAY'   # array of codons
-        or return undef;
-
-    my @ttl_cnt;
-    my $gene_data;
-    foreach $gene_data ( @$gene_counts )
-    {
-        my $i = 0;
-        my $gene_aa_data;
-        foreach $gene_aa_data ( @$gene_data )
-        {
-             my $ttl_aa_cnts = $ttl_cnt[ $i++ ] ||= [];
-             my $j = 0;
-             my $gene_codon_cnt;
-             foreach $gene_codon_cnt ( @$gene_aa_data )
-             {
-                 $ttl_aa_cnts->[ $j++ ] += $gene_codon_cnt;
-             }
-        }
-    }
-
-    \@ttl_cnt;
-}
-
-
-#-----------------------------------------------------------------------------
-#  Format counts with amino acids separated by 2 spaces, and codons within the
-#  amino acid separated by 1 space.  If an id is present, it is separated by a
-#  tab.
-#
-#  naa1c1 naa1c2 naa1c3 naa1c4  naa2c1 naa2c2 ...  naa3c1 naa3c2 ...
-#
-#     report_counts(       $cnts )
-#     report_counts(       $labeled_cnts )
-#     report_counts(       $cnts, $label )
-#     report_counts( \*FH, $cnts )
-#     report_counts( \*FH, $labeled_cnts )
-#     report_counts( \*FH, $cnts, $label )
-#
-#-----------------------------------------------------------------------------
-sub report_counts
-{
-    my $fh = ( ref( $_[0] ) eq 'GLOB' ) ? shift : \*STDOUT;
-    my ( $cnts, $label ) = @_;
-    $cnts && ref( $cnts ) eq 'ARRAY' or return;
-    if ( @$cnts == 2 )
-    {
-        $label = $cnts->[1] unless defined $label;
-        $cnts = $cnts->[0];
-    }
-    print $fh join( '  ', map { join( ' ', map { $_ || 0 } @$_ ) } @$cnts ),
-              ( $label ? "\t$label" : () ),
-              "\n";
 }
 
 
@@ -1078,23 +948,165 @@ sub coding_sequences_from_seed
 }
 
 
-#===============================================================================
-#  Codon usages axes (modal, high_expression, nonnative) from various sources
+#-----------------------------------------------------------------------------
+#  Format counts with amino acids separated by 2 spaces, and codons within the
+#  amino acid separated by 1 space.  If an id is present, it is separated by a
+#  tab.
 #
-#     @axes = ( $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype )
+#  naa1c1 naa1c2 naa1c3 naa1c4  naa2c1 naa2c2 ...  naa3c1 naa3c2 ...
 #
-#===============================================================================
-#  Get available codon usages for a genome from GenomeCodonUsages.pm
+#     report_counts(       $cnts )
+#     report_counts(       $labeled_cnts )
+#     report_counts(       $cnts, $label )
+#     report_counts( \*FH, $cnts )
+#     report_counts( \*FH, $labeled_cnts )
+#     report_counts( \*FH, $cnts, $label )
 #
-#     @axes = genome_axes_from_module( $gid );
-#    \@axes = genome_axes_from_module( $gid );
-#
-#-------------------------------------------------------------------------------
-
-sub genome_axes_from_module
+#-----------------------------------------------------------------------------
+sub report_counts
 {
-    eval { require GenomeCodonUsages } ? GenomeCodonUsages::genome_axes(@_)
-                                       : wantarray ? () : [];
+    my $fh = ( ref( $_[0] ) eq 'GLOB' ) ? shift : \*STDOUT;
+    my ( $cnts, $label ) = @_;
+    $cnts && ref( $cnts ) eq 'ARRAY' or return;
+    if ( @$cnts == 2 )
+    {
+        $label = $cnts->[1] unless defined $label;
+        $cnts  = $cnts->[0];
+    }
+    print $fh join( '  ', map { join( ' ', map { $_ || 0 } @$_ ) } @$cnts ),
+              ( defined $label ? "\t$label" : () ),
+              "\n";
+}
+
+
+#-----------------------------------------------------------------------------
+#  Split counts with amino acids separated by 2 spaces, and codons within the
+#  amino acid separated by 1 space.  If an id is present, it is separated by a
+#  tab.
+#
+#       \@counts           = split_counts( $codon_count_string )
+#     ( \@counts, $label ) = split_counts( $codon_count_string )
+#
+#-----------------------------------------------------------------------------
+sub split_counts
+{   my ( $string ) = shift;
+    chomp $string;
+    my ( $data, $label ) = split /\t/, $string;
+
+    my $cnts = [ map { [ map { $_ + 0 } split / / ] } split /  /, $data ];
+
+    wantarray ? ( $cnts, $label ) : $cnts;
+}
+
+
+#-----------------------------------------------------------------------------
+#  Count the total codons in a gene.
+#
+#     $n_codon = n_codon(   \@counts )
+#     $n_codon = n_codon( [ \@counts, $id ] )
+#     $n_codon = n_codon(   \%counts )
+#
+#-----------------------------------------------------------------------------
+sub n_codon
+{
+    my $cnts = shift;
+    $cnts = codon_count_package( $cnts ) if ( ref $cnts eq 'HASH' );  # Form 3
+    return undef if ( ref $cnts ne 'ARRAY' );
+    $cnts = $cnts->[0] if ( ! ref $cnts->[1] );                       # Form 2
+    my $n = 0; foreach ( @$cnts ) { foreach ( @$_ ) { $n += $_ } }
+
+    $n;
+}
+
+
+#-----------------------------------------------------------------------------
+#  Sum codon counts across genes.
+#
+#     \@total_counts = sum_counts( \@per_gene_count_arrays )
+#     \@total_counts = sum_counts( \@gene_1_counts, \@gene_2_counts, ... )
+#
+#     \%total_counts = sum_counts( \@per_gene_count_hashes )
+#     \%total_counts = sum_counts( \%gene_1_counts, \%gene_2_counts, ... )
+#
+#-----------------------------------------------------------------------------
+sub sum_counts
+{
+    return undef unless @_;
+
+    #  Are counts in arrays?
+
+    if ( ref $_[0] eq 'ARRAY' && ref $_[0]->[0] eq 'ARRAY' )
+    {
+        my @ttl_cnt;
+        foreach my $gene_data ( ref $_[0]->[0]->[0] eq 'ARRAY' ? @{$_[0]} : @_ )
+        {
+            my $i = 0;
+            foreach my $gene_aa_data ( @$gene_data )
+            {
+                my $ttl_aa_cnts = $ttl_cnt[ $i++ ] ||= [ (0) x @$gene_aa_data ];
+                my $j = 0;
+                foreach my $gene_codon_cnt ( @$gene_aa_data )
+                {
+                    $ttl_aa_cnts->[ $j++ ] += $gene_codon_cnt;
+                }
+            }
+        }
+        return \@ttl_cnt;
+    }
+
+    #  Are counts in hash?
+
+    if ( ref $_[0] eq 'HASH' || ref $_[0]->[0] eq 'HASH' )
+    {
+        my %ttl_cnt;
+        foreach my $gene_data ( ref $_[0] eq 'HASH' ? $_ : @{$_[0]} )
+        {
+            foreach ( keys %$gene_data ) { $ttl_cnt{ $_ } += $gene_data->{ $_ } }
+        }
+        return \%ttl_cnt;
+    }
+
+    #  I don't understand args
+
+    return undef;
+}
+
+
+#-----------------------------------------------------------------------------
+#---------------------------- Use sum_counts() -------------------------------
+#-----------------------------------------------------------------------------
+#  Sum codon counts across genes.  Handles any nested arrays of counts.
+#
+#     \@total_counts = sum_packaged_counts( \@per_gene_pakaged_counts )
+#
+#-----------------------------------------------------------------------------
+sub sum_packaged_counts
+{
+    my $gene_counts = shift;
+    ref( $gene_counts ) eq 'ARRAY'                     # array of genes
+        and ref( $gene_counts->[0] ) eq 'ARRAY'        # array of amino acids
+        and ref( $gene_counts->[0]->[0] ) eq 'ARRAY'   # array of codons
+        or return undef;
+
+    my @ttl_cnt;
+    my $gene_data;
+    foreach $gene_data ( @$gene_counts )
+    {
+        my $i = 0;
+        my $gene_aa_data;
+        foreach $gene_aa_data ( @$gene_data )
+        {
+             my $ttl_aa_cnts = $ttl_cnt[ $i++ ] ||= [];
+             my $j = 0;
+             my $gene_codon_cnt;
+             foreach $gene_codon_cnt ( @$gene_aa_data )
+             {
+                 $ttl_aa_cnts->[ $j++ ] += $gene_codon_cnt;
+             }
+        }
+    }
+
+    \@ttl_cnt;
 }
 
 
@@ -1566,6 +1578,26 @@ sub write_genome_codon_usages
 
 
 #===============================================================================
+#  Codon usages axes (modal, high_expression, nonnative) from various sources
+#
+#     @axes = ( $gname, $mode, $md_subtype, $high_expr, $he_subtype, $nonnative, $nn_subtype )
+#
+#===============================================================================
+#  Get available codon usages for a genome from GenomeCodonUsages.pm
+#
+#     @axes = genome_axes_from_module( $gid );
+#    \@axes = genome_axes_from_module( $gid );
+#
+#-------------------------------------------------------------------------------
+
+sub genome_axes_from_module
+{
+    eval { require GenomeCodonUsages } ? GenomeCodonUsages::genome_axes(@_)
+                                       : wantarray ? () : [];
+}
+
+
+#===============================================================================
 #  Build a description of codon usage axes from a list of codon usages. If
 #  modal codon usage is not available, the average codon usage will be used.
 #
@@ -1936,11 +1968,6 @@ sub score_codon_frequencies_0
     my $options = ( ref($_[0]) eq 'HASH' ) ? shift : {};
 
     my $cntfile = option_by_regexp( $options, qr/(count)|(file)/i, '' );
-    if ( ! $cntfile )
-    {
-        my $tmp  = SeedAware::location_of_tmp( $options );
-        $cntfile = SeedAware::new_file_name( "$tmp/score_codon_frequencies_0", 'counts' );
-    }
     my $expon   = option_by_regexp( $options, qr/exp/i,   0.3 );
     my $max_l   = option_by_regexp( $options, qr/len/i,   undef );
     my $p_val   = option_by_regexp( $options, qr/p_val/i, undef );
@@ -1949,13 +1976,24 @@ sub score_codon_frequencies_0
     my $save_cnt = -f $cntfile;
     if ( @$counts )
     {
-        open( CNT, ">$cntfile" )
-            or print STDERR "score_codon_frequencies_0() could not open '$cntfile' for writing.\n"
-            and exit;
-        foreach ( @$counts ) { report_counts( \*CNT, $_ ) }
-        close CNT;
+        my $cntFH;
+        if ( length $cntfile )
+        {
+            open( $cntFH, '>', $cntfile )
+                or print STDERR "score_codon_frequencies_0() could not open '$cntfile' for writing.\n"
+                    and exit;
+        }
+        else
+        {
+            ( $cntFH, $cntfile ) = SeedAware::open_tmp_file( 'score_codon_frequencies_tmp', 'counts' );
+            $cntFH
+                or print STDERR "score_codon_frequencies_0() could not open a temp file for writing.\n"
+                    and exit;
+        }
+        foreach ( @$counts ) { report_counts( $cntFH, $_ ) }
+        close $cntFH;
     }
-    elsif ( ! $save_cnt )
+    elsif ( ! -s $cntfile )
     {
         print STDERR "score_codon_frequencies_0() called with neither count data or a count file.\n";
         exit;
@@ -2034,25 +2072,21 @@ sub score_codon_frequencies
 
     my $options = ( ref($_[0]) eq 'HASH' ) ? shift : {};
 
-    my $cntfile = option_by_regexp( $options, qr/(count)|(file)/i, '' );
-    if ( $cntfile && ref( $cntfile ) eq 'ARRAY' && ! $counts )
+    my $cnt_file = option_by_regexp( $options, qr/(count)|(file)/i, '' );
+    my $expon    = option_by_regexp( $options, qr/exp/i,       0.3 );
+    my $max_l    = option_by_regexp( $options, qr/len/i,   undef );
+    my $p_val    = option_by_regexp( $options, qr/p_val/i, undef );
+    my $pipes    = option_by_regexp( $options, qr/pipe/i,      1 );
+    my $verbose  = option_by_regexp( $options, qr/^verb/i, undef );
+
+    #  This is a very bad overloading of the parameter
+    if ( $cnt_file && ref( $cnt_file ) eq 'ARRAY' && ! $counts )
     {
-        $counts = $cntfile;
-        $cntfile = '';
-    }
-    if ( ! $cntfile && @$counts )
-    {
-        my $tmp  = SeedAware::location_of_tmp( $options );
-        $cntfile = SeedAware::new_file_name( "$tmp/score_codon_frequencies", 'counts' );
+        $counts = $cnt_file;
+        $cnt_file = '';
     }
 
-    my $expon   = option_by_regexp( $options, qr/exp/i,       0.3 );
-    my $max_l   = option_by_regexp( $options, qr/len/i,   undef );
-    my $p_val   = option_by_regexp( $options, qr/p_val/i, undef );
-    my $pipes   = option_by_regexp( $options, qr/pipe/i,      1 );
-    my $verbose = option_by_regexp( $options, qr/^verb/i, undef );
-
-    my %clean_opts = ( cnt_file => $cntfile,
+    my %clean_opts = ( cnt_file => $cnt_file,
                        counts   => $counts,
                        expon    => $expon,
                        max_len  => $max_l,
@@ -2086,19 +2120,22 @@ sub score_codon_frequencies
 #
 #  Options (no flexibility in the keys used here):
 #
-#      cnt_file =>  $cntfile  #  file with codon counts
-#      counts   => \@counts   #    or codon counts
-#      expon    =>  $expon    #  use p-value**expon as score
-#      max_len  =>  $max_l    #  max_length used in chi square
-#      p_value  =>  $p_val    #  P-value threshold for scoring
-#      pipes    =>  $pipes    #  requested number of pipes
+#      cnt_file =>  $cnt_file  #  file with codon counts
+#      counts   => \@counts    #      or codon counts
+#      expon    =>  $expon     #  use p-value**expon as score
+#      max_len  =>  $max_l     #  max_length used in chi square
+#      p_value  =>  $p_val     #  P-value threshold for scoring
+#      pipes    =>  $pipes     #  requested number of pipes
+#
+#  If both cnt_file and counts are supplied, any contents of cnt_file are
+#  overwritten.
 #
 #  Descriptor components:
 #
-#      cnt_file =>  $cntfile  #  file with codon counts, only if to be unlinked
-#      pid      => \@pid      #  PID of each child process
-#      rd       => \@rd       #  file handle for reading scores
-#      wr       => \@wr       #  file handle for writing freqs to evaluate
+#      cnt_file =>  $cnt_file  #  file with codon counts, only if to be unlinked
+#      pid      => \@pid       #  PID of each child process
+#      rd       => \@rd        #  file handle for reading scores
+#      wr       => \@wr        #  file handle for writing freqs to evaluate
 #
 #-------------------------------------------------------------------------------
 #  \%descriptor = open_codon_freq_eval( \%options )
@@ -2108,20 +2145,18 @@ sub open_codon_freq_eval
     my ( $opts ) = @_;
     return undef if ! ( $opts && ref( $opts ) eq 'HASH' );
 
-    my $cntfile = $opts->{ cnt_file } || '';
-    my $counts  = $opts->{ counts }   || [];
-    my $expon   = $opts->{ expon }    || 0.3;
-    my $max_l   = $opts->{ max_len };
-    my $p_val   = $opts->{ p_value };
-    my $pipes   = min( $opts->{ pipes } || 1, &n_cpu() );
+    my $cnt_file = $opts->{ cnt_file } || '';
+    my $counts   = $opts->{ counts }   || [];
+    my $expon    = $opts->{ expon }    || 0.3;
+    my $max_l    = $opts->{ max_len };
+    my $p_val    = $opts->{ p_value };
+    my $pipes    = min( $opts->{ pipes } || 1, &n_cpu() );
 
     #  Locate the counts data:
 
-    my $save_cnt = $cntfile && -f $cntfile;
-    if ( ! $save_cnt && ! @$counts )
-    {
-        croak "gjocodonlib::open_codon_freq_eval() called with neither count data or a count file.\n";
-    }
+    my $save_cnt = -f $cnt_file;
+    ( @$counts || -s $cnt_file )
+        or croak "gjocodonlib::open_codon_freq_eval() called with neither count data or a count file.\n";
 
     #  Open the evaluation pipe(s):
 
@@ -2139,22 +2174,32 @@ sub open_codon_freq_eval
 
     if ( $prog )
     {
-        if ( ! $save_cnt )
+        my $save_cnt = -f $cnt_file;
+        if ( @$counts )
         {
-            $cntfile
-                or croak "open_codon_freq_eval() called without a count file.\n";
-
-            open( CNT, ">$cntfile" )
-                or croak "open_codon_freq_eval() could not open '$cntfile' for writing.\n";
-
-            foreach ( @$counts ) { report_counts( \*CNT, $_ ) }
-            close CNT;
+            my $cntFH;
+            if ( length $cnt_file )
+            {
+                open( $cntFH, '>', $cnt_file )
+                    or print STDERR "open_codon_freq_eval() could not open '$cnt_file' for writing.\n"
+                        and exit;
+            }
+            else
+            {
+                ( $cntFH, $cnt_file ) = SeedAware::open_tmp_file( 'open_codon_freq_eval_tmp', 'counts' );
+                $cntFH
+                    or print STDERR "open_codon_freq_eval() could not open a temp file for writing.\n"
+                        and exit;
+                $opts->{ cnt_file } = $cnt_file;
+            }
+            foreach ( @$counts ) { report_counts( $cntFH, $_ ) }
+            close $cntFH;
         }
 
         my @eval_cmd = ( $prog,
                          ( $max_l ? ( '-l', sprintf( '%d',   $max_l ) ) : ()  ),
                          ( $p_val ? ( '-p', sprintf( '%.3e', $p_val ) ) : ( '-e', sprintf( '%.3f', $expon ) ) ),
-                         $cntfile
+                         $cnt_file
                        );
 
         #  Try to establish one or more evaluation pipes to scoring program:
@@ -2175,17 +2220,20 @@ sub open_codon_freq_eval
     if ( ! $npipe )
     {
         #  If running without pipes, we need the counts in memory:
-        open( CNTS, "<$cntfile" )
-                or die "Could not find or open codon counts file '$cntfile'\n";
-        @$counts = map { chomp; scalar split_counts( $_ ) } <CNTS>;
-        close CNTS;
+        if ( ! @$counts )
+        {
+            open( CNTS, "<$cnt_file" )
+                or die "Could not find or open codon counts file '$cnt_file'\n";
+            @$counts = map { chomp; scalar split_counts( $_ ) } <CNTS>;
+            close CNTS;
 
-        @$counts or die "No codon counts found in '$cntfile'\n";
+            @$counts or die "No codon counts found in '$cnt_file'\n";
+        }
 
         # request_freq_score() and read_freq_score() use these values
 
         $rd[0] = $wr[0] = [ $counts, $p_val, $expon, $max_l ];
-        $pid[0] = 0;   # indicates that it is not external pocess
+        $pid[0] = 0;   # indicates that it is not external process
         $npipe  = 1;
     }
 
@@ -2195,7 +2243,7 @@ sub open_codon_freq_eval
                );
 
     #  Include the counts file, if it is to be removed when done:
-    $desc{ cnt_file } = $cntfile if $cntfile && ! $save_cnt;
+    $desc{ cnt_file } = $cnt_file if $cnt_file && ! $save_cnt;
 
     return \%desc;
 }
@@ -2275,8 +2323,8 @@ sub close_codon_freq_eval
         foreach ( @$pid ) { waitpid $_, 0 }
     }
 
-    my $cntfile = $opts->{ cnt_file } || '';
-    unlink $cntfile if $cntfile && -f $cntfile;
+    my $cnt_file = $opts->{ cnt_file } || '';
+    unlink $cnt_file if $cnt_file && -f $cnt_file;
 
     return;
 }
@@ -2540,8 +2588,8 @@ sub simulate_genome
 #      verbose    => int       #  reporting interval for opt steps (D = never)
 #      vertices   => int       #  minimum vertices in simplex optimization (D = 50)
 #
-#  If count_file exists, it is not deleted. If it has data, they are assumed
-#  to be valid (they must not conflict with \@gene_cnt_pkgs).
+#  If both count_file and gene_cnt_pkgs are supplied, any data in count_file
+#  are overwritten.
 #===============================================================================
 sub modal_codon_usage
 {
@@ -2560,7 +2608,7 @@ sub modal_codon_usage
                  : @$counts >  64 ? 2
                  :                  1;
     my $average   = option_by_regexp( $options, qr/^av/i,          0 );
-    my $cnt_file  = option_by_regexp( $options, qr/file/i,     undef );
+    my $cnt_file  = option_by_regexp( $options, qr/file/i,        '' );
     my $expon     = option_by_regexp( $options, qr/exp/i,          0.3 );
     my $extra     = option_by_regexp( $options, qr/extra/i,        0 );
     my $maxstep   = option_by_regexp( $options, qr/step/i,   1000000 );
@@ -2572,29 +2620,35 @@ sub modal_codon_usage
     my $vertices  = option_by_regexp( $options, qr/vert/i,        50 );
     $n_top = $vertices if $n_top < $vertices;
 
-    if ( ! defined( $cnt_file ) )
+    if ( ! defined( $cnt_file ) && $root_name )
     {
-        if ( $root_name )
-        {
-            $cnt_file = "$root_name.counts";
-        }
-        else
-        {
-            my $tmp   = SeedAware::location_of_tmp( $options );
-            $cnt_file = SeedAware::new_file_name( "$tmp/modal_codon_usage_tmp", 'counts' );
-        }
+        $cnt_file = "$root_name.counts";
     }
     my $save_cnt_file = -f $cnt_file;
 
-    #  The mode optimization needs a counts file
+    #  The mode optimization needs a counts file.  This is configured to not
+    #  clobber and existing file of nonzero size.  Other subroutines in this
+    #  module will overwrite it with the data supplied. 
 
-    if ( ( ( @$counts >= 6 ) || $save_cnt_file ) && ! -s $cnt_file )
+    if ( ( @$counts >= 6 ) || $save_cnt_file )
     {
-        open( CNT, ">$cnt_file" )
-            or print STDERR "modal_codon_usage() could not open '$cnt_file' for writing.\n"
-               and exit;
-        foreach ( @$counts ) { report_counts( \*CNT, $_ ) }
-        close CNT;
+        my $cntFH;
+        if ( length $cnt_file )
+        {
+            open( $cntFH, '>', $cnt_file )
+                or print STDERR "modal_codon_usage() could not open '$cnt_file' for writing.\n"
+                    and exit;
+        }
+        else
+        {
+            ( $cntFH, $cnt_file ) = SeedAware::open_tmp_file( 'open_codon_freq_eval_tmp', 'counts' );
+            $cntFH
+                or print STDERR "modal_codon_usage() could not open a temp file for writing.\n"
+                    and exit;
+            $options->{ cnt_file } = $cnt_file;
+        }
+        foreach ( @$counts ) { report_counts( $cntFH, $_ ) }
+        close $cntFH;
     }
 
     $average = 1 if ( @$counts < 6 );
@@ -2686,12 +2740,7 @@ sub optimize_frequencies_0
 
     my $options = ( ref($_[0]) eq 'HASH' ) ? shift : {};
 
-    my $cntfile  = option_by_regexp( $options, qr/(count)|(file)/i, '' );
-    if ( ! $cntfile )
-    {
-        my $tmp  = SeedAware::location_of_tmp( $options );
-        $cntfile = SeedAware::new_file_name( "$tmp/optimize_frequencies", 'counts' );
-    }
+    my $cnt_file = option_by_regexp( $options, qr/(count)|(file)/i, '' );
     my $expon    = option_by_regexp( $options, qr/exp/i,        0.3 );
     my $extra    = option_by_regexp( $options, qr/extra/i,      0 );
     my $max_l    = option_by_regexp( $options, qr/len/i,    undef );
@@ -2699,16 +2748,27 @@ sub optimize_frequencies_0
     my $verbose  = option_by_regexp( $options, qr/^verb/i,  undef );
     my $vertices = option_by_regexp( $options, qr/vert/i,      42 );
 
-    my $save_cnt = -f $cntfile;
+    my $save_cnt = -f $cnt_file;
     if ( @$counts )
     {
-        open( CNT, ">$cntfile" )
-            or print STDERR "optimize_frequencies_0() could not open '$cntfile' for writing.\n"
-            and exit;
-        foreach ( @$counts ) { report_counts( \*CNT, $_ ) }
-        close CNT;
+        my $cntFH;
+        if ( length $cnt_file )
+        {
+            open( $cntFH, '>', $cnt_file )
+                or print STDERR "optimize_frequencies_0() could not open '$cnt_file' for writing.\n"
+                    and exit;
+        }
+        else
+        {
+            ( $cntFH, $cnt_file ) = SeedAware::open_tmp_file( 'optimize_frequencies', 'counts' );
+            $cntFH
+                or print STDERR "optimize_frequencies_0() could not open a temp file for writing.\n"
+                    and exit;
+        }
+        foreach ( @$counts ) { report_counts( $cntFH, $_ ) }
+        close $cntFH;
     }
-    elsif ( ! $save_cnt )
+    elsif ( ! -s $cnt_file )
     {
         print STDERR "optimize_frequencies_0() called with neither count data or a count file.\n";
         exit;
@@ -2734,7 +2794,7 @@ End_of_Few_Points
     my @eval_cmd = ( 'codon_freq_eval_2',
                      ( $max_l ? ( '-l', sprintf( '%d', $max_l ) ) : () ),
                      '-e', sprintf( '%.3e', $expon ),
-                     $cntfile
+                     $cnt_file
                    );
 
     my( $pid, $rd, $wr );
@@ -2908,7 +2968,7 @@ End_of_Few_Points
     close( $rd );
     waitpid $pid, 0;
 
-    unlink $cntfile if ! $save_cnt;
+    unlink $cnt_file if ! $save_cnt;
 
     my ( $best ) = sort { $b->[0] <=> $a->[0] } @freqs;
 
@@ -2950,18 +3010,7 @@ sub optimize_frequencies
 
     my $options = ( ref($_[0]) eq 'HASH' ) ? shift : {};
 
-    my $cntfile = option_by_regexp( $options, qr/(count)|(file)/i, '' );
-    if ( $cntfile && ref( $cntfile ) eq 'ARRAY' && ! $counts )
-    {
-        $counts = $cntfile;
-        $cntfile = '';
-    }
-    if ( ! $cntfile && @$counts )
-    {
-        my $tmp  = SeedAware::location_of_tmp( $options );
-        $cntfile = SeedAware::new_file_name( "$tmp/optimize_frequencies", 'counts' );
-    }
-
+    my $cnt_file = option_by_regexp( $options, qr/(count)|(file)/i, '' );
     my $expon    = option_by_regexp( $options, qr/exp/i,        0.3 );
     my $extra    = option_by_regexp( $options, qr/extra/i,      0 );
     my $max_l    = option_by_regexp( $options, qr/len/i,    undef );
@@ -2970,11 +3019,16 @@ sub optimize_frequencies
     my $verbose  = option_by_regexp( $options, qr/^verb/i,  undef );
     my $vertices = option_by_regexp( $options, qr/vert/i,      42 );
 
-    my $save_cnt = -f $cntfile;
-    if ( ! @$counts && ! $save_cnt )
+    #  This is a very bad overloading of the parameter
+    if ( $cnt_file && ref( $cnt_file ) eq 'ARRAY' && ! $counts )
     {
-        croak "optimize_frequencies() called with neither count data or a count file.\n";
+        $counts   = $cnt_file;
+        $cnt_file = '';
     }
+
+    my $save_cnt = -f $cnt_file;
+    ( @$counts || -s $cnt_file )
+        or croak "optimize_frequencies() called with neither count data or a count file.\n";
 
     #  Do we have >= 6 points?
 
@@ -2993,7 +3047,7 @@ End_of_Few_Points
 
     #  Open the evaluation pipe:
 
-    my %eval_opts = ( cnt_file => $cntfile,
+    my %eval_opts = ( cnt_file => $cnt_file,
                       counts   => $counts,
                       expon    => $expon,
                       max_len  => $max_l,
@@ -4487,7 +4541,66 @@ sub lnL_at_x
 }
 
 
+#==============================================================================
+#  If two sets of frequencies were drawn from the same distribution, what would
+#  be the expected distance between them?  Found by analysis of random suffles
+#  of the members between the two input sets.
+#
+#      $distance            = null_distance( \@cnt1, \@cnt2, \%options )
+#    ( $distance, $stddev ) = null_distance( \@cnt1, \@cnt2, \%options )
+#
+#  Options:
+#
+#      method   => 'average' | 'mode'  #  Evaluation method: average or mode (D)
+#      mode_opt => \%options           #  modal_codon_usage() options (D = {})
+#      n_null   => $reps               #  Number of shuffles (D = 10)
+#      n_rep    => $reps               #  Number of shuffles (D = 10)
+#
+#  Note: if both n_null and n_rep are supplied, the value of n_null is used.
 #------------------------------------------------------------------------------
+sub null_distance
+{
+    my ( $cnt1, $cnt2, $opt ) = @_;
+    $opt ||= {};
+
+    my $method   = $opt->{ method };
+    my $mode_opt = $opt->{ mode_opt } || {}  if $method =~ /^m/i;
+    my $n_rep    = $opt->{ n_null }   || $opt->{ n_rep } || 10;
+
+    my @null_dists = map { null_distance_1( $cnt1, $cnt2, $method, $mode_opt ) }
+                     ( 1 .. $n_rep );
+    my ( $null_mean, $null_stddev ) = gjostat::mean_stddev( @null_dists );
+    $null_stddev ||= 0;
+    # foreach ( sort { $a<=>$b} @null_dists ) { printf "%.4f\n", $_ }
+    wantarray ? ( $null_mean, $null_stddev ) : $null_mean;
+}
+
+
+sub null_distance_1
+{
+    my ( $cnt1, $cnt2, $method, $mode_opt ) = @_;
+
+    my @mix1 = sort { rand() <=> 0.5 } ( @$cnt1, @$cnt2 );
+    my @mix2 = splice @mix1, @$cnt1;
+
+    my ( $freq1, $freq2 );
+    if ( $method =~ m/^av/i )
+    {
+        $freq1 = average_freq( \@mix1 );
+        $freq2 = average_freq( \@mix2 );
+    }
+    else
+    {
+        $freq1 = modal_codon_usage( \@mix1, $mode_opt );
+        $freq2 = modal_codon_usage( \@mix2, $mode_opt );
+    }
+
+    codon_freq_distance( $freq1, $freq2 );
+}
+
+#==============================================================================
+#  A bunch of more or less useful functions
+#==============================================================================
 #   $value = is_cnts_or_freqs( $ref )
 #
 #      0 => not a valid reference to counts or frequencies

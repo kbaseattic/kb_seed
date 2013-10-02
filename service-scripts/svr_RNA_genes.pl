@@ -2,7 +2,7 @@
 # This is a SAS Component
 #
 ########################################################################
-# Copyright (c) 2003-2012 University of Chicago and Fellowship
+# Copyright (c) 2003-2013 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -34,11 +34,10 @@ Output:
 Options:
 
     -a 'role'  #  Proposed assignment; empty string supresses the field
-               #    (D = '5S rRNA ## 5S ribosomal RNA')
     -b         #  Add a blank line between genomes (D = no blank)
     -c         #  Parameters are contig file names (D = genome ids from STDIN)
     -d domains #  One or more of the letters A, B and/or E, run together
-    -e dist    #  Maximum nucleotides at end to extrapolate a match (D = 10)
+    -e dist    #  Maximum nucleotides at end to extrapolate a match (D = 20)
     -f         #  Fasta output format
     -g         #  Parameters are genome ids. No ids gives all complete genomes.
     -j nt      #  Just show the first and last nt nucleotides (D = full seq)
@@ -56,6 +55,22 @@ Options:
                #      mixing of different types; empty string supresses the
                #      field (D = '')
     -u url     #  url of the desired sapling server
+
+The reference sequence perl modules have common internal variable names. For
+example, RNA_reps_SSU_rRNA begins with:
+
+    package RNA_reps;
+    use strict;
+    use gjoseqlib;
+
+    our @RNA_reps         = gjoseqlib::read_fasta( \*DATA );
+    our $assignment       = 'SSU rRNA ## 16S rRNA, small subunit ribosomal RNA';
+    our $tag              = 'SSU_rRNA';
+    our $max_expect       = 1e-20;
+    our $max_exptrapolate = 10;
+    our $min_coverage     = 0.20;
+
+User-supplied command options will override the default values.
 
 End_of_Usage
 
@@ -125,8 +140,9 @@ if ( $reffile )
             and exit;
     $assignment ||= "RNA based on similarity to $reffile data";
 }
-elsif ( $module ||= 'SSU_rRNA_reps' )
+else
 {
+    $module ||= 'RNA_reps_SSU_rRNA';
     $module =~ s/\.pm$//;
     eval { require "$module.pm" };
     if ( $@ )
@@ -147,7 +163,7 @@ elsif ( $module ||= 'SSU_rRNA_reps' )
 
 ensure_defined( $assignment,  'RNA matching reference data' );
 ensure_defined( $coverage,     0.7 );
-ensure_defined( $extrapolate, 10 );
+ensure_defined( $extrapolate, 20 );
 ensure_defined( $identity,     0.5 );
 
 my $sapObject = $contigfiles ? '' : SAPserver->new( $url ? ( url => $url ) : () );
@@ -183,7 +199,6 @@ my $options = { description => $assignment,
                 refseq      => \@rna
               };
 $options->{ coverage }    = $coverage     if $coverage;
-$options->{ extrapolate } = $extrapolate  if defined $extrapolate;
 $options->{ identity }    = $identity     if $identity;
 $options->{ seedexp }     = $expect       if $expect;
 $options->{ loc_format }  = $loc_format   if $loc_format;
