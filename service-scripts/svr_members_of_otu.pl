@@ -56,6 +56,7 @@ if (! $opted) {
     while (my @tuples = ScriptThing::GetBatch($input, undef, $column)) {
         # Ask the server for results.
         my $document = $sapServer->otu_members(-ids => [map { $_->[0] } @tuples]);
+	my $genome_names = $sapServer->genome_names( -ids => [map { $_->[0] } @tuples]);
         # Loop through the IDs, producing output.
         for my $tuple (@tuples) {
             my ($id, $line) = @$tuple;
@@ -67,6 +68,7 @@ if (! $opted) {
                 print STDERR "None found: $id\n";
             } else {
                 # Yes. Print the output lines.
+		print join("\t", $line, $genome_names->{$id}, $id) . "\n";
                 for my $otherID (sort { $a <=> $b } keys %$genomeData) {
                     print join("\t", $line, $genomeData->{$otherID}, $otherID) . "\n";
                 }

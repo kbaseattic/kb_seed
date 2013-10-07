@@ -63,12 +63,6 @@ following fields are available:
 
 =item is_minimal
 
-=item description
-
-=item solid
-
-=item is_defined
-
 =item source_id
 
 =item type
@@ -123,7 +117,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
+my @all_from_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'temperature', 'description', 'oxygenConcentration', 'pH', 'source_id' );
 
@@ -154,9 +148,6 @@ Usage: get_relationship_UsedIn [arguments] < ids > table.with.fields.added
         mod_date
         name
         is_minimal
-        description
-        solid
-        is_defined
         source_id
         type
 

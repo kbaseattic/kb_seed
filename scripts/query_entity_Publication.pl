@@ -50,6 +50,8 @@ The Publication entity has the following relationship links:
 
 =item PublishedExperiment ExperimentMeta
 
+=item PublishedInteraction Interaction
+
 =item PublishedProtocol Protocol
 
 

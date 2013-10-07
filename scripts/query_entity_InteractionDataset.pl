@@ -9,15 +9,15 @@ use Carp;
 
 =head1 NAME
 
-query_entity_Feature
+query_entity_InteractionDataset
 
 =head1 SYNOPSIS
 
-query_entity_Feature [--is field,value] [--like field,value] [--op operator,field,value]
+query_entity_InteractionDataset [--is field,value] [--like field,value] [--op operator,field,value]
 
 =head1 DESCRIPTION
 
-Query the entity Feature. Results are limited using one or more of the query flags:
+Query the entity InteractionDataset. Results are limited using one or more of the query flags:
 
 =over 4
 
@@ -29,76 +29,30 @@ Query the entity Feature. Results are limited using one or more of the query fla
 
 =back
 
-A feature (sometimes also called a gene) is a part of a
-genome that is of special interest. Features may be spread across
-multiple DNA sequences (contigs) of a genome, but never across more
-than one genome. Each feature in the database has a unique
-ID that functions as its ID in this table. Normally a Feature is
-just a single contigous region on a contig. Features have types,
-and an appropriate choice of available types allows the support
-of protein-encoding genes, exons, RNA genes, binding sites,
-pathogenicity islands, or whatever.
+An Interaction Dataset is a collection of PPI
+data imported from a single database or publication.
+
 
 Example:
 
-    query_entity_Feature -is id,exact-match-value -a > records
+    query_entity_InteractionDataset -is id,exact-match-value -a > records
 
 =head2 Related entities
 
-The Feature entity has the following relationship links:
+The InteractionDataset entity has the following relationship links:
 
 =over 4
     
-=item Controls CoregulatedSet
+=item IsDatasetFor Genome
 
-=item Encompasses Feature
-
-=item FeatureInteractsIn Interaction
-
-=item FeatureMeasuredBy Measurement
-
-=item HasCoregulationWith Feature
-
-=item HasFunctional Role
-
-=item HasIndicatedSignalFrom Experiment
-
-=item HasLevelsFrom ProbeSet
-
-=item ImplementsReaction ReactionInstance
-
-=item IsAnnotatedBy Annotation
-
-=item IsContainedIn SSCell
-
-=item IsCoregulatedWith Feature
-
-=item IsEncompassedIn Feature
-
-=item IsExemplarOf Role
-
-=item IsFormedInto AtomicRegulon
-
-=item IsInPair Pairing
-
-=item IsLocatedIn Contig
-
-=item IsMemberOf Family
-
-=item IsOwnedBy Genome
-
-=item IsRegulatedIn CoregulatedSet
-
-=item KnockedOutIn Strain
-
-=item Produces ProteinSequence
+=item IsGroupingOf Interaction
 
 
 =back
 
 =head1 COMMAND-LINE OPTIONS
 
-query_entity_Feature [arguments] > records
+query_entity_InteractionDataset [arguments] > records
 
 =over 4
 
@@ -149,15 +103,11 @@ strings. The following fields are available:
 
 =over 4
 
-=item feature_type
+=item description
 
-=item source_id
+=item data_source
 
-=item sequence_length
-
-=item function
-
-=item alias
+=item url
 
 =back    
    
@@ -174,11 +124,11 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
+my @all_fields = ( 'description', 'data_source', 'url' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 our $usage = <<'END';
-query_entity_Feature [arguments] > records
+query_entity_InteractionDataset [arguments] > records
 
 --is field,value
     Limit the results to entities where the given field has the given value.
@@ -212,11 +162,9 @@ query_entity_Feature [arguments] > records
     Choose a set of fields to return. Field-list is a comma-separated list of 
     strings. The following fields are available:
 
-        feature_type
-        source_id
-        sequence_length
-        function
-        alias
+        description
+        data_source
+        url
 END
 
 my $a;
@@ -284,7 +232,7 @@ elsif ($f) {
     }
     if (@err)
     {
-	print STDERR "all_entities_Feature: unknown fields @err. Valid fields are: @all_fields\n";
+	print STDERR "all_entities_InteractionDataset: unknown fields @err. Valid fields are: @all_fields\n";
 	exit 1;
     }
 }
@@ -330,7 +278,7 @@ for my $ent (@query_op)
     push(@qry, [$field, $mapped_op, $value]);
 }
 
-my $h = $geO->query_entity_Feature(\@qry, \@fields );
+my $h = $geO->query_entity_InteractionDataset(\@qry, \@fields );
 
 while (my($k, $v) = each %$h)
 {

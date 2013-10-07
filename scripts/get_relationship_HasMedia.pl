@@ -97,12 +97,6 @@ strings. The following fields are available:
 
 =item is_minimal
 
-=item description
-
-=item solid
-
-=item is_defined
-
 =item source_id
 
 =item type
@@ -125,7 +119,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'temperature', 'description', 'oxygenConcentration', 'pH', 'source_id' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
+my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -170,9 +164,6 @@ Usage: get_relationship_HasMedia [arguments] < ids > table.with.fields.added
         mod_date
         name
         is_minimal
-        description
-        solid
-        is_defined
         source_id
         type
 

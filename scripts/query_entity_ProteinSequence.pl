@@ -49,6 +49,8 @@ The ProteinSequence entity has the following relationship links:
     
 =item HasAssertedFunctionFrom Source
 
+=item HasConservedDomainModel ConservedDomainModel
+
 =item IsATopicOf Publication
 
 =item IsAlignedProteinComponentOf AlignmentRow
@@ -56,6 +58,8 @@ The ProteinSequence entity has the following relationship links:
 =item IsProteinFor Feature
 
 =item IsProteinMemberOf Family
+
+=item ProteinInteractsIn Interaction
 
 
 =back

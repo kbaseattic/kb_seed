@@ -44,6 +44,8 @@ The Genome entity has the following relationship links:
 
 =item HadResultsProducedBy ProbeSet
 
+=item HasInteractionDataset InteractionDataset
+
 =item HasRepresentativeOf Family
 
 =item IsCollectedInto OTU

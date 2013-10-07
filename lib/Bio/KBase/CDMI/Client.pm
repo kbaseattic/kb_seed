@@ -107,6 +107,10 @@ sub new
 {
     my($class, $url, @args) = @_;
     
+    if (!defined($url))
+    {
+	$url = 'http://bio-data-1.mcs.anl.gov/services/cdmi_api';
+    }
 
     my $self = {
 	client => Bio::KBase::CDMI::Client::RpcClient->new,
@@ -8085,6 +8089,99 @@ sub get_relationship
 
 
 
+=head2 get_all
+
+  $result_set = $obj->get_all($object_names, $filter_clause, $parameters, $fields, $count)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$object_names is a string
+$filter_clause is a string
+$parameters is a reference to a list where each element is a string
+$fields is a string
+$count is an int
+$result_set is a reference to a list where each element is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$object_names is a string
+$filter_clause is a string
+$parameters is a reference to a list where each element is a string
+$fields is a string
+$count is an int
+$result_set is a reference to a list where each element is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+Wrapper for the GetAll function documented L<here|http://pubseed.theseed.org/sapling/server.cgi?pod=ERDB#GetAll>.
+Note that the object_names and fields arguments must be strings; array references are not allowed.
+
+=back
+
+=cut
+
+sub get_all
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 5)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_all (received $n, expecting 5)");
+    }
+    {
+	my($object_names, $filter_clause, $parameters, $fields, $count) = @args;
+
+	my @_bad_arguments;
+        (!ref($object_names)) or push(@_bad_arguments, "Invalid type for argument 1 \"object_names\" (value was \"$object_names\")");
+        (!ref($filter_clause)) or push(@_bad_arguments, "Invalid type for argument 2 \"filter_clause\" (value was \"$filter_clause\")");
+        (ref($parameters) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"parameters\" (value was \"$parameters\")");
+        (!ref($fields)) or push(@_bad_arguments, "Invalid type for argument 4 \"fields\" (value was \"$fields\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 5 \"count\" (value was \"$count\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_all:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_all');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_all",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_all',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_all",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_all',
+				       );
+    }
+}
+
+
+
 =head2 get_entity_Alignment
 
   $return = $obj->get_entity_Alignment($ids, $fields)
@@ -8143,66 +8240,50 @@ An alignment arranges a group of sequences so that they
 match. Each alignment is associated with a phylogenetic tree that
 describes how the sequences developed and their evolutionary
 distance.
+
 It has the following fields:
 
 =over 4
-
 
 =item n_rows
 
 number of rows in the alignment
 
-
 =item n_cols
 
 number of columns in the alignment
 
-
 =item status
 
-status of the alignment, currently either [i]active[/i],
-[i]superseded[/i], or [i]bad[/i]
-
+status of the alignment, currently either [i]active[/i], [i]superseded[/i], or [i]bad[/i]
 
 =item is_concatenation
 
-TRUE if the rows of the alignment map to multiple
-sequences, FALSE if they map to single sequences
-
+TRUE if the rows of the alignment map to multiple sequences, FALSE if they map to single sequences
 
 =item sequence_type
 
-type of sequence being aligned, currently either
-[i]Protein[/i], [i]DNA[/i], [i]RNA[/i], or [i]Mixed[/i]
-
+type of sequence being aligned, currently either [i]Protein[/i], [i]DNA[/i], [i]RNA[/i], or [i]Mixed[/i]
 
 =item timestamp
 
 date and time the alignment was loaded
 
-
 =item method
 
-name of the primary software package or script used
-to construct the alignment
-
+name of the primary software package or script used to construct the alignment
 
 =item parameters
 
-non-default parameters used as input to the software
-package or script indicated in the method attribute
-
+non-default parameters used as input to the software package or script indicated in the method attribute
 
 =item protocol
 
-description of the steps taken to construct the alignment,
-or a reference to an external pipeline
-
+description of the steps taken to construct the alignment, or a reference to an external pipeline
 
 =item source_id
 
 ID of this alignment in the source database
-
 
 
 =back
@@ -8519,10 +8600,10 @@ This entity represents an attribute type that can
 be assigned to an alignment. The attribute
 values are stored in the relationships to the target. The
 key is the attribute name.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -8815,55 +8896,42 @@ This entity represents a single row of an alignment.
 In general, this corresponds to a sequence, but in a
 concatenated alignment multiple sequences may be represented
 here.
+
 It has the following fields:
 
 =over 4
-
 
 =item row_number
 
 1-based ordinal number of this row in the alignment
 
-
 =item row_id
 
 identifier for this row in the FASTA file for the alignment
-
 
 =item row_description
 
 description of this row in the FASTA file for the alignment
 
-
 =item n_components
 
-number of components that make up this alignment
-row; for a single-sequence alignment this is always "1"
-
+number of components that make up this alignment row; for a single-sequence alignment this is always "1"
 
 =item beg_pos_aln
 
-the 1-based column index in the alignment where this
-sequence row begins
-
+the 1-based column index in the alignment where this sequence row begins
 
 =item end_pos_aln
 
-the 1-based column index in the alignment where this
-sequence row ends
-
+the 1-based column index in the alignment where this sequence row ends
 
 =item md5_of_ungapped_sequence
 
-the MD5 of this row's sequence after gaps have been
-removed; for DNA and RNA sequences, the [b]U[/b] codes are also
-normalized to [b]T[/b] before the MD5 is computed
-
+the MD5 of this row's sequence after gaps have been removed; for DNA and RNA sequences, the [b]U[/b] codes are also normalized to [b]T[/b] before the MD5 is computed
 
 =item sequence
 
 sequence for this alignment row (with indels)
-
 
 
 =back
@@ -9183,46 +9251,38 @@ fields_AlleleFrequency is a reference to a hash where the following keys are def
 =item Description
 
 An allele frequency represents a summary of the major and minor allele frequencies for a position on a chromosome.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_id
 
 identifier for this allele in the original (source) database
 
-
 =item position
 
 Specific position on the contig where the allele occurs
-
 
 =item minor_AF
 
 Minor allele frequency.  Floating point number from 0.0 to 0.5.
 
-
 =item minor_allele
 
 Text letter representation of the minor allele. Valid values are A, C, G, and T.
-
 
 =item major_AF
 
 Major allele frequency.  Floating point number less than or equal to 1.0.
 
-
 =item major_allele
 
 Text letter representation of the major allele. Valid values are A, C, G, and T.
 
-
 =item obs_unit_count
 
-Number of observational units used to compute the allele frequencies. Indicates
-the quality of the analysis.
-
+Number of observational units used to compute the allele frequencies. Indicates the quality of the analysis.
 
 
 =back
@@ -9534,25 +9594,22 @@ Annotations are used to track the history of a feature's
 functional assignments and any related issues. The key is
 the feature ID followed by a colon and a complemented ten-digit
 sequence number.
+
 It has the following fields:
 
 =over 4
-
 
 =item annotator
 
 name of the annotator who made the comment
 
-
 =item comment
 
 text of the annotation
 
-
 =item annotation_time
 
 date and time at which the annotation was made
-
 
 
 =back
@@ -9844,25 +9901,22 @@ fields_Assay is a reference to a hash where the following keys are defined:
 =item Description
 
 An assay is an experimental design for determining alleles at specific chromosome positions.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_id
 
 identifier for this assay in the original (source) database
 
-
 =item assay_type
 
 Text description of the type of assay (e.g., SNP, length, sequence, categorical, array, short read, SSR marker, AFLP marker)
 
-
 =item assay_type_id
 
 source ID associated with the assay type (informational)
-
 
 
 =back
@@ -10152,10 +10206,10 @@ features on a single genome. Atomic regulons are constructed so
 that a given feature can only belong to one. Because of this, the
 expression levels for atomic regulons represent in some sense the
 state of a cell.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -10433,15 +10487,14 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 An attribute describes a category of condition or characteristic for
 an experiment. The goals of the experiment can be inferred from its values
 for all the attributes of interest.
+
 It has the following fields:
 
 =over 4
 
-
 =item description
 
 Descriptive text indicating the nature and use of this attribute.
-
 
 
 =back
@@ -10739,57 +10792,42 @@ ratio and in specific compartments that are necessary for a
 cell to function properly. The prediction of biomasses is key
 to the functioning of the model. Each biomass belongs to
 a specific model.
+
 It has the following fields:
 
 =over 4
-
 
 =item mod_date
 
 last modification date of the biomass data
 
-
 =item name
 
 descriptive name for this biomass
 
-
 =item dna
 
-portion of a gram of this biomass (expressed as a
-fraction of 1.0) that is DNA
-
+portion of a gram of this biomass (expressed as a fraction of 1.0) that is DNA
 
 =item protein
 
-portion of a gram of this biomass (expressed as a
-fraction of 1.0) that is protein
-
+portion of a gram of this biomass (expressed as a fraction of 1.0) that is protein
 
 =item cell_wall
 
-portion of a gram of this biomass (expressed as a
-fraction of 1.0) that is cell wall
-
+portion of a gram of this biomass (expressed as a fraction of 1.0) that is cell wall
 
 =item lipid
 
-portion of a gram of this biomass (expressed as a
-fraction of 1.0) that is lipid but is not part of the cell
-wall
-
+portion of a gram of this biomass (expressed as a fraction of 1.0) that is lipid but is not part of the cell wall
 
 =item cofactor
 
-portion of a gram of this biomass (expressed as a
-fraction of 1.0) that function as cofactors
-
+portion of a gram of this biomass (expressed as a fraction of 1.0) that function as cofactors
 
 =item energy
 
-number of ATP molecules hydrolized per gram of
-this biomass
-
+number of ATP molecules hydrolized per gram of this biomass
 
 
 =back
@@ -11106,36 +11144,26 @@ This entity contains information about the codon usage
 frequency in a particular genome with respect to a particular
 type of analysis (e.g. high-expression genes, modal, mean,
 etc.).
+
 It has the following fields:
 
 =over 4
 
-
 =item frequencies
 
-A packed-string representation of the codon usage
-frequencies. These are not global frequencies, but rather
-frequenicy of use relative to other codons that produce
-the same amino acid.
-
+A packed-string representation of the codon usage frequencies. These are not global frequencies, but rather frequenicy of use relative to other codons that produce the same amino acid.
 
 =item genetic_code
 
 Genetic code used for these codons.
 
-
 =item type
 
-Type of frequency analysis: average, modal,
-high-expression, or non-native.
-
+Type of frequency analysis: average, modal, high-expression, or non-native.
 
 =item subtype
 
-Specific nature of the codon usage with respect
-to the given type, generally indicative of how the
-frequencies were computed.
-
+Specific nature of the codon usage with respect to the given type, generally indicative of how the frequencies were computed.
 
 
 =back
@@ -11432,25 +11460,22 @@ fields_Complex is a reference to a hash where the following keys are defined:
 
 A complex is a set of chemical reactions that act in concert to
 effect a role.
+
 It has the following fields:
 
 =over 4
-
 
 =item name
 
 name of this complex. Not all complexes have names.
 
-
 =item source_id
 
 ID of this complex in the source from which it was added.
 
-
 =item mod_date
 
 date and time of the last change to this complex's definition
-
 
 
 =back
@@ -11757,66 +11782,50 @@ fields_Compound is a reference to a hash where the following keys are defined:
 
 A compound is a chemical that participates in a reaction. Both
 ligands and reaction components are treated as compounds.
+
 It has the following fields:
 
 =over 4
 
-
 =item label
 
-primary name of the compound, for use in displaying
-reactions
-
+primary name of the compound, for use in displaying reactions
 
 =item abbr
 
 shortened abbreviation for the compound name
 
-
 =item source_id
 
 common modeling ID of this compound
-
 
 =item ubiquitous
 
 TRUE if this compound is found in most reactions, else FALSE
 
-
 =item mod_date
 
-date and time of the last modification to the
-compound definition
-
+date and time of the last modification to the compound definition
 
 =item mass
 
 pH-neutral atomic mass of the compound
 
-
 =item formula
 
 a pH-neutral formula for the compound
 
-
 =item charge
 
-computed charge of the compound in a pH-neutral
-solution
-
+computed charge of the compound in a pH-neutral solution
 
 =item deltaG
 
-the pH 7 reference Gibbs free-energy of formation for this
-compound as calculated by the group contribution method (units are
-kcal/mol)
-
+the pH 7 reference Gibbs free-energy of formation for this compound as calculated by the group contribution method (units are kcal/mol)
 
 =item deltaG_error
 
-the uncertainty in the [b]deltaG[/b] value (units are
-kcal/mol)
-
+the uncertainty in the [b]deltaG[/b] value (units are kcal/mol)
 
 
 =back
@@ -12135,22 +12144,18 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 
 A Compound Instance represents the occurrence of a particular
 compound in a location in a model.
+
 It has the following fields:
 
 =over 4
 
-
 =item charge
 
-computed charge based on the location instance pH
-and similar constraints
-
+computed charge based on the location instance pH and similar constraints
 
 =item formula
 
-computed chemical formula for this compound based
-on the location instance pH and similar constraints
-
+computed chemical formula for this compound based on the location instance pH and similar constraints
 
 
 =back
@@ -12397,6 +12402,315 @@ sub all_entities_CompoundInstance
 
 
 
+=head2 get_entity_ConservedDomainModel
+
+  $return = $obj->get_entity_ConservedDomainModel($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+A ConservedDomainModel represents a conserved domain model
+as found in the NCBI CDD archive.
+The id of a ConservedDomainModel is the PSSM-Id. 
+
+It has the following fields:
+
+=over 4
+
+=item accession
+
+CD accession (starting with 'cd', 'pfam', 'smart', 'COG', 'PRK' or "CHL')
+
+=item short_name
+
+CD short name
+
+=item description
+
+CD description
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_ConservedDomainModel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_ConservedDomainModel (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_ConservedDomainModel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_ConservedDomainModel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_ConservedDomainModel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_ConservedDomainModel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_ConservedDomainModel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_ConservedDomainModel',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_ConservedDomainModel
+
+  $return = $obj->query_entity_ConservedDomainModel($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ConservedDomainModel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_ConservedDomainModel (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_ConservedDomainModel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_ConservedDomainModel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ConservedDomainModel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_ConservedDomainModel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_ConservedDomainModel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_ConservedDomainModel',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_ConservedDomainModel
+
+  $return = $obj->all_entities_ConservedDomainModel($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ConservedDomainModel
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_ConservedDomainModel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_ConservedDomainModel (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_ConservedDomainModel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_ConservedDomainModel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_ConservedDomainModel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_ConservedDomainModel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_ConservedDomainModel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_ConservedDomainModel',
+				       );
+    }
+}
+
+
+
 =head2 get_entity_Contig
 
   $return = $obj->get_entity_Contig($ids, $fields)
@@ -12442,15 +12756,14 @@ ContigSequences). This use of the term "ContigSequence", rather
 than just "DNA sequence", may turn out to be a bad idea.  For now,
 you should just realize that a Contig has an associated
 genome, but a ContigSequence does not.
+
 It has the following fields:
 
 =over 4
 
-
 =item source_id
 
 ID of this contig from the core (source) database
-
 
 
 =back
@@ -12733,15 +13046,14 @@ ContigChunks are strings of DNA thought of as being a
 string in a 4-character alphabet with an associated ID.  We
 allow a broader alphabet that includes U (for RNA) and
 the standard ambiguity characters.
+
 It has the following fields:
 
 =over 4
 
-
 =item sequence
 
 base pairs that make up this sequence
-
 
 
 =back
@@ -13028,15 +13340,14 @@ can be either very short or very long.  The basic unit of data
 that is moved to/from the database is the ContigChunk, from
 which ContigSequences are formed. The key of a ContigSequence
 is the sequence's MD5 identifier.
+
 It has the following fields:
 
 =over 4
 
-
 =item length
 
 number of base pairs in the contig
-
 
 
 =back
@@ -13323,22 +13634,18 @@ genes that are coregulated using transcription binding sites and
 corresponding transcription regulatory proteins. We represent a
 coregulated set (which may, or may not, be considered a regulon)
 using CoregulatedSet.
+
 It has the following fields:
 
 =over 4
 
-
 =item source_id
 
-original ID of this coregulated set in the source (core)
-database
-
+original ID of this coregulated set in the source (core) database
 
 =item binding_location
 
-binding location for this set's transcription factor;
-there may be none of these or there may be more than one
-
+binding location for this set's transcription factor; there may be none of these or there may be more than one
 
 
 =back
@@ -13625,20 +13932,18 @@ fields_Diagram is a reference to a hash where the following keys are defined:
 
 A functional diagram describes a network of chemical
 reactions, often comprising a single subsystem.
+
 It has the following fields:
 
 =over 4
-
 
 =item name
 
 descriptive name of this diagram
 
-
 =item content
 
 content of the diagram, in PNG format
-
 
 
 =back
@@ -13926,21 +14231,18 @@ fields_EcNumber is a reference to a hash where the following keys are defined:
 EC numbers are assigned by the Enzyme Commission, and consist
 of four numbers separated by periods, each indicating a successively
 smaller cateogry of enzymes.
+
 It has the following fields:
 
 =over 4
-
 
 =item obsolete
 
 This boolean indicates when an EC number is obsolete.
 
-
 =item replacedby
 
-When an obsolete EC number is replaced with another EC number, this string will
-hold the name of the replacement EC number.
-
+When an obsolete EC number is replaced with another EC number, this string will hold the name of the replacement EC number.
 
 
 =back
@@ -14234,38 +14536,30 @@ fields_Environment is a reference to a hash where the following keys are defined
 An Environment is a set of conditions for microbial growth,
 including temperature, aerobicity, media, and supplementary
 conditions.
+
 It has the following fields:
 
 =over 4
-
 
 =item temperature
 
 The temperature in Kelvin.
 
-
 =item description
 
 A description of the environment.
 
-
 =item oxygenConcentration
 
-The oxygen concentration in the environment in Molar (mol/L).
-A value of -1 indicates that there is oxygen in the environment
-but the concentration is not known, (e.g. an open air shake flask
-experiment).
-
+The oxygen concentration in the environment in Molar (mol/L). A value of -1 indicates that there is oxygen in the environment but the concentration is not known, (e.g. an open air shake flask experiment).
 
 =item pH
 
 The pH of the media used in the environment.
 
-
 =item source_id
 
 The ID of the environment used by the data source.
-
 
 
 =back
@@ -14563,15 +14857,14 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 An experiment is a combination of conditions for which gene expression
 information is desired. The result of the experiment is a set of expression
 levels for features under the given conditions.
+
 It has the following fields:
 
 =over 4
 
-
 =item source
 
 Publication or lab relevant to this experiment.
-
 
 
 =back
@@ -14861,37 +15154,30 @@ fields_ExperimentMeta is a reference to a hash where the following keys are defi
 An Experiment consists of (potentially) multiple
 strains, environments, and measurements on
 those strains and environments.
+
 It has the following fields:
 
 =over 4
-
 
 =item title
 
 Title of the experiment.
 
-
 =item description
 
-Description of the experiment including the experimental
-plan, general results, and conclusions, if possible.
-
+Description of the experiment including the experimental plan, general results, and conclusions, if possible.
 
 =item source_id
 
 The ID of the experiment used by the data source.
 
-
 =item startDate
 
 The date this experiment was started.
 
-
 =item comments
 
-Any data describing the experiment that is not covered by
-the description field.
-
+Any data describing the experiment that is not covered by the description field.
 
 
 =back
@@ -15190,15 +15476,14 @@ An ExperimentalUnit is a subset of an experiment consisting of
 a Strain, an Environment, and one or more Measurements on that
 strain in the specified environment. ExperimentalUnits belong to a
 single experiment.
+
 It has the following fields:
 
 =over 4
 
-
 =item source_id
 
 The ID of the experimental unit used by the data source.
-
 
 
 =back
@@ -15486,31 +15771,26 @@ fields_ExperimentalUnitGroup is a reference to a hash where the following keys a
 An ExperimentalUnitGroup allows for grouping related experimental units
 and their measurements - for instance measurements that were in the same plate.
 
+
 It has the following fields:
 
 =over 4
-
 
 =item source_id
 
 The ID of the experimental unit group used by the data source.
 
-
 =item name
 
 The name of this group, if any.
-
 
 =item comments
 
 Any comments about this group.
 
-
 =item groupType
 
-The type of this grouping, for example '24 well plate', '96 well plate',
-'384 well plate', 'microarray'.
-
+The type of this grouping, for example '24 well plate', '96 well plate', '384 well plate', 'microarray'.
 
 
 =back
@@ -15822,33 +16102,26 @@ as products of translating distinct genes may or may not
 have identical functions.  This may be justified, since
 in a very, very, very few cases identical proteins do, in
 fact, have distinct functions.
+
 It has the following fields:
 
 =over 4
-
 
 =item type
 
 type of protein family (e.g. FIGfam, equivalog)
 
-
 =item release
 
 release number / subtype of protein family
 
-
 =item family_function
 
-optional free-form description of the family. For function-based
-families, this would be the functional role for the family
-members.
-
+optional free-form description of the family. For function-based families, this would be the functional role for the family members.
 
 =item alignment
 
-FASTA-formatted alignment of the family's protein
-sequences
-
+FASTA-formatted alignment of the family's protein sequences
 
 
 =back
@@ -16156,42 +16429,30 @@ just a single contigous region on a contig. Features have types,
 and an appropriate choice of available types allows the support
 of protein-encoding genes, exons, RNA genes, binding sites,
 pathogenicity islands, or whatever.
+
 It has the following fields:
 
 =over 4
 
-
 =item feature_type
 
-Code indicating the type of this feature. Among the
-codes currently supported are "peg" for a protein encoding
-gene, "bs" for a binding site, "opr" for an operon, and so
-forth.
-
+Code indicating the type of this feature. Among the codes currently supported are "peg" for a protein encoding gene, "bs" for a binding site, "opr" for an operon, and so forth.
 
 =item source_id
 
-ID for this feature in its original source (core)
-database
-
+ID for this feature in its original source (core) database
 
 =item sequence_length
 
 Number of base pairs in this feature.
 
-
 =item function
 
-Functional assignment for this feature. This will
-often indicate the feature's functional role or roles, and
-may also have comments.
-
+Functional assignment for this feature. This will often indicate the feature's functional role or roles, and may also have comments.
 
 =item alias
 
-alternative identifier for the feature. These are
-highly unstructured, and frequently non-unique.
-
+alternative identifier for the feature. These are highly unstructured, and frequently non-unique.
 
 
 =back
@@ -16517,80 +16778,62 @@ consider the Kbase to be a framework for managing hundreds of
 thousands of genomes and offering the tools needed to
 support compartive analysis on large sets of genomes,
 some of which are virtually identical.
+
 It has the following fields:
 
 =over 4
-
 
 =item pegs
 
 Number of protein encoding genes for this genome.
 
-
 =item rnas
 
 Number of RNA features found for this organism.
-
 
 =item scientific_name
 
 Full genus/species/strain name of the genome sequence.
 
-
 =item complete
 
 TRUE if the genome sequence is complete, else FALSE
-
 
 =item prokaryotic
 
 TRUE if this is a prokaryotic genome sequence, else FALSE
 
-
 =item dna_size
 
 Number of base pairs in the genome sequence.
-
 
 =item contigs
 
 Number of contigs for this genome sequence.
 
-
 =item domain
 
-Domain for this organism (Archaea, Bacteria, Eukaryota,
-Virus, Plasmid, or Environmental Sample).
-
+Domain for this organism (Archaea, Bacteria, Eukaryota, Virus, Plasmid, or Environmental Sample).
 
 =item genetic_code
 
-Genetic code number used for protein translation on most
-of this genome sequence's contigs.
-
+Genetic code number used for protein translation on most of this genome sequence's contigs.
 
 =item gc_content
 
-Percent GC content present in the genome sequence's
-DNA.
-
+Percent GC content present in the genome sequence's DNA.
 
 =item phenotype
 
-zero or more strings describing phenotypic information
-about this genome sequence
-
+zero or more strings describing phenotypic information about this genome sequence
 
 =item md5
 
 MD5 identifier describing the genome's DNA sequence
 
-
 =item source_id
 
-identifier assigned to this genome by the original
-source
-
+identifier assigned to this genome by the original source
 
 
 =back
@@ -16881,6 +17124,923 @@ sub all_entities_Genome
 
 
 
+=head2 get_entity_Interaction
+
+  $return = $obj->get_entity_Interaction($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+An Interaction represents a protein complex or a pairwise
+(binary) physical interaction between proteins.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a description of this interaction.  If the protein complex has a name, this should be it. 
+
+=item directional
+
+True for directional binary interactions (e.g., those detected by a pulldown experiment), false for non-directional binary interactions and complexes. Bidirectional interactions (e.g., interactions detected by reciprocal pulldown experiments) should be encoded as 2 separate binary interactions. 
+
+=item confidence
+
+Optional numeric estimate of confidence in the interaction. Recommended to use a 0-100 scale. 
+
+=item url
+
+Optional URL for more info about this complex.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Interaction
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Interaction (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Interaction');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Interaction",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_Interaction',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Interaction",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Interaction',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Interaction
+
+  $return = $obj->query_entity_Interaction($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Interaction
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Interaction (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Interaction');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Interaction",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_Interaction',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Interaction",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Interaction',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Interaction
+
+  $return = $obj->all_entities_Interaction($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Interaction
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Interaction
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Interaction (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Interaction');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Interaction",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_Interaction',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Interaction",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Interaction',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_InteractionDataset
+
+  $return = $obj->get_entity_InteractionDataset($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+An Interaction Dataset is a collection of PPI
+data imported from a single database or publication.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a description of the dataset.
+
+=item data_source
+
+Optional external source for this dataset; e.g., another database.
+
+=item url
+
+Optional URL for more info about this dataset.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_InteractionDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_InteractionDataset (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_InteractionDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_InteractionDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_InteractionDataset',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_InteractionDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_InteractionDataset',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_InteractionDataset
+
+  $return = $obj->query_entity_InteractionDataset($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_InteractionDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_InteractionDataset (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_InteractionDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_InteractionDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_InteractionDataset',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_InteractionDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_InteractionDataset',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_InteractionDataset
+
+  $return = $obj->all_entities_InteractionDataset($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_InteractionDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_InteractionDataset (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_InteractionDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_InteractionDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_InteractionDataset',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_InteractionDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_InteractionDataset',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_InteractionDetectionType
+
+  $return = $obj->get_entity_InteractionDetectionType($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+This documents methods by which interactions are detected
+or annotated.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a brief description of this detection method. 
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_InteractionDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_InteractionDetectionType (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_InteractionDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_InteractionDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_entity_InteractionDetectionType',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_InteractionDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_InteractionDetectionType',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_InteractionDetectionType
+
+  $return = $obj->query_entity_InteractionDetectionType($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_InteractionDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_InteractionDetectionType (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_InteractionDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_InteractionDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'query_entity_InteractionDetectionType',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_InteractionDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_InteractionDetectionType',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_InteractionDetectionType
+
+  $return = $obj->all_entities_InteractionDetectionType($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_InteractionDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_InteractionDetectionType (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_InteractionDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_InteractionDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'all_entities_InteractionDetectionType',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_InteractionDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_InteractionDetectionType',
+				       );
+    }
+}
+
+
+
 =head2 get_entity_Locality
 
   $return = $obj->get_entity_Locality($ids, $fields)
@@ -16934,55 +18094,46 @@ fields_Locality is a reference to a hash where the following keys are defined:
 =item Description
 
 A locality is a geographic location.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_name
 
 Name or description of the location used as a collection site.
 
-
 =item city
 
 City of the collecting site.
-
 
 =item state
 
 State or province of the collecting site.
 
-
 =item country
 
 Country of the collecting site.
-
 
 =item origcty
 
 3-letter ISO 3166-1 extended country code for the country of origin.
 
-
 =item elevation
 
 Elevation of the collecting site, expressed in meters above sea level.  Negative values are allowed.
-
 
 =item latitude
 
 Latitude of the collecting site, recorded as a decimal number.  North latitudes are positive values and south latitudes are negative numbers.
 
-
 =item longitude
 
 Longitude of the collecting site, recorded as a decimal number.  West longitudes are positive values and east longitudes are negative numbers.
 
-
 =item lo_accession
 
 gazeteer ontology term ID
-
 
 
 =back
@@ -17297,10 +18448,10 @@ compounds. If a reaction occurs entirely in a single
 location, it will frequently only be represented by the
 cytoplasmic versions of the compounds; however, a transport
 always uses specifically located compounds.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -17584,32 +18735,26 @@ fields_Location is a reference to a hash where the following keys are defined:
 A location is a region of the cell where reaction compounds
 originate from or are transported to (e.g. cell wall, extracellular,
 cytoplasm).
+
 It has the following fields:
 
 =over 4
 
-
 =item mod_date
 
-date and time of the last modification to the
-compartment's definition
-
+date and time of the last modification to the compartment's definition
 
 =item name
 
 common name for the location
 
-
 =item source_id
 
 ID from the source of this location
 
-
 =item abbr
 
-an abbreviation (usually a single letter) for the
-location.
-
+an abbreviation (usually a single letter) for the location.
 
 
 =back
@@ -17909,37 +19054,26 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 The Location Instance represents a region of a cell
 (e.g. cell wall, cytoplasm) as it appears in a specific
 model.
+
 It has the following fields:
 
 =over 4
 
-
 =item index
 
-number used to distinguish between different
-instances of the same type of location in a single
-model. Within a model, any two instances of the same
-location must have difference compartment index
-values.
-
+number used to distinguish between different instances of the same type of location in a single model. Within a model, any two instances of the same location must have difference compartment index values.
 
 =item label
 
-description used to differentiate between instances
-of the same location in a single model
-
+description used to differentiate between instances of the same location in a single model
 
 =item pH
 
-pH of the cell region, which is used to determine compound
-charge and pH gradient across cell membranes
-
+pH of the cell region, which is used to determine compound charge and pH gradient across cell membranes
 
 =item potential
 
-electrochemical potential of the cell region, which is used to
-determine the electrochemical gradient across cell membranes
-
+electrochemical potential of the cell region, which is used to determine the electrochemical gradient across cell membranes
 
 
 =back
@@ -18247,58 +19381,42 @@ fields_Measurement is a reference to a hash where the following keys are defined
 A Measurement is a value generated by performing a protocol to
 evaluate a value on an ExperimentalUnit - e.g. a strain in an
 environment.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_id
 
 The ID of the measurement used by the data source.
 
-
 =item value
 
 The value of the measurement.
 
-
 =item mean
 
-The mean of multiple replicates if they are included in the
-measurement.
-
+The mean of multiple replicates if they are included in the measurement.
 
 =item median
 
-The median of multiple replicates if they are included in
-the measurement.
-
+The median of multiple replicates if they are included in the measurement.
 
 =item stddev
 
-The standard deviation of multiple replicates if they are
-included in the measurement.
-
+The standard deviation of multiple replicates if they are included in the measurement.
 
 =item N
 
-The number of replicates if they are included in the
-measurement.
-
+The number of replicates if they are included in the measurement.
 
 =item p_value
 
-The p-value of multiple replicates if they are included in
-the measurement. The exact meaning of the p-value is specified in
-the MeasurementDescription object for this measurement.
-
+The p-value of multiple replicates if they are included in the measurement. The exact meaning of the p-value is specified in the MeasurementDescription object for this measurement.
 
 =item Z_score
 
-The Z-score of multiple replicates if they are included in
-the measurement. The exact meaning of the p-value is specified in
-the MeasurementDescription object for this measurement.
-
+The Z-score of multiple replicates if they are included in the measurement. The exact meaning of the Z-score is specified in the MeasurementDescription object for this measurement.
 
 
 =back
@@ -18615,37 +19733,30 @@ fields_MeasurementDescription is a reference to a hash where the following keys 
 
 A MeasurementDescription provides information about a
 measurement value.
+
 It has the following fields:
 
 =over 4
-
 
 =item name
 
 The name of the measurement.
 
-
 =item description
 
-The description of the measurement, how it is
-measured, and what the measurement statistics mean.
-
+The description of the measurement, how it is measured, and what the measurement statistics mean.
 
 =item unitOfMeasure
 
 The units of the measurement.
 
-
 =item category
 
-The category the measurement fits into, for example
-phenotype, experimental input, environment.
-
+The category the measurement fits into, for example phenotype, experimental input, environment.
 
 =item source_id
 
 The ID of the measurement description used by the data source.
-
 
 
 =back
@@ -18923,9 +20034,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -18943,9 +20051,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -18958,52 +20063,30 @@ A media describes the chemical content of the solution in which cells
 are grown in an experiment or for the purposes of a model. The key is the
 common media name. The nature of the media is described by its relationship
 to its constituent compounds.
+
 It has the following fields:
 
 =over 4
 
-
 =item mod_date
 
-date and time of the last modification to the media's
-definition
-
+date and time of the last modification to the media's definition
 
 =item name
 
 descriptive name of the media
 
-
 =item is_minimal
 
 TRUE if this is a minimal media, else FALSE
-
-
-=item description
-
-description of the media condition
-
-
-=item solid
-
-Whether the media is solid (True) or liquid (False).
-
-
-=item is_defined
-
-TRUE if this media condition is defined (all components explicitly
-known)
-
 
 =item source_id
 
 The ID of the media used by the data source.
 
-
 =item type
 
 The general category of the media.
-
 
 
 =back
@@ -19081,9 +20164,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -19104,9 +20184,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -19188,9 +20265,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -19209,9 +20283,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -19327,53 +20398,42 @@ fields_Model is a reference to a hash where the following keys are defined:
 A model specifies a relationship between sets of features and
 reactions in a cell. It is used to simulate cell growth and gene
 knockouts to validate annotations.
+
 It has the following fields:
 
 =over 4
-
 
 =item mod_date
 
 date and time of the last change to the model data
 
-
 =item name
 
 descriptive name of the model
-
 
 =item version
 
 revision number of the model
 
-
 =item type
 
-string indicating where the model came from
-(e.g. single genome, multiple genome, or community model)
-
+string indicating where the model came from (e.g. single genome, multiple genome, or community model)
 
 =item status
 
-indicator of whether the model is stable, under
-construction, or under reconstruction
-
+indicator of whether the model is stable, under construction, or under reconstruction
 
 =item reaction_count
 
 number of reactions in the model
 
-
 =item compound_count
 
 number of compounds in the model
 
-
 =item annotation_count
 
-number of features associated with one or more reactions in
-the model
-
+number of features associated with one or more reactions in the model
 
 
 =back
@@ -19680,10 +20740,10 @@ fields_OTU is a reference to a hash where the following keys are defined:
 
 An OTU (Organism Taxonomic Unit) is a named group of related
 genomes.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -19963,27 +21023,22 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 =item Description
 
 An ObservationalUnit is an individual plant that 1) is part of an experiment or study, 2) has measured traits, and 3) is assayed for the purpose of determining alleles.  
+
 It has the following fields:
 
 =over 4
-
 
 =item source_name
 
 Name/ID by which the observational unit may be known by the originator and is used in queries.
 
-
 =item source_name2
 
 Secondary name/ID by which the observational unit may be known and is queried.
 
-
 =item plant_id
 
-ID of the plant that was tested to produce this
-observational unit. Observational units with the same plant
-ID are different assays of a single physical organism.
-
+ID of the plant that was tested to produce this observational unit. Observational units with the same plant ID are different assays of a single physical organism.
 
 
 =back
@@ -20276,17 +21331,14 @@ that all of the first members of the pairs correspond to one another
 (are quite similar), as do all of the second members of the pairs.
 These pairs (from prokaryotic genomes) offer one of the most
 powerful clues relating to uncharacterized genes/peroteins.
+
 It has the following fields:
 
 =over 4
 
-
 =item score
 
-Score for this evidence set. The score indicates the
-number of significantly different genomes represented by the
-pairings.
-
+Score for this evidence set. The score indicates the number of significantly different genomes represented by the pairings.
 
 
 =back
@@ -20569,10 +21621,10 @@ the database; only those that are considered for some reason to be
 significant for annotation purposes.The key of the pairing is the
 concatenation of the feature IDs in alphabetical order with an
 intervening colon.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -20847,10 +21899,10 @@ fields_Parameter is a reference to a hash where the following keys are defined:
 
 A parameter is the name of some quantity that has a value.
 
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -21134,35 +22186,30 @@ fields_Person is a reference to a hash where the following keys are defined:
 =item Description
 
 A person represents a human affiliated in some way with Kbase.
+
 It has the following fields:
 
 =over 4
-
 
 =item firstName
 
 The given name of the person.
 
-
 =item lastName
 
 The surname of the person.
-
 
 =item contactEmail
 
 Email address of the person.
 
-
 =item institution
 
 The institution where the person works.
 
-
 =item source_id
 
 The ID of the person used by the data source.
-
 
 
 =back
@@ -21457,10 +22504,10 @@ fields_ProbeSet is a reference to a hash where the following keys are defined:
 
 A probe set is a device containing multiple probe sequences for use
 in gene expression experiments.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -21742,16 +22789,14 @@ is still associated with Features (and may be for some time),
 publications are associated with ProteinSequences (and the inferred
 impact on Features is through the relationship connecting
 ProteinSequences to Features).
+
 It has the following fields:
 
 =over 4
 
-
 =item sequence
 
-The sequence contains the letters corresponding to
-the protein's amino acids.
-
+The sequence contains the letters corresponding to the protein's amino acids.
 
 
 =back
@@ -22036,28 +23081,22 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 
 A Protocol is a step by step set of instructions for
 performing a part of an experiment.
+
 It has the following fields:
 
 =over 4
-
 
 =item name
 
 The name of the protocol.
 
-
 =item description
 
-The step by step instructions for performing the experiment,
-including measurement details, materials, and equipment. A
-researcher should be able to reproduce the experimental results
-with this information.
-
+The step by step instructions for performing the experiment, including measurement details, materials, and equipment. A researcher should be able to reproduce the experimental results with this information.
 
 =item source_id
 
 The ID of the protocol used by the data source.
-
 
 
 =back
@@ -22354,25 +23393,22 @@ The attached publications give an ID (usually a
 DOI or Pubmed ID),  a URL to the paper (when we have it), and a title
 (when we have it). Pubmed IDs are given unmodified. DOI IDs
 are prefixed with [b]doi:[/b], e.g. [i]doi:1002385[/i].
+
 It has the following fields:
 
 =over 4
-
 
 =item title
 
 title of the article, or (unknown) if the title is not known
 
-
 =item link
 
 URL of the article, DOI preferred
 
-
 =item pubdate
 
 publication date of the article
-
 
 
 =back
@@ -22679,67 +23715,50 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 
 A reaction is a chemical process that converts one set of
 compounds (substrate) to another set (products).
+
 It has the following fields:
 
 =over 4
 
-
 =item mod_date
 
-date and time of the last modification to this reaction's
-definition
-
+date and time of the last modification to this reaction's definition
 
 =item name
 
 descriptive name of this reaction
 
-
 =item source_id
 
 ID of this reaction in the resource from which it was added
-
 
 =item abbr
 
 abbreviated name of this reaction
 
-
 =item direction
 
-direction of this reaction (> for forward-only,
-< for backward-only, = for bidirectional)
-
+direction of this reaction (> for forward-only, < for backward-only, = for bidirectional)
 
 =item deltaG
 
-Gibbs free-energy change for the reaction calculated using
-the group contribution method (units are kcal/mol)
-
+Gibbs free-energy change for the reaction calculated using the group contribution method (units are kcal/mol)
 
 =item deltaG_error
 
 uncertainty in the [b]deltaG[/b] value (units are kcal/mol)
 
-
 =item thermodynamic_reversibility
 
-computed reversibility of this reaction in a
-pH-neutral environment
-
+computed reversibility of this reaction in a pH-neutral environment
 
 =item default_protons
 
-number of protons absorbed by this reaction in a
-pH-neutral environment
-
+number of protons absorbed by this reaction in a pH-neutral environment
 
 =item status
 
-string indicating additional information about
-this reaction, generally indicating whether the reaction
-is balanced and/or lumped
-
+string indicating additional information about this reaction, generally indicating whether the reaction is balanced and/or lumped
 
 
 =back
@@ -23058,25 +24077,18 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 
 A reaction instance describes the specific implementation of
 a reaction in a model.
+
 It has the following fields:
 
 =over 4
 
-
 =item direction
 
-reaction directionality (> for forward, < for
-backward, = for bidirectional) with respect to this model
-
+reaction directionality (> for forward, < for backward, = for bidirectional) with respect to this model
 
 =item protons
 
-number of protons produced by this reaction when
-proceeding in the forward direction. If this is a transport
-reaction, these protons end up in the reaction instance's
-main location. If the number is negative, then the protons
-are consumed by the reaction rather than being produced.
-
+number of protons produced by this reaction when proceeding in the forward direction. If this is a transport reaction, these protons end up in the reaction instance's main location. If the number is negative, then the protons are consumed by the reaction rather than being produced.
 
 
 =back
@@ -23364,15 +24376,14 @@ by a feature. One of the main goals of the database is to assign
 features to roles. Most roles are effected by the construction of
 proteins. Some, however, deal with functional regulation and message
 transmission.
+
 It has the following fields:
 
 =over 4
 
-
 =item hypothetical
 
 TRUE if a role is hypothetical, else FALSE
-
 
 
 =back
@@ -23653,10 +24664,10 @@ An SSCell (SpreadSheet Cell) represents a role as it occurs
 in a subsystem spreadsheet row. The key is a colon-delimited triple
 containing an MD5 hash of the subsystem ID followed by a genome ID
 (with optional region string) and a role abbreviation.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -23939,26 +24950,18 @@ Features of a single Genome.  The roles are part of a designated
 subsystem, and the features associated with each role are included
 in the row. That is, a row amounts to an instance of a subsystem as
 it exists in a specific, designated genome.
+
 It has the following fields:
 
 =over 4
 
-
 =item curated
 
-This flag is TRUE if the assignment of the molecular
-machine has been curated, and FALSE if it was made by an
-automated program.
-
+This flag is TRUE if the assignment of the molecular machine has been curated, and FALSE if it was made by an automated program.
 
 =item region
 
-Region in the genome for which the row is relevant.
-Normally, this is an empty string, indicating that the machine
-covers the whole genome. If a subsystem has multiple rows
-for a genome, this contains a location string describing the
-region occupied by this particular row.
-
+Region in the genome for which the row is relevant. Normally, this is an empty string, indicating that the machine covers the whole genome. If a subsystem has multiple rows for a genome, this contains a location string describing the region occupied by this particular row.
 
 
 =back
@@ -24220,7 +25223,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -24233,7 +25236,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -24247,16 +25250,14 @@ output compounds using reactions. The scenario may use all of the
 reactions controlled by a subsystem or only some, and may also
 incorporate additional reactions. Because scenario names are not
 unique, the actual scenario ID is a number.
+
 It has the following fields:
 
 =over 4
 
-
 =item common_name
 
-Common name of the scenario. The name, rather than the ID
-number, is usually displayed everywhere.
-
+Common name of the scenario. The name, rather than the ID number, is usually displayed everywhere.
 
 
 =back
@@ -24330,7 +25331,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -24346,7 +25347,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -24423,7 +25424,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -24437,7 +25438,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Scenario
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -24536,10 +25537,10 @@ fields_Source is a reference to a hash where the following keys are defined:
 A source is a user or organization that is permitted to
 assign its own identifiers or to submit bioinformatic objects
 to the database.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -24827,51 +25828,34 @@ fields_Strain is a reference to a hash where the following keys are defined:
 This entity represents an organism derived from a genome or
 another organism with one or more modifications to the organism's
 genome.
+
 It has the following fields:
 
 =over 4
 
-
 =item name
 
-The common or laboratory name of the strain, e.g. DH5a or
-JMP1004.
-
+The common or laboratory name of the strain, e.g. DH5a or JMP1004.
 
 =item description
 
-A description of the strain, e.g. knockout/modification
-methods, resulting phenotypes, etc.
-
+A description of the strain, e.g. knockout/modification methods, resulting phenotypes, etc.
 
 =item source_id
 
 The ID of the strain used by the data source.
 
-
 =item aggregateData
 
-Denotes whether this entity represents a physical strain
-(False) or aggregate data calculated from one or more strains
-(True).
-
+Denotes whether this entity represents a physical strain (False) or aggregate data calculated from one or more strains (True).
 
 =item wildtype
 
-Denotes this strain is presumably identical to the parent
-genome.
-
+Denotes this strain is presumably identical to the parent genome.
 
 =item referenceStrain
 
-Denotes whether this strain is a reference strain; e.g. it
-is identical to the genome it's related to (True) or not (False).
-In contrast to wildtype, a referenceStrain is abstract and does
-not physically exist and is used for data that refers to a genome
-but not a particular strain. There should only exist one reference
-strain per genome and all reference strains are wildtype.
-
-
+Denotes whether this strain is a reference strain; e.g. it is identical to the genome it's related to (True) or not (False). In contrast to wildtype, a referenceStrain is abstract and does not physically exist and is used for data that refers to a genome but not a particular strain. There should only exist one reference strain per genome and all reference strains are wildtype. 
 
 
 =back
@@ -25175,25 +26159,22 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 =item Description
 
 An Experiment is a collection of observational units with one originator that are part of a specific study.  An experiment may be conducted at more than one location and in more than one season or year.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_name
 
 Name/ID by which the experiment is known at the source.  
 
-
 =item design
 
 Design of the experiment including the numbers and types of observational units, traits, replicates, sampling plan, and analysis that are planned.
 
-
 =item originator
 
 Name of the individual or program that are the originators of the experiment.
-
 
 
 =back
@@ -25498,63 +26479,42 @@ A subsystem is a set of functional roles that have been annotated simultaneously
 the roles present in a specific pathway), with an associated subsystem spreadsheet
 which encodes the fids in each genome that implement the functional roles in the
 subsystem.
+
 It has the following fields:
 
 =over 4
 
-
 =item version
 
-version number for the subsystem. This value is
-incremented each time the subsystem is backed up.
-
+version number for the subsystem. This value is incremented each time the subsystem is backed up.
 
 =item curator
 
-name of the person currently in charge of the
-subsystem
-
+name of the person currently in charge of the subsystem
 
 =item notes
 
 descriptive notes about the subsystem
 
-
 =item description
 
-description of the subsystem's function in the
-cell
-
+description of the subsystem's function in the cell
 
 =item usable
 
-TRUE if this is a usable subsystem, else FALSE. An
-unusable subsystem is one that is experimental or is of
-such low quality that it can negatively affect analysis.
-
+TRUE if this is a usable subsystem, else FALSE. An unusable subsystem is one that is experimental or is of such low quality that it can negatively affect analysis.
 
 =item private
 
-TRUE if this is a private subsystem, else FALSE. A
-private subsystem has valid data, but is not considered ready
-for general distribution.
-
+TRUE if this is a private subsystem, else FALSE. A private subsystem has valid data, but is not considered ready for general distribution.
 
 =item cluster_based
 
-TRUE if this is a clustering-based subsystem, else
-FALSE. A clustering-based subsystem is one in which there is
-functional-coupling evidence that genes belong together, but
-we do not yet know what they do.
-
+TRUE if this is a clustering-based subsystem, else FALSE. A clustering-based subsystem is one in which there is functional-coupling evidence that genes belong together, but we do not yet know what they do.
 
 =item experimental
 
-TRUE if this is an experimental subsystem, else FALSE.
-An experimental subsystem is designed for investigation and
-is not yet ready to be used in comparative analysis and
-annotation.
-
+TRUE if this is an experimental subsystem, else FALSE. An experimental subsystem is designed for investigation and is not yet ready to be used in comparative analysis and annotation.
 
 
 =back
@@ -25861,10 +26821,10 @@ fields_SubsystemClass is a reference to a hash where the following keys are defi
 
 Subsystem classes impose a hierarchical organization on the
 subsystems.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -26118,7 +27078,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26134,7 +27094,7 @@ $ids is a reference to a list where each element is a string
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26150,34 +27110,26 @@ the NCBI taxonomy. This includes, for each genome, a list of
 ever larger taxonomic groups. The groups are stored as
 instances of this entity, and chained together by the
 IsGroupFor relationship.
+
 It has the following fields:
 
 =over 4
-
 
 =item domain
 
 TRUE if this is a domain grouping, else FALSE.
 
-
 =item hidden
 
-TRUE if this is a hidden grouping, else FALSE. Hidden groupings
-are not typically shown in a lineage list.
-
+TRUE if this is a hidden grouping, else FALSE. Hidden groupings are not typically shown in a lineage list.
 
 =item scientific_name
 
-Primary scientific name for this grouping. This is the name used
-when displaying a taxonomy.
-
+Primary scientific name for this grouping. This is the name used when displaying a taxonomy.
 
 =item alias
 
-Alternate name for this grouping. A grouping
-may have many alternate names. The scientific name should also
-be in this list.
-
+Alternate name for this grouping. A grouping may have many alternate names. The scientific name should also be in this list.
 
 
 =back
@@ -26251,7 +27203,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26270,7 +27222,7 @@ $qry is a reference to a list where each element is a reference to a list contai
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26350,7 +27302,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26367,7 +27319,7 @@ $count is an int
 $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -26477,31 +27429,26 @@ fields_TimeSeries is a reference to a hash where the following keys are defined:
 A TimeSeries provides a means to specify a series of experimental data
 over time by ordering multiple ExperimentalUnits.
 
+
 It has the following fields:
 
 =over 4
-
 
 =item source_id
 
 The ID of the time series used by the data source.
 
-
 =item name
 
 The name of this time series, if any.
-
 
 =item comments
 
 Any comments regarding this time series.
 
-
 =item timeUnits
 
-The units of time for this time series, e.g. 'seconds', 'hours', or more
-abstractly, 'number of times culture grown to saturation.'
-
+The units of time for this time series, e.g. 'seconds', 'hours', or more abstractly, 'number of times culture grown to saturation.'
 
 
 =back
@@ -26799,30 +27746,26 @@ fields_Trait is a reference to a hash where the following keys are defined:
 =item Description
 
 A Trait is a phenotypic quality that can be measured or observed for an observational unit.  Examples include height, sugar content, color, or cold tolerance.
+
 It has the following fields:
 
 =over 4
-
 
 =item trait_name
 
 Text name or description of the trait
 
-
 =item unit_of_measure
 
 The units of measure used when determining this trait.  If multiple units of measure are applicable, each has its own row in the database.  
-
 
 =item TO_ID
 
 Trait Ontology term ID (http://www.gramene.org/plant-ontology/)
 
-
 =item protocol
 
 A thorough description of how the trait was collected, and if a rating, the minimum and maximum values
-
 
 
 =back
@@ -27130,56 +28073,42 @@ fields_Tree is a reference to a hash where the following keys are defined:
 A tree describes how the sequences in an alignment relate
 to each other. Most trees are phylogenetic, but some may be based on
 taxonomy or gene content.
+
 It has the following fields:
 
 =over 4
 
-
 =item status
 
-status of the tree, currently either [i]active[/i],
-[i]superseded[/i], or [i]bad[/i]
-
+status of the tree, currently either [i]active[/i], [i]superseded[/i], or [i]bad[/i]
 
 =item data_type
 
-type of data the tree was built from, usually
-[i]sequence_alignment[/i]
-
+type of data the tree was built from, usually [i]sequence_alignment[/i]
 
 =item timestamp
 
 date and time the tree was loaded
 
-
 =item method
 
-name of the primary software package or script used
-to construct the tree
-
+name of the primary software package or script used to construct the tree
 
 =item parameters
 
-non-default parameters used as input to the software
-package or script indicated in the method attribute
-
+non-default parameters used as input to the software package or script indicated in the method attribute
 
 =item protocol
 
-description of the steps taken to construct the tree,
-or a reference to an external pipeline
-
+description of the steps taken to construct the tree, or a reference to an external pipeline
 
 =item source_id
 
 ID of this tree in the source database
 
-
 =item newick
 
-NEWICK format string containing the structure
-of the tree
-
+NEWICK format string containing the structure of the tree
 
 
 =back
@@ -27488,10 +28417,10 @@ This entity represents an attribute type that can
 be assigned to a tree. The attribute
 values are stored in the relationships to the target. The
 key is the attribute name.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -27768,10 +28697,10 @@ This entity represents an attribute type that can
 be assigned to a node. The attribute
 values are stored in the relationships to the target. The
 key is the attribute name.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -28056,39 +28985,28 @@ Each subsystem may include the designation of distinct
 variants.  Thus, there may be three closely-related, but
 distinguishable forms of histidine degradation.  Each form
 would be called a "variant", with an associated code, and all
-genomes implementing a specific variant can easily be accessed.
+genomes implementing a specific variant can easily be accessed. The ID
+is an MD5 of the subsystem name followed by the variant code.
+
 It has the following fields:
 
 =over 4
 
-
 =item role_rule
 
-a space-delimited list of role IDs, in alphabetical order,
-that represents a possible list of non-auxiliary roles applicable to
-this variant. The roles are identified by their abbreviations. A
-variant may have multiple role rules.
-
+a space-delimited list of role IDs, in alphabetical order, that represents a possible list of non-auxiliary roles applicable to this variant. The roles are identified by their abbreviations. A variant may have multiple role rules.
 
 =item code
 
 the variant code all by itself
 
-
 =item type
 
-variant type indicating the quality of the subsystem
-support. A type of "vacant" means that the subsystem
-does not appear to be implemented by the variant. A
-type of "incomplete" means that the subsystem appears to be
-missing many reactions. In all other cases, the type is
-"normal".
-
+variant type indicating the quality of the subsystem support. A type of "vacant" means that the subsystem does not appear to be implemented by the variant. A type of "incomplete" means that the subsystem appears to be missing many reactions. In all other cases, the type is "normal".
 
 =item comment
 
 commentary text about the variant
-
 
 
 =back
@@ -28403,16 +29321,14 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 
 This relationship indicates the expression level of an atomic regulon
 for a given experiment.
+
 It has the following fields:
 
 =over 4
 
-
 =item level
 
-Indication of whether the feature is expressed (1), not expressed (-1),
-or unknown (0).
-
+Indication of whether the feature is expressed (1), not expressed (-1), or unknown (0).
 
 
 =back
@@ -28659,10 +29575,10 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 
 This relationship connects an alignment to the database
 from which it was generated.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -28917,38 +29833,30 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 
 Sources (users) can make assertions about protein sequence function.
 The assertion is associated with an external identifier.
+
 It has the following fields:
 
 =over 4
 
-
 =item function
 
-text of the assertion made about the identifier.
-It may be an empty string, indicating the function is unknown.
-
+text of the assertion made about the identifier. It may be an empty string, indicating the function is unknown.
 
 =item external_id
 
 external identifier used in making the assertion
 
-
 =item organism
 
-organism name associated with this assertion. If the
-assertion is not associated with a specific organism, this
-will be an empty string.
-
+organism name associated with this assertion. If the assertion is not associated with a specific organism, this will be an empty string.
 
 =item gi_number
 
 NCBI GI number associated with the asserted identifier
 
-
 =item release_date
 
 date and time the assertion was downloaded
-
 
 
 =back
@@ -29218,10 +30126,10 @@ fields_Measurement is a reference to a hash where the following keys are defined
 =item Description
 
 Denotes the compound that a measurement quantifies.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -29488,10 +30396,10 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 
 This relationship connects a publication to the protein
 sequences it describes.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -29741,18 +30649,14 @@ fields_ConsistsOfCompounds is a reference to a hash where the following keys are
 This relationship defines the subcompounds that make up a
 compound. For example, CoCl2-6H2O is made up of 1 Co2+, 2 Cl-, and
 6 H2O.
+
 It has the following fields:
 
 =over 4
 
-
 =item molar_ratio
 
-Number of molecules of the subcompound that make up
-the compound. A -1 in this field signifies that although
-the subcompound is present in the compound, the molar
-ratio is unknown.
-
+Number of molecules of the subcompound that make up the compound. A -1 in this field signifies that although the subcompound is present in the compound, the molar ratio is unknown.
 
 
 =back
@@ -30005,10 +30909,10 @@ This relationship connects a subsystem spreadsheet cell to the features
 that occur in it. A feature may occur in many machine roles and a
 machine role may contain many features. The subsystem annotation
 process is essentially the maintenance of this relationship.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -30273,51 +31177,38 @@ fields_ContigSequence is a reference to a hash where the following keys are defi
 
 This relationship connects a nucleotide alignment row to the
 contig sequences from which its components are formed.
+
 It has the following fields:
 
 =over 4
 
-
 =item index_in_concatenation
 
-1-based ordinal position in the alignment row of this
-nucleotide sequence
-
+1-based ordinal position in the alignment row of this nucleotide sequence
 
 =item beg_pos_in_parent
 
-1-based position in the contig sequence of the first
-nucleotide that appears in the alignment
-
+1-based position in the contig sequence of the first nucleotide that appears in the alignment
 
 =item end_pos_in_parent
 
-1-based position in the contig sequence of the last
-nucleotide that appears in the alignment
-
+1-based position in the contig sequence of the last nucleotide that appears in the alignment
 
 =item parent_seq_len
 
 length of original sequence
 
-
 =item beg_pos_aln
 
-the 1-based column index in the alignment where this
-nucleotide sequence begins
-
+the 1-based column index in the alignment where this nucleotide sequence begins
 
 =item end_pos_aln
 
-the 1-based column index in the alignment where this
-nucleotide sequence ends
-
+the 1-based column index in the alignment where this nucleotide sequence ends
 
 =item kb_feature_id
 
-ID of the feature relevant to this sequence, or an
-empty string if the sequence is not specific to a genome
-
+ID of the feature relevant to this sequence, or an empty string if the sequence is not specific to a genome
 
 
 =back
@@ -30604,51 +31495,38 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 
 This relationship connects a protein alignment row to the
 protein sequences from which its components are formed.
+
 It has the following fields:
 
 =over 4
 
-
 =item index_in_concatenation
 
-1-based ordinal position in the alignment row of this
-protein sequence
-
+1-based ordinal position in the alignment row of this protein sequence
 
 =item beg_pos_in_parent
 
-1-based position in the protein sequence of the first
-amino acid that appears in the alignment
-
+1-based position in the protein sequence of the first amino acid that appears in the alignment
 
 =item end_pos_in_parent
 
-1-based position in the protein sequence of the last
-amino acid that appears in the alignment
-
+1-based position in the protein sequence of the last amino acid that appears in the alignment
 
 =item parent_seq_len
 
 length of original sequence
 
-
 =item beg_pos_aln
 
-the 1-based column index in the alignment where this
-protein sequence begins
-
+the 1-based column index in the alignment where this protein sequence begins
 
 =item end_pos_aln
 
-the 1-based column index in the alignment where this
-protein sequence ends
-
+the 1-based column index in the alignment where this protein sequence ends
 
 =item kb_feature_id
 
-ID of the feature relevant to this protein, or an
-empty string if the protein is not specific to a genome
-
+ID of the feature relevant to this protein, or an empty string if the protein is not specific to a genome
 
 
 =back
@@ -30918,22 +31796,18 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 Experimental units may be collected into groups, such as assay
 plates. This relationship describes which experimenal units belong to
 which groups.
+
 It has the following fields:
 
 =over 4
 
-
 =item location
 
-The location, if any, of the experimental unit in the group.
-Often a plate locator, e.g. 'G11' for 96 well plates.
-
+The location, if any, of the experimental unit in the group. Often a plate locator, e.g. 'G11' for 96 well plates.
 
 =item groupMeta
 
-Denotes that the associated ExperimentalUnit's data measures
-the group as a whole - for example, summary statistics.
-
+Denotes that the associated ExperimentalUnit's data measures the group as a whole - for example, summary statistics.
 
 
 =back
@@ -31184,10 +32058,10 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 
 This relationship connects a coregulated set to the
 features that are used as its transcription factors.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -31449,10 +32323,10 @@ fields_Variant is a reference to a hash where the following keys are defined:
 This relationship connects a subsystem to the individual
 variants used to implement it. Each variant contains a slightly
 different subset of the roles in the parent subsystem.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -31721,15 +32595,14 @@ fields_Alignment is a reference to a hash where the following keys are defined:
 
 This relationship connects an alignment to its free-form
 attributes.
+
 It has the following fields:
 
 =over 4
 
-
 =item value
 
 value of this attribute
-
 
 
 =back
@@ -32000,10 +32873,10 @@ fields_Measurement is a reference to a hash where the following keys are defined
 
 The DescribesMeasurement relationship specifies a description
 for a particular measurement.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -32270,15 +33143,14 @@ fields_Tree is a reference to a hash where the following keys are defined:
 
 This relationship connects a tree to its free-form
 attributes.
+
 It has the following fields:
 
 =over 4
 
-
 =item value
 
 value of this attribute
-
 
 
 =back
@@ -32539,20 +33411,18 @@ fields_Tree is a reference to a hash where the following keys are defined:
 
 This relationship connects an tree to the free-form
 attributes of its nodes.
+
 It has the following fields:
 
 =over 4
-
 
 =item value
 
 value of this attribute
 
-
 =item node_id
 
 ID of the node described by the attribute
-
 
 
 =back
@@ -32739,6 +33609,253 @@ sub get_relationship_HasNodeAttribute
 
 
 
+=head2 get_relationship_DetectedWithMethod
+
+  $return = $obj->get_relationship_DetectedWithMethod($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDetectionType
+	1: a fields_DetectedWithMethod
+	2: a fields_Interaction
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDetectionType
+	1: a fields_DetectedWithMethod
+	2: a fields_Interaction
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+The DetectedWithMethod relationship describes which
+protein-protein interactions were detected or annotated by
+particular methods
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_DetectedWithMethod
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_DetectedWithMethod (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_DetectedWithMethod:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_DetectedWithMethod');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_DetectedWithMethod",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_DetectedWithMethod',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DetectedWithMethod",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_DetectedWithMethod',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_DetectedBy
+
+  $return = $obj->get_relationship_DetectedBy($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_DetectedWithMethod
+	2: a fields_InteractionDetectionType
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_DetectedWithMethod
+	2: a fields_InteractionDetectionType
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_DetectedBy
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_DetectedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_DetectedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_DetectedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_DetectedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_DetectedBy',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DetectedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_DetectedBy',
+				       );
+    }
+}
+
+
+
 =head2 get_relationship_Displays
 
   $return = $obj->get_relationship_Displays($ids, $from_fields, $rel_fields, $to_fields)
@@ -32824,15 +33941,14 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 This relationship connects a diagram to its reactions. A
 diagram shows multiple reactions, and a reaction can be on many
 diagrams.
+
 It has the following fields:
 
 =over 4
 
-
 =item location
 
 Location of the reaction's node on the diagram.
-
 
 
 =back
@@ -33091,10 +34207,10 @@ This relationship connects a feature to a related
 feature; for example, it would connect a gene to its
 constituent splice variants, and the splice variants to their
 exons.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -33337,10 +34453,10 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 
 The EvaluatedIn relationship specifies the experimental
 units performed on a particular strain.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -33602,10 +34718,10 @@ fields_Measurement is a reference to a hash where the following keys are defined
 =item Description
 
 Denotes the feature that a measurement quantifies.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -33858,10 +34974,10 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 
 This relationship connects a coregulated set to the
 source organization that originally computed it.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -34092,16 +35208,14 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 
 This relationship connects an atomic regulon to a probe set from which experimental
 data was produced for its features. It contains a vector of the expression levels.
+
 It has the following fields:
 
 =over 4
 
-
 =item level_vector
 
-Vector of expression levels (-1, 0, 1) for the experiments, in
-sequence order.
-
+Vector of expression levels (-1, 0, 1) for the experiments, in sequence order.
 
 
 =back
@@ -34366,10 +35480,10 @@ fields_Strain is a reference to a hash where the following keys are defined:
 
 The GenomeParentOf relationship specifies the direct child
 strains of a specific genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -34653,15 +35767,14 @@ fields_Compound is a reference to a hash where the following keys are defined:
 This relationship connects a source (database or organization)
 with the compounds for which it has assigned names (aliases).
 The alias itself is stored as intersection data.
+
 It has the following fields:
 
 =over 4
 
-
 =item alias
 
 alias for the compound assigned by the source
-
 
 
 =back
@@ -34918,10 +36031,10 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 
 The HasExperimentalUnit relationship describes which
 ExperimentalUnits are part of a Experiment.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -35172,22 +36285,18 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 
 This relationship connects an experiment to a feature. The feature
 expression levels inferred from the experimental results are stored here.
+
 It has the following fields:
 
 =over 4
 
-
 =item rma_value
 
-Normalized expression value for this feature under the experiment's
-conditions.
-
+Normalized expression value for this feature under the experiment's conditions.
 
 =item level
 
-Indication of whether the feature is expressed (1), not expressed (-1),
-or unknown (0).
-
+Indication of whether the feature is expressed (1), not expressed (-1), or unknown (0).
 
 
 =back
@@ -35448,10 +36557,10 @@ fields_Feature is a reference to a hash where the following keys are defined:
 
 The HasKnockoutIn relationship specifies the gene knockouts in
 a particular strain.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -35714,10 +36823,10 @@ fields_Measurement is a reference to a hash where the following keys are defined
 
 The HasMeasurement relationship specifies a measurement(s)
 performed on a particular experimental unit.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -35977,10 +37086,10 @@ fields_Feature is a reference to a hash where the following keys are defined:
 This relationship connects each feature family to its
 constituent features. A family always has many features, and a
 single feature can be found in many families.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -36233,15 +37342,14 @@ fields_Parameter is a reference to a hash where the following keys are defined:
 
 This relationship denotes which parameters each environment has,
 as well as the value of the parameter.
+
 It has the following fields:
 
 =over 4
 
-
 =item value
 
 The value of the parameter.
-
 
 
 =back
@@ -36440,7 +37548,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_HasParticipant
 	2: a fields_Reaction
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
@@ -36474,7 +37582,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_HasParticipant
 	2: a fields_Reaction
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_HasParticipant is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
@@ -36501,19 +37609,14 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 A scenario consists of many participant reactions that
 convert the input compounds to output compounds. A single reaction
 may participate in many scenarios.
+
 It has the following fields:
 
 =over 4
 
-
 =item type
 
-Indicates the type of participaton. If 0, the
-reaction is in the main pathway of the scenario. If 1, the
-reaction is necessary to make the model work but is not in
-the subsystem. If 2, the reaction is part of the subsystem
-but should not be included in the modelling process.
-
+Indicates the type of participaton. If 0, the reaction is in the main pathway of the scenario. If 1, the reaction is necessary to make the model work but is not in the subsystem. If 2, the reaction is part of the subsystem but should not be included in the modelling process.
 
 
 =back
@@ -36607,7 +37710,7 @@ fields_HasParticipant is a reference to a hash where the following keys are defi
 	to_link has a value which is a string
 	type has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -36641,7 +37744,7 @@ fields_HasParticipant is a reference to a hash where the following keys are defi
 	to_link has a value which is a string
 	type has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -36728,16 +37831,14 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
 	concentration has a value which is a float
-	units has a value which is a string
+	minimum_flux has a value which is a float
+	maximum_flux has a value which is a float
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	label has a value which is a string
@@ -36770,16 +37871,14 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_HasPresenceOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
 	concentration has a value which is a float
-	units has a value which is a string
+	minimum_flux has a value which is a float
+	maximum_flux has a value which is a float
 fields_Compound is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	label has a value which is a string
@@ -36801,24 +37900,22 @@ fields_Compound is a reference to a hash where the following keys are defined:
 This relationship connects a media to the compounds that
 occur in it. The intersection data describes how much of each
 compound can be found.
+
 It has the following fields:
 
 =over 4
 
-
 =item concentration
 
-The concentration of the compound in the media.
-A null value indicates that although the compound is
-present in the media, its concentration is not specified.
-This is typically the case for model medias which do not
-have physical analogs.
+The concentration of the compound in the media. A null value indicates that although the compound is present in the media, its concentration is not specified. This is typically the case for model medias which do not have physical analogs.
 
+=item minimum_flux
 
-=item units
+minimum flux level for the compound in the medium.
 
-vol%, g/L, or molar (mol/L).
+=item maximum_flux
 
+maximum flux level for the compound in the medium.
 
 
 =back
@@ -36911,15 +38008,13 @@ fields_HasPresenceOf is a reference to a hash where the following keys are defin
 	from_link has a value which is a string
 	to_link has a value which is a string
 	concentration has a value which is a float
-	units has a value which is a string
+	minimum_flux has a value which is a float
+	maximum_flux has a value which is a float
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -36953,15 +38048,13 @@ fields_HasPresenceOf is a reference to a hash where the following keys are defin
 	from_link has a value which is a string
 	to_link has a value which is a string
 	concentration has a value which is a float
-	units has a value which is a string
+	minimum_flux has a value which is a float
+	maximum_flux has a value which is a float
 fields_Media is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -37094,17 +38187,14 @@ fields_ProteinSequence is a reference to a hash where the following keys are def
 This relationship connects each feature family to its
 constituent protein sequences. A family always has many protein sequences,
 and a single sequence can be found in many families.
+
 It has the following fields:
 
 =over 4
 
-
 =item source_id
 
-Native identifier used for the protein in the definition
-of the family. This will be its ID in the alignment, if one
-exists.
-
+Native identifier used for the protein in the definition of the family. This will be its ID in the alignment, if one exists.
 
 
 =back
@@ -37362,15 +38452,14 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 This relationship connects a source (database or organization)
 with the reactions for which it has assigned names (aliases).
 The alias itself is stored as intersection data.
+
 It has the following fields:
 
 =over 4
 
-
 =item alias
 
 alias for the reaction assigned by the source
-
 
 
 =back
@@ -37651,10 +38740,10 @@ This relationship connects a genome to the FIGfam protein families
 for which it has representative proteins. This information can be computed
 from other relationships, but it is provided explicitly to allow fast access
 to a genome's FIGfam profile.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -37931,10 +39020,10 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 
 This relationship connects a model to the instances of
 reactions that represent how the reactions occur in the model.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -38181,15 +39270,14 @@ fields_Experiment is a reference to a hash where the following keys are defined:
 
 This relationship connects a probe set to the experiments that were
 applied to it.
+
 It has the following fields:
 
 =over 4
 
-
 =item sequence
 
 Sequence number of this experiment in the various result vectors.
-
 
 
 =back
@@ -38420,10 +39508,10 @@ fields_ContigChunk is a reference to a hash where the following keys are defined
 
 This relationship connects a contig's sequence to its DNA
 sequences.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -38676,10 +39764,10 @@ fields_Reaction is a reference to a hash where the following keys are defined:
 
 This relationship connects a complex to the reactions it
 catalyzes.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -38947,25 +40035,22 @@ fields_Trait is a reference to a hash where the following keys are defined:
 =item Description
 
 This relationship contains the measurement values of a trait on a specific observational Unit
+
 It has the following fields:
 
 =over 4
-
 
 =item value
 
 value of the trait measurement
 
-
 =item statistic_type
 
 text description of the statistic type (e.g. mean, median)
 
-
 =item measure_id
 
 internal ID given to this measurement
-
 
 
 =back
@@ -39232,10 +40317,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 This relationship associates observational units with the
 geographic location where the unit is planted.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -39486,10 +40571,10 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 
 This relationship connects a specific compound in a model to the localized
 compound to which it corresponds.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -39722,16 +40807,14 @@ fields_Attribute is a reference to a hash where the following keys are defined:
 
 This relationship connects an experiment to its attributes. The attribute
 values are stored here.
+
 It has the following fields:
 
 =over 4
 
-
 =item value
 
-Value of this attribute in the given experiment. This is always encoded
-as a string, but may in fact be a number.
-
+Value of this attribute in the given experiment. This is always encoded as a string, but may in fact be a number.
 
 
 =back
@@ -39978,40 +41061,30 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 This relationship defines an observational unit's DNA variation
 from a contig in the reference genome.
+
 It has the following fields:
 
 =over 4
-
 
 =item position
 
 Position of this variation in the reference contig.
 
-
 =item len
 
-Length of the variation in the reference contig. A length
-of zero indicates an insertion.
-
+Length of the variation in the reference contig. A length of zero indicates an insertion.
 
 =item data
 
-Replacement DNA for the variation on the primary chromosome. An
-empty string indicates a deletion. The primary chromosome is chosen
-arbitrarily among the two chromosomes of a plant's chromosome pair
-(one coming from the mother and one from the father).
-
+Replacement DNA for the variation on the primary chromosome. An empty string indicates a deletion. The primary chromosome is chosen arbitrarily among the two chromosomes of a plant's chromosome pair (one coming from the mother and one from the father).
 
 =item data2
 
-Replacement DNA for the variation on the secondary chromosome.
-This will frequently be the same as the primary chromosome string.
-
+Replacement DNA for the variation on the secondary chromosome. This will frequently be the same as the primary chromosome string.
 
 =item quality
 
 Quality score assigned to this variation.
-
 
 
 =back
@@ -40269,31 +41342,26 @@ fields_Contig is a reference to a hash where the following keys are defined:
 =item Description
 
 This relationship contains the best scoring statistical correlations between measured traits and the responsible alleles.
+
 It has the following fields:
 
 =over 4
-
 
 =item source_name
 
 Name of the study which analyzed the data and determined that a variation has impact on a trait
 
-
 =item rank
 
 Rank of the position among all positions correlated with this trait.
-
 
 =item pvalue
 
 P-value of the correlation between the variation and the trait
 
-
 =item position
 
-Position in the reference contig where the trait
-has an impact.
-
+Position in the reference contig where the trait has an impact.
 
 
 =back
@@ -40548,10 +41616,10 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 
 This relationship connects features to reaction instances
 that exist because the feature is included in a model.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -40815,30 +41883,22 @@ contain slightly different sets of roles, but all of the roles in a
 variant must be connected to the parent subsystem by this
 relationship. A subsystem always has at least one role, and a role
 always belongs to at least one subsystem.
+
 It has the following fields:
 
 =over 4
 
-
 =item sequence
 
-Sequence number of the role within the subsystem.
-When the roles are formed into a variant, they will
-generally appear in sequence order.
-
+Sequence number of the role within the subsystem. When the roles are formed into a variant, they will generally appear in sequence order.
 
 =item abbreviation
 
-Abbreviation for this role in this subsystem. The
-abbreviations are used in columnar displays, and they also
-appear on diagrams.
-
+Abbreviation for this role in this subsystem. The abbreviations are used in columnar displays, and they also appear on diagrams.
 
 =item auxiliary
 
-TRUE if this is an auxiliary role, or FALSE if this role
-is a functioning part of the subsystem.
-
+TRUE if this is an auxiliary role, or FALSE if this role is a functioning part of the subsystem.
 
 
 =back
@@ -41120,24 +42180,18 @@ fields_Compound is a reference to a hash where the following keys are defined:
 This relationship connects a environment to the compounds that
 occur in it. The intersection data describes how much of each
 compound can be found.
+
 It has the following fields:
 
 =over 4
 
-
 =item concentration
 
-The concentration of the compound in the environment.
-A null value indicates that although the compound is
-present in the environment, its concentration is not specified.
-This is typically the case for model environments which do not
-have physical analogs.
-
+The concentration of the compound in the environment. A null value indicates that although the compound is present in the environment, its concentration is not specified. This is typically the case for model environments which do not have physical analogs.
 
 =item units
 
 vol%, g/L, or molar (mol/L).
-
 
 
 =back
@@ -41430,10 +42484,10 @@ fields_AlignmentRow is a reference to a hash where the following keys are define
 
 This relationship connects an alignment to its component
 rows.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -41704,10 +42758,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 This relationship associates observational units with the
 experiments that generated the data on them.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -41956,16 +43010,14 @@ fields_Feature is a reference to a hash where the following keys are defined:
 
 This relationship connects a feature to a probe set from which experimental
 data was produced for the feature. It contains a vector of the expression levels.
+
 It has the following fields:
 
 =over 4
 
-
 =item level_vector
 
-Vector of expression levels (-1, 0, 1) for the experiments, in
-sequence order.
-
+Vector of expression levels (-1, 0, 1) for the experiments, in sequence order.
 
 
 =back
@@ -42146,6 +43198,562 @@ sub get_relationship_HasLevelsFrom
 
 
 
+=head2 get_relationship_InteractionFeature
+
+  $return = $obj->get_relationship_InteractionFeature($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_InteractionFeature
+	2: a fields_Feature
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_InteractionFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_InteractionFeature
+	2: a fields_Feature
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_InteractionFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+The InteractionFeature relationship links interactions to
+the features that encode their component proteins.
+
+It has the following fields:
+
+=over 4
+
+=item stoichiometry
+
+Stoichiometry, if applicable (e.g., for a curated complex.
+
+=item strength
+
+Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
+
+=item rank
+
+Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_InteractionFeature
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_InteractionFeature (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_InteractionFeature:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_InteractionFeature');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_InteractionFeature",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_InteractionFeature',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionFeature",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_InteractionFeature',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_FeatureInteractsIn
+
+  $return = $obj->get_relationship_FeatureInteractsIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_InteractionFeature
+	2: a fields_Interaction
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_InteractionFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_InteractionFeature
+	2: a fields_Interaction
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_InteractionFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_FeatureInteractsIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_FeatureInteractsIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_FeatureInteractsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_FeatureInteractsIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_FeatureInteractsIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_FeatureInteractsIn',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_FeatureInteractsIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_FeatureInteractsIn',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_InteractionProtein
+
+  $return = $obj->get_relationship_InteractionProtein($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_InteractionProtein
+	2: a fields_ProteinSequence
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_InteractionProtein is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_InteractionProtein
+	2: a fields_ProteinSequence
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_InteractionProtein is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+
+=end text
+
+=item Description
+
+The InteractionProtein relationship links interactions to
+the component proteins.
+
+It has the following fields:
+
+=over 4
+
+=item stoichiometry
+
+Stoichiometry, if applicable (e.g., for a curated complex.
+
+=item strength
+
+Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
+
+=item rank
+
+Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_InteractionProtein
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_InteractionProtein (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_InteractionProtein:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_InteractionProtein');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_InteractionProtein",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_InteractionProtein',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionProtein",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_InteractionProtein',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_ProteinInteractsIn
+
+  $return = $obj->get_relationship_ProteinInteractsIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ProteinSequence
+	1: a fields_InteractionProtein
+	2: a fields_Interaction
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+fields_InteractionProtein is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ProteinSequence
+	1: a fields_InteractionProtein
+	2: a fields_Interaction
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+fields_InteractionProtein is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_ProteinInteractsIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_ProteinInteractsIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_ProteinInteractsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_ProteinInteractsIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_ProteinInteractsIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_ProteinInteractsIn',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ProteinInteractsIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_ProteinInteractsIn',
+				       );
+    }
+}
+
+
+
 =head2 get_relationship_Involves
 
   $return = $obj->get_relationship_Involves($ids, $from_fields, $rel_fields, $to_fields)
@@ -42226,28 +43834,18 @@ fields_LocalizedCompound is a reference to a hash where the following keys are d
 
 This relationship connects a reaction to the
 specific localized compounds that participate in it.
+
 It has the following fields:
 
 =over 4
 
-
 =item coefficient
 
-Number of molecules of the compound that participate
-in a single instance of the reaction. For example, if a
-reaction produces two water molecules, the stoichiometry of
-water for the reaction would be two. When a reaction is
-written on paper in chemical notation, the stoichiometry is
-the number next to the chemical formula of the
-compound. The value is negative for substrates and positive
-for products.
-
+Number of molecules of the compound that participate in a single instance of the reaction. For example, if a reaction produces two water molecules, the stoichiometry of water for the reaction would be two. When a reaction is written on paper in chemical notation, the stoichiometry is the number next to the chemical formula of the compound. The value is negative for substrates and positive for products.
 
 =item cofactor
 
-TRUE if the compound is a cofactor; FALSE if it is a major
-component of the reaction.
-
+TRUE if the compound is a cofactor; FALSE if it is a major component of the reaction.
 
 
 =back
@@ -42511,10 +44109,10 @@ fields_Annotation is a reference to a hash where the following keys are defined:
 This relationship connects a feature to its annotations. A
 feature may have multiple annotations, but an annotation belongs to
 only one feature.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -42765,10 +44363,10 @@ fields_StudyExperiment is a reference to a hash where the following keys are def
 
 This relationship associates each assay with the relevant
 experiments.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -43021,10 +44619,10 @@ This relationship connects each subsystem class with the
 subsystems that belong to it. A class can contain many subsystems,
 but a subsystem is only in one class. Some subsystems are not in any
 class, but this is usually a temporary condition.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -43290,15 +44888,14 @@ fields_Genome is a reference to a hash where the following keys are defined:
 =item Description
 
 A genome belongs to only one genome set. For each set, this relationship marks the genome to be used as its representative.
+
 It has the following fields:
 
 =over 4
 
-
 =item representative
 
 TRUE for the representative genome of the set, else FALSE.
-
 
 
 =back
@@ -43578,10 +45175,10 @@ fields_Contig is a reference to a hash where the following keys are defined:
 This relationship connects a genome to its
 constituent contigs. Unlike contig sequences, a
 contig belongs to only one genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -43854,16 +45451,14 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 
 This relationship connects a biomass composition reaction to the
 compounds specified as contained in the biomass.
+
 It has the following fields:
 
 =over 4
 
-
 =item coefficient
 
-number of millimoles of the compound instance that exists in one
-gram cell dry weight of biomass
-
+number of millimoles of the compound instance that exists in one gram cell dry weight of biomass
 
 
 =back
@@ -44134,10 +45729,10 @@ fields_AtomicRegulon is a reference to a hash where the following keys are defin
 
 This relationship connects a genome to the atomic regulons that
 describe its state.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -44330,6 +45925,329 @@ sub get_relationship_ReflectsStateOf
 
 
 
+=head2 get_relationship_IsConservedDomainModelFor
+
+  $return = $obj->get_relationship_IsConservedDomainModelFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ConservedDomainModel
+	1: a fields_IsConservedDomainModelFor
+	2: a fields_ProteinSequence
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+fields_IsConservedDomainModelFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is an int
+	to_link has a value which is a string
+	percent_identity has a value which is a float
+	alignment_length has a value which is an int
+	mismatches has a value which is an int
+	gap_openings has a value which is an int
+	protein_start has a value which is an int
+	protein_end has a value which is an int
+	domain_start has a value which is an int
+	domain_end has a value which is an int
+	e_value has a value which is a float
+	bit_score has a value which is a float
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ConservedDomainModel
+	1: a fields_IsConservedDomainModelFor
+	2: a fields_ProteinSequence
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+fields_IsConservedDomainModelFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is an int
+	to_link has a value which is a string
+	percent_identity has a value which is a float
+	alignment_length has a value which is an int
+	mismatches has a value which is an int
+	gap_openings has a value which is an int
+	protein_start has a value which is an int
+	protein_end has a value which is an int
+	domain_start has a value which is an int
+	domain_end has a value which is an int
+	e_value has a value which is a float
+	bit_score has a value which is a float
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship connects a protein sequence with the conserved domains
+that have been computed to be associated with it.
+
+
+It has the following fields:
+
+=over 4
+
+=item percent_identity
+
+
+
+=item alignment_length
+
+
+
+=item mismatches
+
+
+
+=item gap_openings
+
+
+
+=item protein_start
+
+
+
+=item protein_end
+
+
+
+=item domain_start
+
+
+
+=item domain_end
+
+
+
+=item e_value
+
+
+
+=item bit_score
+
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsConservedDomainModelFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsConservedDomainModelFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsConservedDomainModelFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsConservedDomainModelFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsConservedDomainModelFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsConservedDomainModelFor',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsConservedDomainModelFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsConservedDomainModelFor',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasConservedDomainModel
+
+  $return = $obj->get_relationship_HasConservedDomainModel($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ProteinSequence
+	1: a fields_IsConservedDomainModelFor
+	2: a fields_ConservedDomainModel
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+fields_IsConservedDomainModelFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is an int
+	to_link has a value which is a string
+	percent_identity has a value which is a float
+	alignment_length has a value which is an int
+	mismatches has a value which is an int
+	gap_openings has a value which is an int
+	protein_start has a value which is an int
+	protein_end has a value which is an int
+	domain_start has a value which is an int
+	domain_end has a value which is an int
+	e_value has a value which is a float
+	bit_score has a value which is a float
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ProteinSequence
+	1: a fields_IsConservedDomainModelFor
+	2: a fields_ConservedDomainModel
+fields_ProteinSequence is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	sequence has a value which is a string
+fields_IsConservedDomainModelFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is an int
+	to_link has a value which is a string
+	percent_identity has a value which is a float
+	alignment_length has a value which is an int
+	mismatches has a value which is an int
+	gap_openings has a value which is an int
+	protein_start has a value which is an int
+	protein_end has a value which is an int
+	domain_start has a value which is an int
+	domain_end has a value which is an int
+	e_value has a value which is a float
+	bit_score has a value which is a float
+fields_ConservedDomainModel is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	accession has a value which is a string
+	short_name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasConservedDomainModel
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasConservedDomainModel (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasConservedDomainModel:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasConservedDomainModel');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasConservedDomainModel",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasConservedDomainModel',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasConservedDomainModel",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasConservedDomainModel',
+				       );
+    }
+}
+
+
+
 =head2 get_relationship_IsConsistentWith
 
   $return = $obj->get_relationship_IsConsistentWith($ids, $from_fields, $rel_fields, $to_fields)
@@ -44392,10 +46310,10 @@ fields_Role is a reference to a hash where the following keys are defined:
 
 This relationship connects a functional role to the EC numbers consistent
 with the chemistry described in the role.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -44636,10 +46554,10 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 
 The IsContextOf relationship describes the enviroment a
 subexperiment defined by an ExperimentalUnit was performed in.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -44883,15 +46801,14 @@ fields_IsCoregulatedWith is a reference to a hash where the following keys are d
 This relationship connects a feature with another feature in the
 same genome with which it appears to be coregulated as a result of
 expression data analysis.
+
 It has the following fields:
 
 =over 4
 
-
 =item coefficient
 
 Pearson correlation coefficient for this coregulation.
-
 
 
 =back
@@ -45134,22 +47051,18 @@ the members are expressed together. Such a relationship is evidence the
 functions of the FIGfams are themselves related. This relationship is
 commutative; only the instance in which the first FIGfam has a lower ID
 than the second is stored.
+
 It has the following fields:
 
 =over 4
 
-
 =item co_occurrence_evidence
 
-number of times members of the two FIGfams occur close to each
-other on chromosomes
-
+number of times members of the two FIGfams occur close to each other on chromosomes
 
 =item co_expression_evidence
 
-number of times members of the two FIGfams are co-expressed in
-expression data experiments
-
+number of times members of the two FIGfams are co-expressed in expression data experiments
 
 
 =back
@@ -45324,6 +47237,296 @@ sub get_relationship_IsCoupledWith
 
 
 
+=head2 get_relationship_IsDatasetFor
+
+  $return = $obj->get_relationship_IsDatasetFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDataset
+	1: a fields_IsDatasetFor
+	2: a fields_Genome
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+fields_IsDatasetFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDataset
+	1: a fields_IsDatasetFor
+	2: a fields_Genome
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+fields_IsDatasetFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+The IsDatasetFor relationship describes which genomes
+are covered by particular interaction datasets.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsDatasetFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsDatasetFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsDatasetFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsDatasetFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsDatasetFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsDatasetFor',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsDatasetFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsDatasetFor',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasInteractionDataset
+
+  $return = $obj->get_relationship_HasInteractionDataset($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_IsDatasetFor
+	2: a fields_InteractionDataset
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_IsDatasetFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_IsDatasetFor
+	2: a fields_InteractionDataset
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_IsDatasetFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasInteractionDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasInteractionDataset (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasInteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasInteractionDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasInteractionDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_HasInteractionDataset',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasInteractionDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasInteractionDataset',
+				       );
+    }
+}
+
+
+
 =head2 get_relationship_IsDeterminedBy
 
   $return = $obj->get_relationship_IsDeterminedBy($ids, $from_fields, $rel_fields, $to_fields)
@@ -45386,20 +47589,14 @@ A functional coupling evidence set exists because it has
 pairings in it, and this relationship connects the evidence set to
 its constituent pairings. A pairing cam belong to multiple evidence
 sets.
+
 It has the following fields:
 
 =over 4
 
-
 =item inverted
 
-A pairing is an unordered pair of protein sequences,
-but its similarity to other pairings in a pair set is
-ordered. Let (A,B) be a pairing and (X,Y) be another pairing
-in the same set. If this flag is FALSE, then (A =~ X) and (B
-=~ Y). If this flag is TRUE, then (A =~ Y) and (B =~
-X).
-
+A pairing is an unordered pair of protein sequences, but its similarity to other pairings in a pair set is ordered. Let (A,B) be a pairing and (X,Y) be another pairing in the same set. If this flag is FALSE, then (A =~ X) and (B =~ Y). If this flag is TRUE, then (A =~ Y) and (B =~ X).
 
 
 =back
@@ -45650,10 +47847,10 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 
 This relationship connects a model to its instances of
 subcellular locations that participate in the model.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -45923,10 +48120,10 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 =item Description
 
 This relationship links a reaction to the way it is used in a model.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -46185,10 +48382,10 @@ fields_Role is a reference to a hash where the following keys are defined:
 
 This relationship links a role to a feature that provides a typical
 example of how the role is implemented.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -46433,10 +48630,10 @@ fields_Role is a reference to a hash where the following keys are defined:
 
 This relationship connects an isofunctional family to the roles that
 make up its assigned function.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -46679,10 +48876,10 @@ fields_Feature is a reference to a hash where the following keys are defined:
 
 This relationship connects each feature to the atomic regulon to
 which it belongs.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -46927,10 +49124,10 @@ fields_Feature is a reference to a hash where the following keys are defined:
 
 This relationship connects a role with the features in which
 it plays a functional part.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -47129,7 +49326,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -47153,7 +49350,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -47170,10 +49367,10 @@ fields_IsGroupFor is a reference to a hash where the following keys are defined:
 The recursive IsGroupFor relationship organizes
 taxonomic groupings into a hierarchy based on the standard organism
 taxonomy.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -47251,7 +49448,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -47275,7 +49472,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsGroupFor
 	2: a fields_TaxonomicGrouping
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -47338,6 +49535,261 @@ sub get_relationship_IsInGroup
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsInGroup",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsInGroup',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsGroupingOf
+
+  $return = $obj->get_relationship_IsGroupingOf($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDataset
+	1: a fields_IsGroupingOf
+	2: a fields_Interaction
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+fields_IsGroupingOf is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_InteractionDataset
+	1: a fields_IsGroupingOf
+	2: a fields_Interaction
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+fields_IsGroupingOf is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+The IsGroupingOf relationship describes which
+interactions are part of a particular interaction
+dataset.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsGroupingOf
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsGroupingOf (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsGroupingOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsGroupingOf');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsGroupingOf",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_IsGroupingOf',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsGroupingOf",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsGroupingOf',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_InInteractionDataset
+
+  $return = $obj->get_relationship_InInteractionDataset($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_IsGroupingOf
+	2: a fields_InteractionDataset
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_IsGroupingOf is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_IsGroupingOf
+	2: a fields_InteractionDataset
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_IsGroupingOf is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_InInteractionDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_InInteractionDataset (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_InInteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_InInteractionDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_InInteractionDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_InInteractionDataset',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InInteractionDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_InInteractionDataset',
 				       );
     }
 }
@@ -47413,10 +49865,10 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 This relationship connects a variant to the physical machines
 that implement it in the genomes. A variant is implemented by many
 machines, but a machine belongs to only one variant.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -47663,10 +50115,10 @@ A pairing contains exactly two protein sequences. A protein
 sequence can belong to multiple pairings. When going from a protein
 sequence to its pairings, they are presented in alphabetical order
 by sequence key.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -47915,10 +50367,10 @@ fields_LocationInstance is a reference to a hash where the following keys are de
 
 This relationship connects a subcellular location to the instances
 of that location that occur in models.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -48186,33 +50638,26 @@ as those methods rejoin the fragements for contiguous features. A few
 features belong to multiple DNA sequences. In that case, however, all
 the DNA sequences belong to the same genome. A DNA sequence itself
 will frequently have thousands of features connected to it.
+
 It has the following fields:
 
 =over 4
 
-
 =item ordinal
 
-Sequence number of this segment, starting from 1
-and proceeding sequentially forward from there.
-
+Sequence number of this segment, starting from 1 and proceeding sequentially forward from there.
 
 =item begin
 
-Index (1-based) of the first residue in the contig
-that belongs to the segment.
-
+Index (1-based) of the first residue in the contig that belongs to the segment.
 
 =item len
 
 Length of this segment.
 
-
 =item dir
 
-Direction (strand) of the segment: "+" if it is
-forward and "-" if it is backward.
-
+Direction (strand) of the segment: "+" if it is forward and "-" if it is backward.
 
 
 =back
@@ -48477,10 +50922,10 @@ fields_Measurement is a reference to a hash where the following keys are defined
 
 The IsMeasurementMethodOf relationship describes which protocol
 was used to take a measurement.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -48767,10 +51212,10 @@ fields_Model is a reference to a hash where the following keys are defined:
 
 A genome can be modeled by many different models, but a model belongs
 to only one genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -49054,21 +51499,18 @@ fields_IsModifiedToBuildAlignment is a reference to a hash where the following k
 =item Description
 
 Relates an alignment to other alignments built from it.
+
 It has the following fields:
 
 =over 4
-
 
 =item modification_type
 
 description of how the alignment was modified
 
-
 =item modification_value
 
-description of any parameters used to derive the
-modification
-
+description of any parameters used to derive the modification
 
 
 =back
@@ -49326,22 +51768,18 @@ fields_IsModifiedToBuildTree is a reference to a hash where the following keys a
 =item Description
 
 Relates a tree to other trees built from it.
+
 It has the following fields:
 
 =over 4
 
-
 =item modification_type
 
-description of how the tree was modified (rerooted,
-annotated, etc.)
-
+description of how the tree was modified (rerooted, annotated, etc.)
 
 =item modification_value
 
-description of any parameters used to derive the
-modification
-
+description of any parameters used to derive the modification
 
 
 =back
@@ -49619,10 +52057,10 @@ contains. Though technically redundant (the information is
 available from the feature's contigs), it simplifies the
 extremely common process of finding all features for a
 genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -49889,10 +52327,10 @@ fields_LocalizedCompound is a reference to a hash where the following keys are d
 
 This relationship connects a localized compound to the
 location in which it occurs during one or more reactions.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -50137,10 +52575,10 @@ This relationship connects a peg feature to the protein
 sequence it produces (if any). Only peg features participate in this
 relationship. A single protein sequence will frequently be produced
 by many features.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -50385,22 +52823,14 @@ fields_ReactionInstance is a reference to a hash where the following keys are de
 
 This relationship connects a compound instance to the reaction instance
 in which it is transformed.
+
 It has the following fields:
 
 =over 4
 
-
 =item coefficient
 
-Number of molecules of the compound that participate
-in a single instance of the reaction. For example, if a
-reaction produces two water molecules, the stoichiometry of
-water for the reaction would be two. When a reaction is
-written on paper in chemical notation, the stoichiometry is
-the number next to the chemical formula of the
-compound. The value is negative for substrates and positive
-for products.
-
+Number of molecules of the compound that participate in a single instance of the reaction. For example, if a reaction produces two water molecules, the stoichiometry of water for the reaction would be two. When a reaction is written on paper in chemical notation, the stoichiometry is the number next to the chemical formula of the compound. The value is negative for substrates and positive for products.
 
 
 =back
@@ -50645,10 +53075,10 @@ fields_CompoundInstance is a reference to a hash where the following keys are de
 
 This relationship connects a specific instance of a compound in a model
 to the specific instance of the model subcellular location where the compound exists.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -50916,10 +53346,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 This relationship associates each observational unit with the reference
 genome that it will be compared to.  All variations will be differences
 between the observational unit and the reference.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -51187,10 +53617,10 @@ fields_CoregulatedSet is a reference to a hash where the following keys are defi
 =item Description
 
 This relationship connects a feature to the set of coregulated features.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -51448,10 +53878,10 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 This relationship connects a diagram to the subsystems that are depicted on
 it. Only diagrams which are useful in curating or annotation the subsystem are
 specified in this relationship.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -51658,7 +54088,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsRepresentedBy
 	2: a fields_ObservationalUnit
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -51687,7 +54117,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsRepresentedBy
 	2: a fields_ObservationalUnit
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -51708,10 +54138,10 @@ fields_ObservationalUnit is a reference to a hash where the following keys are d
 
 This relationship associates observational units with a genus,
 species, strain, and/or variety that was the source material.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -51797,7 +54227,7 @@ fields_IsRepresentedBy is a reference to a hash where the following keys are def
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -51826,7 +54256,7 @@ fields_IsRepresentedBy is a reference to a hash where the following keys are def
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -51952,10 +54382,10 @@ This relationship connects a role to the machine roles that
 represent its appearance in a molecular machine. A machine role has
 exactly one associated role, but a role may be represented by many
 machine roles.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -52184,10 +54614,10 @@ fields_SSCell is a reference to a hash where the following keys are defined:
 
 This relationship connects a subsystem spreadsheet row to its
 constituent spreadsheet cells.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -52420,10 +54850,10 @@ This relationship connects a Contig as it occurs in a
 genome to the Contig Sequence that represents the physical
 DNA base pairs. A contig sequence may represent many contigs,
 but each contig has only one sequence.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -52627,7 +55057,7 @@ fields_IsSubInstanceOf is a reference to a hash where the following keys are def
 	from_link has a value which is a string
 	to_link has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -52658,7 +55088,7 @@ fields_IsSubInstanceOf is a reference to a hash where the following keys are def
 	from_link has a value which is a string
 	to_link has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -52669,10 +55099,10 @@ fields_Scenario is a reference to a hash where the following keys are defined:
 This relationship connects a scenario to its subsystem it
 validates. A scenario belongs to exactly one subsystem, but a
 subsystem may have multiple scenarios.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -52750,7 +55180,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsSubInstanceOf
 	2: a fields_Subsystem
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
@@ -52781,7 +55211,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsSubInstanceOf
 	2: a fields_Subsystem
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_IsSubInstanceOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
@@ -52931,16 +55361,14 @@ fields_AlleleFrequency is a reference to a hash where the following keys are def
 
 This relationship describes the statistical frequencies of the
 most common alleles in various positions on the reference contig.
+
 It has the following fields:
 
 =over 4
 
-
 =item position
 
-Position in the reference contig where the trait
-has an impact.
-
+Position in the reference contig where the trait has an impact.
 
 
 =back
@@ -53177,10 +55605,10 @@ fields_IsSuperclassOf is a reference to a hash where the following keys are defi
 
 This is a recursive relationship that imposes a hierarchy on
 the subsystem classes.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -53363,7 +55791,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTaxonomyOf
 	2: a fields_Genome
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -53402,7 +55830,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTaxonomyOf
 	2: a fields_Genome
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -53435,10 +55863,10 @@ A genome is assigned to a particular point in the taxonomy tree, but not
 necessarily to a leaf node. In some cases, the exact species and strain is
 not available when inserting the genome, so it is placed at the lowest node
 that probably contains the actual genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -53534,7 +55962,7 @@ fields_IsTaxonomyOf is a reference to a hash where the following keys are define
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -53573,7 +56001,7 @@ fields_IsTaxonomyOf is a reference to a hash where the following keys are define
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_TaxonomicGrouping is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	domain has a value which is an int
 	hidden has a value which is an int
 	scientific_name has a value which is a string
@@ -53675,7 +56103,7 @@ fields_IsTerminusFor is a reference to a hash where the following keys are defin
 	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -53709,7 +56137,7 @@ fields_IsTerminusFor is a reference to a hash where the following keys are defin
 	to_link has a value which is an int
 	group_number has a value which is an int
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -53723,16 +56151,14 @@ and a scenario will have many termini. The relationship attributes
 indicate whether the compound is an input to the scenario or an
 output. In some cases, there may be multiple alternative output
 groups. This is also indicated by the attributes.
+
 It has the following fields:
 
 =over 4
 
-
 =item group_number
 
-If zero, then the compound is an input. If one, the compound is
-an output. If two, the compound is an auxiliary output.
-
+If zero, then the compound is an input. If one, the compound is an output. If two, the compound is an auxiliary output.
 
 
 =back
@@ -53810,7 +56236,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTerminusFor
 	2: a fields_Compound
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
@@ -53844,7 +56270,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_IsTerminusFor
 	2: a fields_Compound
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_IsTerminusFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
@@ -53992,28 +56418,22 @@ fields_Role is a reference to a hash where the following keys are defined:
 =item Description
 
 This connects a complex to the roles that work together to form the complex.
+
 It has the following fields:
 
 =over 4
 
-
 =item optional
 
-TRUE if the role is not necessarily required to trigger the
-complex, else FALSE
-
+TRUE if the role is not necessarily required to trigger the complex, else FALSE
 
 =item type
 
-a string code that is used to determine whether a complex
-should be added to a model
-
+a string code that is used to determine whether a complex should be added to a model
 
 =item triggering
 
-TRUE if the presence of the role requires including the
-complex in the model, else FALSE
-
+TRUE if the presence of the role requires including the complex in the model, else FALSE
 
 
 =back
@@ -54286,10 +56706,10 @@ fields_Tree is a reference to a hash where the following keys are defined:
 
 This relationship connects each tree to the alignment from
 which it is built. There is at most one.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -54580,10 +57000,10 @@ fields_Biomass is a reference to a hash where the following keys are defined:
 
 This relationship connects a model to its associated biomass
 composition reactions.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -54812,9 +57232,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -54843,9 +57260,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -54856,10 +57270,10 @@ fields_Media is a reference to a hash where the following keys are defined:
 
 This relationship connects an experiment to the media in which the
 experiment took place.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -54941,9 +57355,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
@@ -54972,9 +57383,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_OperatesIn is a reference to a hash where the following keys are defined:
@@ -55115,23 +57523,18 @@ fields_ExperimentalUnit is a reference to a hash where the following keys are de
 Experimental units may be ordered into time series. This
 relationship describes which experimenal units belong to
 which time series.
+
 It has the following fields:
 
 =over 4
 
-
 =item time
 
-The time at which the associated ExperimentUnit's data
-was taken.
-
+The time at which the associated ExperimentUnit's data was taken.
 
 =item timeMeta
 
-Denotes that the associated ExperimentalUnit's data measures
-the time series as a whole - for example, lag and doubling times
-for bacterial growth curves.
-
+Denotes that the associated ExperimentalUnit's data measures the time series as a whole - for example, lag and doubling times for bacterial growth curves.
 
 
 =back
@@ -55332,7 +57735,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_Overlaps
 	2: a fields_Diagram
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
@@ -55357,7 +57760,7 @@ $return is a reference to a list where each element is a reference to a list con
 	1: a fields_Overlaps
 	2: a fields_Diagram
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 fields_Overlaps is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
@@ -55376,10 +57779,10 @@ A Scenario overlaps a diagram when the diagram displays a
 portion of the reactions that make up the scenario. A scenario may
 overlap many diagrams, and a diagram may be include portions of many
 scenarios.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -55464,7 +57867,7 @@ fields_Overlaps is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 </pre>
@@ -55489,7 +57892,7 @@ fields_Overlaps is a reference to a hash where the following keys are defined:
 	from_link has a value which is an int
 	to_link has a value which is a string
 fields_Scenario is a reference to a hash where the following keys are defined:
-	id has a value which is an int
+	id has a value which is a string
 	common_name has a value which is a string
 
 
@@ -55628,10 +58031,10 @@ fields_LocalizedCompound is a reference to a hash where the following keys are d
 
 This relationship connects a generic compound to a specific compound
 where subceullar location has been specified.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -55896,16 +58299,14 @@ fields_ExperimentMeta is a reference to a hash where the following keys are defi
 
 Denotes that a Person was associated with a
 Experiment in some role.
+
 It has the following fields:
 
 =over 4
 
-
 =item role
 
-Describes the role the person played in the experiment.
-Examples are Primary Investigator, Designer, Experimentalist, etc.
-
+Describes the role the person played in the experiment. Examples are Primary Investigator, Designer, Experimentalist, etc.
 
 
 =back
@@ -56177,10 +58578,10 @@ fields_Genome is a reference to a hash where the following keys are defined:
 This relationship connects a probe set to a genome for which it was
 used to produce experimental results. In general, a probe set is used for
 only one genome and vice versa, but this is not a requirement.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -56445,10 +58846,10 @@ fields_Subsystem is a reference to a hash where the following keys are defined:
 
 This relationship connects a source (core) database
 to the subsystems it submitted to the knowledge base.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -56703,10 +59104,10 @@ fields_ExperimentMeta is a reference to a hash where the following keys are defi
 
 The PublishedExperiment relationship describes where a
 particular experiment was published.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -56889,6 +59290,260 @@ sub get_relationship_ExperimentPublishedIn
 
 
 
+=head2 get_relationship_PublishedInteraction
+
+  $return = $obj->get_relationship_PublishedInteraction($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_PublishedInteraction
+	2: a fields_Interaction
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_PublishedInteraction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_PublishedInteraction
+	2: a fields_Interaction
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_PublishedInteraction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+The PublishedInteraction relationship links interactions
+to the manuscript they are published in.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_PublishedInteraction
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PublishedInteraction (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PublishedInteraction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PublishedInteraction');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PublishedInteraction",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_PublishedInteraction',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PublishedInteraction",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PublishedInteraction',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_InteractionPublishedIn
+
+  $return = $obj->get_relationship_InteractionPublishedIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_PublishedInteraction
+	2: a fields_Publication
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_PublishedInteraction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Interaction
+	1: a fields_PublishedInteraction
+	2: a fields_Publication
+fields_Interaction is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_PublishedInteraction is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_InteractionPublishedIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_InteractionPublishedIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_InteractionPublishedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_InteractionPublishedIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_InteractionPublishedIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_relationship_InteractionPublishedIn',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionPublishedIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_InteractionPublishedIn',
+				       );
+    }
+}
+
+
+
 =head2 get_relationship_PublishedProtocol
 
   $return = $obj->get_relationship_PublishedProtocol($ids, $from_fields, $rel_fields, $to_fields)
@@ -56957,10 +59612,10 @@ fields_Protocol is a reference to a hash where the following keys are defined:
 
 The ProtocolPublishedIn relationship describes where a
 particular protocol was published.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -57224,15 +59879,14 @@ fields_Compound is a reference to a hash where the following keys are defined:
 This relationship indicates that a compound appears on a
 particular diagram. The same compound can appear on many diagrams,
 and a diagram always contains many compounds.
+
 It has the following fields:
 
 =over 4
 
-
 =item location
 
 Location of the compound's node on the diagram.
-
 
 
 =back
@@ -57491,10 +60145,10 @@ fields_StrainParentOf is a reference to a hash where the following keys are defi
 
 The recursive StrainParentOf relationship organizes derived
 organisms into a tree based on parent/child relationships.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -57751,10 +60405,10 @@ fields_Genome is a reference to a hash where the following keys are defined:
 
 This relationship connects a genome to the
 core database from which it was loaded.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -58021,16 +60675,14 @@ fields_SupersedesAlignment is a reference to a hash where the following keys are
 
 This relationship connects an alignment to the alignments
 it replaces.
+
 It has the following fields:
 
 =over 4
 
-
 =item successor_type
 
-Indicates whether sequences were removed or added
-to create the new alignment.
-
+Indicates whether sequences were removed or added to create the new alignment.
 
 
 =back
@@ -58285,16 +60937,14 @@ fields_SupersedesTree is a reference to a hash where the following keys are defi
 
 This relationship connects a tree to the trees
 it replaces.
+
 It has the following fields:
 
 =over 4
 
-
 =item successor_type
 
-Indicates whether sequences were removed or added
-to create the new tree.
-
+Indicates whether sequences were removed or added to create the new tree.
 
 
 =back
@@ -58547,10 +61197,10 @@ fields_Tree is a reference to a hash where the following keys are defined:
 
 This relationship connects a tree to the source database from
 which it was generated.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -58757,9 +61407,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_UsedIn is a reference to a hash where the following keys are defined:
@@ -58792,9 +61439,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 fields_UsedIn is a reference to a hash where the following keys are defined:
@@ -58815,10 +61459,10 @@ fields_Environment is a reference to a hash where the following keys are defined
 
 The UsedIn relationship defines which media is used by an
 Environment.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -58910,9 +61554,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -58945,9 +61586,6 @@ fields_Media is a reference to a hash where the following keys are defined:
 	mod_date has a value which is a string
 	name has a value which is a string
 	is_minimal has a value which is a string
-	description has a value which is a string
-	solid has a value which is a string
-	is_defined has a value which is a string
 	source_id has a value which is a string
 	type has a value which is a string
 
@@ -59098,10 +61736,10 @@ fields_SSRow is a reference to a hash where the following keys are defined:
 This relationship connects a genome to the machines that form
 its metabolic pathways. A genome can use many machines, but a
 machine is used by exactly one genome.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -59388,10 +62026,10 @@ fields_CodonUsage is a reference to a hash where the following keys are defined:
 
 This relationship connects a genome to the various codon usage
 records for it.
+
 It has the following fields:
 
 =over 4
-
 
 
 =back
@@ -64199,6 +66837,42 @@ formula has a value which is a string
 
 
 
+=head2 fields_ConservedDomainModel
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+accession has a value which is a string
+short_name has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+accession has a value which is a string
+short_name has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Contig
 
 =over 4
@@ -64713,6 +67387,112 @@ source_id has a value which is a string
 
 
 
+=head2 fields_Interaction
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+directional has a value which is an int
+confidence has a value which is a float
+url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+directional has a value which is an int
+confidence has a value which is a float
+url has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_InteractionDataset
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+data_source has a value which is a string
+url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+data_source has a value which is a string
+url has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_InteractionDetectionType
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Locality
 
 =over 4
@@ -64969,9 +67749,6 @@ id has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
 is_minimal has a value which is a string
-description has a value which is a string
-solid has a value which is a string
-is_defined has a value which is a string
 source_id has a value which is a string
 type has a value which is a string
 
@@ -64986,9 +67763,6 @@ id has a value which is a string
 mod_date has a value which is a string
 name has a value which is a string
 is_minimal has a value which is a string
-description has a value which is a string
-solid has a value which is a string
-is_defined has a value which is a string
 source_id has a value which is a string
 type has a value which is a string
 
@@ -65569,7 +68343,7 @@ region has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is an int
+id has a value which is a string
 common_name has a value which is a string
 
 </pre>
@@ -65579,7 +68353,7 @@ common_name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is an int
+id has a value which is a string
 common_name has a value which is a string
 
 
@@ -65785,7 +68559,7 @@ id has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is an int
+id has a value which is a string
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
@@ -65798,7 +68572,7 @@ alias has a value which is a reference to a list where each element is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is an int
+id has a value which is a string
 domain has a value which is an int
 hidden has a value which is an int
 scientific_name has a value which is a string
@@ -66597,6 +69371,38 @@ node_id has a value which is a string
 
 
 
+=head2 fields_DetectedWithMethod
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Displays
 
 =over 4
@@ -67106,7 +69912,8 @@ a reference to a hash where the following keys are defined:
 from_link has a value which is a string
 to_link has a value which is a string
 concentration has a value which is a float
-units has a value which is a string
+minimum_flux has a value which is a float
+maximum_flux has a value which is a float
 
 </pre>
 
@@ -67118,7 +69925,8 @@ a reference to a hash where the following keys are defined:
 from_link has a value which is a string
 to_link has a value which is a string
 concentration has a value which is a float
-units has a value which is a string
+minimum_flux has a value which is a float
+maximum_flux has a value which is a float
 
 
 =end text
@@ -67779,6 +70587,82 @@ level_vector has a value which is a countVector
 
 
 
+=head2 fields_InteractionFeature
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_InteractionProtein
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Involves
 
 =over 4
@@ -68043,6 +70927,58 @@ to_link has a value which is a string
 
 
 
+=head2 fields_IsConservedDomainModelFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is an int
+to_link has a value which is a string
+percent_identity has a value which is a float
+alignment_length has a value which is an int
+mismatches has a value which is an int
+gap_openings has a value which is an int
+protein_start has a value which is an int
+protein_end has a value which is an int
+domain_start has a value which is an int
+domain_end has a value which is an int
+e_value has a value which is a float
+bit_score has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is an int
+to_link has a value which is a string
+percent_identity has a value which is a float
+alignment_length has a value which is an int
+mismatches has a value which is an int
+gap_openings has a value which is an int
+protein_start has a value which is an int
+protein_end has a value which is an int
+domain_start has a value which is an int
+domain_end has a value which is an int
+e_value has a value which is a float
+bit_score has a value which is a float
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_IsConsistentWith
 
 =over 4
@@ -68169,6 +71105,38 @@ from_link has a value which is a string
 to_link has a value which is a string
 co_occurrence_evidence has a value which is an int
 co_expression_evidence has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsDatasetFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -68427,6 +71395,38 @@ to_link has a value which is an int
 a reference to a hash where the following keys are defined:
 from_link has a value which is an int
 to_link has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsGroupingOf
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -69590,6 +72590,38 @@ to_link has a value which is a string
 
 
 =head2 fields_PublishedExperiment
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_PublishedInteraction
 
 =over 4
 

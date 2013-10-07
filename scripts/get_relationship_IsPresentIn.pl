@@ -93,7 +93,9 @@ strings. The following fields are available:
 
 =item concentration
 
-=item units
+=item minimum_flux
+
+=item maximum_flux
 
 =back    
 
@@ -111,12 +113,6 @@ strings. The following fields are available:
 =item name
 
 =item is_minimal
-
-=item description
-
-=item solid
-
-=item is_defined
 
 =item source_id
 
@@ -139,8 +135,8 @@ use Getopt::Long;
 #Default fields
  
 my @all_from_fields = ( 'id', 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'units' );
-my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
+my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'minimum_flux', 'maximum_flux' );
+my @all_to_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -183,7 +179,8 @@ Usage: get_relationship_IsPresentIn [arguments] < ids > table.with.fields.added
         from_link
         to_link
         concentration
-        units
+        minimum_flux
+        maximum_flux
 
 --to field-list
     Choose a set of fields from the Media entity to 
@@ -192,9 +189,6 @@ Usage: get_relationship_IsPresentIn [arguments] < ids > table.with.fields.added
         mod_date
         name
         is_minimal
-        description
-        solid
-        is_defined
         source_id
         type
 

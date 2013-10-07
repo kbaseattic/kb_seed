@@ -520,8 +520,10 @@ sub psiblast_search {
 
     if (ref $db ne 'ARRAY') {
         if ($db =~ /^(\d+\.\d+)$/)  { $db = "$org_dir/$1/Features/peg/fasta" }
-        elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/public-pseed.complete" }
-        elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/public-pseed.complete" }
+        elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/SEED.ALL.NR" }
+        elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/SEED.ALL.NR" }
+        elsif (uc $db eq 'PPSEED.complete')  { $db = "$psi_dir/public-pseed.complete" }
+        elsif (uc $db eq 'PUBSEED.complete') { $db = "$psi_dir/public-pseed.complete" }
         elsif (uc $db eq 'PSEED')   { $db = "$psi_dir/ppseed.NR" }
         elsif (uc $db eq 'SEED')    { $db = "$psi_dir/SEED.complete.fasta" }
     }

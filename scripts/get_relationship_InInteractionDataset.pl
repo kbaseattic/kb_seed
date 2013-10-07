@@ -8,21 +8,21 @@ use Carp;
 
 =head1 NAME
 
-get_relationship_HasPresenceOf
+get_relationship_InInteractionDataset
 
 =head1 SYNOPSIS
 
-get_relationship_HasPresenceOf [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+get_relationship_InInteractionDataset [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
 
 =head1 DESCRIPTION
 
-This relationship connects a media to the compounds that
-occur in it. The intersection data describes how much of each
-compound can be found.
+The IsGroupingOf relationship describes which
+interactions are part of a particular interaction
+dataset.
 
 Example:
 
-    get_relationship_HasPresenceOf -a < ids > table.with.fields.added
+    get_relationship_InInteractionDataset -a < ids > table.with.fields.added
 
 would read in a file of ids and add a column for each field in the relationship.
 
@@ -40,7 +40,7 @@ output is to the standard output.
 
 =head1 COMMAND-LINE OPTIONS
 
-Usage: get_relationship_HasPresenceOf [arguments] < ids > table.with.fields.added
+Usage: get_relationship_InInteractionDataset [arguments] < ids > table.with.fields.added
 
 =over 4
 
@@ -50,7 +50,7 @@ Select the identifier from column num
 
 =item -from field-list
 
-Choose a set of fields from the Media
+Choose a set of fields from the Interaction
 entity to return. Field-list is a comma-separated list of strings. The
 following fields are available:
 
@@ -58,15 +58,13 @@ following fields are available:
 
 =item id
 
-=item mod_date
+=item description
 
-=item name
+=item directional
 
-=item is_minimal
+=item confidence
 
-=item source_id
-
-=item type
+=item url
 
 =back    
 
@@ -81,42 +79,22 @@ strings. The following fields are available:
 
 =item to_link
 
-=item concentration
-
-=item minimum_flux
-
-=item maximum_flux
-
 =back    
 
 =item -to field-list
 
-Choose a set of fields from the Compound entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the InteractionDataset entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
 
-=item label
+=item description
 
-=item abbr
+=item data_source
 
-=item source_id
-
-=item ubiquitous
-
-=item mod_date
-
-=item mass
-
-=item formula
-
-=item charge
-
-=item deltaG
-
-=item deltaG_error
+=item url
 
 =back    
 
@@ -134,9 +112,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
-my @all_rel_fields = ( 'from_link', 'to_link', 'concentration', 'minimum_flux', 'maximum_flux' );
-my @all_to_fields = ( 'id', 'label', 'abbr', 'source_id', 'ubiquitous', 'mod_date', 'mass', 'formula', 'charge', 'deltaG', 'deltaG_error' );
+my @all_from_fields = ( 'id', 'description', 'directional', 'confidence', 'url' );
+my @all_rel_fields = ( 'from_link', 'to_link',  );
+my @all_to_fields = ( 'id', 'description', 'data_source', 'url' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -149,7 +127,7 @@ my @rel_fields;
 my @to_fields;
 
 our $usage = <<'END';
-Usage: get_relationship_HasPresenceOf [arguments] < ids > table.with.fields.added
+Usage: get_relationship_InInteractionDataset [arguments] < ids > table.with.fields.added
 
 --show-fields
     List the available fields.
@@ -158,39 +136,28 @@ Usage: get_relationship_HasPresenceOf [arguments] < ids > table.with.fields.adde
     Select the identifier from column num
 
 --from field-list
-    Choose a set of fields from the Media
+    Choose a set of fields from the Interaction
     entity to return. Field-list is a comma-separated list of strings. The
     following fields are available:
         id
-        mod_date
-        name
-        is_minimal
-        source_id
-        type
+        description
+        directional
+        confidence
+        url
 
 --rel field-list
     Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
     strings. The following fields are available:
         from_link
         to_link
-        concentration
-        minimum_flux
-        maximum_flux
 
 --to field-list
-    Choose a set of fields from the Compound entity to 
+    Choose a set of fields from the InteractionDataset entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
-        label
-        abbr
-        source_id
-        ubiquitous
-        mod_date
-        mass
-        formula
-        charge
-        deltaG
-        deltaG_error
+        description
+        data_source
+        url
 
 END
 
@@ -268,7 +235,7 @@ else
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
 	
     my @h = map { $_->[0] } @tuples;
-    my $h = $geO->get_relationship_HasPresenceOf(\@h, \@from_fields, \@rel_fields, \@to_fields);
+    my $h = $geO->get_relationship_InInteractionDataset(\@h, \@from_fields, \@rel_fields, \@to_fields);
     my %results;
     for my $result (@$h) {
         my @from;
@@ -315,7 +282,7 @@ sub check_fields {
         }
 	if (@err) {
 		my @f = keys %all_fields;
-		print STDERR "get_relationship_HasPresenceOf: unknown fields @err. Valid fields are @f\n";
+		print STDERR "get_relationship_InInteractionDataset: unknown fields @err. Valid fields are @f\n";
 		return 1;
 	}
 	return 0;

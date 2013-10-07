@@ -91,7 +91,7 @@ The p-value of multiple replicates if they are included in the measurement. The 
 
 =item Z_score
 
-The Z-score of multiple replicates if they are included in the measurement. The exact meaning of the p-value is specified in the MeasurementDescription object for this measurement.
+The Z-score of multiple replicates if they are included in the measurement. The exact meaning of the Z-score is specified in the MeasurementDescription object for this measurement.
 
 
 =back
@@ -134,7 +134,7 @@ The following fields are available:
     p_value
         The p-value of multiple replicates if they are included in the measurement. The exact meaning of the p-value is specified in the MeasurementDescription object for this measurement.
     Z_score
-        The Z-score of multiple replicates if they are included in the measurement. The exact meaning of the p-value is specified in the MeasurementDescription object for this measurement.
+        The Z-score of multiple replicates if they are included in the measurement. The exact meaning of the Z-score is specified in the MeasurementDescription object for this measurement.
 END
 
 

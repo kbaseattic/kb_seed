@@ -9,27 +9,21 @@ use Carp;
 
 =head1 NAME
 
-get_entity_Feature
+get_entity_InteractionDataset
 
 =head1 SYNOPSIS
 
-get_entity_Feature [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
+get_entity_InteractionDataset [-c N] [-a] [--fields field-list] < ids > table.with.fields.added
 
 =head1 DESCRIPTION
 
-A feature (sometimes also called a gene) is a part of a
-genome that is of special interest. Features may be spread across
-multiple DNA sequences (contigs) of a genome, but never across more
-than one genome. Each feature in the database has a unique
-ID that functions as its ID in this table. Normally a Feature is
-just a single contigous region on a contig. Features have types,
-and an appropriate choice of available types allows the support
-of protein-encoding genes, exons, RNA genes, binding sites,
-pathogenicity islands, or whatever.
+An Interaction Dataset is a collection of PPI
+data imported from a single database or publication.
+
 
 Example:
 
-    get_entity_Feature -a < ids > table.with.fields.added
+    get_entity_InteractionDataset -a < ids > table.with.fields.added
 
 would read in a file of ids and add a column for each field in the entity.
 
@@ -47,60 +41,20 @@ output is to the standard output.
 
 =head2 Related entities
 
-The Feature entity has the following relationship links:
+The InteractionDataset entity has the following relationship links:
 
 =over 4
     
-=item Controls CoregulatedSet
+=item IsDatasetFor Genome
 
-=item Encompasses Feature
-
-=item FeatureInteractsIn Interaction
-
-=item FeatureMeasuredBy Measurement
-
-=item HasCoregulationWith Feature
-
-=item HasFunctional Role
-
-=item HasIndicatedSignalFrom Experiment
-
-=item HasLevelsFrom ProbeSet
-
-=item ImplementsReaction ReactionInstance
-
-=item IsAnnotatedBy Annotation
-
-=item IsContainedIn SSCell
-
-=item IsCoregulatedWith Feature
-
-=item IsEncompassedIn Feature
-
-=item IsExemplarOf Role
-
-=item IsFormedInto AtomicRegulon
-
-=item IsInPair Pairing
-
-=item IsLocatedIn Contig
-
-=item IsMemberOf Family
-
-=item IsOwnedBy Genome
-
-=item IsRegulatedIn CoregulatedSet
-
-=item KnockedOutIn Strain
-
-=item Produces ProteinSequence
+=item IsGroupingOf Interaction
 
 
 =back
 
 =head1 COMMAND-LINE OPTIONS
 
-Usage: get_entity_Feature [arguments] < ids > table.with.fields.added
+Usage: get_entity_InteractionDataset [arguments] < ids > table.with.fields.added
 
     -a		    Return all available fields.
     -c num          Select the identifier from column num.
@@ -113,25 +67,17 @@ The following fields are available:
 
 =over 4    
 
-=item feature_type
+=item description
 
-Code indicating the type of this feature. Among the codes currently supported are "peg" for a protein encoding gene, "bs" for a binding site, "opr" for an operon, and so forth.
+This is a description of the dataset.
 
-=item source_id
+=item data_source
 
-ID for this feature in its original source (core) database
+Optional external source for this dataset; e.g., another database.
 
-=item sequence_length
+=item url
 
-Number of base pairs in this feature.
-
-=item function
-
-Functional assignment for this feature. This will often indicate the feature's functional role or roles, and may also have comments.
-
-=item alias
-
-alternative identifier for the feature. These are highly unstructured, and frequently non-unique.
+Optional URL for more info about this dataset.
 
 
 =back
@@ -144,7 +90,7 @@ L<The SEED Project|http://www.theseed.org>
 
 
 our $usage = <<'END';
-Usage: get_entity_Feature [arguments] < ids > table.with.fields.added
+Usage: get_entity_InteractionDataset [arguments] < ids > table.with.fields.added
 
     -c num          Select the identifier from column num
     -i filename     Use filename rather than stdin for input
@@ -154,16 +100,12 @@ Usage: get_entity_Feature [arguments] < ids > table.with.fields.added
 
 The following fields are available:
 
-    feature_type
-        Code indicating the type of this feature. Among the codes currently supported are "peg" for a protein encoding gene, "bs" for a binding site, "opr" for an operon, and so forth.
-    source_id
-        ID for this feature in its original source (core) database
-    sequence_length
-        Number of base pairs in this feature.
-    function
-        Functional assignment for this feature. This will often indicate the feature's functional role or roles, and may also have comments.
-    alias
-        alternative identifier for the feature. These are highly unstructured, and frequently non-unique.
+    description
+        This is a description of the dataset.
+    data_source
+        Optional external source for this dataset; e.g., another database.
+    url
+        Optional URL for more info about this dataset.
 END
 
 
@@ -173,7 +115,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
+my @all_fields = ( 'description', 'data_source', 'url' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $column;
@@ -226,7 +168,7 @@ elsif ($f) {
     }
     if (@err)
     {
-	print STDERR "get_entity_Feature: unknown fields @err. Valid fields are: @all_fields\n";
+	print STDERR "get_entity_InteractionDataset: unknown fields @err. Valid fields are: @all_fields\n";
 	exit 1;
     }
 } else {
@@ -246,7 +188,7 @@ else
 
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
     my @h = map { $_->[0] } @tuples;
-    my $h = $geO->get_entity_Feature(\@h, \@fields);
+    my $h = $geO->get_entity_InteractionDataset(\@h, \@fields);
     for my $tuple (@tuples) {
         my @values;
         my ($id, $line) = @$tuple;

@@ -82,18 +82,6 @@ descriptive name of the media
 
 TRUE if this is a minimal media, else FALSE
 
-=item description
-
-description of the media condition
-
-=item solid
-
-Whether the media is solid (True) or liquid (False).
-
-=item is_defined
-
-TRUE if this media condition is defined (all components explicitly known)
-
 =item source_id
 
 The ID of the media used by the data source.
@@ -129,12 +117,6 @@ The following fields are available:
         descriptive name of the media
     is_minimal
         TRUE if this is a minimal media, else FALSE
-    description
-        description of the media condition
-    solid
-        Whether the media is solid (True) or liquid (False).
-    is_defined
-        TRUE if this media condition is defined (all components explicitly known)
     source_id
         The ID of the media used by the data source.
     type
@@ -148,7 +130,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = ( 'mod_date', 'name', 'is_minimal', 'description', 'solid', 'is_defined', 'source_id', 'type' );
+my @all_fields = ( 'mod_date', 'name', 'is_minimal', 'source_id', 'type' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 my $column;
