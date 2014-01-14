@@ -11,17 +11,22 @@ use JSON::XS;
 use IDclient;
 use Prodigal;
 use GenomeTypeObject;
+use Bio::KBase::IDServer::Client;
 
 my $help;
 my $input_file;
 my $output_file;
 my $temp_dir;
+my $id_prefix;
+my $id_server;
 
 use Getopt::Long;
-my $rc = GetOptions('help'      => \$help,
-		    'input=s' 	=> \$input_file,
-		    'output=s'  => \$output_file,
-		    'tmpdir=s'  => \$temp_dir,
+my $rc = GetOptions('help'        => \$help,
+		    'input=s'     => \$input_file,
+		    'output=s'    => \$output_file,
+		    'tmpdir=s'    => \$temp_dir,
+		    'id-prefix=s' => \$id_prefix,
+		    'id-server=s' => \$id_server,
 		    );
 
 if (!$rc || $help || @ARGV != 0) {
@@ -48,13 +53,21 @@ my $genomeTO;
     $genomeTO = $json->decode($genomeTO_txt);
 }
 
-
 if ($genomeTO->{domain} !~ m/^([ABV])/o) {
     die "Invalid domain: \"$genomeTO->{domain}\"";
 }
 
 
-my $id_server = IDclient->new($genomeTO);
+my $id_client;
+if ($id_server)
+{
+    $id_client = Bio::KBase::IDServer::Client->new($id_server);
+}
+else
+{	
+    $id_client = IDclient->new($genomeTO);
+}
+
 my $genetic_code = $genomeTO->{genetic_code};
 my $contigs      = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{contigs} } ];
 
@@ -63,19 +76,30 @@ my $params = { -contigs      => $contigs,
 	       };
 if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
 		   
-my $result = &Prodigal::run_prodigal($params);
+my($result, $event) = &Prodigal::run_prodigal($params);
 
+my $event_id = &GenomeTypeObject::add_analysis_event($genomeTO, $event);
+
+$id_prefix = $genomeTO->{id} unless $id_prefix;
+
+my $count = @$result;
+my $type = 'CDS';
+my $typed_prefix = join(".", $id_prefix, $type);
+my $cur_id_suffix = $id_client->allocate_id_range($typed_prefix, $count);
 
 foreach my $entry (@$result) {
-    print STDERR (&SeedUtils::flatten_dumper($entry), "\n");
+    print STDERR (&SeedUtils::flatten_dumper($entry), "\n") if $ENV{DEBUG};
     my ($contig, $beg, undef, $strand, $length, $translation) = @$entry;
-    
-    &GenomeTypeObject::add_feature($genomeTO, { -id_server  => $id_server,
-						-id_prefix  => 'rast|0',
+
+    my $id = join(".", $typed_prefix, $cur_id_suffix);
+    $cur_id_suffix++;
+    &GenomeTypeObject::add_feature($genomeTO, { -id         => $id,
 						-type       => 'CDS',
 						-location   => [[ $contig, $beg, $strand, $length ]],
 						-annotator  => 'prodigal',
 						-annotation => 'Add feature called by PRODIGAL',
+						-analysis_event_id   => $event_id,
+						    -protein_translation => $translation,
 					    }
 				   );
 }

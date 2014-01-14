@@ -45,64 +45,57 @@ files with a heading line.
 =item complex.dtx
 
 Each record in this file corresponds to an instance of the B<Complex>
-entity record. The fields are (0) the KBase complex ID (id), (1) last
-modification date (mod-date), and (2) the source id (source-id).
+entity record. The fields are (0) the KBase complex ID (id), (1) the source id (source-id),
+and (2) the last modification date (mod-date).
 
 =item complexName.dtx
 
 Each record in this file corresponds to a B<ComplexName> record. There
 is one of these for each complex that has a descriptive name. The fields
-are (0) the KBase complex ID (id) and (1) the complex name (name).
+are (0) the KBase complex ID (id), (1) the source ID (not used) and (2) the 
+complex name (name).
 
 =item compound.dtx
 
 Each record in this file represents an instance of the B<Compound>
-entity. The fields are (0) the abbreviated name (abbr), (1) the default charge (charge),
-(2) the energy of formation (deltaG), (3) the error in the energy-of-
-formation value (deltaG-error), (4) the pH-neutral formula (formula),
-(5) the KBase compound ID (id), (6) the primary name of the compound
-for use in displaying reactions (label), (7) the pH-neutral atomic mass
-(mass), (8) the last modification date (mod-date), and (9) the source
-ID (source-id). The I<ubiquitous> field will default to FALSE, and gets
-computed later.
+entity. The fields are (0) the KBase compound ID (id), (1) the source
+ID (source-id), (2) the pH-neutral atomic mass (mass), (3) the last 
+modification date (mod-date), (4) the abbreviated name (abbr), (5) the
+default charge (charge), (6) the energy of formation (deltaG), (7) the
+error in the energy-of-formation value (deltaG-error), (8) the pH-neutral
+formula (formula), (9) the primary name of the compound for use in 
+displaying reactions (label), and (10) the uncharged formula (not used). 
+The I<ubiquitous> field will default to FALSE, and gets computed later.
 
 =item hasCompoundAliasFrom.dtx
 
 Each record in this file represents a relationship instance of
 B<HasCompoundAliasFrom> between B<Compound> and B<Source>. The
-fields are (0) the compound alias (alias), (1) the KBase compound ID
-(to-link), and (2) the alias source (from-link).
+fields are (0) the alias source (from-link), (1) the KBase 
+compound ID (to-link), and (2) the compound alias (alias).
 
 =item hasPresenceOf.dtx
 
 Each record in this file represents a relationship instnce of
 B<HasPresenceOf> between B<Media> and B<Compound>. The fields
-are (0) the compound concentration (concentration), (1) the KBase
-ID of the media (from-link), (2) the maximum flux (maximum-flux),
-(3) the minimum flux (minimum-flux), and the (4) KBase ID of the
-compound (to-link).
+are (0) the KBase ID of the media (from-link), (1) the KBase 
+ID of the compound (to-link), (2) the compound concentration 
+(concentration), (3) the maximum flux (not used), and
+(3) the minimum flux (not used). The I<units> field is not
+specified and will be set to a null string.
 
 =item hasReactionAliasFrom.dtx
 
 Each record in this file represents a relationship instance of
 B<HasReactionAliasFrom> between B<Reaction> and B<Source>. The
-fields are (0) the reaction alias (alias), (1) the KBase reaction ID
-(to-link), and (2) the alias source (from-link).
+fields are (0) the alias source (from-link), (1) the KBase 
+reaction ID (to-link), and (2) the reaction alias (alias).
 
 =item hasStep.dtx
 
 Each record in this file represents a relationship instance of
 B<HasStep> between B<Complex> and B<Reaction>. The fields are (0) the
 KBase complex ID (from-link) and (1) the KBase reaction ID (to-link).
-
-=item Involves.dtx
-
-Each record in this file represents a relationship instance of
-B<Involves> between B<Reaction> and B<LocalizedCompound>. The
-fields are (0) the stoichiometric coefficient (coefficient), (1) C<1>
-for a cofactor and C<0> otherwise (cofactor), (2) the KBase ID of
-the source reaction (from-link) and (3) the KBase ID of the target
-compound (to-link).
 
 =item IsParticipatingAt.dtx
 
@@ -115,25 +108,33 @@ The fields are (0) the KBase ID of the location (from-link) and
 
 Each record in this file represents a relationship instance of
 B<IsTriggeredBy> between B<Complex> and B<Role>. The fields are
-(0) the KBase ID of the complex (from-link), (1) C<1> if the
-role is optional as a trigger and C<0> if it is required to trigger
-(optional), (2) the ID of the target role (to-link), (3) C<1> if
-the presence of the role requires including the complex in the model
-and C<0> if it does not (triggering), and (4) the type of triggering
-relationship (type).
+(0) the KBase ID of the complex (from-link), (1) the ID of the 
+target role (to-link), (2) the source id (not used), (3) C<1> if 
+the role is optional as a trigger and C<0> if it is required to 
+trigger (optional), (4) the type of triggering relationship (type), 
+and (5) C<1> if the presence of the role requires including the 
+complex in the model and C<0> if it does not (triggering).
 
 =item LocalizedCompound.dtx
 
 Each record in this file represents an instance of the B<LocalizedCompound>
 entity. The single field is the KBase ID of the localized compound (id).
 
+=item location.dtx
+
+Each record in this file represents an instance of the B<Location>
+entity. The fields are (0) the KBase ID of the location (id), (1) the
+hierarchy position of the location (not used), (2) the modification date
+(mod-date), (3) the abbreviation (abbr), and (4) the name. The I<source-id>
+field will be set to the same as the abbreviation. 
+
 =item media.dtx
 
 Each record in this file represents an instance of the B<Media> entity.
 The fields are (0) the KBase ID of the media (id), (1) C<1> if the media is
 minimal and C<0> if it is not (is-minimal), (2) the last modification
-date (mod-date), (3) the MODELseed ID (source-id), (4) the media name
-(name), and (5) the media type (type).
+date (mod-date), (3) the media name (name), and (4) the media type (type).
+The I<source-id> field will be set to the same as the media name.
 
 =item ParticipatesAs.dtx
 
@@ -145,15 +146,23 @@ compound ID (to-link).
 =item reaction.dtx
 
 Each record in this file represents an instance of the B<Reaction>
-entity. The fields are (0) the abbreviated name of the reaction (abbr),
+entity. The fields are (0) the KBase ID of the reaction (id), 
 (1) the default number of protons absorbed (default-protons), (2) the
 reactions Gibbs free-energy change (deltaG), (3) the uncertainty in the
 deltaG value (deltaG-error), (4) the direction of the reaction (direction),
-(5) the last modification date (mod-date), (6) the descriptive name
-(name), (7) the MODELseed ID (source-id), (8) a coded string indicating
-whether the reaction is balanced or not (status), and (9) the
-computed reversibility of the reaction in a pH-neutral environment
-(thermodynamic-reversibility).
+(5) the last modification date (mod-date), (6) the computed reversibility 
+of the reaction in a pH-neutral environment (thermodynamic-reversibility),
+(7) the abbreviated name of the reaction (abbr), (8) the MODELseed ID 
+(source-id), (9) the descriptive name (name), and (10) a coded string indicating
+whether the reaction is balanced or not (status).
+
+=item Reagent.dtx
+
+Each record in this file represents an instance of the B<Involves> relationship
+between B<Reaction> and B<LocalizedCompound>. The fields are (0) the
+KBase ID of the source reaction (from-link), (1) the KBase ID of the target
+localized compound (to-link), (2) the coefficient (coefficient), and (3)
+TRUE iff the reagent acts as a cofactor (cofactor).
 
 =back
 
@@ -259,7 +268,7 @@ Name of the directory containing the model data files.
         { from_link => 0, to_link => 1 }, 1, 1);
     $loader->SimpleLoad($inDirectory, 'reaction.dtx', 'Reaction', { abbr => [0, 'copy', ''],
           default_protons => 1, deltaG => [2, 'copy', 1000000], deltaG_error => [3, 'copy', 1000000],
-          direction => 4, mod_date => [5, 'timeStamp', 0], name => 6, id => 7, source_id => 8,
+          direction => 4, id => 5, mod_date => [6, 'timeStamp', 0], name => 7, source_id => 8,
           status => [9, 'copy', 'OK'], thermodynamic_reversibility => [10, 'copy', '<=>'] }, 1, 1);
     # Unspool the relation loaders.
     print "Loading database relations.\n";

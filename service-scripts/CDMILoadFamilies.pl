@@ -22,6 +22,7 @@
     use SeedUtils;
     use Bio::KBase::CDMI::CDMI;
     use Bio::KBase::CDMI::CDMILoader;
+    use Bio::KBase::CDMI::FamilyUtils;
 
 =head1 CDMI Protein Family Loader
 
@@ -134,7 +135,7 @@ my ($clear, $release, $nodelete);
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(clear => \$clear,
         "release=s" => \$release, nodelete => \$nodelete);
 if (! $cdmi) {
-    print "usage: CDMILoadFIGfams [options] type releaseDirectory\n";
+    print "usage: CDMILoadFamilies [options] type releaseDirectory\n";
 } else {
     # Create the loader object.
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
@@ -148,180 +149,8 @@ if (! $cdmi) {
     } elsif (! -d $releaseDirectory) {
         die "Invalid release directory name $releaseDirectory.\n";
     } else {
-        # Get the list of tables.
-        my @tables = qw(Family FamilyAlignment HasMember HasProteinMember IsCoupledTo HasRepresentativeOf IsFamilyFor);
-        # Are we clearing?
-        if ($clear) {
-            # Recreate the tables.
-            for my $table (@tables) {
-                $cdmi->CreateTable($table, 1);
-                print "$table recreated.\n";
-            }
-        }
-        # Set up the relation loaders.
-        $loader->SetRelations(@tables);
-        # Compute the release code.
-        if (! $release) {
-            # No release code specified on the command line, so compute
-            # it from the directory name.
-            my @parts = split /[\/\\]/, $releaseDirectory;
-            $release = pop @parts;
-        }
-        # Create the family-type object.
-        my $typeModule = "Bio::KBase::CDMI::FamilyType::$type";
-        eval "require $typeModule";
-        my $ftype = eval("$typeModule->new(\$release)");
-        if ($@) {
-            die "Error creating family type object: $@\n";
-        }
-        # This counter is used to track progress.
-        my $count = 0;
-        # Call the initialization method.
-        $ftype->Init($loader, $releaseDirectory);
-        # Extract the family type name and release code.
-        my $typeName = $ftype->typeName;
-        my $releaseCode = $ftype->release;
-        # We are now ready to begin. Start by deleting any existing
-        # families.
-        if (! $nodelete) {
-            print "Deleting old families of type $type.\n";
-            my $ffQ = $cdmi->Get('Family', 'Family(type) = ?', [$typeName]);
-            while (my $family = $ffQ->Fetch()) {
-                my $newStats = $cdmi->Delete(Family => $family->PrimaryValue('id'));
-                $stats->Accumulate($newStats);
-                $count++;
-                if ($count % 5000 == 0) {
-                    print "$count families deleted.\n";
-                }
-            }
-        }
-        # The first task is to create the families themselves. We do this
-        # by reading the family.functions file.
-        $count = 0;
-        my $ih;
-        print "Reading family functions file.\n";
-        open($ih, "<$releaseDirectory/family.functions") || die "Could not open family.functions file: $!\n";
-        while (! eof $ih) {
-            # Read the family ID and the function.
-            my ($family, $function) = $loader->GetLine($ih);
-            $stats->Add(familyFunctionLineIn => 1);
-            # Insure the function is non-null.
-            if (! $function) {
-                $stats->Add(functionMissing => 1);
-                $function = '';
-            }
-            # Create the family records.
-            $loader->InsertObject('Family', id => $family, type => $typeName,
-                release => $releaseCode, family_function => $function);
-            # Now we must associate the family with the roles implied by the
-            # function. We only do this for non-null functions.
-            if ($function) {
-                my ($roles, $errors) = SeedUtils::roles_for_loading($function);
-                if (! defined $roles) {
-                    # Here the function does not appear to be a role.
-                    $stats->Add(roleRejected => 1);
-                } else {
-                    # Here the function contained one or more roles. Count
-                    # the number of roles that were rejected for being too
-                    # long.
-                    $stats->Add(rolesTooLong => $errors);
-                    # Loop through the roles found.
-                    for my $role (@$roles) {
-                        # Insure this role is in the database.
-                        my $roleID = $loader->CheckRole($role);
-                        # Connect it to the family.
-                        $loader->InsertObject('IsFamilyFor', from_link => $family,
-                                to_link => $roleID);
-                    }
-                }
-            }
-            $count++;
-            if ($count % 5000 == 0) {
-                print "$count families loaded.\n";
-            }
-        }
-        # Close the family.functions file.
-        close $ih; undef $ih;
-        # Now we must put the members into the families. We get this
-        # information from the families.2c file. For feature-based
-        # families, the HasRepresentativeOf and HasProteinMember
-        # relationship present special problems, because we need to
-        # insure we don't create duplicates. The following hashes track
-        # the KBase genome and protein IDs, respectively, for the current
-        # family. When the family is completed, we will output them.
-        my $genomes = {};
-        my $proteins = {};
-        my $currentFF;
-        $count = 0;
-        # Open the families.2c file for input and loop through it.
-        print "Processing member data.\n";
-        open($ih, "<$releaseDirectory/families.2c") || die "Could not open families.2c file: $!\n";
-        while (! eof $ih) {
-            my ($family, $mem) = $loader->GetLine($ih);
-            $stats->Add(lineIn => 1);
-            $count++;
-            if ($count % 10000 == 0) {
-                print "$count members processed.\n";
-            }
-            # Is this a new family?
-            if (! defined $currentFF || $family ne $currentFF) {
-                # Yes. Clear the hashes and set up for the next family.
-                $currentFF = $family;
-                $genomes = {};
-                $proteins = {};
-            }
-            # Declare the basic data variables. These will store the
-            # KBase feature, protein, and genome IDs, respectively.
-            my ($fid, $pid, $genome);
-            # Are we feature-based or protein-based?
-            if ($ftype->featureBased) {
-                # Get the data for this feature.
-                ($fid, $pid, $genome) = $ftype->ResolveFeatureMember($loader,
-                        $mem);
-            } else {
-                # Here we're protein-based. Get the protein ID.
-                $pid = $ftype->ResolveProteinMember($loader, $mem);
-            }
-            # Now we store the stuff we've found.
-            if ($pid) {
-                # There is a protein. If it's new for this family, connect
-                # it.
-                if (! $proteins->{$pid}) {
-                    $stats->Add(newProteinConnected => 1);
-                    $loader->InsertObject('HasProteinMember',
-                            from_link => $family,
-                            source_id => $mem, to_link => $pid);
-                    # Insure we don't do this protein again.
-                    $proteins->{$pid} = 1;
-                } else {
-                    $stats->Add(oldProteinSkipped => 1);
-                }
-            }
-            if ($fid) {
-                # There is a feature. This is always connected.
-                $stats->Add(newFeatureConnected => 1);
-                $loader->InsertObject('HasMember', from_link => $family,
-                        to_link => $fid);
-                # Check the genome.
-                if (! $genomes->{$genome}) {
-                    # It's new, so connect it.
-                    $stats->Add(newGenomeConnected => 1);
-                    $loader->InsertObject('HasRepresentativeOf',
-                            from_link => $family, to_link => $genome);
-                    $stats->Add(newGenomeConnected => 1);
-                    $genomes->{$genome} = 1;
-                } else {
-                    $stats->Add(oldGenomeSkipped => 1);
-                }
-            }
-        }
-        # Close the families.2c file.
-        close $ih;
-        # Process any additional files.
-        $ftype->ProcessAdditionalFiles($loader, $releaseDirectory);
-        # Unspool the relations.
-        print "Unspooling relations.\n";
-        $loader->LoadRelations();
+        Bio::KBase::CDMI::FamilyUtils::LoadFamily($loader, $type, 
+                $releaseDirectory, $release, $clear, $nodelete);
     }
     print "All done:\n" . $stats->Show();
 }

@@ -284,7 +284,7 @@ sub TSetup {
     # Get the parameters.
     my ($categoryList, $target) = @_;
     # Parse the category list.
-    my @categoryData = split /\s+/, $categoryList;
+    my @categoryData = split m/\s+/, $categoryList;
     # Extract the trace level.
     $TraceLevel = shift @categoryData;
     # Presume category-based tracing until we learn otherwise.
@@ -1836,7 +1836,7 @@ sub StandardSetup {
         push @cats, "Tracer";
         # Check for more tracing groups.
         if ($retOptions->{moreTracing}) {
-            push @cats, split /,/, $retOptions->{moreTracing};
+            push @cats, split m/,/, $retOptions->{moreTracing};
         }
         # Next, we create the category string by joining the categories.
         my $cats = join(" ", @cats);

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+package Bio::KBase::CDMI::ExpressionUtils;
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship
@@ -21,17 +21,14 @@ use strict;
 use SeedUtils;
 use Bio::KBase::CDMI::CDMI;
 use Bio::KBase::CDMI::CDMILoader;
-use IDServerAPIClient;
 
-=head1 CDMI Expression Data Loader
+=head1 CDMI Expression Data Loading Utilities
 
-    CDMILoadExpression [options] source expDirectory
+This module contains the main method for loading expression data for a genome 
+into a KBase Central Data Model Instance. At the current time, we do not support 
+multiple sets of expression data per genome. 
 
-Load expression data for a genome into a KBase Central Data Model Instance.
-At the current time, we do not support multiple sets of expression data
-per genome. A future database update will address this.
-
-The lowest-level name of the directory must be the genome ID. Data is
+The lowest-level name of the expression directory must be the genome ID. Data is
 represented by the following files.
 
 =over 4
@@ -88,43 +85,6 @@ list of the on-off values.
 
 =back
 
-
-=head2 Command-Line Options and Parameters
-
-The command-line options are those specified in L<Bio::KBase::CDMI::CDMI/new_for_script> plus the
-following.
-
-=over 4
-
-=item recursive
-
-If this option is specified, then instead of loading a single expression
-data set from the specified directory, data will be loaded from each subdirectory
-of the specified directory. This allows multiple data sets from a single
-source to be loaded in one pass.
-
-=item newOnly
-
-If this option is specified, a data set will only be loaded if its chip is
-not already found in the database.
-
-=item clear
-
-If this option is specified, the expression tables will be recreated
-before loading.
-
-=item slow
-
-Use individual INSERT commands to load the database instead of spooling into
-sequential load files.
-
-=item
-
-=back
-
-There are two positional parameters-- the source database name (e.g. C<SEED>,
-C<MOL>, ...) and the name of the directory containing the expression data.
-
 =cut
 
 # List of tables to be loaded the normal way.
@@ -137,66 +97,10 @@ use constant TABLES => [qw(ProbeSet ProducedResultsFor
 # inserts.
 use constant SPECIAL => [qw(IndicatedLevelsFor)];
 
-# Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url, $slow);
-
-# Prevent buffering on STDOUT.
-$| = 1;
-# Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("recursive" => \$recursive,
-        "newOnly" => \$newOnly, "slow" => \$slow, "clear" => \$clear);
-if (! $cdmi) {
-    print "usage: CDMILoadExpression [options] source genomeDirectory\n";
-    exit;
-}
-
-# Get the source and expression directory.
-    my ($source, $expDirectory) = @ARGV;
-    if (! $source) {
-        die "No source database specified.\n";
-    } elsif (! $expDirectory) {
-        die "No expression directory specified.\n";
-    } elsif (! -d $expDirectory) {
-        die "Expression directory $expDirectory not found.\n";
-    } else {
-        # Create the loader.
-        my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-        $loader->SetSource($source);
-        # Are we clearing?
-        if($clear) {
-            # Yes. Recreate the expression tables.
-            for my $table (@{TABLES()}, @{SPECIAL()}) {
-                print "Recreating $table.\n";
-                $cdmi->CreateTable($table, 1);
-            }
-        }
-        # Are we in recursive mode?
-        if (! $recursive) {
-            # No. Load the one expression directory.
-            LoadExpressionData($loader, $expDirectory);
-        } else {
-            # Yes. Get the subdirectories.
-            opendir(TMP, $expDirectory) || die "Could not open $expDirectory.\n";
-            my @subDirs = sort grep { substr($_,0,1) ne '.' } readdir(TMP);
-            print scalar(@subDirs) . " entries found in $expDirectory.\n";
-            # Loop through the subdirectories.
-            for my $subDir (@subDirs) {
-                my $fullPath = "$expDirectory/$subDir";
-                if (-d $fullPath) {
-                    LoadExpressionData($loader, $fullPath);
-                }
-            }
-        }
-        # Display the statistics.
-        print "All done.\n" . $loader->stats->Show();
-    }
-
-
-=head2 Subroutines
 
 =head3 LoadExpressionData
 
-    LoadExpression($loader, $genomeDirectory);
+    LoadExpressionData($loader, $genomeDirectory, $slow);
 
 Load a single genome's expression data from the specified directory.
 
@@ -210,13 +114,18 @@ L<Bio::KBase::CDMI::CDMILoader> object to help manager the load.
 
 Directory containing the expression data files.
 
+=item slow
+
+If TRUE, all the data will be loaded using INSERTs. Otherwise, some
+data will be loaded using file loads.
+
 =back
 
 =cut
 
 sub LoadExpressionData {
     # Get the parameters.
-    my ($loader, $expDataDirectory) = @_;
+    my ($loader, $expDataDirectory, $slow) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Get the database.
@@ -282,7 +191,8 @@ sub LoadExpressionData {
             for (my $seqNo = 0; $seqNo < $expCount; $seqNo++) {
                 my $name = $experiments[$seqNo];
                 $expHash{$name} = $seqNo;
-                $loader->InsertObject('HasResultsIn', from_link => $chipID, to_link => $name,
+                $loader->InsertObject('HasResultsIn', from_link => $chipID, 
+                                    to_link => "$chipID:$name",
                                     sequence => $seqNo);
                 $loader->InsertObject('Experiment', id => $name, source => '');
                 $stats->Add(experiments => 1);
@@ -305,8 +215,8 @@ sub LoadExpressionData {
                 for my $exp (@exps) {
                     if (! exists $expHash{$exp}) {
                         $loader->InsertObject('HasResultsIn', from_link => $chipID,
-                                            to_link => $exp, sequence => -1);
-                        $loader->InsertObject('Experiment', id => $exp, source => '');
+                                            to_link => "$chipID:$exp", sequence => -1);
+                        $loader->InsertObject('Experiment', id => "$chipID:$exp", source => '');
                         $stats->Add(extraExperiment => 1);
                     }
                 }
@@ -346,7 +256,7 @@ sub LoadExpressionData {
                             for (my $i = 0; $i <= $#exps; $i++) {
                                 if (defined $signals->[$i]) {
                                     # Here we have a signal for this experiment.
-                                    $loader->InsertObject('HasIndicatedSignalFrom', to_link => $exps[$i],
+                                    $loader->InsertObject('HasIndicatedSignalFrom', to_link => "$chipID:$exps[$i]",
                                                         from_link => $fidKBID, rma_value => $signals->[$i],
                                                         level => $onOffs[$i]);
                                     $stats->Add(signalX => 1);
@@ -458,7 +368,7 @@ sub LoadExpressionData {
                     if ($i >= $expCount) {
                         $stats->Add(extraExpressionVectorElement => 1);
                     } else {
-                        $loader->InsertObject('AffectsLevelOf', from_link => $experiments[$i],
+                        $loader->InsertObject('AffectsLevelOf', from_link => "$chipID:$experiments[$i]",
                                             to_link => $realID, level => $levels[$i]);
                     }
                 }
@@ -515,4 +425,4 @@ sub ReadExperiments {
     return @retVal;
 }
 
-
+1;

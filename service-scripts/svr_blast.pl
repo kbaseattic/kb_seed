@@ -23,7 +23,7 @@ Example: svr_blast -p pegs 83333.1    [ blast PEGs identified in file against ge
          svr_blast  83333.1           [ sequences of PEGs from the last column of STDIN input against genome]
          svr_blast                    [ sequences of PEGs from the last column of STDIN input against themselves ]
          svr_blast -c 1               [ sequences of PEGs from the first column of STDIN input against themselves ]
-         svr_blast -c 1 -parms='m 8'  [ sequences of PEGs from the first column of STDIN input against themselves - -m8 format ]
+         svr_blast -c 1 -parms='-m8'  [ sequences of PEGs from the first column of STDIN input against themselves - -m8 format ]
       
     The output is exactly the unfiltered blast output
 

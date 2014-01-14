@@ -46,6 +46,16 @@
       <Notes>The Strain region contains data modeling strains of organisms derived
       from a parent genome and their relationships.</Notes>
     </Region>
+    <Region name="Networks">
+      <Notes></Notes>
+    </Region>
+    <Region name="Regulation">
+      <Notes>The Regulation region contains data about regulatory networks.</Notes>
+    </Region>
+    <Region name="Expression_v2">
+      <Notes>The expression_v2 contains expression data for various expression experiments (Microarray, RNA-Seq, proteomics, qPCR).
+      It will eventually replace any existing expression schema.</Notes>
+    </Region>
   </Regions>
   <Diagram height="800" width="700" ratio="0.7" size="90"
     fontSize="12" editable="1" />
@@ -200,12 +210,26 @@
     </Entity>
     <Entity name="Source" keyType="string">
       <DisplayInfo theme="black">
-        <RegionInfo name="Annotations" row="7" col="1" />
+        <RegionInfo name="Annotations" row="3" col="1" />
         <RegionInfo name="Models" row="9" col="3" />
-        <RegionInfo name="" row="3" col="5" />
+        <RegionInfo name="" row="1" col="5" />
         <RegionInfo name="Subsystem" row="1" col="1" />
         <RegionInfo name="Alignments" row="1" col="3" />
+        <RegionInfo name="Networks" row="1" col="1" />
+        <RegionInfo name="Regulation" row="8" col="2" />
       </DisplayInfo>
+      <Fields>
+	<Field name="name" type="string">
+	  <Notes>The user-readable name for this source.</Notes>
+	</Field>
+	<Field name="url" type="string">
+	  <Notes>The URL to a site with information about this source.</Notes>
+	</Field>
+	<Field name="description" type="string">
+	  <Notes>A short textual description of this source.</Notes>
+	</Field>
+      </Fields>
+	
       <Notes>A source is a user or organization that is permitted to
       assign its own identifiers or to submit bioinformatic objects
       to the database.</Notes>
@@ -253,16 +277,6 @@
         <Field name="is-minimal" type="semi-boolean">
           <Notes>TRUE if this is a minimal media, else FALSE</Notes>
         </Field>
-        <Field name="description" type="string">
-          <Notes>description of the media condition</Notes>
-        </Field>
-	<Field name="solid" type="semi-boolean">
-          <Notes>Whether the media is solid (True) or liquid (False).</Notes>
-        </Field>
-        <Field name="is-defined" type="semi-boolean">
-          <Notes>TRUE if this media condition is defined (all components explicitly
-          known)</Notes>
-         </Field>
         <Field name="source-id" type="string">
           <Notes>The ID of the media used by the data source.</Notes>
         </Field>
@@ -276,20 +290,6 @@
           media by source ID.</Notes>
           <IndexFields>
             <IndexField name="source-id" order="ascending"/>
-          </IndexFields>
-        </Index>
-        <Index>
-          <Notes>This index allows the user to search for a media
-          by solidity.</Notes>
-          <IndexFields>
-            <IndexField name="solid" order="ascending" />
-          </IndexFields>
-        </Index>
-        <Index>
-          <Notes>This index allows the user to search for a media
-          by whether it is defined.</Notes>
-          <IndexFields>
-            <IndexField name="is-defined" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
@@ -559,6 +559,7 @@
       <DisplayInfo theme="green">
         <RegionInfo name="" row="1" col="1" />
         <RegionInfo name="Experiment" row="1" col="5" />
+        <RegionInfo name="Networks" row="2" col="5" />
       </DisplayInfo>
       <Notes>Experimenters attach publications to experiments and
       protocols. Annotators attach publications to ProteinSequences.
@@ -610,7 +611,8 @@
       variants.  Thus, there may be three closely-related, but
       distinguishable forms of histidine degradation.  Each form
       would be called a "variant", with an associated code, and all
-      genomes implementing a specific variant can easily be accessed.</Notes>
+      genomes implementing a specific variant can easily be accessed. The ID
+      is an MD5 of the subsystem name followed by the variant code.</Notes>
       <Asides>The variant code is generally a number with zero or more
       decimal points, similar to what it done with software version numbers
       or legal outline numbers.</Asides>
@@ -764,6 +766,8 @@
         <RegionInfo name="GenoPheno" row="1" col="4" />
         <RegionInfo name="Strain" row="5" col="1" />
         <RegionInfo name="Alignments" row="6" col="6" />
+        <RegionInfo name="Networks" row="1" col="5" />
+        <RegionInfo name="Regulation" row="4" col="1" />
       </DisplayInfo>
       <Notes>The Kbase houses a large and growing set of genomes.  We
       often have multiple genomes that have identical DNA.  These usually
@@ -1073,6 +1077,8 @@
         <RegionInfo name="Strain" row="1" col="1" />
         <RegionInfo name="Experiment" row="7" col="7" />
         <RegionInfo name="Models" row="3" col="5" />
+        <RegionInfo name="Networks" row="3" col="5" />
+        <RegionInfo name="Regulation" row="5" col="5" />
       </DisplayInfo>
       <Notes>A feature (sometimes also called a gene) is a part of a
       genome that is of special interest. Features may be spread across
@@ -2008,8 +2014,515 @@
       <Notes>A parameter is the name of some quantity that has a value.
       </Notes>
     </Entity>
+
+    <Entity name="RegulogCollection" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="2" col="1" caption="Regulog\nCollection"/>
+      </DisplayInfo>
+      <Notes>A RegulogCollection describes a set of regulogs that are being
+      curated on well-defined set of genomes.
+      </Notes>
+      <Fields>
+	<Field name="name" type="string">
+	  <Notes>The name of this regulog collection.
+	  </Notes>
+	</Field>
+	<Field name="description" type="string">
+	  <Notes>A brief description of this regulog collection.
+	  </Notes>
+	</Field>
+      </Fields>
+    </Entity>
+
+    <Entity name="Regulog" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="1" col="2"
+		    caption="Regulog"/>
+      </DisplayInfo>
+
+      <Notes>
+      </Notes>
+
+      <Fields>
+	<Field name="description" type="string">
+	  <Notes>
+	  </Notes>
+	</Field>
+      </Fields>
+    </Entity>
+
+    <Entity name="Effector" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="3" col="5" caption="Effector"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+      <Fields>
+	<Field name="name" type="string">
+	  <Notes> Name of this effector.</Notes>
+	</Field>
+	<Field name="effector-class" type="string">
+	  <Notes>The class of this effector.</Notes>
+	</Field>
+      </Fields>
+    </Entity>
+
+    <Entity name="Regulon" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="3" col="2"
+		    caption="Regulon"/>
+      </DisplayInfo>
+
+      <Notes>
+      </Notes>
+
+      <Fields>
+	<Field name="description" type="string">
+	  <Notes>A short description for this regulon.
+	  </Notes>
+	</Field>
+      </Fields>
+    </Entity>
+
+
+    <Entity name="Regulome" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="6" col="2"
+		    caption="Regulome"/>
+      </DisplayInfo>
+
+      <Notes>
+      </Notes>
+
+      <Fields>
+	<Field name="description" type="string">
+	  <Notes>A short description for this regulome.
+	  </Notes>
+	</Field>
+	<Field name="creation-date" type="date">
+	  <Notes>Creation date for this regulome.</Notes>
+	</Field>
+      </Fields>
+    </Entity>
+
+    <Entity name="Operon" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="7" col="5"
+		    caption="Operon"/>
+      </DisplayInfo>
+
+      <Notes>
+      </Notes>
+
+      <Fields>
+      </Fields>
+    </Entity>
+    
+    <Entity name="Regulator" keyType="string">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" row="1" col="5"
+		    caption="Regulator"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+
+      <Fields>
+	<Field name="name" type="string">
+	  <Notes>A human-readable name for this Regulator.
+	  </Notes>
+	</Field>
+	<Field name="rfam-id" type="string">
+	  <Notes>If this regulator is an RNA regulator, the rfam-id field will contain
+	  the RFAM identifier corresponding to it.
+	  </Notes>
+	</Field>
+	<Field name="tf-family" type="string">
+	  <Notes>If this regulator is a transcription factor, then the tf-family field
+	  will contain the name of the transcription factor family.
+	  </Notes>
+	</Field>
+	<Field name="type" type="string">
+	  <Notes>Type of the regulator; currently either RNA or TF.
+	  </Notes>
+	</Field>
+	<Field name="taxonomy" type="string">
+	  <Notes>Type of the regulator; currently either RNA or TF.
+	  </Notes>
+	</Field>
+      </Fields>
+    </Entity>
+    <Entity name="AssociationDataset" keyType="string">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" row="1" col="3"
+		    caption="Association\nDataset" />
+      </DisplayInfo>
+      <Notes>An Association Dataset is a collection of PPI
+      data imported from a single database or publication.
+      </Notes>
+      <Fields>
+        <Field name="description" type="string">
+          <Notes>This is a description of the dataset.</Notes>
+        </Field>
+        <Field name="data-source" type="string">
+          <Notes>Optional external source for this dataset; e.g.,
+          another database.</Notes>
+        </Field>
+        <Field name="url" type="string">
+          <Notes>Optional URL for more info about this dataset.</Notes>
+        </Field>
+	<Field name="association-type" type="string">
+	  <Notes>The type of this association.</Notes>
+	</Field>	    
+      </Fields>
+    </Entity>
+    <Entity name="Association" keyType="string">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" row="3" col="3"
+		    caption="Association" />
+      </DisplayInfo>
+      <Notes>An Association represents a protein complex or a pairwise
+      (binary) physical association between proteins.
+      </Notes>
+      <Fields>
+        <Field name="name" type="string">
+          <Notes>This is the name of the association.
+	  </Notes>
+        </Field>
+        <Field name="description" type="string">
+          <Notes>This is a description of this association.  If the
+          protein complex has a name, this should be it.
+	  </Notes>
+        </Field>
+        <Field name="directional" type="boolean">
+          <Notes>True for directional binary associations (e.g., those
+          detected by a pulldown experiment), false for
+          non-directional binary associations and complexes.
+          Bidirectional associations (e.g., associations detected by
+          reciprocal pulldown experiments) should be encoded as 2
+          separate binary associations.
+          </Notes>
+        </Field>
+        <Field name="confidence" type="float">
+          <Notes>Optional numeric estimate of confidence in the association.
+          Recommended to use a 0-100 scale.
+          </Notes>
+        </Field>
+        <Field name="url" type="string">
+          <Notes>Optional URL for more info about this complex.</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="AssociationDetectionType" keyType="string">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" row="5" col="3"
+		    caption="Association\nDetection Type" />
+      </DisplayInfo>
+      <Notes>This documents methods by which associations are detected
+      or annotated.
+      </Notes>
+      <Fields>
+        <Field name="description" type="string">
+          <Notes>This is a brief description of this detection method.
+          </Notes>
+        </Field>
+      </Fields>
+    </Entity>
+    <Entity name="ConservedDomainModel" keyType="int">
+      <DisplayInfo theme="green" col="3" row="7" caption="Conserved DomainModel">
+        <RegionInfo name="" row="5" col="1"/>
+      </DisplayInfo>
+      <Notes>A ConservedDomainModel represents a conserved domain model
+      as found in the NCBI CDD archive.
+      
+      The id of a ConservedDomainModel is the PSSM-Id. </Notes>
+      <Fields>
+        <Field name="accession" type="text">
+          <Notes>CD accession (starting with 'cd', 'pfam', 'smart', 'COG', 'PRK' or "CHL')</Notes>
+        </Field>
+        <Field name="short-name" type="text">
+          <Notes>CD short name</Notes>
+        </Field>
+        <Field name="description" type="text">
+          <Notes>CD description</Notes>
+        </Field>
+      </Fields>
+    </Entity>
+	<Entity name="Series" keyType="string">
+	<DisplayInfo theme="cyan">
+		<RegionInfo name="Expression_v2" row="2" col="4" />
+	</DisplayInfo> 		  
+		<Notes>A series refers to a group of samples for expression data.</Notes>
+		<Asides>This often times will map to a GEO Series aka GSE#.</Asides>
+		<Fields>
+			<Field name="title" type="long-string">
+				<Notes>free text title of the series</Notes>
+			</Field>
+			<Field name="summary" type="long-string">
+				<Notes>free text summary of the series</Notes>
+			</Field>
+			<Field name="design" type="long-string">
+				<Notes>free text design of the series</Notes>
+			</Field>
+			<Field name="externalSourceId" type="string">
+				<Notes>The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSE2365).
+					This will keep them from having to do problematic likes on the source-id field.</Notes>
+			</Field>
+			<Field name="kbaseSubmissionDate" type="date">
+				<Notes>date of submission (to Kbase)</Notes>
+			</Field>
+			<Field name="externalSourceDate" type="date">
+				<Notes>date that may exist in the external source metadata (could be to GEO, M3D etc...)</Notes>
+			</Field>
+			<Field name="source-id" type="string">
+				<Notes>The ID of the environment used by the data source.</Notes>
+			</Field>
+		</Fields>
+		<FulltextIndexes>
+			<FulltextIndex type="field" name="title"
+				in_result="1" />
+			<FulltextIndex type="field" name="summary"
+				in_result="1" />
+			<FulltextIndex type="field" name="design"
+				in_result="1" />
+		</FulltextIndexes>
+		<Indexes>
+			<Index>
+			<Notes>This index provides the ability to search by 
+				title. It should only be used for LIKE-style searches.</Notes>
+				<IndexFields>
+					<IndexField name="title" order="ascending" />
+				</IndexFields>
+			</Index>
+			<Index>
+			<Notes>This index allows retrieval by the external source id.</Notes>
+				<IndexFields>
+					<IndexField name="externalSourceId" order="ascending" />
+				</IndexFields>
+			</Index>				
+			<Index>
+				<Notes>This index allows retrieval by the source id.</Notes>
+				<IndexFields>
+					<IndexField name="source-id" order="ascending" />
+				</IndexFields>
+			</Index>
+		</Indexes>
+	</Entity>
+	<Entity name="Platform" keyType="string">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="2" col="2" />
+		</DisplayInfo>
+		<Notes>Platform that the expression sample/experiment was run on.</Notes>
+		<Asides>This often times will map to a GEO Platform (aka GPL).</Asides>
+		<Fields>
+			<Field name="title" type="long-string">
+				<Notes>free text title of the comparison</Notes>
+			</Field>
+			<Field name="externalSourceId" type="string">
+				<Notes>The externalSourceId gives users potentially an easy way to find the data of interest (ex:GPL514).
+				This will keep them from having to do problematic likes on the source-id field.</Notes>
+			</Field>
+			<Field name="technology" type="long-string">
+				<Notes>Ideally enumerated values, but may have to make this free text (spotted DNA/cDNA, spotted oligonucleotide, in situ oligonucleotide, antibody, tissue, SARST, RT-PCR, or MPSS).</Notes>
+			</Field>
+			<Field name="type" type="string">
+				<Notes>Enumerated Microarray, RNA-Seq, qPCR</Notes>
+			</Field>
+			<Field name="source-id" type="string">
+				<Notes>The ID of the environment used by the data source.</Notes>
+			</Field>
+		</Fields>
+		<FulltextIndexes>
+			<FulltextIndex type="field" name="title" in_result="1" />
+		</FulltextIndexes>
+		<Indexes>
+			<Index>
+				<Notes>This index allows retrieval by the external source id.</Notes>
+				<IndexFields>
+					<IndexField name="externalSourceId" order="ascending" />
+				</IndexFields>
+			</Index>
+			<Index>
+				<Notes>This index allows retrieval by the source id.</Notes>
+				<IndexFields>
+					<IndexField name="source-id" order="ascending" />
+				</IndexFields>
+			</Index>
+		</Indexes>	
+	</Entity>
+	<Entity name="Sample" keyType="string">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="4" col="4" />
+		</DisplayInfo>
+		<Notes>A sample is an experiment.  
+				In intensity experiment situations the sample will map 1 to 1 to the GSM.  
+				In this case there will be corresponding log2level data stored in the Measurement table.
+			</Notes>
+		<Asides>This often times will map to a GEO GSM.</Asides>
+		<Fields>
+			<Field name="title" type="long-string">
+				<Notes>free text title of the sample</Notes>
+			</Field>
+			<Field name="dataSource" type="string">
+			<Notes>The Data Source will be a way to identify where the data came from.  Examples might be : GEO, SEED Expression Pipeline, Enigma, M3D</Notes>
+			</Field>
+			<Field name="externalSourceId" type="string">
+				<Notes>The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSM9514).
+				This will keep them from having to do problematic likes on the source-id field.</Notes>
+			</Field>
+			<Field name="description" type="long-string">
+				<Notes>Free-text descibing the experiment.</Notes>
+			</Field>
+			<Field name="molecule" type="string">
+				<Notes>Enumerated field (total RNA, polyA RNA, cytoplasmic RNA, nuclear RNA, genomic DNA).</Notes>
+			</Field>
+			<Field name="type" type="string">
+				<Notes>Enumerated Microarray, RNA-Seq, qPCR</Notes>
+			</Field>			
+			<Field name="kbaseSubmissionDate" type="date">
+				<Notes>date of submission to Kbase</Notes>
+			</Field>
+			<Field name="externalSourceDate" type="date">
+				<Notes>date that may exist in the external source metadata (could be to GEO, M3D etc...)</Notes>
+			</Field>
+			<Field name="custom" type="semi-boolean">
+			  <Notes>A flag to keep track if this series was generated by custom operations (averaging or comparison)</Notes>
+			</Field>
+			<Field name="originalLog2Median" type="float" null="1">
+			  <Notes>The Original Median of the sample in log2space.  If null means the original median was not able to be determined.</Notes>
+			</Field>
+			<Field name="source-id" type="string">
+				<Notes>The ID of the environment used by the data source.</Notes>
+			</Field>
+			<Field name="dataQualityLevel" type="int">
+			  <Notes>The quality of the data.  Lower the number the better.  Details need to be worked out.</Notes>
+			</Field>
+		</Fields>
+		<FulltextIndexes>
+			<FulltextIndex type="field" name="title" in_result="1" />
+			<FulltextIndex type="field" name="description" in_result="1" />
+			<FulltextIndex type="field" name="dataSource" in_result="1" />
+		</FulltextIndexes>
+		<Indexes>
+			<Index>
+				<Notes>Allows for quick retrieval of certain molecule types.</Notes>
+				<IndexFields>
+					<IndexField name="molecule" order="ascending" />
+				</IndexFields>
+			</Index>
+			<Index>
+				<Notes>This index allows retrieval by the source id.</Notes>
+				<IndexFields>
+					<IndexField name="source-id" order="ascending" />
+				</IndexFields>
+			</Index>
+                        <Index> 
+                                <Notes>Allows for quick retrieval of certain dataQualityLevels.</Notes> 
+                                <IndexFields> 
+                                        <IndexField name="dataQualityLevel" order="ascending" /> 
+                                </IndexFields> 
+                        </Index> 
+
+		</Indexes>	
+	</Entity>
+	<Entity name="Ontology" keyType="string">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="4" col="6" />
+		</DisplayInfo>
+		<Notes>-- Environmental Ontology. (ENVO Terms) http://environmentontology.org/  
+		-- Plant Ontology (PO Terms). http://www.plantontology.org/   
+		-- Plant Environmental Ontology (EO Terms). http://www.gramene.org/plant_ontology/index.html#eo
+		-- ENVO : http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo
+		-- PO : http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co
+		-- EO : http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo
+		</Notes>
+		<Fields>
+			<Field name="id" type="string">
+				<Notes>Ontologgy ID.</Notes>
+			</Field>
+                        <Field name="name" type="string">
+                                <Notes>Type of the ontology.</Notes>
+                        </Field> 
+			<Field name="definition" type="text">
+				<Notes>Definition of the ontology</Notes>
+			</Field>
+			<Field name="ontologySource" type="string">
+				<Notes>Enumerated value (ENVO, EO, PO).</Notes>
+			</Field>			
+		</Fields>
+		<Indexes>
+			<Index>
+				<IndexFields>
+					<IndexField name="id" order="ascending" />
+				</IndexFields>
+			</Index>
+		</Indexes>	
+	</Entity>
+	<Entity name="SampleAnnotation" keyType="string">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="2" col="6" />
+		</DisplayInfo>
+		<Notes>Keeps track of ontology annotation date (and person if not automated).
+		</Notes>
+		<Fields>
+			<Field name="annotationDate" type="date">
+				<Notes>date of annotation</Notes>
+			</Field>
+			<Field name="source-id" type="string">
+				<Notes>The ID of the environment used by the data source.</Notes>
+			</Field>				
+		</Fields>
+		<Indexes>
+			<Index>
+				<Notes>This index allows retrieval by the source id.</Notes>
+				<IndexFields>
+					<IndexField name="source-id" order="ascending" />
+				</IndexFields>
+			</Index>
+		</Indexes>	
+	</Entity>
+	<Entity name="ReplicateGroup" keyType="string">
+	  	<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="10" col="5" />
+		</DisplayInfo>
+		<Notes>Keeps track of Replicate Groups of Expression Samples.  Has only an ID.  Relationship is the important part.
+		</Notes>
+		<Fields>
+		</Fields>
+	</Entity>
   </Entities>
   <Relationships>
+    <Relationship name="IsConservedDomainModelFor" from="ConservedDomainModel"
+                  to="ProteinSequence" arity="MM" converse="HasConservedDomainModel">
+      <DisplayInfo caption="HasConserved\nDomainModel" theme="green">
+        <RegionInfo name="" row="4" col="1"/>
+      </DisplayInfo>
+      <Notes>
+        This relationship connects a protein sequence with the conserved domains
+        that have been computed to be associated with it.
+      </Notes>
+      <Fields>
+        <Field name="percent-identity" type="float">
+        </Field>
+        <Field name="alignment-length" type="int">
+        </Field>
+        <Field name="mismatches" type="int">
+        </Field>
+        <Field name="gap-openings" type="int">
+        </Field>
+        <Field name="protein-start" type="int">
+        </Field>
+        <Field name="protein-end" type="int">
+        </Field>
+        <Field name="domain-start" type="int">
+        </Field>
+        <Field name="domain-end" type="int">
+        </Field>
+        <Field name="e-value" type="float">
+        </Field>
+        <Field name="bit-score" type="float">
+        </Field>
+      </Fields>
+    </Relationship>
     <Relationship name="ImplementsReaction" from="Feature" to="ReactionInstance"
                   arity="MM" converse="ImplementedBasedOn">
       <DisplayInfo theme="navy">
@@ -2072,7 +2585,8 @@
     <Relationship name="StrainParentOf" from="Strain"
       to="Strain" arity="1M" converse="DerivedFromStrain">
       <DisplayInfo theme="gray">
-        <RegionInfo name="Strain" caption="Strain\nParentOf" />
+        <RegionInfo name="Strain" caption="Strain\nParent Of" row="3" col="2"
+                    fixed="1" />
       </DisplayInfo>
       <Notes>The recursive StrainParentOf relationship organizes derived
       organisms into a tree based on parent/child relationships.</Notes>
@@ -2196,8 +2710,11 @@
           This is typically the case for model medias which do not
           have physical analogs.</Notes>
         </Field>
-        <Field name="units" type="string">
-          <Notes>vol%, g/L, or molar (mol/L).</Notes>
+        <Field name="minimum-flux" type="float">
+          <Notes>minimum flux level for the compound in the medium.</Notes>
+        </Field>
+        <Field name="maximum-flux" type="float">
+          <Notes>maximum flux level for the compound in the medium.</Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -3299,6 +3816,18 @@
       feature may have multiple annotations, but an annotation belongs to
       only one feature.</Notes>
     </Relationship>
+    <Relationship name="HasAliasAssertedFrom" from="Feature" to="Source" converse="AssertsAliasFor" arity="MM">
+      <DisplayInfo theme="green" caption="HasAlias\nAssertedFrom">
+	<RegionInfo name="Annotations"/>
+	<RegionInfo name=""/>
+      </DisplayInfo>
+      <Notes>A Source may assert aliases for features.</Notes>
+      <Fields>
+	<Field name="alias" type="text">
+	  <Notes>text of the alias for the feature.</Notes>
+	</Field>
+      </Fields>
+    </Relationship>
     <Relationship name="HasMember" from="Family" to="Feature"
       arity="MM" converse="IsMemberOf">
       <DisplayInfo theme="brown" caption="Is\nMember\nOf">
@@ -3552,14 +4081,14 @@
     </Relationship>
     <Relationship name="FeatureMeasuredBy" from="Feature"
       to="Measurement" arity="1M" converse="MeasuresFeature">
-      <DisplayInfo theme="gray" caption="Feature\nMeasuredBy">
+      <DisplayInfo theme="gray" caption="Feature\nMeasured By">
         <RegionInfo name="Experiment" />
       </DisplayInfo>
       <Notes>Denotes the feature that a measurement quantifies.</Notes>
     </Relationship>
     <Relationship name="HasParameter" from="Environment"
       to="Parameter" arity="MM" converse="OfEnvironment">
-      <DisplayInfo theme="gray" caption="HasParameter">
+      <DisplayInfo theme="gray" caption="Has\nParameter">
         <RegionInfo name="Experiment" />
       </DisplayInfo>
       <Notes>This relationship denotes which parameters each environment has,
@@ -3570,6 +4099,284 @@
         </Field>
       </Fields>
     </Relationship>
+
+    <Relationship name="RegulomeHasGenome" from="Regulome"
+		  to="Genome" arity="1M" converse="GenomeIsInRegulome">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="Regulome\nHas\nGenome"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+
+    <Relationship name="RegulomeSource" from="Regulome" to="Source"
+		  arity="1M" converse="CreatedRegulome">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="Regulome\nSource"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+
+
+    <Relationship name="HasRegulogs" from="RegulogCollection" to="Regulog"
+		  arity="1M" converse="IsInCollection">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="HasRegulogs"
+		    fixed="1" row="1" col="1"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+
+    <Relationship name="HasEffector" from="Regulon" to="Effector"
+		  arity="MM" converse="IsEffectorFor">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="HasEffector"/>
+      </DisplayInfo>
+    </Relationship>
+      
+    <Relationship name="HasGenomes" from="RegulogCollection" to="Genome"
+		  arity="MM" converse="IsInRegulogCollection">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="HasGenomes"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+      
+    <Relationship name="RegulogHasRegulon" from="Regulog"
+		  to="Regulon" arity="1M" converse="RegulonIsInRegolog">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="RegulogHas\nRegulon"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+
+    <Relationship name="RegulomeHasRegulon" from="Regulome"
+		  to="Regulon" arity="1M" converse="RegulonIsInRegolome">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="RegulomeHas\nRegulon"/>
+      </DisplayInfo>
+      <Notes>
+      </Notes>
+    </Relationship>
+
+    <Relationship name="FeatureIsTranscriptionFactorFor" from="Feature"
+		  to="Regulon" arity="1M" converse="HasTranscriptionFactorFeature">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="FeatureIs\nTranscription\nFactorFor"/>
+      </DisplayInfo>
+    </Relationship>
+
+    <Relationship name="IsRegulatorFor" from="Regulator"
+		  to="Regulog" arity="1M" converse="HasRegulator">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="Is\nRegulator\nFor"/>
+      </DisplayInfo>
+    </Relationship>
+
+    <Relationship name="IsRegulatorForRegulon" from="Regulator"
+		  to="Regulon" arity="1M" converse="ReglonHasRegulator">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="IsRegulator\nForRegulon"/>
+      </DisplayInfo>
+    </Relationship>
+
+    <Relationship name="IsInOperon" from="Feature" to="Operon"
+		  arity="MM" converse="OperonContains">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="IsInOperon"/>
+      </DisplayInfo>
+      <Fields>
+	<Field name="rank" type="int">
+	  <Notes>The rank (order) of this feature in the operon.</Notes>
+	</Field>
+      </Fields>
+    </Relationship>
+
+    <Relationship name="IsRegulatorySiteFor" from="Feature" to="Operon"
+		  arity="1M" converse="HasRegulatorySite">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="Is\nRegulatory\nSiteFor"
+		    fixed="1" row="6" col="6"/>
+      </DisplayInfo>
+      <Fields>
+      </Fields>
+    </Relationship>
+
+    <Relationship name="RegulonHasOperon" from="Regulon" to="Operon"
+		  arity="1M" converse="OperonIsInRegulon">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Regulation" caption="HasOperon"/>
+      </DisplayInfo>
+    </Relationship>
+
+    <Relationship name="IsSourceForAssociationDataset" from="Source" to="AssociationDataset"
+		  arity="1M" converse="AssociationDatasetSourcedBy">
+      <DisplayInfo theme="navy">
+	<RegionInfo name="Networks" caption="IsSource\nForAssociationDataset"/>
+      </DisplayInfo>
+    </Relationship>
+
+    <Relationship name="IsDatasetFor" from="AssociationDataset"
+      to="Genome" arity="MM" converse="HasAssociationDataset">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" caption="Is\nDataset\nFor"/>
+      </DisplayInfo>
+      <Notes>The IsDatasetFor relationship describes which genomes
+      are covered by particular association datasets.</Notes>
+    </Relationship>
+    <Relationship name="IsGroupingOf" from="AssociationDataset"
+      to="Association" arity="1M" converse="InAssociationDataset">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" caption="Is\nGrouping\nOf"/>
+      </DisplayInfo>
+      <Notes>The IsGroupingOf relationship describes which
+      associations are part of a particular association
+      dataset.</Notes>
+    </Relationship>
+    <Relationship name="DetectedWithMethod" from="AssociationDetectionType"
+      to="Association" arity="1M" converse="DetectedBy">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" caption="Detected\nBy"/>
+      </DisplayInfo>
+      <Notes>The DetectedWithMethod relationship describes which
+      protein-protein associations were detected or annotated by
+      particular methods</Notes>
+    </Relationship>
+    <Relationship name="PublishedAssociation" from="Publication"
+      to="Association" arity="1M" converse="AssociationPublishedIn">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" caption="Published\nAssociation"
+                    fixed="1" row="2" col="4" />
+      </DisplayInfo>
+      <Notes>The PublishedAssociation relationship links associations
+      to the manuscript they are published in.</Notes>
+    </Relationship>
+    <Relationship name="AssociationFeature" from="Association"
+                  to="Feature" arity="MM" converse="FeatureInteractsIn">
+      <DisplayInfo theme="navy">
+        <RegionInfo name="Networks" caption="Association Feature" />
+      </DisplayInfo>
+      <Notes>The AssociationFeature relationship links associations to
+      the features that encode their component proteins.</Notes>
+      <Fields>
+        <Field name="stoichiometry" type="int">
+          <Notes>Stoichiometry, if applicable (e.g., for a curated
+          complex.</Notes>
+        </Field>
+        <Field name="strength" type="float">
+          <Notes>Optional numeric measure of strength of the association
+          (e.g., kD or relative estimate of binding affinity)</Notes>
+        </Field>
+        <Field name="rank" type="int">
+          <Notes>Numbered starting at 1 within an Association, if
+          directional.  Meaning is method-dependent; e.g., for
+          associations derived from pulldown data, rank 1 should be
+          assigned to the bait.</Notes>
+        </Field>
+      </Fields>
+    </Relationship>
+	<Relationship name="SeriesPublishedIn" from="Series" to="Publication" arity="MM" converse="PublicationsForSeries">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="3" row="1" fixed="1"
+						caption="Series\nPublished In" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="SampleContactPerson" from="Sample" to="Person" arity="MM" converse="PersonPerformedSample">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="5" row="2" fixed="1"
+						caption="Sample\nContact\nPerson" />
+		</DisplayInfo>
+	</Relationship>  
+	<Relationship name="StrainWithSample" from="Strain" to="Sample" arity="1M" converse="SampleForStrain">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="3" row="4" fixed="1"
+						caption="Strain with\nSample" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="SampleInSeries" from="Sample" to="Series" arity="MM" converse="SeriesWithSamples">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="4" row="3" fixed="1"
+						caption="Sample In\nSeries" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="StrainWithPlatforms" from="Strain" to="Platform" arity="1M" converse="PlatformForStrain">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="2" row="3" fixed="1"
+					caption="Strain with\nPlatforms" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="PlatformWithSamples" from="Platform" to="Sample" arity="1M" converse="SampleRunOnPlatform">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="3" row="3" fixed="1"
+					caption="Platform\nWith\nSamples" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="SampleMeasurements" from="Sample" to="Measurement" arity="1M" converse="MeasurementInSample">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="4" row="5" fixed="1"
+					caption="SampleMeasurements" />
+		</DisplayInfo>
+		<Notes> The Measurements for the data should be in Log2 space and 
+		the measurements for a given sample should have the median set to zero.</Notes>
+	</Relationship>
+	<Relationship name="PersonAnnotatedSample" from="Person" to="SampleAnnotation" arity="1M" converse="SampleAnnotatedBy">
+	  <DisplayInfo theme="cyan">
+		<RegionInfo name="Expression_v2" col="6" row="1" fixed="1"
+					caption="Person\nAnnotated\nSample" />
+	  </DisplayInfo>
+	  <Notes>Only stores a person if a person annotates the data by hand.  
+	  Automated Sample Annotations will not be annotated by a person.</Notes>
+	</Relationship>
+	<Relationship name="SampleHasAnnotations" from="Sample" to="SampleAnnotation" arity="1M" converse="AnnotationsForSample">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="5" row="3" fixed="1"
+					caption="Sample\nHas\nAnnotations" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="ProtocolForSample" from="Protocol" to="Sample" arity="1M" converse="SampleUsesProtocol">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="5" row="5" fixed="1"
+					caption="Protocol\nFor\nSample" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="SampleAveragedFrom" arity="MM" from="Sample" to="Sample" converse="SampleComponentOf">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" caption="Sample\nAveraged\nFrom"
+				col="5" row="4" fixed="1" />
+		</DisplayInfo>
+		<Notes>Custom averaging of samples (typically replicates).</Notes>
+	</Relationship>
+        <Relationship name="DefaultControlSample" arity="1M" from="Sample" to="Sample" converse="SamplesDefaultControl">
+                <DisplayInfo theme="cyan">
+                        <RegionInfo name="Expression_v2" caption="Default\nControl\nSample"
+                                col="3" row="5" fixed="1" />
+                </DisplayInfo>
+                <Notes>The Default control for samples to compare against.  (Log2 measurments of Test Sample)/(Log2 measurements of Default Control).
+		Really minus instead of divide since the values are already in Log2 Space.</Notes>
+        </Relationship>
+	<Relationship name="SamplesInReplicateGroup" arity="MM" from="Sample" to="ReplicateGroup" converse="ReplicateGroupsForSample">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" caption="Samples\nIn\nReplicate\nGroup"
+				col="5" row="9" fixed="1" />
+		</DisplayInfo>
+		<Notes>Custom averaging of samples (typically replicates).</Notes>
+	</Relationship>
+	<Relationship name="OntologyForSample" from="Ontology" to="SampleAnnotation" arity="1M" converse="SampleHasOntology">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="6" row="3" fixed="1"
+					caption="Ontology\nFor\nSample" />
+		</DisplayInfo>
+	</Relationship>
+	<Relationship name="HasExpressionSample" from="ExperimentalUnit" to="Sample" arity="1M" converse="SampleBelongsToExperimentalUnit">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" col="3" row="6" fixed="1"
+					caption="Has Expression\nSample" />
+		</DisplayInfo>
+	</Relationship>
   </Relationships>
   <Shapes>
     <Shape type="diamond" name="BelongsToVariant" from="Role" to="Variant">

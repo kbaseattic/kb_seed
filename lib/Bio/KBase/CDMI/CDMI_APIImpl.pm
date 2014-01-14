@@ -126,7 +126,7 @@ sub processFields {
     my ($fields, $converse) = @_;
     my $fieldinfo = {};
     
-    for my $field (keys $fields) {
+    for my $field (keys %{$fields}) {
         my $name = $field;
         if ($converse) {
             if($field eq 'to-link') {
@@ -149,7 +149,7 @@ sub processFields {
 sub setUpRelationships {
     my ($self, $cdmi) = @_;
     
-    my @reltables = keys $cdmi->GetObjectsTable('Relationship');
+    my @reltables = keys %{$cdmi->GetObjectsTable('Relationship')};
     
     my $converseToRel = {};
     
@@ -157,7 +157,7 @@ sub setUpRelationships {
         $converseToRel->{$cdmi->FindRelationship($rel)->{converse}} = $rel;
     }
     
-    push @reltables, keys $converseToRel;
+    push @reltables, keys %$converseToRel;
     $self->{relationships} = \@reltables;
     $self->{converseToRel} = $converseToRel;
 }
@@ -8370,7 +8370,7 @@ sub get_entity
     
     # could memoize this if necessary, unlikely
     
-    my $return = {};
+    $return = {};
     
     for my $ent (@$entity_names) {
         my $entdata = $self->{db}->FindEntity($ent);
@@ -8381,10 +8381,10 @@ sub get_entity
         $return->{$ent}->{fields} = processFields($entdata->{Fields}, 0);
         my @rels = ();
         my @reldata = $self->{db}->GetConnectingRelationshipData($ent);
-        for my $rel (keys $reldata[0]) {
+        for my $rel (keys %{$reldata[0]}) {
             push @rels, [$rel, $reldata[0]->{$rel}->{to}];
         }
-        for my $rel (keys $reldata[1]) {
+        for my $rel (keys %{$reldata[1]}) {
             push @rels, [$reldata[1]->{$rel}->{converse}, 
                          $reldata[1]->{$rel}->{from}];
         }
@@ -8492,7 +8492,7 @@ sub get_relationship
     
     # could memoize this if necessary, unlikely
     
-    my $return = {};
+    $return = {};
     
     for my $rel (@$relationship_names) {
         if (exists $self->{converseToRel}->{$rel}) {

@@ -149,9 +149,9 @@ genome IDs for the genomes to load in its first column.
     # Output the statistics.
     Trace("Processing complete:\n" . $stats->Show()) if T(1);
 
- # This method actually creates the CDMI directory from the SEED
- # directory.
- sub CreateDirectory {
+# This method actually creates the CDMI directory from the SEED
+# directory.
+sub CreateDirectory {
     # Get the parameters.
     my ($genomeID, $inDirectory, $outDirectory) = @_;
     # These will be used for file handles.
@@ -207,7 +207,7 @@ genome IDs for the genomes to load in its first column.
                 $stats->Add(deletedInTbl => 1);
             } else {
                 # Parse the locations.
-                my @locs = split /\s*,\s*/, $locs;
+                my @locs = split m/\s*,\s*/, $locs;
                 my $convertedLocs = join(",", map { "$genomeID:" . BasicLocation->new($_)->String() } @locs);
                 # Translate the feature type.
                 if ($fidType eq 'peg') {

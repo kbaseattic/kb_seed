@@ -74,6 +74,7 @@ use SeedUtils;
 use SeedAware;
 
 use Bio::KBase::GenomeAnnotation::Client;
+use Bio::KBase::IDServer::Client;
 use JSON::XS;
 
 use IDclient;
@@ -88,6 +89,7 @@ my ($temp_dir) = &SeedAware::temporary_directory();
 my $seleno;
 my $pyrro;
 my $id_prefix = 'rast|0';
+my $id_server;
 
 use Getopt::Long;
 my $rc = GetOptions('help'         => \$help,
@@ -97,6 +99,8 @@ my $rc = GetOptions('help'         => \$help,
 		    'seleno'       => \$seleno,
 		    'pyrro'        => \$pyrro,
 		    'id_prefix=s'  => \$id_prefix,
+		    'id-prefix=s'  => \$id_prefix,
+		    'id-server=s'  => \$id_server,
 		    );
 
 
@@ -142,8 +146,16 @@ if ($genomeTO->{domain} !~ m/^([ABV])/o) {
     die "Invalid domain: \"$genomeTO->{domain}\"";
 }
 
+my $id_client;
+if ($id_server)
+{
+    $id_client = Bio::KBase::IDServer::Client->new($id_server);
+}
+else
+{	
+    $id_client = IDclient->new($genomeTO);
+}
 
-my $id_client = IDclient->new($genomeTO);
 my $genetic_code = $genomeTO->{genetic_code};
 my $contigs      = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{contigs} } ];
 

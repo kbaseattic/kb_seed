@@ -98,7 +98,7 @@ sub get_contigs {
 	($contigs && (@$contigs > 0))
 	    || die "could not get the contigs for $genome";
 	my $contigH = $sapO->contig_sequences( -ids => $contigs );
-	open(TMP,">",$tmp) || die "could not open $tmp";
+	open(TMP,">",$tmp) || die "could not open $tmp for writing: $!";
 	foreach my $contig (@$contigs)
 	{
 	    my $seq = $contigH->{$contig};
@@ -109,8 +109,8 @@ sub get_contigs {
     }
     elsif ($fastaF && (-s $fastaF))
     {
-	open(TMP,">",$tmp) || die "could not open $tmp";
-	open(FASTA,"<",$fastaF) || die "could not open $fastaF";
+	open(TMP,">",$tmp) || die "could not open $tmp for writing: $!";
+	open(FASTA,"<",$fastaF) || die "could not open $fastaF for reading: $!";
 	while (defined($_ = <FASTA>))
 	{
 	    print TMP $_;
@@ -120,7 +120,7 @@ sub get_contigs {
     }
     else
     {
-	open(TMP,">",$tmp) || die "could not open $tmp";
+	open(TMP,">",$tmp) || die "could not open $tmp for writing: $!";
 	while (defined($_ = <STDIN>))
 	{
 	    print TMP $_;

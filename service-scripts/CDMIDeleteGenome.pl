@@ -43,6 +43,10 @@ tab-delimited input file. The file name may be specified as an option
 value, or if the option is specified without a value, the file will be
 taken from the standard input.
 
+=item verbose
+
+If specified, a detailed list of the delete commands used will be output.
+
 =back
 
 If the I<file> parameter is not specified, the list of genome IDs is taken from
@@ -52,10 +56,13 @@ the positional parameters.
 
 # Turn off buffering for progress messages.
 $| = 1;
-# This will hold the FILE option parameter.
-my $file;
+# These will hold the option parameters.
+my ($file, $verbose);
 # Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("file:s" => \$file);
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("file:s" => \$file, 
+        "verbose" => \$verbose);
+# Normalize the verbose parameter.
+$verbose = ($verbose ? 1 : 0);
 # Get the genome IDs. We need to figure out if we have a file or not.
 my @genomeIDs;
 if (defined $file) {
@@ -86,7 +93,7 @@ if (defined $file) {
 my $stats = Stats->new();
 for my $genomeID (@genomeIDs) {
     print "Deleting $genomeID.\n";
-    my $subStats = $cdmi->Delete(Genome => $genomeID, 'print' => 1);
+    my $subStats = $cdmi->Delete(Genome => $genomeID, 'print' => $verbose);
     $stats->Accumulate($subStats);
 }
 # Display the statistics.

@@ -183,6 +183,13 @@ our @EXPORT_OK = qw(
         open_tmp_file
         );
 
+my($REAL_STDIN, $REAL_STDOUT, $REAL_STDERR);
+BEGIN {
+    open $REAL_STDIN,  '<&='  . fileno(*STDIN);
+    open $REAL_STDOUT, '>>&=' . fileno(*STDOUT);
+    open $REAL_STDERR, '>>&=' . fileno(*STDERR);
+}
+
 #
 # Bah. On Windows, redirecty stuff needs IPC::Run.
 #
@@ -268,6 +275,10 @@ sub system_with_redirect
         #  Child process adjusts its file handles and does an exec()
         elsif ( defined $pid )
         {
+	    local *STDIN = $REAL_STDIN;
+	    local *STDOUT = $REAL_STDOUT;
+	    local *STDERR = $REAL_STDERR;
+
             #  Give the child its own file handles, modified as requested
 	    open STDIN,  fixin(  $opts->{stdin}  ) if defined $opts->{stdin};
 	    open STDOUT, fixout( $opts->{stdout} ) if defined $opts->{stdout};

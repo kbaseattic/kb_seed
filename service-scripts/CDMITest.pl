@@ -40,6 +40,11 @@ my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    my $count = $cdmi->GetCount("Diagram", "", []);
-    print "Count = '$count'\n";
+    my @genomes = $cdmi->GetAll("Genome WasSubmittedBy", "Genome(dna-size) < ? AND Genome(prokaryotic) = 1 AND Genome(complete) = 1 ORDER BY Genome(dna-size) DESC",
+            [500000], 'Genome(id) Genome(dna-size) Genome(pegs) WasSubmittedBy(to-link) Genome(source-id)');
+    print "ID\tdna size\tpegs\tsource\tsource-id\ttaxonomy\n";
+    for my $genome (@genomes) {
+        my @taxonomy = $cdmi->Taxonomy($genome->[0]);
+        print join("\t", @$genome, @taxonomy) . "\n";
+    }
 }

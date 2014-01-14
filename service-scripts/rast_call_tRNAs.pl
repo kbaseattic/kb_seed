@@ -27,16 +27,16 @@ rast_call_RNAs [--input genome_file] [--output genome_file] [--url service-url] 
 
 =head1 DESCRIPTION
 
-Find instances of tRNAs and 5S, SSU, and LSU ribosomal RNAs in a genome-type object.
+Find instances of tRNAs in a genome-type object.
 
 Example:
 
-    rast_call_RNAs < input_genome > output_genome_with_selenoproteins_called
+    rast_call_tRNAs < input_genome > output_genome_with_selenoproteins_called
 
 =head1 COMMAND-LINE OPTIONS
 
-Usage: rast_call_RNAs  < input_genome_object  > output_genome_object
-Usage: rast_call_RNAs  --input input_genome_object --output output_genome_object
+Usage: rast_call_tRNAs  < input_genome_object  > output_genome_object
+Usage: rast_call_tRNAs  --input input_genome_object --output output_genome_object
 
     --input      --- Read input genome-typed object from file instead of STDIN
 
@@ -59,6 +59,7 @@ use Data::Dumper;
 
 use gjoseqlib;
 use Bio::KBase::GenomeAnnotation::Client;
+use Bio::KBase::IDServer::Client;
 use JSON::XS;
 
 use IDclient;
@@ -70,13 +71,15 @@ my $input_file;
 my $output_file;
 my $temp_dir;
 my $id_prefix = 'rast|0';
+my $id_server;
 
 use Getopt::Long;
 my $rc = GetOptions('help'        => \$help,
 		    'input=s'     => \$input_file,
 		    'output=s'    => \$output_file,
 		    'tmpdir=s'    => \$temp_dir,
-		    'id_prefix=s' => \$id_prefix,
+		    'id-prefix=s' => \$id_prefix,
+		    'id-server=s' => \$id_server,
 		    );
 
 if (!$rc || $help || @ARGV != 0) {
@@ -110,13 +113,22 @@ my $genomeTO;
     my $genomeTO_txt = <$in_fh>;
     $genomeTO = $json->decode($genomeTO_txt);
 }
-my $id_client = IDclient->new($genomeTO);
+my $id_client;
+if ($id_server)
+{
+    $id_client = Bio::KBase::IDServer::Client->new($id_server);
+}
+else
+{	
+    $id_client = IDclient->new($genomeTO);
+}
+
 
 
 #...Extract genome-object fields...
 my ($genus, $species) = (($genomeTO->{scientific_name} =~ m/^(\S+)\s+(\S+)/o)
 			 ? ($1, $2)
-			 : die qq(Could not parse scientific_name: \"$genomeTO->{scientific_name}\")
+			 : qw(Unknown sp.)
 			 );
 
 my $domain = (($genomeTO->{domain} =~ m/^([ABE])/o)
@@ -127,6 +139,7 @@ my $domain = (($genomeTO->{domain} =~ m/^([ABE])/o)
 my $contigs = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{contigs} } ];
 
 my $params = { -orgID   => $genomeTO->{id},
+	       -rnas    => q(tRNA),
 	       -genus   => $genus,
 	       -species => $species,
 	       -domain  => $domain,
@@ -136,8 +149,8 @@ if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
 	
 	   
 #...Run the `search_for_rnas` wrapper...
-my $result = Find_RNAs::find_rnas($params);
-
+my($result, $event) = Find_RNAs::find_rnas($params);
+my $event_id = &GenomeTypeObject::add_analysis_event($genomeTO, $event);
 
 foreach my $entry (@$result) {
     my (undef, $contig, $beg, $end, $func) = @$entry;
@@ -152,6 +165,7 @@ foreach my $entry (@$result) {
 						-function   => $func,
 						-annotator  => 'search_for_rnas',
 						-annotation => 'Add feature called by search_for_rnas',
+						-analysis_event_id => $event_id,
 					    }
 				   );
 }

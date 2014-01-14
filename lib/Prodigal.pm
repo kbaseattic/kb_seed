@@ -26,6 +26,7 @@ package Prodigal;
 use strict;
 use warnings;
 
+use Time::HiRes 'gettimeofday';
 use Scalar::Util qw/ openhandle /;
 use File::Temp qw/ tempfile tempdir /;
 use Data::Dumper;
@@ -48,10 +49,9 @@ sub run_prodigal
     #
     # Create temporary directory and FASTA for the contig data.
     #
-    my $tmp_dir = tempdir( DIR => (defined($params->{-tmpdir})
-				   ? $params->{-tmpdir}
-				   : q(tmpdir_prodigal_XXXXXXXX))
-			   );
+    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tempdir}) : ();
+    my $tmp_dir = tempdir( @tmpdir, TEMPLATE => 'tmpdir_prodigal_XXXXXXXX');
+
     print STDERR "contig=$tmp_dir\n" if $ENV{DEBUG};
     
     #...Logfile will always be non-null, so no need to test it later...
@@ -93,6 +93,15 @@ sub run_prodigal
 	       );
     my $cmd = join q( ), @cmd;
     
+    my $hostname = `hostname`;
+    chomp $hostname;
+    my $event = {
+	tool_name => "prodigal",
+	execute_time => scalar gettimeofday,
+	parameters => \@cmd,
+	hostname => $hostname,
+    };
+
     warn "Run: $cmd\n" if $ENV{DEBUG};
     my $res = system( @cmd );
     if ($res != 0) {
@@ -178,7 +187,7 @@ sub run_prodigal
 # 	unlink($tbl2);
     }
     
-    return $encoded_tbl;
+    return wantarray ? ($encoded_tbl, $event) : $encoded_tbl;
 }
 
 1;

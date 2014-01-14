@@ -696,9 +696,10 @@ sub add_to_alignment
 #
 #  Options:
 #
-#     trim   => bool     # trim sequence start and end
-#     silent => bool     # no information messages
-#     stddev => float    # window of similarity to include in profile (D = 1.5)
+#     trim    => bool     # trim sequence start and end
+#     silent  => bool     # no information messages
+#     stddev  => float    # window of similarity to include in profile (D = 1.5)
+#     verbose => bool     # add information messages
 #
 #===============================================================================
 
@@ -708,8 +709,8 @@ sub add_to_alignment_v2
 
     $options = {} if ! $options || ( ref( $options ) ne 'HASH' );
 
-    my $silent  = $options->{ silent }
-               || ( defined $options->{ verbose } ? ! $options->{ verbose } : 0 );
+    my $silent  = ! $options->{ verbose }
+               && ( defined $options->{ silent } ? $options->{ silent } : 1 );
     my $std_dev = $options->{ stddev } || 1.5;  #  The definition of "not significantly less similar"
     my $trim    = $options->{ trim }   || 0;
 
@@ -813,7 +814,6 @@ sub add_to_alignment_v2
     {
         my $m41 = $m4;
         my $m51 = $m5;
-        $m41 =~ tr/\377//;
         print STDERR join( ', ', length($m4), $m41 =~ tr/\377//, length( $ali->[0]->[2] )), "\n";
         print STDERR join( ', ', length($m5), $m51 =~ tr/\377//, length( $seq->[2] )), "\n";
     }

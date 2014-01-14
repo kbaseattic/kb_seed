@@ -19,6 +19,7 @@
 ########################################################################
 
 my $usage = <<'End_of_Usage';
+
 Identify the RNA genes in one or more genomes.
 
 Usage: svr_RNA_genes    [options] < genome_ids       > RNAs_found
@@ -55,6 +56,7 @@ Options:
                #      mixing of different types; empty string supresses the
                #      field (D = '')
     -u url     #  url of the desired sapling server
+    -v         #  Send some progress information to STDERR
 
 The reference sequence perl modules have common internal variable names. For
 example, RNA_reps_SSU_rRNA begins with:
@@ -63,12 +65,12 @@ example, RNA_reps_SSU_rRNA begins with:
     use strict;
     use gjoseqlib;
 
-    our @RNA_reps         = gjoseqlib::read_fasta( \*DATA );
-    our $assignment       = 'SSU rRNA ## 16S rRNA, small subunit ribosomal RNA';
-    our $tag              = 'SSU_rRNA';
-    our $max_expect       = 1e-20;
-    our $max_exptrapolate = 10;
-    our $min_coverage     = 0.20;
+    our @RNA_reps        = gjoseqlib::read_fasta( \*DATA );
+    our $assignment      = 'SSU rRNA ## 16S rRNA, small subunit ribosomal RNA';
+    our $tag             = 'SSU_rRNA';
+    our $max_expect      = 1e-20;
+    our $max_extrapolate = 10;
+    our $min_coverage    = 0.20;
 
 User-supplied command options will override the default values.
 
@@ -99,6 +101,7 @@ my $quality     =  0;
 my $reffile     = '';
 my $tag;
 my $url;
+my $verbose     =  0;
 
 while ( @ARGV && $ARGV[0] =~ s/^-// )
 {
@@ -121,6 +124,7 @@ while ( @ARGV && $ARGV[0] =~ s/^-// )
     if ( s/p//g ) { $complete    = 0 }
     if ( s/q//g ) { $quality     = 1 }
     if ( s/s//g ) { $no_seq      = 1 }
+    if ( s/v//g ) { $verbose     = 1 }
 
     if ( m/\S/ )
     {
@@ -152,13 +156,13 @@ else
     }
 
     @rna         = @RNA_reps::RNA_reps;
-    $assignment  = $RNA_reps::assignment       if ! $assignment          && $RNA_reps::assignment;
-    $tag         = $RNA_reps::tag              if ! $tag                 && $RNA_reps::tag;
+    $assignment  = $RNA_reps::assignment      if ! $assignment          && $RNA_reps::assignment;
+    $tag         = $RNA_reps::tag             if ! $tag                 && $RNA_reps::tag;
 
-    $coverage    = $RNA_reps::min_coverage     if ! defined $coverage    && $RNA_reps::min_coverage;
-    $identity    = $RNA_reps::min_identity     if ! defined $identity    && $RNA_reps::min_identity;
-    $expect      = $RNA_reps::max_expect       if                           $RNA_reps::max_expect;
-    $extrapolate = $RNA_reps::max_exptrapolate if ! defined $extrapolate && $RNA_reps::max_exptrapolate;
+    $coverage    = $RNA_reps::min_coverage    if ! defined $coverage    && $RNA_reps::min_coverage;
+    $identity    = $RNA_reps::min_identity    if ! defined $identity    && $RNA_reps::min_identity;
+    $expect      = $RNA_reps::max_expect      if                           $RNA_reps::max_expect;
+    $extrapolate = $RNA_reps::max_extrapolate if ! defined $extrapolate && $RNA_reps::max_extrapolate;
 }
 
 ensure_defined( $assignment,  'RNA matching reference data' );
@@ -206,8 +210,10 @@ $options->{ loc_format }  = $loc_format   if $loc_format;
 my $pat;
 $pat = qr/^(.{$just_ends})....+(.{$just_ends})$/o if $just_ends;
 
+print STDERR "    @{[scalar @genomes]} genomes to process\n" if $verbose;
 foreach my $genome ( @genomes )
 {
+    print STDERR "Processing $genome.\n" if $verbose;
     my @contigs;
     if ( $contigfiles )
     {
@@ -229,6 +235,7 @@ foreach my $genome ( @genomes )
             or print STDERR "No sequences found for '$genome'. Skipping.\n"
                 and next;
     }
+    print STDERR "    @{[scalar @contigs]} contigs\n" if $verbose;
 
     my $instances = find_homologs::find_nucleotide_homologs( \@contigs, $options );
 
@@ -244,6 +251,7 @@ foreach my $genome ( @genomes )
                          }
                     @$instances;
 
+    print STDERR "    @{[scalar @instances]} RNAs found\n" if $verbose;
     foreach ( @instances )
     {
         if ( ! $fasta )

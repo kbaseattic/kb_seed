@@ -631,7 +631,7 @@ sub next_blast_record
 
         #  Query sequence description  -----------------------------------------
 
-        if ( s/^Query=\s+// )
+        if ( s/^Query=\s*// )
         {
             $q_ok   = 0;
             $s_ok   = 0;
@@ -895,7 +895,11 @@ sub nextline
 
 sub split_id
 {
-    ( $_[0] =~ m/(\S+)(\s+(\S.*))?$/ ) ? ( $1, defined($3) ? $3 : "" ) : ();
+    local $_ = defined $_[0] ? $_[0] : '';
+    s/^\s+//;
+    s/\s+$//;
+    my ( $id, $def ) = /^(\S+)(?:\s+(\S.*))?$/;
+    ( defined $id ? $id : 'untitled', defined $def ? $def : '' );
 }
 
 

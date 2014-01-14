@@ -4763,6 +4763,10 @@ sub InsertObject {
 =head3 UpdateEntity
 
     $erdb->UpdateEntity($entityName, $id, %fields);
+    
+or
+    
+    my $ok = $erdb->UpdateEntity($entityName, $id, \%fields, $optional);
 
 Update the values of an entity. This is an unprotected update, so it should only be
 done if the database resides on a database server.
@@ -4782,8 +4786,13 @@ ID of the entity to update. If no entity exists with this ID, an error will be t
 Hash mapping field names to their new values. All of the fields named
 must be in the entity's primary relation, and they cannot any of them be the ID field.
 Field names should be in the L</Standard Field Name Format>. The default object name in
-this case is the entity name. For backward compatability, this can also be a hash
-reference.
+this case is the entity name.
+
+=item optional
+
+If specified and TRUE, then the update is optional and will return TRUE if successful and FALSE
+if the entity instance was not found. If this parameter is present, I<fields> must be a hash
+reference and not a raw hash.
 
 =back
 
@@ -4792,10 +4801,11 @@ reference.
 sub UpdateEntity {
     # Get the parameters.
     my ($self, $entityName, $id, $first, @leftovers) = @_;
-    # Get the field hash.
-    my $fields;
+    # Get the field hash and optional-update flag.
+    my ($fields, $optional);    
     if (ref $first eq 'HASH') {
         $fields = $first;
+        $optional = $leftovers[0];
     } else {
         $fields = { $first, @leftovers };
     }
@@ -4823,12 +4833,20 @@ sub UpdateEntity {
     my $command = "UPDATE $self->{_quote}$entityName$self->{_quote} SET " . join(", ", @sets) . " WHERE id = ?";
     # Add the ID to the list of binding values.
     push @valueList, $id;
+    # This will be the return value.
+    my $retVal = 1;
     # Call SQL to do the work.
     my $rows = $self->{_dbh}->SQL($command, 0, @valueList);
     # Check for errors.
     if ($rows == 0) {
-        Confess("Entity $id of type $entityName not found.");
+        if ($optional) {
+            $retVal = 0;
+        } else {
+            Confess("Entity $id of type $entityName not found.");
+        }
     }
+    # Return the success indication.
+    return $retVal;
 }
 
 =head3 Delete

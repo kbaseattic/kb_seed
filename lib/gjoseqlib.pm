@@ -2580,7 +2580,7 @@ sub useful_aa_align
     $m1 &= $m2;             # Valid in seq1 and seq2
     #  Shared gaps
     my $m3 = $s1; $m3 =~ tr/-/\000/; $m3 =~ tr/\000/\377/c;
-    my $m4 = $s1; $m4 =~ tr/-/\000/; $m4 =~ tr/\000/\377/c;
+    my $m4 = $s2; $m4 =~ tr/-/\000/; $m4 =~ tr/\000/\377/c;
     #  Valid and not shared gap;
     $m1 &= $m3 | $m4;
 

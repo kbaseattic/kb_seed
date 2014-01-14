@@ -24,7 +24,7 @@
 
 =head1 CDMI Entity Integrity Check
 
-    CDMIFixRels [options] rel1 rel2 ...
+    CDMIFixEntities [options] rel1 rel2 ...
 
 This script analyzes entities and relationships in a CDMI and deletes
 entity instances that are not connected to an owning relationship.

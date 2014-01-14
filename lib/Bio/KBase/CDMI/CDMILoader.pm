@@ -589,8 +589,18 @@ sub InsertObject {
                         # Nulls are OK. Put in the MySQL load code for nulls.
                         $value = "\\N";
                     } else {
-                        # The missing value is an error.
-                        die "Missing field $fieldName in $relationName InsertObject.\n";
+                        # The missing value is an error. Compute an ID for this record.
+                        my $id = "<unknown>";
+                        if (defined $fields{id}) {
+                            $id = $fields{id};
+                        } else {
+                            my $from = $fields{from_link} || $fields{'from-link'};
+                            my $to = $fields{to_link} || $fields{'to-link'};
+                            if (defined $from && defined $to) {
+                                $id = "$from -> $to";
+                            }
+                        }
+                        die "Missing field $fieldName in $relationName InsertObject for record $id.\n";
                     }
                 }
             }
@@ -1417,5 +1427,6 @@ sub idMap {
     # Return the result.
     return \%retVal;
 }
+
 
 1;

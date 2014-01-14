@@ -12,19 +12,18 @@ genomes_to_fids
 
 =head1 SYNOPSIS
 
-genomes_to_fids [arguments] < input > output
+genomes_to_fids [options] [fid-type fid-type ...] < input > output
 
 =head1 DESCRIPTION
 
 
 genomes_to_fids is used to get the fids included in specific genomes.  It
-is often the case that you want just one or two types of fids -- hence, the
-types_of_fids argument.
-
+is often the case that you want just one or two types of fids; in this case
+you may enumerate the types that you wish to retrieve.
 
 Example:
 
-    genomes_to_fids [arguments] < input > output
+    genomes_to_fids peg CDS rna < input > output
 
 The standard input should be a tab-separated table (i.e., each line
 is a tab-separated set of fields).  Normally, the last field in each
@@ -40,12 +39,11 @@ output is to the standard output. For each input line, ther can be many output l
 
 =head1 COMMAND-LINE OPTIONS
 
-Usage: genomes_to_fids [arguments] < input > output
-
+Usage: genomes_to_fids [arguments] [fid-types] < input > output
 
     -c num        Select the identifier from column num
     -i filename   Use filename rather than stdin for input
-
+    fid-type	  Optional type of fid to return (peg, CDS, rna, etc)
 =head1 AUTHORS
 
 L<The SEED Project|http://www.theseed.org>
@@ -53,7 +51,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-our $usage = "usage: genomes_to_fids [-c column] < input > output";
+our $usage = "usage: genomes_to_fids [-c column] [fid-type, fid-type ...] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;

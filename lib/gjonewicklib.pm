@@ -4899,7 +4899,8 @@ sub set_difference
 #
 #  Options:
 #
-#     dist => tip-to-tip distance threshold   # D = 0.1
+#     dist => float,       tip-to-tip distance threshold   # D = 0.1
+#     pref => \%tip_pref,  preferred tips are associated with higher scores
 #
 #-----------------------------------------------------------------------------
 sub representative_tips
@@ -4915,11 +4916,12 @@ sub representative_tips
 
 sub rep_tips_with_dist
 {
-    my ($node,$args) = @_;
+    my ($node, $args) = @_;
 
     my $solid = [];
     my $shaky = [];
-    my $cutoffD = $args->{dist} || $args->{close} || 0.1;
+    my $cutoffD = $args->{dist} || 0.1;
+    my $prefH = $args->{pref};
 
     my $parentD = newick_x($node);
     my $lbl = newick_lbl($node);
@@ -4928,11 +4930,11 @@ sub rep_tips_with_dist
     {
 	if ($cutoffD <= $parentD)
 	{
-	    push(@$solid,$lbl);
+	    push(@$solid, $lbl);
 	}
 	else
 	{
-	    push(@$shaky,[$parentD,$lbl]);
+	    push(@$shaky, [$parentD, $lbl]);
 	}
     }
     else
@@ -4941,36 +4943,38 @@ sub rep_tips_with_dist
 	my @pool_of_shaky;
 	foreach my $d (@desc)
 	{
-	    my ($solidD,$shakyD) = rep_tips_with_dist($d,$args);
-	    push(@$solid,@$solidD);
-	    push(@pool_of_shaky,@$shakyD);
+	    my ($solidD, $shakyD) = rep_tips_with_dist($d, $args);
+	    push(@$solid, @$solidD);
+	    push(@pool_of_shaky, @$shakyD);
 	}
 	@pool_of_shaky = sort { $a->[0] <=> $b->[0] } @pool_of_shaky;
+        
 	while ((@pool_of_shaky > 1) && (($pool_of_shaky[0]->[0] + $pool_of_shaky[1]->[0]) < $cutoffD))
 	{
 	    my $eliminate = shift @pool_of_shaky;
-	    $pool_of_shaky[0]->[1] = $eliminate->[1];
+            my ($lbl1, $lbl2) = ($eliminate->[1], $pool_of_shaky[0]->[1]);
+	    $pool_of_shaky[0]->[1] = $lbl1 if $prefH->{$lbl1} > $prefH->{$lbl2};
 	}
 	foreach my $tuple (@pool_of_shaky)
 	{
-	    my ($currentD,$lbl) = @$tuple;
-	    rep_tips_keep($solid,$shaky,$parentD,$cutoffD,$lbl,$currentD);
+	    my ($currentD, $lbl) = @$tuple;
+	    rep_tips_keep($solid, $shaky, $parentD, $cutoffD, $lbl, $currentD);
 	}
     }
+    
     return ($solid,$shaky);
 }
 	   
 sub rep_tips_keep
 {
-    my ($solid,$shaky,$parentD,$cutoffD,$lbl,$currentD) = @_;
-
+    my ($solid, $shaky, $parentD, $cutoffD, $lbl, $currentD) = @_;
     if (($currentD + $parentD) > $cutoffD)
     {
-	push(@$solid,$lbl);
+	push(@$solid, $lbl);
     }
     else
     {
-	push(@$shaky,[$currentD+$parentD,$lbl]);
+	push(@$shaky, [$currentD+$parentD, $lbl]);
     }
 }
 

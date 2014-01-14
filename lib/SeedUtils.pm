@@ -2056,10 +2056,18 @@ sub strip_func {
 }
 
 sub strip_func_comment {
-        my($func) = @_;
+    my($func) = @_;
 
-        $func =~ s/\s*\#.*$//;
-        return($func);
+    if (wantarray)
+    {
+	my($just_func, $comment) = $func =~ /(.*?)(\s*\#.*)?$/;
+        return($just_func, $comment);						  
+    }
+    else
+    {
+	$func =~ s/\s*\#.*$//;
+	return $func;
+    }
 }
 
 sub verify_db {

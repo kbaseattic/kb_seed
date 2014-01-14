@@ -28,10 +28,10 @@
     CDMILoadAnnotations [options] source annotationFile
 
 This script loads Annotation data for features from the specified source.
-the coupling data from a Sapling database dump. The dump files
-are read in and the feature IDs converted from FIG IDs to KBase IDs. Only
-features for genomes found in the KBase CDMI will be included in the
-output. Two relations are loaded-- B<Annotation> and B<IsAnnotatedBy>.
+The dump files are read in and the feature IDs converted from FIG IDs 
+to KBase IDs. Only features for genomes found in the KBase CDMI will 
+be included in the output. Two relations are loaded-- B<Annotation> and
+ B<IsAnnotatedBy>.
 
 The input file contains multi-line records, each delimited by a single
 line containing a double slash (C<//>). The first line of each record

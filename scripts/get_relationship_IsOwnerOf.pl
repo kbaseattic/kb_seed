@@ -257,9 +257,9 @@ if ($a) {
 }
  
 my $ih;
-if ($input_file)
+if ($i)
 {
-    open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+    open $ih, "<", $i or die "Cannot open input file $input_file: $!";
 }
 else
 {
