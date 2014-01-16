@@ -109,7 +109,7 @@ sub new
     
     if (!defined($url))
     {
-	$url = 'http://bio-data-1.mcs.anl.gov/services/cdmi_api';
+	$url = 'https://kbase.us/services/cdmi_api';
     }
 
     my $self = {
@@ -215,8 +215,9 @@ sub fids_to_annotations
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_annotations',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -302,8 +303,9 @@ sub fids_to_functions
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_functions',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -406,8 +408,9 @@ sub fids_to_literature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_literature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -499,8 +502,9 @@ sub fids_to_protein_families
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_protein_families',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -589,8 +593,9 @@ sub fids_to_roles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_roles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -680,8 +685,9 @@ sub fids_to_subsystems
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_subsystems',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -787,8 +793,9 @@ sub fids_to_co_occurring_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_co_occurring_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -904,8 +911,9 @@ sub fids_to_locations
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_locations',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -995,8 +1003,9 @@ sub locations_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'locations_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1087,8 +1096,9 @@ sub alleles_to_bp_locs
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'alleles_to_bp_locs',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1189,8 +1199,9 @@ sub region_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'region_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1293,8 +1304,9 @@ sub region_to_alleles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'region_to_alleles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1381,8 +1393,9 @@ sub alleles_to_traits
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'alleles_to_traits',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1469,8 +1482,9 @@ sub traits_to_alleles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'traits_to_alleles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1575,8 +1589,9 @@ sub ous_with_trait
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'ous_with_trait',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1689,8 +1704,9 @@ sub locations_to_dna_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'locations_to_dna_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1780,8 +1796,9 @@ sub proteins_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'proteins_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1874,8 +1891,9 @@ sub proteins_to_protein_families
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'proteins_to_protein_families',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -1976,8 +1994,9 @@ sub proteins_to_literature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'proteins_to_literature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2081,8 +2100,9 @@ sub proteins_to_functions
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'proteins_to_functions',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2185,8 +2205,9 @@ sub proteins_to_roles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'proteins_to_roles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2275,8 +2296,9 @@ sub roles_to_proteins
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'roles_to_proteins',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2365,8 +2387,9 @@ sub roles_to_subsystems
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'roles_to_subsystems',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2456,8 +2479,9 @@ sub roles_to_protein_families
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'roles_to_protein_families',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2552,8 +2576,9 @@ sub fids_to_coexpressed_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_coexpressed_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2642,8 +2667,9 @@ sub protein_families_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'protein_families_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2732,8 +2758,9 @@ sub protein_families_to_proteins
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'protein_families_to_proteins',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2819,8 +2846,9 @@ sub protein_families_to_functions
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'protein_families_to_functions',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -2921,8 +2949,9 @@ sub protein_families_to_co_occurring_families
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'protein_families_to_co_occurring_families',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3026,8 +3055,9 @@ sub co_occurrence_evidence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'co_occurrence_evidence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3114,8 +3144,9 @@ sub contigs_to_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'contigs_to_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3204,8 +3235,9 @@ sub contigs_to_lengths
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'contigs_to_lengths',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3295,8 +3327,9 @@ sub contigs_to_md5s
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'contigs_to_md5s',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3389,8 +3422,9 @@ sub md5s_to_genomes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'md5s_to_genomes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3480,8 +3514,9 @@ sub genomes_to_md5s
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_md5s',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3570,8 +3605,9 @@ sub genomes_to_contigs
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_contigs',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3667,8 +3703,9 @@ sub genomes_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3786,8 +3823,9 @@ sub genomes_to_taxonomies
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_taxonomies',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3887,8 +3925,9 @@ sub genomes_to_subsystems
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_subsystems',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -3982,8 +4021,9 @@ sub subsystems_to_genomes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'subsystems_to_genomes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4087,8 +4127,9 @@ sub subsystems_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'subsystems_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4183,8 +4224,9 @@ sub subsystems_to_roles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'subsystems_to_roles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4294,8 +4336,9 @@ sub subsystems_to_spreadsheets
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'subsystems_to_spreadsheets',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4367,8 +4410,9 @@ sub all_roles_used_in_models
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_roles_used_in_models',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4477,8 +4521,9 @@ sub complexes_to_complex_data
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'complexes_to_complex_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4583,8 +4628,9 @@ sub genomes_to_genome_data
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'genomes_to_genome_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4679,8 +4725,9 @@ sub fids_to_regulon_data
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_regulon_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4767,8 +4814,9 @@ sub regulons_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'regulons_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4895,8 +4943,9 @@ sub fids_to_feature_data
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_feature_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -4999,8 +5048,9 @@ sub equiv_sequence_assertions
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'equiv_sequence_assertions',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5096,8 +5146,9 @@ sub fids_to_atomic_regulons
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_atomic_regulons',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5185,8 +5236,9 @@ sub atomic_regulons_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'atomic_regulons_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5274,8 +5326,9 @@ sub fids_to_protein_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_protein_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5360,8 +5413,9 @@ sub fids_to_proteins
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_proteins',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5447,8 +5501,9 @@ sub fids_to_dna_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_dna_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5549,8 +5604,9 @@ sub roles_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'roles_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5647,8 +5703,9 @@ sub reactions_to_complexes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'reactions_to_complexes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5733,8 +5790,9 @@ sub aliases_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'aliases_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5822,8 +5880,9 @@ sub external_ids_to_fids
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'external_ids_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -5912,8 +5971,9 @@ sub reaction_strings
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'reaction_strings',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6008,8 +6068,9 @@ sub roles_to_complexes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'roles_to_complexes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6096,8 +6157,9 @@ sub complexes_to_roles
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'complexes_to_roles',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6196,8 +6258,9 @@ sub fids_to_subsystem_data
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_subsystem_data',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6280,8 +6343,9 @@ sub representative
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'representative',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6366,8 +6430,9 @@ sub otu_members
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'otu_members',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6448,8 +6513,9 @@ sub otus_to_representatives
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'otus_to_representatives',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6534,8 +6600,9 @@ sub fids_to_genomes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'fids_to_genomes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6639,8 +6706,9 @@ sub text_search
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'text_search',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6750,8 +6818,9 @@ sub corresponds
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'corresponds',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -6901,8 +6970,9 @@ sub corresponds_from_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'corresponds_from_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7006,8 +7076,9 @@ sub close_genomes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'close_genomes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7123,8 +7194,9 @@ sub representative_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'representative_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7404,8 +7476,9 @@ sub align_sequences
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'align_sequences',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7525,8 +7598,9 @@ sub build_tree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'build_tree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7625,8 +7699,9 @@ sub alignment_by_id
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'alignment_by_id',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7709,8 +7784,9 @@ sub tree_by_id
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'tree_by_id',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7780,8 +7856,9 @@ sub all_entities
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7851,8 +7928,9 @@ sub all_relationships
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_relationships',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -7960,8 +8038,9 @@ sub get_entity
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8071,8 +8150,9 @@ sub get_relationship
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8166,8 +8246,9 @@ sub get_all
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_all',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8323,8 +8404,9 @@ sub get_entity_Alignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Alignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8436,8 +8518,9 @@ sub query_entity_Alignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Alignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8546,8 +8629,9 @@ sub all_entities_Alignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Alignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8643,8 +8727,9 @@ sub get_entity_AlignmentAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_AlignmentAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8736,8 +8821,9 @@ sub query_entity_AlignmentAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_AlignmentAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8826,8 +8912,9 @@ sub all_entities_AlignmentAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_AlignmentAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -8971,8 +9058,9 @@ sub get_entity_AlignmentRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_AlignmentRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9080,8 +9168,9 @@ sub query_entity_AlignmentRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_AlignmentRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9186,8 +9275,9 @@ sub all_entities_AlignmentRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_AlignmentRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9322,8 +9412,9 @@ sub get_entity_AlleleFrequency
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_AlleleFrequency',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9429,8 +9520,9 @@ sub query_entity_AlleleFrequency
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_AlleleFrequency',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9533,8 +9625,9 @@ sub all_entities_AlleleFrequency
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_AlleleFrequency',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9649,8 +9742,9 @@ sub get_entity_Annotation
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Annotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9748,8 +9842,9 @@ sub query_entity_Annotation
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Annotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9844,8 +9939,9 @@ sub all_entities_Annotation
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Annotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -9956,8 +10052,9 @@ sub get_entity_Assay
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Assay',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10055,8 +10152,9 @@ sub query_entity_Assay
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Assay',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10151,8 +10249,9 @@ sub all_entities_Assay
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Assay',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10161,6 +10260,952 @@ sub all_entities_Assay
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Assay",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_Assay',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Association
+
+  $return = $obj->get_entity_Association($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+An Association represents a protein complex or a pairwise
+(binary) physical association between proteins.
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+This is the name of the association. 
+
+=item description
+
+This is a description of this association.  If the protein complex has a name, this should be it. 
+
+=item directional
+
+True for directional binary associations (e.g., those detected by a pulldown experiment), false for non-directional binary associations and complexes. Bidirectional associations (e.g., associations detected by reciprocal pulldown experiments) should be encoded as 2 separate binary associations. 
+
+=item confidence
+
+Optional numeric estimate of confidence in the association. Recommended to use a 0-100 scale. 
+
+=item url
+
+Optional URL for more info about this complex.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Association
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Association (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Association:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Association');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Association",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Association',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Association",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Association',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Association
+
+  $return = $obj->query_entity_Association($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Association
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Association (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Association:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Association');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Association",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Association',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Association",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Association',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Association
+
+  $return = $obj->all_entities_Association($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Association
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Association
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Association (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Association:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Association');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Association",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Association',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Association",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Association',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_AssociationDataset
+
+  $return = $obj->get_entity_AssociationDataset($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+
+=end text
+
+=item Description
+
+An Association Dataset is a collection of PPI
+data imported from a single database or publication.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a description of the dataset.
+
+=item data_source
+
+Optional external source for this dataset; e.g., another database.
+
+=item url
+
+Optional URL for more info about this dataset.
+
+=item association_type
+
+The type of this association.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_AssociationDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_AssociationDataset (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_AssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_AssociationDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_AssociationDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_AssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_AssociationDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_AssociationDataset',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_AssociationDataset
+
+  $return = $obj->query_entity_AssociationDataset($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_AssociationDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_AssociationDataset (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_AssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_AssociationDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_AssociationDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_AssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_AssociationDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_AssociationDataset',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_AssociationDataset
+
+  $return = $obj->all_entities_AssociationDataset($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDataset
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_AssociationDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_AssociationDataset (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_AssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_AssociationDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_AssociationDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_AssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_AssociationDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_AssociationDataset',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_AssociationDetectionType
+
+  $return = $obj->get_entity_AssociationDetectionType($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+This documents methods by which associations are detected
+or annotated.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a brief description of this detection method. 
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_AssociationDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_AssociationDetectionType (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_AssociationDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_AssociationDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_AssociationDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_AssociationDetectionType',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_AssociationDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_AssociationDetectionType',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_AssociationDetectionType
+
+  $return = $obj->query_entity_AssociationDetectionType($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_AssociationDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_AssociationDetectionType (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_AssociationDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_AssociationDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_AssociationDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_AssociationDetectionType',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_AssociationDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_AssociationDetectionType',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_AssociationDetectionType
+
+  $return = $obj->all_entities_AssociationDetectionType($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_AssociationDetectionType
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_AssociationDetectionType
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_AssociationDetectionType (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_AssociationDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_AssociationDetectionType');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_AssociationDetectionType",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_AssociationDetectionType',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_AssociationDetectionType",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_AssociationDetectionType',
 				       );
     }
 }
@@ -10249,8 +11294,9 @@ sub get_entity_AtomicRegulon
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_AtomicRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10342,8 +11388,9 @@ sub query_entity_AtomicRegulon
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_AtomicRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10432,8 +11479,9 @@ sub all_entities_AtomicRegulon
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_AtomicRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10534,8 +11582,9 @@ sub get_entity_Attribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Attribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10629,8 +11678,9 @@ sub query_entity_Attribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Attribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10721,8 +11771,9 @@ sub all_entities_Attribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Attribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10867,8 +11918,9 @@ sub get_entity_Biomass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Biomass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -10976,8 +12028,9 @@ sub query_entity_Biomass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Biomass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11082,8 +12135,9 @@ sub all_entities_Biomass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Biomass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11203,8 +12257,9 @@ sub get_entity_CodonUsage
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_CodonUsage',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11304,8 +12359,9 @@ sub query_entity_CodonUsage
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_CodonUsage',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11402,8 +12458,9 @@ sub all_entities_CodonUsage
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_CodonUsage',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11515,8 +12572,9 @@ sub get_entity_Complex
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Complex',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11614,8 +12672,9 @@ sub query_entity_Complex
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Complex',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11710,8 +12769,9 @@ sub all_entities_Complex
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Complex',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11865,8 +12925,9 @@ sub get_entity_Compound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Compound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -11978,8 +13039,9 @@ sub query_entity_Compound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Compound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12088,8 +13150,9 @@ sub all_entities_Compound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Compound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12195,8 +13258,9 @@ sub get_entity_CompoundInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_CompoundInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12292,8 +13356,9 @@ sub query_entity_CompoundInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_CompoundInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12386,8 +13451,9 @@ sub all_entities_CompoundInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_CompoundInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12500,8 +13566,9 @@ sub get_entity_ConservedDomainModel
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ConservedDomainModel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12599,8 +13666,9 @@ sub query_entity_ConservedDomainModel
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ConservedDomainModel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12695,8 +13763,9 @@ sub all_entities_ConservedDomainModel
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ConservedDomainModel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12803,8 +13872,9 @@ sub get_entity_Contig
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Contig',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12898,8 +13968,9 @@ sub query_entity_Contig
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Contig',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -12990,8 +14061,9 @@ sub all_entities_Contig
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Contig',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13093,8 +14165,9 @@ sub get_entity_ContigChunk
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ContigChunk',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13188,8 +14261,9 @@ sub query_entity_ContigChunk
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ContigChunk',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13280,8 +14354,9 @@ sub all_entities_ContigChunk
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ContigChunk',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13387,8 +14462,9 @@ sub get_entity_ContigSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ContigSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13482,8 +14558,9 @@ sub query_entity_ContigSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ContigSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13574,8 +14651,9 @@ sub all_entities_ContigSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ContigSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13685,8 +14763,9 @@ sub get_entity_CoregulatedSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_CoregulatedSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13782,8 +14861,9 @@ sub query_entity_CoregulatedSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_CoregulatedSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13876,8 +14956,9 @@ sub all_entities_CoregulatedSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_CoregulatedSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -13983,8 +15064,9 @@ sub get_entity_Diagram
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Diagram',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14080,8 +15162,9 @@ sub query_entity_Diagram
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Diagram',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14174,8 +15257,9 @@ sub all_entities_Diagram
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Diagram',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14282,8 +15366,9 @@ sub get_entity_EcNumber
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_EcNumber',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14379,8 +15464,9 @@ sub query_entity_EcNumber
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_EcNumber',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14473,8 +15559,9 @@ sub all_entities_EcNumber
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_EcNumber',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14483,6 +15570,304 @@ sub all_entities_EcNumber
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_EcNumber",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_EcNumber',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Effector
+
+  $return = $obj->get_entity_Effector($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+Name of this effector.
+
+=item effector_class
+
+The class of this effector.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Effector
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Effector (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Effector:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Effector');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Effector",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Effector',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Effector",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Effector',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Effector
+
+  $return = $obj->query_entity_Effector($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Effector
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Effector (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Effector:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Effector');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Effector",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Effector',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Effector",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Effector',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Effector
+
+  $return = $obj->all_entities_Effector($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Effector
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Effector
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Effector (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Effector:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Effector');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Effector",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Effector',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Effector",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Effector',
 				       );
     }
 }
@@ -14599,8 +15984,9 @@ sub get_entity_Environment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Environment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14702,8 +16088,9 @@ sub query_entity_Environment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Environment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14802,8 +16189,9 @@ sub all_entities_Environment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Environment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14904,8 +16292,9 @@ sub get_entity_Experiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Experiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -14999,8 +16388,9 @@ sub query_entity_Experiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Experiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15091,8 +16481,9 @@ sub all_entities_Experiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Experiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15217,8 +16608,9 @@ sub get_entity_ExperimentMeta
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ExperimentMeta',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15320,8 +16712,9 @@ sub query_entity_ExperimentMeta
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ExperimentMeta',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15420,8 +16813,9 @@ sub all_entities_ExperimentMeta
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ExperimentMeta',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15523,8 +16917,9 @@ sub get_entity_ExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15618,8 +17013,9 @@ sub query_entity_ExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15710,8 +17106,9 @@ sub all_entities_ExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15830,8 +17227,9 @@ sub get_entity_ExperimentalUnitGroup
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ExperimentalUnitGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -15931,8 +17329,9 @@ sub query_entity_ExperimentalUnitGroup
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ExperimentalUnitGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16029,8 +17428,9 @@ sub all_entities_ExperimentalUnitGroup
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ExperimentalUnitGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16161,8 +17561,9 @@ sub get_entity_Family
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Family',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16262,8 +17663,9 @@ sub query_entity_Family
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Family',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16360,8 +17762,9 @@ sub all_entities_Family
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Family',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16492,8 +17895,9 @@ sub get_entity_Feature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Feature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16595,8 +17999,9 @@ sub query_entity_Feature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Feature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16695,8 +18100,9 @@ sub all_entities_Feature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Feature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16873,8 +18279,9 @@ sub get_entity_Genome
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Genome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -16992,8 +18399,9 @@ sub query_entity_Genome
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Genome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -17108,8 +18516,9 @@ sub all_entities_Genome
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Genome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -17118,923 +18527,6 @@ sub all_entities_Genome
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Genome",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_Genome',
-				       );
-    }
-}
-
-
-
-=head2 get_entity_Interaction
-
-  $return = $obj->get_entity_Interaction($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-An Interaction represents a protein complex or a pairwise
-(binary) physical interaction between proteins.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a description of this interaction.  If the protein complex has a name, this should be it. 
-
-=item directional
-
-True for directional binary interactions (e.g., those detected by a pulldown experiment), false for non-directional binary interactions and complexes. Bidirectional interactions (e.g., interactions detected by reciprocal pulldown experiments) should be encoded as 2 separate binary interactions. 
-
-=item confidence
-
-Optional numeric estimate of confidence in the interaction. Recommended to use a 0-100 scale. 
-
-=item url
-
-Optional URL for more info about this complex.
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_Interaction
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_entity_Interaction (received $n, expecting 2)");
-    }
-    {
-	my($ids, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_entity_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_entity_Interaction');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_entity_Interaction",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_entity_Interaction',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Interaction",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_entity_Interaction',
-				       );
-    }
-}
-
-
-
-=head2 query_entity_Interaction
-
-  $return = $obj->query_entity_Interaction($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_Interaction
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function query_entity_Interaction (received $n, expecting 2)");
-    }
-    {
-	my($qry, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to query_entity_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'query_entity_Interaction');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.query_entity_Interaction",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'query_entity_Interaction',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Interaction",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'query_entity_Interaction',
-				       );
-    }
-}
-
-
-
-=head2 all_entities_Interaction
-
-  $return = $obj->all_entities_Interaction($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_Interaction
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_Interaction
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 3)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function all_entities_Interaction (received $n, expecting 3)");
-    }
-    {
-	my($start, $count, $fields) = @args;
-
-	my @_bad_arguments;
-        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
-        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to all_entities_Interaction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'all_entities_Interaction');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.all_entities_Interaction",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'all_entities_Interaction',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Interaction",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'all_entities_Interaction',
-				       );
-    }
-}
-
-
-
-=head2 get_entity_InteractionDataset
-
-  $return = $obj->get_entity_InteractionDataset($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-An Interaction Dataset is a collection of PPI
-data imported from a single database or publication.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a description of the dataset.
-
-=item data_source
-
-Optional external source for this dataset; e.g., another database.
-
-=item url
-
-Optional URL for more info about this dataset.
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_InteractionDataset
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_entity_InteractionDataset (received $n, expecting 2)");
-    }
-    {
-	my($ids, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_entity_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_entity_InteractionDataset');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_entity_InteractionDataset",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_entity_InteractionDataset',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_InteractionDataset",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_entity_InteractionDataset',
-				       );
-    }
-}
-
-
-
-=head2 query_entity_InteractionDataset
-
-  $return = $obj->query_entity_InteractionDataset($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_InteractionDataset
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function query_entity_InteractionDataset (received $n, expecting 2)");
-    }
-    {
-	my($qry, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to query_entity_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'query_entity_InteractionDataset');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.query_entity_InteractionDataset",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'query_entity_InteractionDataset',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_InteractionDataset",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'query_entity_InteractionDataset',
-				       );
-    }
-}
-
-
-
-=head2 all_entities_InteractionDataset
-
-  $return = $obj->all_entities_InteractionDataset($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDataset
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	data_source has a value which is a string
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_InteractionDataset
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 3)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function all_entities_InteractionDataset (received $n, expecting 3)");
-    }
-    {
-	my($start, $count, $fields) = @args;
-
-	my @_bad_arguments;
-        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
-        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to all_entities_InteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'all_entities_InteractionDataset');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.all_entities_InteractionDataset",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'all_entities_InteractionDataset',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_InteractionDataset",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'all_entities_InteractionDataset',
-				       );
-    }
-}
-
-
-
-=head2 get_entity_InteractionDetectionType
-
-  $return = $obj->get_entity_InteractionDetectionType($ids, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-
-=end text
-
-=item Description
-
-This documents methods by which interactions are detected
-or annotated.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a brief description of this detection method. 
-
-
-=back
-
-=back
-
-=cut
-
-sub get_entity_InteractionDetectionType
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_entity_InteractionDetectionType (received $n, expecting 2)");
-    }
-    {
-	my($ids, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_entity_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_entity_InteractionDetectionType');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_entity_InteractionDetectionType",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_entity_InteractionDetectionType',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_InteractionDetectionType",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_entity_InteractionDetectionType',
-				       );
-    }
-}
-
-
-
-=head2 query_entity_InteractionDetectionType
-
-  $return = $obj->query_entity_InteractionDetectionType($qry, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$qry is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a string
-	1: a string
-	2: a string
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub query_entity_InteractionDetectionType
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 2)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function query_entity_InteractionDetectionType (received $n, expecting 2)");
-    }
-    {
-	my($qry, $fields) = @args;
-
-	my @_bad_arguments;
-        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to query_entity_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'query_entity_InteractionDetectionType');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.query_entity_InteractionDetectionType",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'query_entity_InteractionDetectionType',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_InteractionDetectionType",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'query_entity_InteractionDetectionType',
-				       );
-    }
-}
-
-
-
-=head2 all_entities_InteractionDetectionType
-
-  $return = $obj->all_entities_InteractionDetectionType($start, $count, $fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$start is an int
-$count is an int
-$fields is a reference to a list where each element is a string
-$return is a reference to a hash where the key is a string and the value is a fields_InteractionDetectionType
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub all_entities_InteractionDetectionType
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 3)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function all_entities_InteractionDetectionType (received $n, expecting 3)");
-    }
-    {
-	my($start, $count, $fields) = @args;
-
-	my @_bad_arguments;
-        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
-        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
-        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to all_entities_InteractionDetectionType:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'all_entities_InteractionDetectionType');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.all_entities_InteractionDetectionType",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'all_entities_InteractionDetectionType',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_InteractionDetectionType",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'all_entities_InteractionDetectionType',
 				       );
     }
 }
@@ -18173,8 +18665,9 @@ sub get_entity_Locality
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Locality',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18284,8 +18777,9 @@ sub query_entity_Locality
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Locality',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18392,8 +18886,9 @@ sub all_entities_Locality
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Locality',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18491,8 +18986,9 @@ sub get_entity_LocalizedCompound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_LocalizedCompound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18584,8 +19080,9 @@ sub query_entity_LocalizedCompound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_LocalizedCompound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18674,8 +19171,9 @@ sub all_entities_LocalizedCompound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_LocalizedCompound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18794,8 +19292,9 @@ sub get_entity_Location
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Location',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18895,8 +19394,9 @@ sub query_entity_Location
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Location',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -18993,8 +19493,9 @@ sub all_entities_Location
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Location',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19113,8 +19614,9 @@ sub get_entity_LocationInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_LocationInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19214,8 +19716,9 @@ sub query_entity_LocationInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_LocationInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19312,8 +19815,9 @@ sub all_entities_LocationInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_LocationInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19456,8 +19960,9 @@ sub get_entity_Measurement
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Measurement',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19565,8 +20070,9 @@ sub query_entity_Measurement
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Measurement',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19671,8 +20177,9 @@ sub all_entities_Measurement
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Measurement',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19796,8 +20303,9 @@ sub get_entity_MeasurementDescription
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_MeasurementDescription',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19899,8 +20407,9 @@ sub query_entity_MeasurementDescription
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_MeasurementDescription',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -19999,8 +20508,9 @@ sub all_entities_MeasurementDescription
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_MeasurementDescription',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20126,8 +20636,9 @@ sub get_entity_Media
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Media',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20229,8 +20740,9 @@ sub query_entity_Media
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Media',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20329,8 +20841,9 @@ sub all_entities_Media
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Media',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20473,8 +20986,9 @@ sub get_entity_Model
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Model',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20582,8 +21096,9 @@ sub query_entity_Model
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Model',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20688,8 +21203,9 @@ sub all_entities_Model
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Model',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20783,8 +21299,9 @@ sub get_entity_OTU
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_OTU',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20876,8 +21393,9 @@ sub query_entity_OTU
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_OTU',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -20966,8 +21484,9 @@ sub all_entities_OTU
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_OTU',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21078,8 +21597,9 @@ sub get_entity_ObservationalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ObservationalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21177,8 +21697,9 @@ sub query_entity_ObservationalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ObservationalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21273,8 +21794,9 @@ sub all_entities_ObservationalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ObservationalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21283,6 +21805,610 @@ sub all_entities_ObservationalUnit
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_ObservationalUnit",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_ObservationalUnit',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Ontology
+
+  $return = $obj->get_entity_Ontology($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+
+=end text
+
+=item Description
+
+-- Environmental Ontology. (ENVO Terms) http://environmentontology.org/  
+-- Plant Ontology (PO Terms). http://www.plantontology.org/   
+-- Plant Environmental Ontology (EO Terms). http://www.gramene.org/plant_ontology/index.html#eo
+-- ENVO : http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo
+-- PO : http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co
+-- EO : http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo
+
+
+It has the following fields:
+
+=over 4
+
+=item id
+
+Ontologgy ID.
+
+=item name
+
+Type of the ontology.
+
+=item definition
+
+Definition of the ontology
+
+=item ontologySource
+
+Enumerated value (ENVO, EO, PO).
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Ontology
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Ontology (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Ontology:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Ontology');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Ontology",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Ontology',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Ontology",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Ontology',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Ontology
+
+  $return = $obj->query_entity_Ontology($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Ontology
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Ontology (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Ontology:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Ontology');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Ontology",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Ontology',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Ontology",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Ontology',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Ontology
+
+  $return = $obj->all_entities_Ontology($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Ontology
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Ontology
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Ontology (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Ontology:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Ontology');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Ontology",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Ontology',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Ontology",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Ontology',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Operon
+
+  $return = $obj->get_entity_Operon($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Operon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Operon (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Operon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Operon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Operon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Operon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Operon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Operon',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Operon
+
+  $return = $obj->query_entity_Operon($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Operon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Operon (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Operon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Operon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Operon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Operon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Operon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Operon',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Operon
+
+  $return = $obj->all_entities_Operon($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Operon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Operon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Operon (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Operon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Operon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Operon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Operon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Operon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Operon',
 				       );
     }
 }
@@ -21378,8 +22504,9 @@ sub get_entity_PairSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_PairSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21473,8 +22600,9 @@ sub query_entity_PairSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_PairSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21565,8 +22693,9 @@ sub all_entities_PairSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_PairSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21664,8 +22793,9 @@ sub get_entity_Pairing
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Pairing',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21757,8 +22887,9 @@ sub query_entity_Pairing
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Pairing',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21847,8 +22978,9 @@ sub all_entities_Pairing
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Pairing',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -21942,8 +23074,9 @@ sub get_entity_Parameter
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Parameter',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22035,8 +23168,9 @@ sub query_entity_Parameter
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Parameter',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22125,8 +23259,9 @@ sub all_entities_Parameter
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Parameter',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22249,8 +23384,9 @@ sub get_entity_Person
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Person',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22352,8 +23488,9 @@ sub query_entity_Person
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Person',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22452,8 +23589,9 @@ sub all_entities_Person
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Person',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22462,6 +23600,336 @@ sub all_entities_Person
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Person",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_Person',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Platform
+
+  $return = $obj->get_entity_Platform($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Platform that the expression sample/experiment was run on.
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the comparison
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GPL514). This will keep them from having to do problematic likes on the source-id field.
+
+=item technology
+
+Ideally enumerated values, but may have to make this free text (spotted DNA/cDNA, spotted oligonucleotide, in situ oligonucleotide, antibody, tissue, SARST, RT-PCR, or MPSS).
+
+=item type
+
+Enumerated Microarray, RNA-Seq, qPCR
+
+=item source_id
+
+The ID used as the data source.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Platform
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Platform (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Platform:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Platform');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Platform",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Platform',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Platform",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Platform',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Platform
+
+  $return = $obj->query_entity_Platform($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Platform
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Platform (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Platform:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Platform');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Platform",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Platform',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Platform",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Platform',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Platform
+
+  $return = $obj->all_entities_Platform($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Platform
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Platform
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Platform (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Platform:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Platform');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Platform",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Platform',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Platform",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Platform',
 				       );
     }
 }
@@ -22547,8 +24015,9 @@ sub get_entity_ProbeSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ProbeSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22640,8 +24109,9 @@ sub query_entity_ProbeSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ProbeSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22730,8 +24200,9 @@ sub all_entities_ProbeSet
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ProbeSet',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22836,8 +24307,9 @@ sub get_entity_ProteinSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ProteinSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -22931,8 +24403,9 @@ sub query_entity_ProteinSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ProteinSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23023,8 +24496,9 @@ sub all_entities_ProteinSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ProteinSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23136,8 +24610,9 @@ sub get_entity_Protocol
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Protocol',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23235,8 +24710,9 @@ sub query_entity_Protocol
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Protocol',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23331,8 +24807,9 @@ sub all_entities_Protocol
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Protocol',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23448,8 +24925,9 @@ sub get_entity_Publication
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Publication',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23547,8 +25025,9 @@ sub query_entity_Publication
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Publication',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23643,8 +25122,9 @@ sub all_entities_Publication
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Publication',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23798,8 +25278,9 @@ sub get_entity_Reaction
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Reaction',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -23911,8 +25392,9 @@ sub query_entity_Reaction
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Reaction',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24021,8 +25503,9 @@ sub all_entities_Reaction
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Reaction',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24128,8 +25611,9 @@ sub get_entity_ReactionInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_ReactionInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24225,8 +25709,9 @@ sub query_entity_ReactionInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_ReactionInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24319,8 +25804,9 @@ sub all_entities_ReactionInstance
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_ReactionInstance',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24329,6 +25815,1791 @@ sub all_entities_ReactionInstance
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_ReactionInstance",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_ReactionInstance',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Regulator
+
+  $return = $obj->get_entity_Regulator($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+A human-readable name for this Regulator. 
+
+=item rfam_id
+
+If this regulator is an RNA regulator, the rfam-id field will contain the RFAM identifier corresponding to it. 
+
+=item tf_family
+
+If this regulator is a transcription factor, then the tf-family field will contain the name of the transcription factor family. 
+
+=item type
+
+Type of the regulator; currently either RNA or TF. 
+
+=item taxonomy
+
+Type of the regulator; currently either RNA or TF. 
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Regulator
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Regulator (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Regulator:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Regulator');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Regulator",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Regulator',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Regulator",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Regulator',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Regulator
+
+  $return = $obj->query_entity_Regulator($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Regulator
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Regulator (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Regulator:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Regulator');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Regulator",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Regulator',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Regulator",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Regulator',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Regulator
+
+  $return = $obj->all_entities_Regulator($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulator
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Regulator
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Regulator (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Regulator:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Regulator');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Regulator",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Regulator',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Regulator",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Regulator',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Regulog
+
+  $return = $obj->get_entity_Regulog($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Regulog
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Regulog (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Regulog:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Regulog');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Regulog",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Regulog',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Regulog",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Regulog',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Regulog
+
+  $return = $obj->query_entity_Regulog($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Regulog
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Regulog (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Regulog:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Regulog');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Regulog",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Regulog',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Regulog",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Regulog',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Regulog
+
+  $return = $obj->all_entities_Regulog($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulog
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Regulog
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Regulog (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Regulog:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Regulog');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Regulog",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Regulog',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Regulog",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Regulog',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_RegulogCollection
+
+  $return = $obj->get_entity_RegulogCollection($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+A RegulogCollection describes a set of regulogs that are being
+curated on well-defined set of genomes.
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+The name of this regulog collection. 
+
+=item description
+
+A brief description of this regulog collection. 
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_RegulogCollection
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_RegulogCollection (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_RegulogCollection:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_RegulogCollection');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_RegulogCollection",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_RegulogCollection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_RegulogCollection",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_RegulogCollection',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_RegulogCollection
+
+  $return = $obj->query_entity_RegulogCollection($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_RegulogCollection
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_RegulogCollection (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_RegulogCollection:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_RegulogCollection');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_RegulogCollection",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_RegulogCollection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_RegulogCollection",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_RegulogCollection',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_RegulogCollection
+
+  $return = $obj->all_entities_RegulogCollection($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_RegulogCollection
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_RegulogCollection
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_RegulogCollection (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_RegulogCollection:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_RegulogCollection');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_RegulogCollection",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_RegulogCollection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_RegulogCollection",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_RegulogCollection',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Regulome
+
+  $return = $obj->get_entity_Regulome($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+A short description for this regulome. 
+
+=item creation_date
+
+Creation date for this regulome.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Regulome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Regulome (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Regulome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Regulome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Regulome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Regulome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Regulome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Regulome',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Regulome
+
+  $return = $obj->query_entity_Regulome($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Regulome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Regulome (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Regulome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Regulome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Regulome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Regulome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Regulome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Regulome',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Regulome
+
+  $return = $obj->all_entities_Regulome($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Regulome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Regulome (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Regulome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Regulome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Regulome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Regulome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Regulome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Regulome',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Regulon
+
+  $return = $obj->get_entity_Regulon($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+A short description for this regulon. 
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Regulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Regulon (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Regulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Regulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Regulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Regulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Regulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Regulon',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Regulon
+
+  $return = $obj->query_entity_Regulon($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Regulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Regulon (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Regulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Regulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Regulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Regulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Regulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Regulon',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Regulon
+
+  $return = $obj->all_entities_Regulon($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Regulon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Regulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Regulon (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Regulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Regulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Regulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Regulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Regulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Regulon',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_ReplicateGroup
+
+  $return = $obj->get_entity_ReplicateGroup($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Keeps track of Replicate Groups of Expression Samples.  Has only an ID.  Relationship is the important part.
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_ReplicateGroup
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_ReplicateGroup (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_ReplicateGroup:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_ReplicateGroup');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_ReplicateGroup",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_ReplicateGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_ReplicateGroup",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_ReplicateGroup',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_ReplicateGroup
+
+  $return = $obj->query_entity_ReplicateGroup($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_ReplicateGroup
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_ReplicateGroup (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_ReplicateGroup:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_ReplicateGroup');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_ReplicateGroup",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_ReplicateGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_ReplicateGroup",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_ReplicateGroup',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_ReplicateGroup
+
+  $return = $obj->all_entities_ReplicateGroup($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_ReplicateGroup
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_ReplicateGroup
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_ReplicateGroup (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_ReplicateGroup:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_ReplicateGroup');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_ReplicateGroup",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_ReplicateGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_ReplicateGroup",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_ReplicateGroup',
 				       );
     }
 }
@@ -24423,8 +27694,9 @@ sub get_entity_Role
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Role',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24518,8 +27790,9 @@ sub query_entity_Role
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Role',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24610,8 +27883,9 @@ sub all_entities_Role
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Role',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24707,8 +27981,9 @@ sub get_entity_SSCell
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_SSCell',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24800,8 +28075,9 @@ sub query_entity_SSCell
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_SSCell',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -24890,8 +28166,9 @@ sub all_entities_SSCell
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_SSCell',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25001,8 +28278,9 @@ sub get_entity_SSRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_SSRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25098,8 +28376,9 @@ sub query_entity_SSRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_SSRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25192,8 +28471,9 @@ sub all_entities_SSRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_SSRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25202,6 +28482,710 @@ sub all_entities_SSRow
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_SSRow",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_SSRow',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Sample
+
+  $return = $obj->get_entity_Sample($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+A sample is an experiment.  
+In intensity experiment situations the sample will map 1 to 1 to the GSM.  
+In this case there will be corresponding log2level data stored in the Measurement table.
+
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the sample
+
+=item dataSource
+
+The Data Source will be a way to identify where the data came from.  Examples might be : GEO, SEED Expression Pipeline, Enigma, M3D
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSM9514). This will keep them from having to do problematic likes on the source-id field.
+
+=item description
+
+Free-text descibing the experiment.
+
+=item molecule
+
+Enumerated field (total RNA, polyA RNA, cytoplasmic RNA, nuclear RNA, genomic DNA).
+
+=item type
+
+Enumerated Microarray, RNA-Seq, qPCR
+
+=item kbaseSubmissionDate
+
+date of submission to Kbase
+
+=item externalSourceDate
+
+date that may exist in the external source metadata (could be to GEO, M3D etc...)
+
+=item custom
+
+A flag to keep track if this series was generated by custom operations (averaging or comparison)
+
+=item originalLog2Median
+
+The Original Median of the sample in log2space.  If null means the original median was not able to be determined.
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+=item dataQualityLevel
+
+The quality of the data.  Lower the number the better.  Details need to be worked out.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Sample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Sample (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Sample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Sample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Sample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Sample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Sample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Sample',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Sample
+
+  $return = $obj->query_entity_Sample($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Sample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Sample (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Sample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Sample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Sample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Sample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Sample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Sample',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Sample
+
+  $return = $obj->all_entities_Sample($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Sample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Sample (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Sample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Sample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Sample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Sample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Sample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Sample',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_SampleAnnotation
+
+  $return = $obj->get_entity_SampleAnnotation($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Keeps track of ontology annotation date (and person if not automated).
+
+
+It has the following fields:
+
+=over 4
+
+=item annotationDate
+
+date of annotation
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_SampleAnnotation
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_SampleAnnotation (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_SampleAnnotation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_SampleAnnotation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_SampleAnnotation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_SampleAnnotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_SampleAnnotation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_SampleAnnotation',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_SampleAnnotation
+
+  $return = $obj->query_entity_SampleAnnotation($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_SampleAnnotation
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_SampleAnnotation (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_SampleAnnotation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_SampleAnnotation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_SampleAnnotation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_SampleAnnotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_SampleAnnotation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_SampleAnnotation',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_SampleAnnotation
+
+  $return = $obj->all_entities_SampleAnnotation($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_SampleAnnotation
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_SampleAnnotation
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_SampleAnnotation (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_SampleAnnotation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_SampleAnnotation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_SampleAnnotation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_SampleAnnotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_SampleAnnotation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_SampleAnnotation',
 				       );
     }
 }
@@ -25297,8 +29281,9 @@ sub get_entity_Scenario
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Scenario',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25392,8 +29377,9 @@ sub query_entity_Scenario
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Scenario',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25484,8 +29470,9 @@ sub all_entities_Scenario
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Scenario',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25494,6 +29481,356 @@ sub all_entities_Scenario
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Scenario",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'all_entities_Scenario',
+				       );
+    }
+}
+
+
+
+=head2 get_entity_Series
+
+  $return = $obj->get_entity_Series($ids, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+A series refers to a group of samples for expression data.
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the series
+
+=item summary
+
+free text summary of the series
+
+=item design
+
+free text design of the series
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSE2365). This will keep them from having to do problematic likes on the source-id field.
+
+=item kbaseSubmissionDate
+
+date of submission (to Kbase)
+
+=item externalSourceDate
+
+date that may exist in the external source metadata (could be to GEO, M3D etc...)
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_entity_Series
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_entity_Series (received $n, expecting 2)");
+    }
+    {
+	my($ids, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_entity_Series:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_entity_Series');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_entity_Series",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_entity_Series',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_entity_Series",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_entity_Series',
+				       );
+    }
+}
+
+
+
+=head2 query_entity_Series
+
+  $return = $obj->query_entity_Series($qry, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$qry is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a string
+	1: a string
+	2: a string
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub query_entity_Series
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function query_entity_Series (received $n, expecting 2)");
+    }
+    {
+	my($qry, $fields) = @args;
+
+	my @_bad_arguments;
+        (ref($qry) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"qry\" (value was \"$qry\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to query_entity_Series:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'query_entity_Series');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.query_entity_Series",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'query_entity_Series',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method query_entity_Series",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'query_entity_Series',
+				       );
+    }
+}
+
+
+
+=head2 all_entities_Series
+
+  $return = $obj->all_entities_Series($start, $count, $fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$start is an int
+$count is an int
+$fields is a reference to a list where each element is a string
+$return is a reference to a hash where the key is a string and the value is a fields_Series
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub all_entities_Series
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function all_entities_Series (received $n, expecting 3)");
+    }
+    {
+	my($start, $count, $fields) = @args;
+
+	my @_bad_arguments;
+        (!ref($start)) or push(@_bad_arguments, "Invalid type for argument 1 \"start\" (value was \"$start\")");
+        (!ref($count)) or push(@_bad_arguments, "Invalid type for argument 2 \"count\" (value was \"$count\")");
+        (ref($fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"fields\" (value was \"$fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to all_entities_Series:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'all_entities_Series');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.all_entities_Series",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'all_entities_Series',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method all_entities_Series",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'all_entities_Series',
 				       );
     }
 }
@@ -25516,6 +29853,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -25528,6 +29868,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -25541,6 +29884,18 @@ to the database.
 It has the following fields:
 
 =over 4
+
+=item name
+
+The user-readable name for this source.
+
+=item url
+
+The URL to a site with information about this source.
+
+=item description
+
+A short textual description of this source.
 
 
 =back
@@ -25580,8 +29935,9 @@ sub get_entity_Source
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Source',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25615,6 +29971,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -25630,6 +29989,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -25673,8 +30035,9 @@ sub query_entity_Source
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Source',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25706,6 +30069,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -25719,6 +30085,9 @@ $fields is a reference to a list where each element is a string
 $return is a reference to a hash where the key is a string and the value is a fields_Source
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -25763,8 +30132,9 @@ sub all_entities_Source
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Source',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -25895,8 +30265,9 @@ sub get_entity_Strain
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Strain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26000,8 +30371,9 @@ sub query_entity_Strain
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Strain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26102,8 +30474,9 @@ sub all_entities_Strain
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Strain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26214,8 +30587,9 @@ sub get_entity_StudyExperiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_StudyExperiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26313,8 +30687,9 @@ sub query_entity_StudyExperiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_StudyExperiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26409,8 +30784,9 @@ sub all_entities_StudyExperiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_StudyExperiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26554,8 +30930,9 @@ sub get_entity_Subsystem
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Subsystem',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26663,8 +31040,9 @@ sub query_entity_Subsystem
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Subsystem',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26769,8 +31147,9 @@ sub all_entities_Subsystem
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Subsystem',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26864,8 +31243,9 @@ sub get_entity_SubsystemClass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_SubsystemClass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -26957,8 +31337,9 @@ sub query_entity_SubsystemClass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_SubsystemClass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27047,8 +31428,9 @@ sub all_entities_SubsystemClass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_SubsystemClass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27169,8 +31551,9 @@ sub get_entity_TaxonomicGrouping
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_TaxonomicGrouping',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27270,8 +31653,9 @@ sub query_entity_TaxonomicGrouping
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_TaxonomicGrouping',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27368,8 +31752,9 @@ sub all_entities_TaxonomicGrouping
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_TaxonomicGrouping',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27488,8 +31873,9 @@ sub get_entity_TimeSeries
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_TimeSeries',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27589,8 +31975,9 @@ sub query_entity_TimeSeries
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_TimeSeries',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27687,8 +32074,9 @@ sub all_entities_TimeSeries
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_TimeSeries',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27805,8 +32193,9 @@ sub get_entity_Trait
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Trait',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -27906,8 +32295,9 @@ sub query_entity_Trait
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Trait',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28004,8 +32394,9 @@ sub all_entities_Trait
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Trait',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28148,8 +32539,9 @@ sub get_entity_Tree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Tree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28257,8 +32649,9 @@ sub query_entity_Tree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Tree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28363,8 +32756,9 @@ sub all_entities_Tree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Tree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28460,8 +32854,9 @@ sub get_entity_TreeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_TreeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28553,8 +32948,9 @@ sub query_entity_TreeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_TreeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28643,8 +33039,9 @@ sub all_entities_TreeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_TreeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28740,8 +33137,9 @@ sub get_entity_TreeNodeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_TreeNodeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28833,8 +33231,9 @@ sub query_entity_TreeNodeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_TreeNodeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -28923,8 +33322,9 @@ sub all_entities_TreeNodeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_TreeNodeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29046,8 +33446,9 @@ sub get_entity_Variant
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_entity_Variant',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29147,8 +33548,9 @@ sub query_entity_Variant
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'query_entity_Variant',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29245,8 +33647,9 @@ sub all_entities_Variant
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'all_entities_Variant',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29370,8 +33773,9 @@ sub get_relationship_AffectsLevelOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_AffectsLevelOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29483,8 +33887,9 @@ sub get_relationship_IsAffectedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAffectedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29520,6 +33925,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Alignment
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -29552,6 +33960,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Alignment
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Aligned is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -29620,8 +34031,9 @@ sub get_relationship_Aligned
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Aligned',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29672,6 +34084,9 @@ fields_Aligned is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -29704,6 +34119,9 @@ fields_Aligned is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -29749,8 +34167,9 @@ sub get_relationship_WasAlignedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasAlignedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29786,6 +34205,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_ProteinSequence
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -29814,6 +34236,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_ProteinSequence
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_AssertsFunctionFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -29898,8 +34323,9 @@ sub get_relationship_AssertsFunctionFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_AssertsFunctionFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -29946,6 +34372,9 @@ fields_AssertsFunctionFor is a reference to a hash where the following keys are 
 	release_date has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -29974,6 +34403,9 @@ fields_AssertsFunctionFor is a reference to a hash where the following keys are 
 	release_date has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -30019,8 +34451,9 @@ sub get_relationship_HasAssertedFunctionFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasAssertedFunctionFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30029,6 +34462,298 @@ sub get_relationship_HasAssertedFunctionFrom
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAssertedFunctionFrom",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_HasAssertedFunctionFrom',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_AssociationFeature
+
+  $return = $obj->get_relationship_AssociationFeature($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Association
+	1: a fields_AssociationFeature
+	2: a fields_Feature
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_AssociationFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Association
+	1: a fields_AssociationFeature
+	2: a fields_Feature
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_AssociationFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+The AssociationFeature relationship links associations to
+the features that encode their component proteins.
+
+It has the following fields:
+
+=over 4
+
+=item stoichiometry
+
+Stoichiometry, if applicable (e.g., for a curated complex.
+
+=item strength
+
+Optional numeric measure of strength of the association (e.g., kD or relative estimate of binding affinity)
+
+=item rank
+
+Numbered starting at 1 within an Association, if directional.  Meaning is method-dependent; e.g., for associations derived from pulldown data, rank 1 should be assigned to the bait.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_AssociationFeature
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AssociationFeature (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AssociationFeature:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AssociationFeature');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AssociationFeature",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_AssociationFeature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AssociationFeature",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AssociationFeature',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_FeatureInteractsIn
+
+  $return = $obj->get_relationship_FeatureInteractsIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_AssociationFeature
+	2: a fields_Association
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_AssociationFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_AssociationFeature
+	2: a fields_Association
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_AssociationFeature is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	stoichiometry has a value which is an int
+	strength has a value which is a float
+	rank has a value which is an int
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_FeatureInteractsIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_FeatureInteractsIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_FeatureInteractsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_FeatureInteractsIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_FeatureInteractsIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_FeatureInteractsIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_FeatureInteractsIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_FeatureInteractsIn',
 				       );
     }
 }
@@ -30171,8 +34896,9 @@ sub get_relationship_CompoundMeasuredBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_CompoundMeasuredBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30316,8 +35042,9 @@ sub get_relationship_MeasuresCompound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_MeasuresCompound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30441,8 +35168,9 @@ sub get_relationship_Concerns
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Concerns',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30558,8 +35286,9 @@ sub get_relationship_IsATopicOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsATopicOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30698,8 +35427,9 @@ sub get_relationship_ConsistsOfCompounds
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ConsistsOfCompounds',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30825,8 +35555,9 @@ sub get_relationship_ComponentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ComponentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -30954,8 +35685,9 @@ sub get_relationship_Contains
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Contains',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31073,8 +35805,9 @@ sub get_relationship_IsContainedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsContainedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31250,8 +35983,9 @@ sub get_relationship_ContainsAlignedDNA
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ContainsAlignedDNA',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31391,8 +36125,9 @@ sub get_relationship_IsAlignedDNAComponentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAlignedDNAComponentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31568,8 +36303,9 @@ sub get_relationship_ContainsAlignedProtein
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ContainsAlignedProtein',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31709,8 +36445,9 @@ sub get_relationship_IsAlignedProteinComponentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAlignedProteinComponentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31849,8 +36586,9 @@ sub get_relationship_ContainsExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ContainsExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -31972,8 +36710,9 @@ sub get_relationship_GroupedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_GroupedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32103,8 +36842,9 @@ sub get_relationship_Controls
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Controls',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32226,8 +36966,9 @@ sub get_relationship_IsControlledUsing
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsControlledUsing',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32236,6 +36977,274 @@ sub get_relationship_IsControlledUsing
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsControlledUsing",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsControlledUsing',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_DefaultControlSample
+
+  $return = $obj->get_relationship_DefaultControlSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_DefaultControlSample
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_DefaultControlSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_DefaultControlSample
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_DefaultControlSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+
+=end text
+
+=item Description
+
+The Default control for samples to compare against.  (Log2 measurments of Test Sample)/(Log2 measurements of Default Control).
+Really minus instead of divide since the values are already in Log2 Space.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_DefaultControlSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_DefaultControlSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_DefaultControlSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_DefaultControlSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_DefaultControlSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_DefaultControlSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DefaultControlSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_DefaultControlSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SamplesDefaultControl
+
+  $return = $obj->get_relationship_SamplesDefaultControl($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_DefaultControlSample
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_DefaultControlSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_DefaultControlSample
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_DefaultControlSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SamplesDefaultControl
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SamplesDefaultControl (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SamplesDefaultControl:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SamplesDefaultControl');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SamplesDefaultControl",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SamplesDefaultControl',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SamplesDefaultControl",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SamplesDefaultControl',
 				       );
     }
 }
@@ -32368,8 +37377,9 @@ sub get_relationship_Describes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Describes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32501,8 +37511,9 @@ sub get_relationship_IsDescribedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDescribedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32644,8 +37655,9 @@ sub get_relationship_DescribesAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DescribesAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32775,8 +37787,9 @@ sub get_relationship_HasAlignmentAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasAlignmentAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -32918,8 +37931,9 @@ sub get_relationship_DescribesMeasurement
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DescribesMeasurement',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33053,8 +38067,9 @@ sub get_relationship_IsDefinedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDefinedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33192,8 +38207,9 @@ sub get_relationship_DescribesTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DescribesTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33319,8 +38335,9 @@ sub get_relationship_HasTreeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasTreeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33464,8 +38481,9 @@ sub get_relationship_DescribesTreeNode
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DescribesTreeNode',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33593,8 +38611,9 @@ sub get_relationship_HasNodeAttribute
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasNodeAttribute',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33625,17 +38644,18 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDetectionType
+	0: a fields_AssociationDetectionType
 	1: a fields_DetectedWithMethod
-	2: a fields_Interaction
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	2: a fields_Association
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -33652,17 +38672,18 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDetectionType
+	0: a fields_AssociationDetectionType
 	1: a fields_DetectedWithMethod
-	2: a fields_Interaction
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+	2: a fields_Association
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -33674,7 +38695,7 @@ fields_Interaction is a reference to a hash where the following keys are defined
 =item Description
 
 The DetectedWithMethod relationship describes which
-protein-protein interactions were detected or annotated by
+protein-protein associations were detected or annotated by
 particular methods
 
 It has the following fields:
@@ -33721,8 +38742,9 @@ sub get_relationship_DetectedWithMethod
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DetectedWithMethod',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33753,11 +38775,12 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
+	0: a fields_Association
 	1: a fields_DetectedWithMethod
-	2: a fields_InteractionDetectionType
-fields_Interaction is a reference to a hash where the following keys are defined:
+	2: a fields_AssociationDetectionType
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -33765,7 +38788,7 @@ fields_Interaction is a reference to a hash where the following keys are defined
 fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 
@@ -33780,11 +38803,12 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
+	0: a fields_Association
 	1: a fields_DetectedWithMethod
-	2: a fields_InteractionDetectionType
-fields_Interaction is a reference to a hash where the following keys are defined:
+	2: a fields_AssociationDetectionType
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -33792,7 +38816,7 @@ fields_Interaction is a reference to a hash where the following keys are defined
 fields_DetectedWithMethod is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDetectionType is a reference to a hash where the following keys are defined:
+fields_AssociationDetectionType is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 
@@ -33840,8 +38864,9 @@ sub get_relationship_DetectedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DetectedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -33990,8 +39015,9 @@ sub get_relationship_Displays
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Displays',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34127,8 +39153,9 @@ sub get_relationship_IsDisplayedOn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDisplayedOn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34252,8 +39279,9 @@ sub get_relationship_Encompasses
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Encompasses',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34367,8 +39395,9 @@ sub get_relationship_IsEncompassedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsEncompassedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34498,8 +39527,9 @@ sub get_relationship_EvaluatedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_EvaluatedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34621,8 +39651,9 @@ sub get_relationship_IncludesStrain
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludesStrain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34631,6 +39662,255 @@ sub get_relationship_IncludesStrain
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IncludesStrain",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IncludesStrain',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_FeatureIsTranscriptionFactorFor
+
+  $return = $obj->get_relationship_FeatureIsTranscriptionFactorFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_FeatureIsTranscriptionFactorFor
+	2: a fields_Regulon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_FeatureIsTranscriptionFactorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_FeatureIsTranscriptionFactorFor
+	2: a fields_Regulon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_FeatureIsTranscriptionFactorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_FeatureIsTranscriptionFactorFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_FeatureIsTranscriptionFactorFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_FeatureIsTranscriptionFactorFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_FeatureIsTranscriptionFactorFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_FeatureIsTranscriptionFactorFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_FeatureIsTranscriptionFactorFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_FeatureIsTranscriptionFactorFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_FeatureIsTranscriptionFactorFor',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasTranscriptionFactorFeature
+
+  $return = $obj->get_relationship_HasTranscriptionFactorFeature($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_FeatureIsTranscriptionFactorFor
+	2: a fields_Feature
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_FeatureIsTranscriptionFactorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_FeatureIsTranscriptionFactorFor
+	2: a fields_Feature
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_FeatureIsTranscriptionFactorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasTranscriptionFactorFeature
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasTranscriptionFactorFeature (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasTranscriptionFactorFeature:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasTranscriptionFactorFeature');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasTranscriptionFactorFeature",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasTranscriptionFactorFeature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasTranscriptionFactorFeature",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasTranscriptionFactorFeature',
 				       );
     }
 }
@@ -34763,8 +40043,9 @@ sub get_relationship_FeatureMeasuredBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_FeatureMeasuredBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34898,8 +40179,9 @@ sub get_relationship_MeasuresFeature
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_MeasuresFeature',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -34935,6 +40217,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_CoregulatedSet
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Formulated is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -34959,6 +40244,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_CoregulatedSet
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Formulated is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -35019,8 +40307,9 @@ sub get_relationship_Formulated
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Formulated',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35063,6 +40352,9 @@ fields_Formulated is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -35087,6 +40379,9 @@ fields_Formulated is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -35132,8 +40427,9 @@ sub get_relationship_WasFormulatedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasFormulatedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35257,8 +40553,9 @@ sub get_relationship_GeneratedLevelsFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_GeneratedLevelsFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35370,8 +40667,9 @@ sub get_relationship_WasGeneratedFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasGeneratedFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35525,8 +40823,9 @@ sub get_relationship_GenomeParentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_GenomeParentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35672,8 +40971,9 @@ sub get_relationship_DerivedFromGenome
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DerivedFromGenome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35682,6 +40982,273 @@ sub get_relationship_DerivedFromGenome
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DerivedFromGenome",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_DerivedFromGenome',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasAliasAssertedFrom
+
+  $return = $obj->get_relationship_HasAliasAssertedFrom($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_HasAliasAssertedFrom
+	2: a fields_Source
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_HasAliasAssertedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	alias has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_HasAliasAssertedFrom
+	2: a fields_Source
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_HasAliasAssertedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	alias has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+A Source may assert aliases for features.
+
+It has the following fields:
+
+=over 4
+
+=item alias
+
+text of the alias for the feature.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_HasAliasAssertedFrom
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasAliasAssertedFrom (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasAliasAssertedFrom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasAliasAssertedFrom');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasAliasAssertedFrom",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasAliasAssertedFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAliasAssertedFrom",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasAliasAssertedFrom',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_AssertsAliasFor
+
+  $return = $obj->get_relationship_AssertsAliasFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_HasAliasAssertedFrom
+	2: a fields_Feature
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_HasAliasAssertedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	alias has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_HasAliasAssertedFrom
+	2: a fields_Feature
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_HasAliasAssertedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	alias has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_AssertsAliasFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AssertsAliasFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AssertsAliasFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AssertsAliasFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AssertsAliasFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_AssertsAliasFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AssertsAliasFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AssertsAliasFor',
 				       );
     }
 }
@@ -35709,6 +41276,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Compound
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -35742,6 +41312,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Compound
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_HasCompoundAliasFrom is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -35816,8 +41389,9 @@ sub get_relationship_HasCompoundAliasFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasCompoundAliasFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35869,6 +41443,9 @@ fields_HasCompoundAliasFrom is a reference to a hash where the following keys ar
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -35902,6 +41479,9 @@ fields_HasCompoundAliasFrom is a reference to a hash where the following keys ar
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -35947,8 +41527,9 @@ sub get_relationship_UsesAliasForCompound
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_UsesAliasForCompound',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -35957,6 +41538,243 @@ sub get_relationship_UsesAliasForCompound
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_UsesAliasForCompound",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_UsesAliasForCompound',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasEffector
+
+  $return = $obj->get_relationship_HasEffector($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_HasEffector
+	2: a fields_Effector
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_HasEffector is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_HasEffector
+	2: a fields_Effector
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_HasEffector is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_HasEffector
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasEffector (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasEffector:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasEffector');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasEffector",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasEffector',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasEffector",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasEffector',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsEffectorFor
+
+  $return = $obj->get_relationship_IsEffectorFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Effector
+	1: a fields_HasEffector
+	2: a fields_Regulon
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+fields_HasEffector is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Effector
+	1: a fields_HasEffector
+	2: a fields_Regulon
+fields_Effector is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	effector_class has a value which is a string
+fields_HasEffector is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsEffectorFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsEffectorFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsEffectorFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsEffectorFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsEffectorFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsEffectorFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsEffectorFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsEffectorFor',
 				       );
     }
 }
@@ -36076,8 +41894,9 @@ sub get_relationship_HasExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36197,8 +42016,9 @@ sub get_relationship_IsExperimentalUnitOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsExperimentalUnitOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36207,6 +42027,570 @@ sub get_relationship_IsExperimentalUnitOf
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsExperimentalUnitOf",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsExperimentalUnitOf',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasExpressionSample
+
+  $return = $obj->get_relationship_HasExpressionSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ExperimentalUnit
+	1: a fields_HasExpressionSample
+	2: a fields_Sample
+fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_HasExpressionSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ExperimentalUnit
+	1: a fields_HasExpressionSample
+	2: a fields_Sample
+fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+fields_HasExpressionSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+This relationship indicating the expression samples for an experimental unit.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_HasExpressionSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasExpressionSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasExpressionSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasExpressionSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasExpressionSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasExpressionSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasExpressionSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasExpressionSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleBelongsToExperimentalUnit
+
+  $return = $obj->get_relationship_SampleBelongsToExperimentalUnit($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_HasExpressionSample
+	2: a fields_ExperimentalUnit
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_HasExpressionSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_HasExpressionSample
+	2: a fields_ExperimentalUnit
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_HasExpressionSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ExperimentalUnit is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleBelongsToExperimentalUnit
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleBelongsToExperimentalUnit (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleBelongsToExperimentalUnit:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleBelongsToExperimentalUnit');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleBelongsToExperimentalUnit",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleBelongsToExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleBelongsToExperimentalUnit",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleBelongsToExperimentalUnit',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasGenomes
+
+  $return = $obj->get_relationship_HasGenomes($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_RegulogCollection
+	1: a fields_HasGenomes
+	2: a fields_Genome
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+fields_HasGenomes is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_RegulogCollection
+	1: a fields_HasGenomes
+	2: a fields_Genome
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+fields_HasGenomes is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_HasGenomes
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasGenomes (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasGenomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasGenomes');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasGenomes",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasGenomes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasGenomes",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasGenomes',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsInRegulogCollection
+
+  $return = $obj->get_relationship_IsInRegulogCollection($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_HasGenomes
+	2: a fields_RegulogCollection
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_HasGenomes is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_HasGenomes
+	2: a fields_RegulogCollection
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_HasGenomes is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsInRegulogCollection
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsInRegulogCollection (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsInRegulogCollection:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsInRegulogCollection');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsInRegulogCollection",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsInRegulogCollection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsInRegulogCollection",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsInRegulogCollection',
 				       );
     }
 }
@@ -36338,8 +42722,9 @@ sub get_relationship_HasIndicatedSignalFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasIndicatedSignalFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36463,8 +42848,9 @@ sub get_relationship_IndicatesSignalFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IndicatesSignalFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36602,8 +42988,9 @@ sub get_relationship_HasKnockoutIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasKnockoutIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36733,8 +43120,9 @@ sub get_relationship_KnockedOutIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_KnockedOutIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36868,8 +43256,9 @@ sub get_relationship_HasMeasurement
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasMeasurement',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -36995,8 +43384,9 @@ sub get_relationship_IsMeasureOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsMeasureOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37131,8 +43521,9 @@ sub get_relationship_HasMember
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasMember',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37258,8 +43649,9 @@ sub get_relationship_IsMemberOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsMemberOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37391,8 +43783,9 @@ sub get_relationship_HasParameter
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasParameter',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37512,8 +43905,9 @@ sub get_relationship_OfEnvironment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_OfEnvironment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37658,8 +44052,9 @@ sub get_relationship_HasParticipant
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasParticipant',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37791,8 +44186,9 @@ sub get_relationship_ParticipatesIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ParticipatesIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -37957,8 +44353,9 @@ sub get_relationship_HasPresenceOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasPresenceOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38102,8 +44499,9 @@ sub get_relationship_IsPresentIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsPresentIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38236,8 +44634,9 @@ sub get_relationship_HasProteinMember
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasProteinMember',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38357,8 +44756,9 @@ sub get_relationship_IsProteinMemberOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsProteinMemberOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38394,6 +44794,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Reaction
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -38427,6 +44830,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Reaction
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_HasReactionAliasFrom is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -38501,8 +44907,9 @@ sub get_relationship_HasReactionAliasFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasReactionAliasFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38554,6 +44961,9 @@ fields_HasReactionAliasFrom is a reference to a hash where the following keys ar
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -38587,6 +44997,9 @@ fields_HasReactionAliasFrom is a reference to a hash where the following keys ar
 	alias has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -38632,8 +45045,9 @@ sub get_relationship_UsesAliasForReaction
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_UsesAliasForReaction',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38642,6 +45056,243 @@ sub get_relationship_UsesAliasForReaction
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_UsesAliasForReaction",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_UsesAliasForReaction',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasRegulogs
+
+  $return = $obj->get_relationship_HasRegulogs($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_RegulogCollection
+	1: a fields_HasRegulogs
+	2: a fields_Regulog
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+fields_HasRegulogs is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_RegulogCollection
+	1: a fields_HasRegulogs
+	2: a fields_Regulog
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+fields_HasRegulogs is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_HasRegulogs
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasRegulogs (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasRegulogs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasRegulogs');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasRegulogs",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasRegulogs',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasRegulogs",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasRegulogs',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsInCollection
+
+  $return = $obj->get_relationship_IsInCollection($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_HasRegulogs
+	2: a fields_RegulogCollection
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_HasRegulogs is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_HasRegulogs
+	2: a fields_RegulogCollection
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_HasRegulogs is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_RegulogCollection is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_IsInCollection
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsInCollection (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsInCollection:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsInCollection');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsInCollection",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsInCollection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsInCollection",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsInCollection',
 				       );
     }
 }
@@ -38785,8 +45436,9 @@ sub get_relationship_HasRepresentativeOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasRepresentativeOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -38928,8 +45580,9 @@ sub get_relationship_IsRepresentedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRepresentedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39065,8 +45718,9 @@ sub get_relationship_HasRequirementOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasRequirementOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39194,8 +45848,9 @@ sub get_relationship_IsARequirementOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsARequirementOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39319,8 +45974,9 @@ sub get_relationship_HasResultsIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasResultsIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39432,8 +46088,9 @@ sub get_relationship_HasResultsFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasResultsFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39553,8 +46210,9 @@ sub get_relationship_HasSection
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasSection',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39666,8 +46324,9 @@ sub get_relationship_IsSectionOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSectionOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39809,8 +46468,9 @@ sub get_relationship_HasStep
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasStep',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -39944,8 +46604,9 @@ sub get_relationship_IsStepOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsStepOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40092,8 +46753,9 @@ sub get_relationship_HasTrait
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasTrait',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40221,8 +46883,9 @@ sub get_relationship_Measures
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Measures',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40362,8 +47025,9 @@ sub get_relationship_HasUnits
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasUnits',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40495,8 +47159,9 @@ sub get_relationship_IsLocated
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsLocated',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40616,8 +47281,9 @@ sub get_relationship_HasUsage
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasUsage',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40729,8 +47395,9 @@ sub get_relationship_IsUsageOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsUsageOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40856,8 +47523,9 @@ sub get_relationship_HasValueFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasValueFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -40971,8 +47639,9 @@ sub get_relationship_HasValueIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasValueIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41126,8 +47795,9 @@ sub get_relationship_HasVariationIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasVariationIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41253,8 +47923,9 @@ sub get_relationship_IsVariedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsVariedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41403,8 +48074,9 @@ sub get_relationship_Impacts
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Impacts',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41530,8 +48202,9 @@ sub get_relationship_IsImpactedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsImpactedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41661,8 +48334,9 @@ sub get_relationship_ImplementsReaction
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ImplementsReaction',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41784,8 +48458,9 @@ sub get_relationship_ImplementedBasedOn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ImplementedBasedOn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -41940,8 +48615,9 @@ sub get_relationship_Includes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Includes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42073,8 +48749,9 @@ sub get_relationship_IsIncludedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsIncludedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42233,8 +48910,9 @@ sub get_relationship_IncludesAdditionalCompounds
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludesAdditionalCompounds',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42376,8 +49054,9 @@ sub get_relationship_IncludedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42529,8 +49208,9 @@ sub get_relationship_IncludesAlignmentRow
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludesAlignmentRow',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42674,8 +49354,9 @@ sub get_relationship_IsAlignmentRowIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAlignmentRowIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42803,8 +49484,9 @@ sub get_relationship_IncludesPart
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludesPart',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -42924,8 +49606,9 @@ sub get_relationship_IsPartOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsPartOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -43059,8 +49742,9 @@ sub get_relationship_IndicatedLevelsFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IndicatedLevelsFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -43182,8 +49866,9 @@ sub get_relationship_HasLevelsFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasLevelsFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -43192,562 +49877,6 @@ sub get_relationship_HasLevelsFrom
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasLevelsFrom",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_HasLevelsFrom',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_InteractionFeature
-
-  $return = $obj->get_relationship_InteractionFeature($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_InteractionFeature
-	2: a fields_Feature
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_InteractionFeature is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Feature is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	feature_type has a value which is a string
-	source_id has a value which is a string
-	sequence_length has a value which is an int
-	function has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_InteractionFeature
-	2: a fields_Feature
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_InteractionFeature is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Feature is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	feature_type has a value which is a string
-	source_id has a value which is a string
-	sequence_length has a value which is an int
-	function has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-
-
-=end text
-
-=item Description
-
-The InteractionFeature relationship links interactions to
-the features that encode their component proteins.
-
-It has the following fields:
-
-=over 4
-
-=item stoichiometry
-
-Stoichiometry, if applicable (e.g., for a curated complex.
-
-=item strength
-
-Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
-
-=item rank
-
-Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_InteractionFeature
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_InteractionFeature (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_InteractionFeature:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_InteractionFeature');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_InteractionFeature",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_InteractionFeature',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionFeature",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_InteractionFeature',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_FeatureInteractsIn
-
-  $return = $obj->get_relationship_FeatureInteractsIn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Feature
-	1: a fields_InteractionFeature
-	2: a fields_Interaction
-fields_Feature is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	feature_type has a value which is a string
-	source_id has a value which is a string
-	sequence_length has a value which is an int
-	function has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-fields_InteractionFeature is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Feature
-	1: a fields_InteractionFeature
-	2: a fields_Interaction
-fields_Feature is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	feature_type has a value which is a string
-	source_id has a value which is a string
-	sequence_length has a value which is an int
-	function has a value which is a string
-	alias has a value which is a reference to a list where each element is a string
-fields_InteractionFeature is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_FeatureInteractsIn
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_FeatureInteractsIn (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_FeatureInteractsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_FeatureInteractsIn');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_FeatureInteractsIn",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_FeatureInteractsIn',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_FeatureInteractsIn",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_FeatureInteractsIn',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_InteractionProtein
-
-  $return = $obj->get_relationship_InteractionProtein($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_InteractionProtein
-	2: a fields_ProteinSequence
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_InteractionProtein is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_InteractionProtein
-	2: a fields_ProteinSequence
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_InteractionProtein is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-
-
-=end text
-
-=item Description
-
-The InteractionProtein relationship links interactions to
-the component proteins.
-
-It has the following fields:
-
-=over 4
-
-=item stoichiometry
-
-Stoichiometry, if applicable (e.g., for a curated complex.
-
-=item strength
-
-Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
-
-=item rank
-
-Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_InteractionProtein
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_InteractionProtein (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_InteractionProtein:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_InteractionProtein');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_InteractionProtein",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_InteractionProtein',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionProtein",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_InteractionProtein',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_ProteinInteractsIn
-
-  $return = $obj->get_relationship_ProteinInteractsIn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ProteinSequence
-	1: a fields_InteractionProtein
-	2: a fields_Interaction
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-fields_InteractionProtein is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_ProteinSequence
-	1: a fields_InteractionProtein
-	2: a fields_Interaction
-fields_ProteinSequence is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	sequence has a value which is a string
-fields_InteractionProtein is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-	stoichiometry has a value which is an int
-	strength has a value which is a float
-	rank has a value which is an int
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_ProteinInteractsIn
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_ProteinInteractsIn (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_ProteinInteractsIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_ProteinInteractsIn');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_ProteinInteractsIn",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_ProteinInteractsIn',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ProteinInteractsIn",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_ProteinInteractsIn',
 				       );
     }
 }
@@ -43887,8 +50016,9 @@ sub get_relationship_Involves
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Involves',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44020,8 +50150,9 @@ sub get_relationship_IsInvolvedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInvolvedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44154,8 +50285,9 @@ sub get_relationship_IsAnnotatedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAnnotatedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44279,8 +50411,9 @@ sub get_relationship_Annotates
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Annotates',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44408,8 +50541,9 @@ sub get_relationship_IsAssayOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAssayOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44529,8 +50663,9 @@ sub get_relationship_IsAssayedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsAssayedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44664,8 +50799,9 @@ sub get_relationship_IsClassFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsClassFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44789,8 +50925,9 @@ sub get_relationship_IsInClass
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInClass',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -44937,8 +51074,9 @@ sub get_relationship_IsCollectionOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsCollectionOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45074,8 +51212,9 @@ sub get_relationship_IsCollectedInto
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsCollectedInto',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45220,8 +51359,9 @@ sub get_relationship_IsComposedOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsComposedOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45357,8 +51497,9 @@ sub get_relationship_IsComponentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsComponentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45500,8 +51641,9 @@ sub get_relationship_IsComprisedOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsComprisedOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45631,8 +51773,9 @@ sub get_relationship_Comprises
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Comprises',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45774,8 +51917,9 @@ sub get_relationship_IsConfiguredBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsConfiguredBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -45909,8 +52053,9 @@ sub get_relationship_ReflectsStateOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ReflectsStateOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46095,8 +52240,9 @@ sub get_relationship_IsConservedDomainModelFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsConservedDomainModelFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46232,8 +52378,9 @@ sub get_relationship_HasConservedDomainModel
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasConservedDomainModel',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46355,8 +52502,9 @@ sub get_relationship_IsConsistentWith
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsConsistentWith',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46470,8 +52618,9 @@ sub get_relationship_IsConsistentTo
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsConsistentTo',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46599,8 +52748,9 @@ sub get_relationship_IsContextOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsContextOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46720,8 +52870,9 @@ sub get_relationship_HasEnvironment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasEnvironment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46850,8 +53001,9 @@ sub get_relationship_IsCoregulatedWith
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsCoregulatedWith',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -46967,8 +53119,9 @@ sub get_relationship_HasCoregulationWith
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasCoregulationWith',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47104,8 +53257,9 @@ sub get_relationship_IsCoupledTo
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsCoupledTo',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47221,8 +53375,9 @@ sub get_relationship_IsCoupledWith
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsCoupledWith',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47253,14 +53408,15 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDataset
+	0: a fields_AssociationDataset
 	1: a fields_IsDatasetFor
 	2: a fields_Genome
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 fields_IsDatasetFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -47291,14 +53447,15 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDataset
+	0: a fields_AssociationDataset
 	1: a fields_IsDatasetFor
 	2: a fields_Genome
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 fields_IsDatasetFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -47324,7 +53481,7 @@ fields_Genome is a reference to a hash where the following keys are defined:
 =item Description
 
 The IsDatasetFor relationship describes which genomes
-are covered by particular interaction datasets.
+are covered by particular association datasets.
 
 It has the following fields:
 
@@ -47370,8 +53527,9 @@ sub get_relationship_IsDatasetFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDatasetFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47386,9 +53544,9 @@ sub get_relationship_IsDatasetFor
 
 
 
-=head2 get_relationship_HasInteractionDataset
+=head2 get_relationship_HasAssociationDataset
 
-  $return = $obj->get_relationship_HasInteractionDataset($ids, $from_fields, $rel_fields, $to_fields)
+  $return = $obj->get_relationship_HasAssociationDataset($ids, $from_fields, $rel_fields, $to_fields)
 
 =over 4
 
@@ -47404,7 +53562,7 @@ $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
 	0: a fields_Genome
 	1: a fields_IsDatasetFor
-	2: a fields_InteractionDataset
+	2: a fields_AssociationDataset
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -47423,11 +53581,12 @@ fields_Genome is a reference to a hash where the following keys are defined:
 fields_IsDatasetFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 
 </pre>
 
@@ -47442,7 +53601,7 @@ $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
 	0: a fields_Genome
 	1: a fields_IsDatasetFor
-	2: a fields_InteractionDataset
+	2: a fields_AssociationDataset
 fields_Genome is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	pegs has a value which is an int
@@ -47461,11 +53620,12 @@ fields_Genome is a reference to a hash where the following keys are defined:
 fields_IsDatasetFor is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 
 
 =end text
@@ -47478,7 +53638,7 @@ fields_InteractionDataset is a reference to a hash where the following keys are 
 
 =cut
 
-sub get_relationship_HasInteractionDataset
+sub get_relationship_HasAssociationDataset
 {
     my($self, @args) = @_;
 
@@ -47487,7 +53647,7 @@ sub get_relationship_HasInteractionDataset
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_HasInteractionDataset (received $n, expecting 4)");
+							       "Invalid argument count for function get_relationship_HasAssociationDataset (received $n, expecting 4)");
     }
     {
 	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
@@ -47498,29 +53658,30 @@ sub get_relationship_HasInteractionDataset
         (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
         (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_HasInteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_relationship_HasAssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_HasInteractionDataset');
+								   method_name => 'get_relationship_HasAssociationDataset');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_HasInteractionDataset",
+	method => "CDMI_EntityAPI.get_relationship_HasAssociationDataset",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_HasInteractionDataset',
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasAssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasInteractionDataset",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAssociationDataset",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_HasInteractionDataset',
+					    method_name => 'get_relationship_HasAssociationDataset',
 				       );
     }
 }
@@ -47638,8 +53799,9 @@ sub get_relationship_IsDeterminedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDeterminedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47751,8 +53913,9 @@ sub get_relationship_Determines
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Determines',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -47892,8 +54055,9 @@ sub get_relationship_IsDividedInto
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDividedInto',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48025,8 +54189,9 @@ sub get_relationship_IsDivisionOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsDivisionOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48165,8 +54330,9 @@ sub get_relationship_IsExecutedAs
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsExecutedAs',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48298,8 +54464,9 @@ sub get_relationship_IsExecutionOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsExecutionOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48427,8 +54594,9 @@ sub get_relationship_IsExemplarOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsExemplarOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48548,8 +54716,9 @@ sub get_relationship_HasAsExemplar
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasAsExemplar',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48675,8 +54844,9 @@ sub get_relationship_IsFamilyFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsFamilyFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48794,8 +54964,9 @@ sub get_relationship_DeterminesFunctionOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DeterminesFunctionOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -48921,8 +55092,9 @@ sub get_relationship_IsFormedOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsFormedOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49040,8 +55212,9 @@ sub get_relationship_IsFormedInto
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsFormedInto',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49169,8 +55342,9 @@ sub get_relationship_IsFunctionalIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsFunctionalIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49290,8 +55464,9 @@ sub get_relationship_HasFunctional
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasFunctional',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49412,8 +55587,9 @@ sub get_relationship_IsGroupFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsGroupFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49525,8 +55701,9 @@ sub get_relationship_IsInGroup
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49557,19 +55734,21 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDataset
+	0: a fields_AssociationDataset
 	1: a fields_IsGroupingOf
-	2: a fields_Interaction
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	2: a fields_Association
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 fields_IsGroupingOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -49586,19 +55765,21 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_InteractionDataset
+	0: a fields_AssociationDataset
 	1: a fields_IsGroupingOf
-	2: a fields_Interaction
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+	2: a fields_Association
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 fields_IsGroupingOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -49610,7 +55791,7 @@ fields_Interaction is a reference to a hash where the following keys are defined
 =item Description
 
 The IsGroupingOf relationship describes which
-interactions are part of a particular interaction
+associations are part of a particular association
 dataset.
 
 It has the following fields:
@@ -49657,8 +55838,9 @@ sub get_relationship_IsGroupingOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsGroupingOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -49673,9 +55855,9 @@ sub get_relationship_IsGroupingOf
 
 
 
-=head2 get_relationship_InInteractionDataset
+=head2 get_relationship_InAssociationDataset
 
-  $return = $obj->get_relationship_InInteractionDataset($ids, $from_fields, $rel_fields, $to_fields)
+  $return = $obj->get_relationship_InAssociationDataset($ids, $from_fields, $rel_fields, $to_fields)
 
 =over 4
 
@@ -49689,11 +55871,12 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
+	0: a fields_Association
 	1: a fields_IsGroupingOf
-	2: a fields_InteractionDataset
-fields_Interaction is a reference to a hash where the following keys are defined:
+	2: a fields_AssociationDataset
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -49701,11 +55884,12 @@ fields_Interaction is a reference to a hash where the following keys are defined
 fields_IsGroupingOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 
 </pre>
 
@@ -49718,11 +55902,12 @@ $from_fields is a reference to a list where each element is a string
 $rel_fields is a reference to a list where each element is a string
 $to_fields is a reference to a list where each element is a string
 $return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
+	0: a fields_Association
 	1: a fields_IsGroupingOf
-	2: a fields_InteractionDataset
-fields_Interaction is a reference to a hash where the following keys are defined:
+	2: a fields_AssociationDataset
+fields_Association is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	description has a value which is a string
 	directional has a value which is an int
 	confidence has a value which is a float
@@ -49730,11 +55915,12 @@ fields_Interaction is a reference to a hash where the following keys are defined
 fields_IsGroupingOf is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
-fields_InteractionDataset is a reference to a hash where the following keys are defined:
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	description has a value which is a string
 	data_source has a value which is a string
 	url has a value which is a string
+	association_type has a value which is a string
 
 
 =end text
@@ -49747,7 +55933,7 @@ fields_InteractionDataset is a reference to a hash where the following keys are 
 
 =cut
 
-sub get_relationship_InInteractionDataset
+sub get_relationship_InAssociationDataset
 {
     my($self, @args) = @_;
 
@@ -49756,7 +55942,7 @@ sub get_relationship_InInteractionDataset
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_InInteractionDataset (received $n, expecting 4)");
+							       "Invalid argument count for function get_relationship_InAssociationDataset (received $n, expecting 4)");
     }
     {
 	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
@@ -49767,29 +55953,30 @@ sub get_relationship_InInteractionDataset
         (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
         (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_InInteractionDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_relationship_InAssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_InInteractionDataset');
+								   method_name => 'get_relationship_InAssociationDataset');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_InInteractionDataset",
+	method => "CDMI_EntityAPI.get_relationship_InAssociationDataset",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_InInteractionDataset',
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_InAssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InInteractionDataset",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InAssociationDataset",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_InInteractionDataset',
+					    method_name => 'get_relationship_InAssociationDataset',
 				       );
     }
 }
@@ -49910,8 +56097,9 @@ sub get_relationship_IsImplementedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsImplementedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50031,8 +56219,9 @@ sub get_relationship_Implements
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Implements',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50041,6 +56230,259 @@ sub get_relationship_Implements
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_Implements",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_Implements',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsInOperon
+
+  $return = $obj->get_relationship_IsInOperon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_IsInOperon
+	2: a fields_Operon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_IsInOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	rank has a value which is an int
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_IsInOperon
+	2: a fields_Operon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_IsInOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	rank has a value which is an int
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+=item rank
+
+The rank (order) of this feature in the operon.
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsInOperon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsInOperon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsInOperon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsInOperon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsInOperon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsInOperon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsInOperon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsInOperon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_OperonContains
+
+  $return = $obj->get_relationship_OperonContains($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_IsInOperon
+	2: a fields_Feature
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_IsInOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_IsInOperon
+	2: a fields_Feature
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_IsInOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+	rank has a value which is an int
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_OperonContains
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_OperonContains (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_OperonContains:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_OperonContains');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_OperonContains",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_OperonContains',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_OperonContains",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_OperonContains',
 				       );
     }
 }
@@ -50160,8 +56602,9 @@ sub get_relationship_IsInPair
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInPair',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50279,8 +56722,9 @@ sub get_relationship_IsPairOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsPairOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50412,8 +56856,9 @@ sub get_relationship_IsInstantiatedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInstantiatedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50537,8 +56982,9 @@ sub get_relationship_IsInstanceOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInstanceOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50699,8 +57145,9 @@ sub get_relationship_IsLocatedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsLocatedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50828,8 +57275,9 @@ sub get_relationship_IsLocusFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsLocusFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -50967,8 +57415,9 @@ sub get_relationship_IsMeasurementMethodOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsMeasurementMethodOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51098,8 +57547,9 @@ sub get_relationship_WasMeasuredBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasMeasuredBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51257,8 +57707,9 @@ sub get_relationship_IsModeledBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsModeledBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51408,8 +57859,9 @@ sub get_relationship_Models
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Models',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51552,8 +58004,9 @@ sub get_relationship_IsModifiedToBuildAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsModifiedToBuildAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51681,8 +58134,9 @@ sub get_relationship_IsModificationOfAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsModificationOfAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51821,8 +58275,9 @@ sub get_relationship_IsModifiedToBuildTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsModifiedToBuildTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -51946,8 +58401,9 @@ sub get_relationship_IsModificationOfTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsModificationOfTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52102,8 +58558,9 @@ sub get_relationship_IsOwnerOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsOwnerOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52247,8 +58704,9 @@ sub get_relationship_IsOwnedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsOwnedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52372,8 +58830,9 @@ sub get_relationship_IsParticipatingAt
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsParticipatingAt',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52489,8 +58948,9 @@ sub get_relationship_ParticipatesAt
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ParticipatesAt',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52620,8 +59080,9 @@ sub get_relationship_IsProteinFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsProteinFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52741,8 +59202,9 @@ sub get_relationship_Produces
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Produces',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52872,8 +59334,9 @@ sub get_relationship_IsReagentIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsReagentIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -52991,8 +59454,9 @@ sub get_relationship_Targets
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Targets',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53120,8 +59584,9 @@ sub get_relationship_IsRealLocationOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRealLocationOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53241,8 +59706,9 @@ sub get_relationship_HasRealLocationIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasRealLocationIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53391,8 +59857,9 @@ sub get_relationship_IsReferencedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsReferencedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53532,8 +59999,9 @@ sub get_relationship_UsesReference
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_UsesReference',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53662,8 +60130,9 @@ sub get_relationship_IsRegulatedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRegulatedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53785,8 +60254,9 @@ sub get_relationship_IsRegulatedSetOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRegulatedSetOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -53795,6 +60265,749 @@ sub get_relationship_IsRegulatedSetOf
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRegulatedSetOf",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsRegulatedSetOf',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsRegulatorFor
+
+  $return = $obj->get_relationship_IsRegulatorFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulator
+	1: a fields_IsRegulatorFor
+	2: a fields_Regulog
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+fields_IsRegulatorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulator
+	1: a fields_IsRegulatorFor
+	2: a fields_Regulog
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+fields_IsRegulatorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsRegulatorFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsRegulatorFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsRegulatorFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsRegulatorFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsRegulatorFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsRegulatorFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRegulatorFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsRegulatorFor',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasRegulator
+
+  $return = $obj->get_relationship_HasRegulator($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_IsRegulatorFor
+	2: a fields_Regulator
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_IsRegulatorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_IsRegulatorFor
+	2: a fields_Regulator
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_IsRegulatorFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasRegulator
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasRegulator (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasRegulator:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasRegulator');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasRegulator",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasRegulator',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasRegulator",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasRegulator',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsRegulatorForRegulon
+
+  $return = $obj->get_relationship_IsRegulatorForRegulon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulator
+	1: a fields_IsRegulatorForRegulon
+	2: a fields_Regulon
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+fields_IsRegulatorForRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulator
+	1: a fields_IsRegulatorForRegulon
+	2: a fields_Regulon
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+fields_IsRegulatorForRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsRegulatorForRegulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsRegulatorForRegulon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsRegulatorForRegulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsRegulatorForRegulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsRegulatorForRegulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsRegulatorForRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRegulatorForRegulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsRegulatorForRegulon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_ReglonHasRegulator
+
+  $return = $obj->get_relationship_ReglonHasRegulator($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_IsRegulatorForRegulon
+	2: a fields_Regulator
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_IsRegulatorForRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_IsRegulatorForRegulon
+	2: a fields_Regulator
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_IsRegulatorForRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulator is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	rfam_id has a value which is a string
+	tf_family has a value which is a string
+	type has a value which is a string
+	taxonomy has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_ReglonHasRegulator
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_ReglonHasRegulator (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_ReglonHasRegulator:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_ReglonHasRegulator');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_ReglonHasRegulator",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_ReglonHasRegulator',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ReglonHasRegulator",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_ReglonHasRegulator',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsRegulatorySiteFor
+
+  $return = $obj->get_relationship_IsRegulatorySiteFor($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_IsRegulatorySiteFor
+	2: a fields_Operon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_IsRegulatorySiteFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Feature
+	1: a fields_IsRegulatorySiteFor
+	2: a fields_Operon
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+fields_IsRegulatorySiteFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsRegulatorySiteFor
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsRegulatorySiteFor (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsRegulatorySiteFor:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsRegulatorySiteFor');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsRegulatorySiteFor",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsRegulatorySiteFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsRegulatorySiteFor",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsRegulatorySiteFor',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_HasRegulatorySite
+
+  $return = $obj->get_relationship_HasRegulatorySite($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_IsRegulatorySiteFor
+	2: a fields_Feature
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_IsRegulatorySiteFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_IsRegulatorySiteFor
+	2: a fields_Feature
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_IsRegulatorySiteFor is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Feature is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	feature_type has a value which is a string
+	source_id has a value which is a string
+	sequence_length has a value which is an int
+	function has a value which is a string
+	alias has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_HasRegulatorySite
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_HasRegulatorySite (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_HasRegulatorySite:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_HasRegulatorySite');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_HasRegulatorySite",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_HasRegulatorySite',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasRegulatorySite",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_HasRegulatorySite',
 				       );
     }
 }
@@ -53923,8 +61136,9 @@ sub get_relationship_IsRelevantFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRelevantFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54052,8 +61266,9 @@ sub get_relationship_IsRelevantTo
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRelevantTo',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54183,8 +61398,9 @@ sub get_relationship_IsRepresentedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRepresentedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54306,8 +61522,9 @@ sub get_relationship_DefinedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DefinedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54427,8 +61644,9 @@ sub get_relationship_IsRoleOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRoleOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54538,8 +61756,9 @@ sub get_relationship_HasRole
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasRole',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54659,8 +61878,9 @@ sub get_relationship_IsRowOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRowOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54772,8 +61992,9 @@ sub get_relationship_IsRoleFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsRoleFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -54895,8 +62116,9 @@ sub get_relationship_IsSequenceOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSequenceOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55008,8 +62230,9 @@ sub get_relationship_HasAsSequence
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasAsSequence',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55018,6 +62241,259 @@ sub get_relationship_HasAsSequence
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HasAsSequence",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_HasAsSequence',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_IsSourceForAssociationDataset
+
+  $return = $obj->get_relationship_IsSourceForAssociationDataset($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_IsSourceForAssociationDataset
+	2: a fields_AssociationDataset
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_IsSourceForAssociationDataset is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_IsSourceForAssociationDataset
+	2: a fields_AssociationDataset
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_IsSourceForAssociationDataset is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_IsSourceForAssociationDataset
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_IsSourceForAssociationDataset (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_IsSourceForAssociationDataset:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_IsSourceForAssociationDataset');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_IsSourceForAssociationDataset",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_IsSourceForAssociationDataset',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsSourceForAssociationDataset",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_IsSourceForAssociationDataset',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_AssociationDatasetSourcedBy
+
+  $return = $obj->get_relationship_AssociationDatasetSourcedBy($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_AssociationDataset
+	1: a fields_IsSourceForAssociationDataset
+	2: a fields_Source
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+fields_IsSourceForAssociationDataset is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_AssociationDataset
+	1: a fields_IsSourceForAssociationDataset
+	2: a fields_Source
+fields_AssociationDataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	data_source has a value which is a string
+	url has a value which is a string
+	association_type has a value which is a string
+fields_IsSourceForAssociationDataset is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_AssociationDatasetSourcedBy
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AssociationDatasetSourcedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AssociationDatasetSourcedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AssociationDatasetSourcedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AssociationDatasetSourcedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_AssociationDatasetSourcedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AssociationDatasetSourcedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AssociationDatasetSourcedBy',
 				       );
     }
 }
@@ -55144,8 +62620,9 @@ sub get_relationship_IsSubInstanceOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSubInstanceOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55271,8 +62748,9 @@ sub get_relationship_Validates
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Validates',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55410,8 +62888,9 @@ sub get_relationship_IsSummarizedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSummarizedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55537,8 +63016,9 @@ sub get_relationship_Summarizes
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Summarizes',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55650,8 +63130,9 @@ sub get_relationship_IsSuperclassOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSuperclassOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55755,8 +63236,9 @@ sub get_relationship_IsSubclassOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSubclassOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -55908,8 +63390,9 @@ sub get_relationship_IsTaxonomyOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsTaxonomyOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56051,8 +63534,9 @@ sub get_relationship_IsInTaxa
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsInTaxa',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56200,8 +63684,9 @@ sub get_relationship_IsTerminusFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsTerminusFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56333,8 +63818,9 @@ sub get_relationship_HasAsTerminus
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasAsTerminus',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56475,8 +63961,9 @@ sub get_relationship_IsTriggeredBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsTriggeredBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56598,8 +64085,9 @@ sub get_relationship_Triggers
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Triggers',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56751,8 +64239,9 @@ sub get_relationship_IsUsedToBuildTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsUsedToBuildTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -56896,8 +64385,9 @@ sub get_relationship_IsBuiltFromAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsBuiltFromAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57045,8 +64535,9 @@ sub get_relationship_Manages
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Manages',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57186,8 +64677,9 @@ sub get_relationship_IsManagedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsManagedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57196,6 +64688,257 @@ sub get_relationship_IsManagedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_IsManagedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_IsManagedBy',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_OntologyForSample
+
+  $return = $obj->get_relationship_OntologyForSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Ontology
+	1: a fields_OntologyForSample
+	2: a fields_SampleAnnotation
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+fields_OntologyForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Ontology
+	1: a fields_OntologyForSample
+	2: a fields_SampleAnnotation
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+fields_OntologyForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship the ontology PO#, EO# or ENVO# associatioed with the sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_OntologyForSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_OntologyForSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_OntologyForSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_OntologyForSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_OntologyForSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_OntologyForSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_OntologyForSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_OntologyForSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleHasOntology
+
+  $return = $obj->get_relationship_SampleHasOntology($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_OntologyForSample
+	2: a fields_Ontology
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_OntologyForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_OntologyForSample
+	2: a fields_Ontology
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_OntologyForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Ontology is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	id has a value which is a string
+	name has a value which is a string
+	definition has a value which is a string
+	ontologySource has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleHasOntology
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleHasOntology (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleHasOntology:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleHasOntology');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleHasOntology",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleHasOntology',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleHasOntology",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleHasOntology',
 				       );
     }
 }
@@ -57315,8 +65058,9 @@ sub get_relationship_OperatesIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_OperatesIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57436,8 +65180,9 @@ sub get_relationship_IsUtilizedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsUtilizedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57576,8 +65321,9 @@ sub get_relationship_OrdersExperimentalUnit
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_OrdersExperimentalUnit',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57699,8 +65445,9 @@ sub get_relationship_IsTimepointOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsTimepointOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57824,8 +65571,9 @@ sub get_relationship_Overlaps
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Overlaps',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -57939,8 +65687,9 @@ sub get_relationship_IncludesPartOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IncludesPartOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58076,8 +65825,9 @@ sub get_relationship_ParticipatesAs
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ParticipatesAs',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58205,8 +65955,9 @@ sub get_relationship_IsParticipationOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsParticipationOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58348,8 +66099,9 @@ sub get_relationship_PerformedExperiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_PerformedExperiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58479,8 +66231,9 @@ sub get_relationship_PerformedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_PerformedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58489,6 +66242,557 @@ sub get_relationship_PerformedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PerformedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_PerformedBy',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PersonAnnotatedSample
+
+  $return = $obj->get_relationship_PersonAnnotatedSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Person
+	1: a fields_PersonAnnotatedSample
+	2: a fields_SampleAnnotation
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+fields_PersonAnnotatedSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Person
+	1: a fields_PersonAnnotatedSample
+	2: a fields_SampleAnnotation
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+fields_PersonAnnotatedSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Only stores a person if a person annotates the data by hand.  
+Automated Sample Annotations will not be annotated by a person.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_PersonAnnotatedSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PersonAnnotatedSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PersonAnnotatedSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PersonAnnotatedSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PersonAnnotatedSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PersonAnnotatedSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PersonAnnotatedSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PersonAnnotatedSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleAnnotatedBy
+
+  $return = $obj->get_relationship_SampleAnnotatedBy($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_PersonAnnotatedSample
+	2: a fields_Person
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_PersonAnnotatedSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_PersonAnnotatedSample
+	2: a fields_Person
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_PersonAnnotatedSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleAnnotatedBy
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleAnnotatedBy (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleAnnotatedBy:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleAnnotatedBy');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleAnnotatedBy",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleAnnotatedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleAnnotatedBy",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleAnnotatedBy',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PlatformWithSamples
+
+  $return = $obj->get_relationship_PlatformWithSamples($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Platform
+	1: a fields_PlatformWithSamples
+	2: a fields_Sample
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+fields_PlatformWithSamples is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Platform
+	1: a fields_PlatformWithSamples
+	2: a fields_Sample
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+fields_PlatformWithSamples is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+This relationship indicates the expression samples that were run on a particular platform.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_PlatformWithSamples
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PlatformWithSamples (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PlatformWithSamples:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PlatformWithSamples');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PlatformWithSamples",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PlatformWithSamples',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PlatformWithSamples",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PlatformWithSamples',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleRunOnPlatform
+
+  $return = $obj->get_relationship_SampleRunOnPlatform($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_PlatformWithSamples
+	2: a fields_Platform
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_PlatformWithSamples is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_PlatformWithSamples
+	2: a fields_Platform
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_PlatformWithSamples is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleRunOnPlatform
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleRunOnPlatform (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleRunOnPlatform:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleRunOnPlatform');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleRunOnPlatform",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleRunOnPlatform',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleRunOnPlatform",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleRunOnPlatform',
 				       );
     }
 }
@@ -58623,8 +66927,9 @@ sub get_relationship_ProducedResultsFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ProducedResultsFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58758,8 +67063,9 @@ sub get_relationship_HadResultsProducedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HadResultsProducedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58768,6 +67074,293 @@ sub get_relationship_HadResultsProducedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_HadResultsProducedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_HadResultsProducedBy',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_ProtocolForSample
+
+  $return = $obj->get_relationship_ProtocolForSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Protocol
+	1: a fields_ProtocolForSample
+	2: a fields_Sample
+fields_Protocol is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+fields_ProtocolForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Protocol
+	1: a fields_ProtocolForSample
+	2: a fields_Sample
+fields_Protocol is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+fields_ProtocolForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+This relationship indicates the protocol used in the expression sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_ProtocolForSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_ProtocolForSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_ProtocolForSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_ProtocolForSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_ProtocolForSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_ProtocolForSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ProtocolForSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_ProtocolForSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleUsesProtocol
+
+  $return = $obj->get_relationship_SampleUsesProtocol($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_ProtocolForSample
+	2: a fields_Protocol
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_ProtocolForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Protocol is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_ProtocolForSample
+	2: a fields_Protocol
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_ProtocolForSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Protocol is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleUsesProtocol
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleUsesProtocol (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleUsesProtocol:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleUsesProtocol');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleUsesProtocol",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleUsesProtocol',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleUsesProtocol",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleUsesProtocol',
 				       );
     }
 }
@@ -58795,6 +67388,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Subsystem
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Provided is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -58825,6 +67421,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Subsystem
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Provided is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -58891,8 +67490,9 @@ sub get_relationship_Provided
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Provided',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -58941,6 +67541,9 @@ fields_Provided is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -58971,6 +67574,9 @@ fields_Provided is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -59016,8 +67622,9 @@ sub get_relationship_WasProvidedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasProvidedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -59026,6 +67633,266 @@ sub get_relationship_WasProvidedBy
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_WasProvidedBy",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_WasProvidedBy',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PublishedAssociation
+
+  $return = $obj->get_relationship_PublishedAssociation($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_PublishedAssociation
+	2: a fields_Association
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_PublishedAssociation is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_PublishedAssociation
+	2: a fields_Association
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_PublishedAssociation is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+
+
+=end text
+
+=item Description
+
+The PublishedAssociation relationship links associations
+to the manuscript they are published in.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_PublishedAssociation
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PublishedAssociation (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PublishedAssociation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PublishedAssociation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PublishedAssociation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PublishedAssociation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PublishedAssociation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PublishedAssociation',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_AssociationPublishedIn
+
+  $return = $obj->get_relationship_AssociationPublishedIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Association
+	1: a fields_PublishedAssociation
+	2: a fields_Publication
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_PublishedAssociation is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Association
+	1: a fields_PublishedAssociation
+	2: a fields_Publication
+fields_Association is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	directional has a value which is an int
+	confidence has a value which is a float
+	url has a value which is a string
+fields_PublishedAssociation is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_AssociationPublishedIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AssociationPublishedIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AssociationPublishedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AssociationPublishedIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AssociationPublishedIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_AssociationPublishedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AssociationPublishedIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AssociationPublishedIn',
 				       );
     }
 }
@@ -59149,8 +68016,9 @@ sub get_relationship_PublishedExperiment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_PublishedExperiment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -59274,8 +68142,9 @@ sub get_relationship_ExperimentPublishedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ExperimentPublishedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -59284,260 +68153,6 @@ sub get_relationship_ExperimentPublishedIn
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ExperimentPublishedIn",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_ExperimentPublishedIn',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_PublishedInteraction
-
-  $return = $obj->get_relationship_PublishedInteraction($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Publication
-	1: a fields_PublishedInteraction
-	2: a fields_Interaction
-fields_Publication is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	title has a value which is a string
-	link has a value which is a string
-	pubdate has a value which is a string
-fields_PublishedInteraction is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Publication
-	1: a fields_PublishedInteraction
-	2: a fields_Interaction
-fields_Publication is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	title has a value which is a string
-	link has a value which is a string
-	pubdate has a value which is a string
-fields_PublishedInteraction is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-
-
-=end text
-
-=item Description
-
-The PublishedInteraction relationship links interactions
-to the manuscript they are published in.
-
-It has the following fields:
-
-=over 4
-
-
-=back
-
-=back
-
-=cut
-
-sub get_relationship_PublishedInteraction
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_PublishedInteraction (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_PublishedInteraction:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_PublishedInteraction');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_PublishedInteraction",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_PublishedInteraction',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PublishedInteraction",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_PublishedInteraction',
-				       );
-    }
-}
-
-
-
-=head2 get_relationship_InteractionPublishedIn
-
-  $return = $obj->get_relationship_InteractionPublishedIn($ids, $from_fields, $rel_fields, $to_fields)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_PublishedInteraction
-	2: a fields_Publication
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_PublishedInteraction is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-fields_Publication is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	title has a value which is a string
-	link has a value which is a string
-	pubdate has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is a string
-$from_fields is a reference to a list where each element is a string
-$rel_fields is a reference to a list where each element is a string
-$to_fields is a reference to a list where each element is a string
-$return is a reference to a list where each element is a reference to a list containing 3 items:
-	0: a fields_Interaction
-	1: a fields_PublishedInteraction
-	2: a fields_Publication
-fields_Interaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	description has a value which is a string
-	directional has a value which is an int
-	confidence has a value which is a float
-	url has a value which is a string
-fields_PublishedInteraction is a reference to a hash where the following keys are defined:
-	from_link has a value which is a string
-	to_link has a value which is a string
-fields_Publication is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	title has a value which is a string
-	link has a value which is a string
-	pubdate has a value which is a string
-
-
-=end text
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub get_relationship_InteractionPublishedIn
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 4)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_relationship_InteractionPublishedIn (received $n, expecting 4)");
-    }
-    {
-	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
-
-	my @_bad_arguments;
-        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
-        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
-        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
-        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_relationship_InteractionPublishedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_relationship_InteractionPublishedIn');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "CDMI_EntityAPI.get_relationship_InteractionPublishedIn",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'get_relationship_InteractionPublishedIn',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_InteractionPublishedIn",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_relationship_InteractionPublishedIn',
 				       );
     }
 }
@@ -59657,8 +68272,9 @@ sub get_relationship_PublishedProtocol
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_PublishedProtocol',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -59778,8 +68394,9 @@ sub get_relationship_ProtocolPublishedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_ProtocolPublishedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -59788,6 +68405,3233 @@ sub get_relationship_ProtocolPublishedIn
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ProtocolPublishedIn",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_ProtocolPublishedIn',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulogHasRegulon
+
+  $return = $obj->get_relationship_RegulogHasRegulon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_RegulogHasRegulon
+	2: a fields_Regulon
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulogHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulog
+	1: a fields_RegulogHasRegulon
+	2: a fields_Regulon
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulogHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_RegulogHasRegulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulogHasRegulon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulogHasRegulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulogHasRegulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulogHasRegulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulogHasRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulogHasRegulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulogHasRegulon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulonIsInRegolog
+
+  $return = $obj->get_relationship_RegulonIsInRegolog($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulogHasRegulon
+	2: a fields_Regulog
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulogHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulogHasRegulon
+	2: a fields_Regulog
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulogHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulog is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_RegulonIsInRegolog
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulonIsInRegolog (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulonIsInRegolog:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulonIsInRegolog');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulonIsInRegolog",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulonIsInRegolog',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulonIsInRegolog",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulonIsInRegolog',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulomeHasGenome
+
+  $return = $obj->get_relationship_RegulomeHasGenome($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeHasGenome
+	2: a fields_Genome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeHasGenome is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeHasGenome
+	2: a fields_Genome
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeHasGenome is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_RegulomeHasGenome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulomeHasGenome (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulomeHasGenome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulomeHasGenome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulomeHasGenome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulomeHasGenome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulomeHasGenome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulomeHasGenome',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_GenomeIsInRegulome
+
+  $return = $obj->get_relationship_GenomeIsInRegulome($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_RegulomeHasGenome
+	2: a fields_Regulome
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_RegulomeHasGenome is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Genome
+	1: a fields_RegulomeHasGenome
+	2: a fields_Regulome
+fields_Genome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	pegs has a value which is an int
+	rnas has a value which is an int
+	scientific_name has a value which is a string
+	complete has a value which is an int
+	prokaryotic has a value which is an int
+	dna_size has a value which is an int
+	contigs has a value which is an int
+	domain has a value which is a string
+	genetic_code has a value which is an int
+	gc_content has a value which is a float
+	phenotype has a value which is a reference to a list where each element is a string
+	md5 has a value which is a string
+	source_id has a value which is a string
+fields_RegulomeHasGenome is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_GenomeIsInRegulome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_GenomeIsInRegulome (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_GenomeIsInRegulome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_GenomeIsInRegulome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_GenomeIsInRegulome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_GenomeIsInRegulome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_GenomeIsInRegulome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_GenomeIsInRegulome',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulomeHasRegulon
+
+  $return = $obj->get_relationship_RegulomeHasRegulon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeHasRegulon
+	2: a fields_Regulon
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeHasRegulon
+	2: a fields_Regulon
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_RegulomeHasRegulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulomeHasRegulon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulomeHasRegulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulomeHasRegulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulomeHasRegulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulomeHasRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulomeHasRegulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulomeHasRegulon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulonIsInRegolome
+
+  $return = $obj->get_relationship_RegulonIsInRegolome($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulomeHasRegulon
+	2: a fields_Regulome
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulomeHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulomeHasRegulon
+	2: a fields_Regulome
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulomeHasRegulon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_RegulonIsInRegolome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulonIsInRegolome (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulonIsInRegolome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulonIsInRegolome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulonIsInRegolome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulonIsInRegolome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulonIsInRegolome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulonIsInRegolome',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulomeSource
+
+  $return = $obj->get_relationship_RegulomeSource($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeSource
+	2: a fields_Source
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeSource is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulome
+	1: a fields_RegulomeSource
+	2: a fields_Source
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+fields_RegulomeSource is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_RegulomeSource
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulomeSource (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulomeSource:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulomeSource');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulomeSource",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulomeSource',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulomeSource",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulomeSource',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_CreatedRegulome
+
+  $return = $obj->get_relationship_CreatedRegulome($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_RegulomeSource
+	2: a fields_Regulome
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_RegulomeSource is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Source
+	1: a fields_RegulomeSource
+	2: a fields_Regulome
+fields_Source is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
+fields_RegulomeSource is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulome is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+	creation_date has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_CreatedRegulome
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_CreatedRegulome (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_CreatedRegulome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_CreatedRegulome');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_CreatedRegulome",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_CreatedRegulome',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_CreatedRegulome",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_CreatedRegulome',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_RegulonHasOperon
+
+  $return = $obj->get_relationship_RegulonHasOperon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulonHasOperon
+	2: a fields_Operon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulonHasOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Regulon
+	1: a fields_RegulonHasOperon
+	2: a fields_Operon
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+fields_RegulonHasOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_RegulonHasOperon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_RegulonHasOperon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_RegulonHasOperon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_RegulonHasOperon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_RegulonHasOperon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_RegulonHasOperon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_RegulonHasOperon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_RegulonHasOperon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_OperonIsInRegulon
+
+  $return = $obj->get_relationship_OperonIsInRegulon($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_RegulonHasOperon
+	2: a fields_Regulon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_RegulonHasOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Operon
+	1: a fields_RegulonHasOperon
+	2: a fields_Regulon
+fields_Operon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_RegulonHasOperon is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Regulon is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	description has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_OperonIsInRegulon
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_OperonIsInRegulon (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_OperonIsInRegulon:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_OperonIsInRegulon');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_OperonIsInRegulon",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_OperonIsInRegulon',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_OperonIsInRegulon",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_OperonIsInRegulon',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleAveragedFrom
+
+  $return = $obj->get_relationship_SampleAveragedFrom($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleAveragedFrom
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleAveragedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleAveragedFrom
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleAveragedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+
+=end text
+
+=item Description
+
+Custom averaging of samples (typically replicates).
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SampleAveragedFrom
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleAveragedFrom (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleAveragedFrom:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleAveragedFrom');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleAveragedFrom",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleAveragedFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleAveragedFrom",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleAveragedFrom',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleComponentOf
+
+  $return = $obj->get_relationship_SampleComponentOf($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleAveragedFrom
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleAveragedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleAveragedFrom
+	2: a fields_Sample
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleAveragedFrom is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleComponentOf
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleComponentOf (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleComponentOf:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleComponentOf');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleComponentOf",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleComponentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleComponentOf",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleComponentOf',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleContactPerson
+
+  $return = $obj->get_relationship_SampleContactPerson($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleContactPerson
+	2: a fields_Person
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleContactPerson is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleContactPerson
+	2: a fields_Person
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleContactPerson is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+The people that performed the expression experiment(sample).
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SampleContactPerson
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleContactPerson (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleContactPerson:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleContactPerson');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleContactPerson",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleContactPerson',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleContactPerson",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleContactPerson',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PersonPerformedSample
+
+  $return = $obj->get_relationship_PersonPerformedSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Person
+	1: a fields_SampleContactPerson
+	2: a fields_Sample
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+fields_SampleContactPerson is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Person
+	1: a fields_SampleContactPerson
+	2: a fields_Sample
+fields_Person is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	firstName has a value which is a string
+	lastName has a value which is a string
+	contactEmail has a value which is a string
+	institution has a value which is a string
+	source_id has a value which is a string
+fields_SampleContactPerson is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_PersonPerformedSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PersonPerformedSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PersonPerformedSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PersonPerformedSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PersonPerformedSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PersonPerformedSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PersonPerformedSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PersonPerformedSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleHasAnnotations
+
+  $return = $obj->get_relationship_SampleHasAnnotations($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleHasAnnotations
+	2: a fields_SampleAnnotation
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleHasAnnotations is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleHasAnnotations
+	2: a fields_SampleAnnotation
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleHasAnnotations is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship indicates the sample annotations that belong to the sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SampleHasAnnotations
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleHasAnnotations (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleHasAnnotations:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleHasAnnotations');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleHasAnnotations",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleHasAnnotations',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleHasAnnotations",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleHasAnnotations',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_AnnotationsForSample
+
+  $return = $obj->get_relationship_AnnotationsForSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_SampleHasAnnotations
+	2: a fields_Sample
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_SampleHasAnnotations is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_SampleAnnotation
+	1: a fields_SampleHasAnnotations
+	2: a fields_Sample
+fields_SampleAnnotation is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	annotationDate has a value which is a string
+	source_id has a value which is a string
+fields_SampleHasAnnotations is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_AnnotationsForSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_AnnotationsForSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_AnnotationsForSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_AnnotationsForSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_AnnotationsForSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_AnnotationsForSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_AnnotationsForSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_AnnotationsForSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleInSeries
+
+  $return = $obj->get_relationship_SampleInSeries($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleInSeries
+	2: a fields_Series
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleInSeries is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleInSeries
+	2: a fields_Series
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleInSeries is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship indicates what samples are in a series.  Note a sample can be in more than one series.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SampleInSeries
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleInSeries (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleInSeries:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleInSeries');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleInSeries",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleInSeries',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleInSeries",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleInSeries',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SeriesWithSamples
+
+  $return = $obj->get_relationship_SeriesWithSamples($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Series
+	1: a fields_SampleInSeries
+	2: a fields_Sample
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+fields_SampleInSeries is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Series
+	1: a fields_SampleInSeries
+	2: a fields_Sample
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+fields_SampleInSeries is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SeriesWithSamples
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SeriesWithSamples (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SeriesWithSamples:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SeriesWithSamples');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SeriesWithSamples",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SeriesWithSamples',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SeriesWithSamples",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SeriesWithSamples',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleMeasurements
+
+  $return = $obj->get_relationship_SampleMeasurements($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleMeasurements
+	2: a fields_Measurement
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleMeasurements is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Measurement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	value has a value which is a float
+	mean has a value which is a float
+	median has a value which is a float
+	stddev has a value which is a float
+	N has a value which is an int
+	p_value has a value which is a float
+	Z_score has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SampleMeasurements
+	2: a fields_Measurement
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SampleMeasurements is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Measurement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	value has a value which is a float
+	mean has a value which is a float
+	median has a value which is a float
+	stddev has a value which is a float
+	N has a value which is an int
+	p_value has a value which is a float
+	Z_score has a value which is a float
+
+
+=end text
+
+=item Description
+
+The Measurements for expression microarray data should be in Log2 space and 
+the measurements for a given sample should have the median set to zero.  RNA-Seq data will likely be in FPKM.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SampleMeasurements
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleMeasurements (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleMeasurements:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleMeasurements');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleMeasurements",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleMeasurements',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleMeasurements",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleMeasurements',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_MeasurementInSample
+
+  $return = $obj->get_relationship_MeasurementInSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Measurement
+	1: a fields_SampleMeasurements
+	2: a fields_Sample
+fields_Measurement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	value has a value which is a float
+	mean has a value which is a float
+	median has a value which is a float
+	stddev has a value which is a float
+	N has a value which is an int
+	p_value has a value which is a float
+	Z_score has a value which is a float
+fields_SampleMeasurements is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Measurement
+	1: a fields_SampleMeasurements
+	2: a fields_Sample
+fields_Measurement is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	source_id has a value which is a string
+	value has a value which is a float
+	mean has a value which is a float
+	median has a value which is a float
+	stddev has a value which is a float
+	N has a value which is an int
+	p_value has a value which is a float
+	Z_score has a value which is a float
+fields_SampleMeasurements is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_MeasurementInSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_MeasurementInSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_MeasurementInSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_MeasurementInSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_MeasurementInSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_MeasurementInSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_MeasurementInSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_MeasurementInSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SamplesInReplicateGroup
+
+  $return = $obj->get_relationship_SamplesInReplicateGroup($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SamplesInReplicateGroup
+	2: a fields_ReplicateGroup
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SamplesInReplicateGroup is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_SamplesInReplicateGroup
+	2: a fields_ReplicateGroup
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_SamplesInReplicateGroup is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+
+
+=end text
+
+=item Description
+
+The samples that are identified as being part of one replicate group.  All samples in replicate group are replicates of one another.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SamplesInReplicateGroup
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SamplesInReplicateGroup (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SamplesInReplicateGroup:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SamplesInReplicateGroup');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SamplesInReplicateGroup",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SamplesInReplicateGroup',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SamplesInReplicateGroup",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SamplesInReplicateGroup',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_ReplicateGroupsForSample
+
+  $return = $obj->get_relationship_ReplicateGroupsForSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ReplicateGroup
+	1: a fields_SamplesInReplicateGroup
+	2: a fields_Sample
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_SamplesInReplicateGroup is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_ReplicateGroup
+	1: a fields_SamplesInReplicateGroup
+	2: a fields_Sample
+fields_ReplicateGroup is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+fields_SamplesInReplicateGroup is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_ReplicateGroupsForSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_ReplicateGroupsForSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_ReplicateGroupsForSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_ReplicateGroupsForSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_ReplicateGroupsForSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_ReplicateGroupsForSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_ReplicateGroupsForSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_ReplicateGroupsForSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SeriesPublishedIn
+
+  $return = $obj->get_relationship_SeriesPublishedIn($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Series
+	1: a fields_SeriesPublishedIn
+	2: a fields_Publication
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+fields_SeriesPublishedIn is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Series
+	1: a fields_SeriesPublishedIn
+	2: a fields_Publication
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+fields_SeriesPublishedIn is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship indicates where the series was published.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_SeriesPublishedIn
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SeriesPublishedIn (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SeriesPublishedIn:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SeriesPublishedIn');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SeriesPublishedIn",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SeriesPublishedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SeriesPublishedIn",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SeriesPublishedIn',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PublicationsForSeries
+
+  $return = $obj->get_relationship_PublicationsForSeries($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_SeriesPublishedIn
+	2: a fields_Series
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_SeriesPublishedIn is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Publication
+	1: a fields_SeriesPublishedIn
+	2: a fields_Series
+fields_Publication is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	link has a value which is a string
+	pubdate has a value which is a string
+fields_SeriesPublishedIn is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Series is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	externalSourceId has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_PublicationsForSeries
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PublicationsForSeries (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PublicationsForSeries:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PublicationsForSeries');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PublicationsForSeries",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PublicationsForSeries',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PublicationsForSeries",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PublicationsForSeries',
 				       );
     }
 }
@@ -59928,8 +71772,9 @@ sub get_relationship_Shows
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Shows',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60065,8 +71910,9 @@ sub get_relationship_IsShownOn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsShownOn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60190,8 +72036,9 @@ sub get_relationship_StrainParentOf
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_StrainParentOf',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60307,8 +72154,9 @@ sub get_relationship_DerivedFromStrain
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_DerivedFromStrain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60317,6 +72165,576 @@ sub get_relationship_DerivedFromStrain
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_DerivedFromStrain",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_relationship_DerivedFromStrain',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_StrainWithPlatforms
+
+  $return = $obj->get_relationship_StrainWithPlatforms($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Strain
+	1: a fields_StrainWithPlatforms
+	2: a fields_Platform
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+fields_StrainWithPlatforms is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Strain
+	1: a fields_StrainWithPlatforms
+	2: a fields_Platform
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+fields_StrainWithPlatforms is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+This relationship indicates the platforms for a strain.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_StrainWithPlatforms
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_StrainWithPlatforms (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_StrainWithPlatforms:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_StrainWithPlatforms');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_StrainWithPlatforms",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_StrainWithPlatforms',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_StrainWithPlatforms",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_StrainWithPlatforms',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_PlatformForStrain
+
+  $return = $obj->get_relationship_PlatformForStrain($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Platform
+	1: a fields_StrainWithPlatforms
+	2: a fields_Strain
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+fields_StrainWithPlatforms is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Platform
+	1: a fields_StrainWithPlatforms
+	2: a fields_Strain
+fields_Platform is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	externalSourceId has a value which is a string
+	technology has a value which is a string
+	type has a value which is a string
+	source_id has a value which is a string
+fields_StrainWithPlatforms is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_PlatformForStrain
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_PlatformForStrain (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_PlatformForStrain:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_PlatformForStrain');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_PlatformForStrain",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_PlatformForStrain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_PlatformForStrain",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_PlatformForStrain',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_StrainWithSample
+
+  $return = $obj->get_relationship_StrainWithSample($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Strain
+	1: a fields_StrainWithSample
+	2: a fields_Sample
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+fields_StrainWithSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Strain
+	1: a fields_StrainWithSample
+	2: a fields_Sample
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+fields_StrainWithSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+
+
+=end text
+
+=item Description
+
+This indicates which expression samples a strain has.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+
+=back
+
+=cut
+
+sub get_relationship_StrainWithSample
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_StrainWithSample (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_StrainWithSample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_StrainWithSample');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_StrainWithSample",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_StrainWithSample',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_StrainWithSample",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_StrainWithSample',
+				       );
+    }
+}
+
+
+
+=head2 get_relationship_SampleForStrain
+
+  $return = $obj->get_relationship_SampleForStrain($ids, $from_fields, $rel_fields, $to_fields)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_StrainWithSample
+	2: a fields_Strain
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_StrainWithSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ids is a reference to a list where each element is a string
+$from_fields is a reference to a list where each element is a string
+$rel_fields is a reference to a list where each element is a string
+$to_fields is a reference to a list where each element is a string
+$return is a reference to a list where each element is a reference to a list containing 3 items:
+	0: a fields_Sample
+	1: a fields_StrainWithSample
+	2: a fields_Strain
+fields_Sample is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	title has a value which is a string
+	dataSource has a value which is a string
+	externalSourceId has a value which is a string
+	description has a value which is a string
+	molecule has a value which is a string
+	type has a value which is a string
+	kbaseSubmissionDate has a value which is a string
+	externalSourceDate has a value which is a string
+	custom has a value which is a string
+	originalLog2Median has a value which is a float
+	source_id has a value which is a string
+	dataQualityLevel has a value which is an int
+fields_StrainWithSample is a reference to a hash where the following keys are defined:
+	from_link has a value which is a string
+	to_link has a value which is a string
+fields_Strain is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	source_id has a value which is a string
+	aggregateData has a value which is a string
+	wildtype has a value which is a string
+	referenceStrain has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_relationship_SampleForStrain
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 4)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_relationship_SampleForStrain (received $n, expecting 4)");
+    }
+    {
+	my($ids, $from_fields, $rel_fields, $to_fields) = @args;
+
+	my @_bad_arguments;
+        (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"ids\" (value was \"$ids\")");
+        (ref($from_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"from_fields\" (value was \"$from_fields\")");
+        (ref($rel_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"rel_fields\" (value was \"$rel_fields\")");
+        (ref($to_fields) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"to_fields\" (value was \"$to_fields\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_relationship_SampleForStrain:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_relationship_SampleForStrain');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_EntityAPI.get_relationship_SampleForStrain",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_relationship_SampleForStrain',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_relationship_SampleForStrain",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_relationship_SampleForStrain',
 				       );
     }
 }
@@ -60344,6 +72762,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Genome
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -60379,6 +72800,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Genome
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Submitted is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -60450,8 +72874,9 @@ sub get_relationship_Submitted
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Submitted',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60505,6 +72930,9 @@ fields_Submitted is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -60540,6 +72968,9 @@ fields_Submitted is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -60585,8 +73016,9 @@ sub get_relationship_WasSubmittedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_WasSubmittedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60724,8 +73156,9 @@ sub get_relationship_SupersedesAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_SupersedesAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60851,8 +73284,9 @@ sub get_relationship_IsSupersededByAlignment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSupersededByAlignment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -60986,8 +73420,9 @@ sub get_relationship_SupersedesTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_SupersedesTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61109,8 +73544,9 @@ sub get_relationship_IsSupersededByTree
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsSupersededByTree',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61146,6 +73582,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Tree
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -61176,6 +73615,9 @@ $return is a reference to a list where each element is a reference to a list con
 	2: a fields_Tree
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 fields_Treed is a reference to a hash where the following keys are defined:
 	from_link has a value which is a string
 	to_link has a value which is a string
@@ -61242,8 +73684,9 @@ sub get_relationship_Treed
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Treed',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61292,6 +73735,9 @@ fields_Treed is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 </pre>
 
@@ -61322,6 +73768,9 @@ fields_Treed is a reference to a hash where the following keys are defined:
 	to_link has a value which is a string
 fields_Source is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
+	url has a value which is a string
+	description has a value which is a string
 
 
 =end text
@@ -61367,8 +73816,9 @@ sub get_relationship_IsTreeFrom
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsTreeFrom',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61504,8 +73954,9 @@ sub get_relationship_UsedIn
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_UsedIn',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61633,8 +74084,9 @@ sub get_relationship_HasMedia
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_HasMedia',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61781,8 +74233,9 @@ sub get_relationship_Uses
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_Uses',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -61920,8 +74373,9 @@ sub get_relationship_IsUsedBy
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_IsUsedBy',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -62071,8 +74525,9 @@ sub get_relationship_UsesCodons
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_UsesCodons',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -62214,8 +74669,9 @@ sub get_relationship_AreCodonsFor
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_relationship_AreCodonsFor',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -66571,6 +79027,116 @@ assay_type_id has a value which is a string
 
 
 
+=head2 fields_Association
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+description has a value which is a string
+directional has a value which is an int
+confidence has a value which is a float
+url has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+description has a value which is a string
+directional has a value which is an int
+confidence has a value which is a float
+url has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_AssociationDataset
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+data_source has a value which is a string
+url has a value which is a string
+association_type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+data_source has a value which is a string
+url has a value which is a string
+association_type has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_AssociationDetectionType
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_AtomicRegulon
 
 =over 4
@@ -67071,6 +79637,40 @@ replacedby has a value which is a string
 
 
 
+=head2 fields_Effector
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+effector_class has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+effector_class has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Environment
 
 =over 4
@@ -67379,112 +79979,6 @@ gc_content has a value which is a float
 phenotype has a value which is a reference to a list where each element is a string
 md5 has a value which is a string
 source_id has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_Interaction
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
-directional has a value which is an int
-confidence has a value which is a float
-url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
-directional has a value which is an int
-confidence has a value which is a float
-url has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_InteractionDataset
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
-data_source has a value which is a string
-url has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
-data_source has a value which is a string
-url has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_InteractionDetectionType
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is a string
-description has a value which is a string
 
 
 =end text
@@ -67885,6 +80379,74 @@ plant_id has a value which is a string
 
 
 
+=head2 fields_Ontology
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+id has a value which is a string
+name has a value which is a string
+definition has a value which is a string
+ontologySource has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+id has a value which is a string
+name has a value which is a string
+definition has a value which is a string
+ontologySource has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_Operon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_PairSet
 
 =over 4
@@ -68008,6 +80570,46 @@ firstName has a value which is a string
 lastName has a value which is a string
 contactEmail has a value which is a string
 institution has a value which is a string
+source_id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_Platform
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+externalSourceId has a value which is a string
+technology has a value which is a string
+type has a value which is a string
+source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+externalSourceId has a value which is a string
+technology has a value which is a string
+type has a value which is a string
 source_id has a value which is a string
 
 
@@ -68235,6 +80837,208 @@ protons has a value which is a float
 
 
 
+=head2 fields_Regulator
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+rfam_id has a value which is a string
+tf_family has a value which is a string
+type has a value which is a string
+taxonomy has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+rfam_id has a value which is a string
+tf_family has a value which is a string
+type has a value which is a string
+taxonomy has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_Regulog
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_RegulogCollection
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_Regulome
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+creation_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+creation_date has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_Regulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_ReplicateGroup
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Role
 
 =over 4
@@ -68331,6 +81135,94 @@ region has a value which is a string
 
 
 
+=head2 fields_Sample
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+dataSource has a value which is a string
+externalSourceId has a value which is a string
+description has a value which is a string
+molecule has a value which is a string
+type has a value which is a string
+kbaseSubmissionDate has a value which is a string
+externalSourceDate has a value which is a string
+custom has a value which is a string
+originalLog2Median has a value which is a float
+source_id has a value which is a string
+dataQualityLevel has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+dataSource has a value which is a string
+externalSourceId has a value which is a string
+description has a value which is a string
+molecule has a value which is a string
+type has a value which is a string
+kbaseSubmissionDate has a value which is a string
+externalSourceDate has a value which is a string
+custom has a value which is a string
+originalLog2Median has a value which is a float
+source_id has a value which is a string
+dataQualityLevel has a value which is an int
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleAnnotation
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+annotationDate has a value which is a string
+source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+annotationDate has a value which is a string
+source_id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Scenario
 
 =over 4
@@ -68363,6 +81255,50 @@ common_name has a value which is a string
 
 
 
+=head2 fields_Series
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+summary has a value which is a string
+design has a value which is a string
+externalSourceId has a value which is a string
+kbaseSubmissionDate has a value which is a string
+externalSourceDate has a value which is a string
+source_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+title has a value which is a string
+summary has a value which is a string
+design has a value which is a string
+externalSourceId has a value which is a string
+kbaseSubmissionDate has a value which is a string
+externalSourceDate has a value which is a string
+source_id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_Source
 
 =over 4
@@ -68376,6 +81312,9 @@ common_name has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+name has a value which is a string
+url has a value which is a string
+description has a value which is a string
 
 </pre>
 
@@ -68385,6 +81324,9 @@ id has a value which is a string
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+name has a value which is a string
+url has a value which is a string
+description has a value which is a string
 
 
 =end text
@@ -68913,6 +81855,44 @@ release_date has a value which is a string
 
 
 
+=head2 fields_AssociationFeature
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+stoichiometry has a value which is an int
+strength has a value which is a float
+rank has a value which is an int
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_CompoundMeasuredBy
 
 =over 4
@@ -69172,6 +82152,38 @@ groupMeta has a value which is a string
 
 
 =head2 fields_Controls
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_DefaultControlSample
 
 =over 4
 
@@ -69501,6 +82513,38 @@ to_link has a value which is a string
 
 
 
+=head2 fields_FeatureIsTranscriptionFactorFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_FeatureMeasuredBy
 
 =over 4
@@ -69631,6 +82675,40 @@ to_link has a value which is a string
 
 
 
+=head2 fields_HasAliasAssertedFrom
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+alias has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+alias has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_HasCompoundAliasFrom
 
 =over 4
@@ -69665,7 +82743,103 @@ alias has a value which is a string
 
 
 
+=head2 fields_HasEffector
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_HasExperimentalUnit
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_HasExpressionSample
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_HasGenomes
 
 =over 4
 
@@ -69995,6 +83169,38 @@ a reference to a hash where the following keys are defined:
 from_link has a value which is a string
 to_link has a value which is a string
 alias has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_HasRegulogs
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
 
 
 =end text
@@ -70579,82 +83785,6 @@ a reference to a hash where the following keys are defined:
 from_link has a value which is a string
 to_link has a value which is a string
 level_vector has a value which is a countVector
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_InteractionFeature
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-from_link has a value which is a string
-to_link has a value which is a string
-stoichiometry has a value which is an int
-strength has a value which is a float
-rank has a value which is an int
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-from_link has a value which is a string
-to_link has a value which is a string
-stoichiometry has a value which is an int
-strength has a value which is a float
-rank has a value which is an int
-
-
-=end text
-
-=back
-
-
-
-=head2 fields_InteractionProtein
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-from_link has a value which is a string
-to_link has a value which is a string
-stoichiometry has a value which is an int
-strength has a value which is a float
-rank has a value which is an int
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-from_link has a value which is a string
-to_link has a value which is a string
-stoichiometry has a value which is an int
-strength has a value which is a float
-rank has a value which is an int
 
 
 =end text
@@ -71467,6 +84597,40 @@ to_link has a value which is a string
 
 
 
+=head2 fields_IsInOperon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+rank has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+rank has a value which is an int
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_IsInPair
 
 =over 4
@@ -71933,6 +85097,102 @@ to_link has a value which is a string
 
 
 
+=head2 fields_IsRegulatorFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsRegulatorForRegulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsRegulatorySiteFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_IsRelevantFor
 
 =over 4
@@ -72062,6 +85322,38 @@ to_link has a value which is a string
 
 
 =head2 fields_IsSequenceOf
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_IsSourceForAssociationDataset
 
 =over 4
 
@@ -72359,6 +85651,38 @@ to_link has a value which is a string
 
 
 
+=head2 fields_OntologyForSample
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_OperatesIn
 
 =over 4
@@ -72525,7 +85849,103 @@ role has a value which is a string
 
 
 
+=head2 fields_PersonAnnotatedSample
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_PlatformWithSamples
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_ProducedResultsFor
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_ProtocolForSample
 
 =over 4
 
@@ -72589,6 +86009,38 @@ to_link has a value which is a string
 
 
 
+=head2 fields_PublishedAssociation
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 fields_PublishedExperiment
 
 =over 4
@@ -72621,7 +86073,7 @@ to_link has a value which is a string
 
 
 
-=head2 fields_PublishedInteraction
+=head2 fields_PublishedProtocol
 
 =over 4
 
@@ -72653,7 +86105,359 @@ to_link has a value which is a string
 
 
 
-=head2 fields_PublishedProtocol
+=head2 fields_RegulogHasRegulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_RegulomeHasGenome
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_RegulomeHasRegulon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_RegulomeSource
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_RegulonHasOperon
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleAveragedFrom
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleContactPerson
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleHasAnnotations
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleInSeries
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SampleMeasurements
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SamplesInReplicateGroup
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_SeriesPublishedIn
 
 =over 4
 
@@ -72720,6 +86524,70 @@ location has a value which is a rectangle
 
 
 =head2 fields_StrainParentOf
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_StrainWithPlatforms
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+from_link has a value which is a string
+to_link has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 fields_StrainWithSample
 
 =over 4
 

@@ -46,6 +46,8 @@ The Protocol entity has the following relationship links:
     
 =item IsMeasurementMethodOf Measurement
 
+=item ProtocolForSample Sample
+
 =item ProtocolPublishedIn Publication
 
 

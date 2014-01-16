@@ -17,7 +17,7 @@ get_relationship_IsDatasetFor [-c N] [-a] [--fields field-list] < ids > table.wi
 =head1 DESCRIPTION
 
 The IsDatasetFor relationship describes which genomes
-are covered by particular interaction datasets.
+are covered by particular association datasets.
 
 Example:
 
@@ -49,7 +49,7 @@ Select the identifier from column num
 
 =item -from field-list
 
-Choose a set of fields from the InteractionDataset
+Choose a set of fields from the AssociationDataset
 entity to return. Field-list is a comma-separated list of strings. The
 following fields are available:
 
@@ -62,6 +62,8 @@ following fields are available:
 =item data_source
 
 =item url
+
+=item association_type
 
 =back    
 
@@ -129,7 +131,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'description', 'data_source', 'url' );
+my @all_from_fields = ( 'id', 'description', 'data_source', 'url', 'association_type' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'pegs', 'rnas', 'scientific_name', 'complete', 'prokaryotic', 'dna_size', 'contigs', 'domain', 'genetic_code', 'gc_content', 'phenotype', 'md5', 'source_id' );
 
@@ -153,13 +155,14 @@ Usage: get_relationship_IsDatasetFor [arguments] < ids > table.with.fields.added
     Select the identifier from column num
 
 --from field-list
-    Choose a set of fields from the InteractionDataset
+    Choose a set of fields from the AssociationDataset
     entity to return. Field-list is a comma-separated list of strings. The
     following fields are available:
         id
         description
         data_source
         url
+        association_type
 
 --rel field-list
     Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 

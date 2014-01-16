@@ -55,9 +55,13 @@ The Feature entity has the following relationship links:
 
 =item Encompasses Feature
 
-=item FeatureInteractsIn Interaction
+=item FeatureInteractsIn Association
+
+=item FeatureIsTranscriptionFactorFor Regulon
 
 =item FeatureMeasuredBy Measurement
+
+=item HasAliasAssertedFrom Source
 
 =item HasCoregulationWith Feature
 
@@ -81,6 +85,8 @@ The Feature entity has the following relationship links:
 
 =item IsFormedInto AtomicRegulon
 
+=item IsInOperon Operon
+
 =item IsInPair Pairing
 
 =item IsLocatedIn Contig
@@ -90,6 +96,8 @@ The Feature entity has the following relationship links:
 =item IsOwnedBy Genome
 
 =item IsRegulatedIn CoregulatedSet
+
+=item IsRegulatorySiteFor Operon
 
 =item KnockedOutIn Strain
 

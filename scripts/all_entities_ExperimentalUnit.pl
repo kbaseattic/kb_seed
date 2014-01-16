@@ -41,6 +41,8 @@ The ExperimentalUnit entity has the following relationship links:
 
 =item HasEnvironment Environment
 
+=item HasExpressionSample Sample
+
 =item HasMeasurement Measurement
 
 =item IncludesStrain Strain

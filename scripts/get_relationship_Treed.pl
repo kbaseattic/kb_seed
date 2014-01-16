@@ -57,6 +57,12 @@ following fields are available:
 
 =item id
 
+=item name
+
+=item url
+
+=item description
+
 =back    
 
 =item -rel field-list
@@ -113,7 +119,7 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id',  );
+my @all_from_fields = ( 'id', 'name', 'url', 'description' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
 my @all_to_fields = ( 'id', 'status', 'data_type', 'timestamp', 'method', 'parameters', 'protocol', 'source_id', 'newick' );
 
@@ -141,6 +147,9 @@ Usage: get_relationship_Treed [arguments] < ids > table.with.fields.added
     entity to return. Field-list is a comma-separated list of strings. The
     following fields are available:
         id
+        name
+        url
+        description
 
 --rel field-list
     Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 

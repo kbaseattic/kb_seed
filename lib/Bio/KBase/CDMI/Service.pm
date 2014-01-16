@@ -2,6 +2,8 @@ package Bio::KBase::CDMI::Service;
 
 use Data::Dumper;
 use Moose;
+use JSON;
+use Bio::KBase::Log;
 
 extends 'RPC::Any::Server::JSONRPC::PSGI';
 
@@ -9,6 +11,7 @@ has 'instance_dispatch' => (is => 'ro', isa => 'HashRef');
 has 'user_auth' => (is => 'ro', isa => 'UserAuth');
 has 'valid_methods' => (is => 'ro', isa => 'HashRef', lazy => 1,
 			builder => '_build_valid_methods');
+has 'loggers' => (is => 'ro', required => 1, builder => '_build_loggers');
 
 our $CallContext;
 
@@ -112,6 +115,15 @@ our %return_counts = (
         'get_entity_Assay' => 1,
         'query_entity_Assay' => 1,
         'all_entities_Assay' => 1,
+        'get_entity_Association' => 1,
+        'query_entity_Association' => 1,
+        'all_entities_Association' => 1,
+        'get_entity_AssociationDataset' => 1,
+        'query_entity_AssociationDataset' => 1,
+        'all_entities_AssociationDataset' => 1,
+        'get_entity_AssociationDetectionType' => 1,
+        'query_entity_AssociationDetectionType' => 1,
+        'all_entities_AssociationDetectionType' => 1,
         'get_entity_AtomicRegulon' => 1,
         'query_entity_AtomicRegulon' => 1,
         'all_entities_AtomicRegulon' => 1,
@@ -154,6 +166,9 @@ our %return_counts = (
         'get_entity_EcNumber' => 1,
         'query_entity_EcNumber' => 1,
         'all_entities_EcNumber' => 1,
+        'get_entity_Effector' => 1,
+        'query_entity_Effector' => 1,
+        'all_entities_Effector' => 1,
         'get_entity_Environment' => 1,
         'query_entity_Environment' => 1,
         'all_entities_Environment' => 1,
@@ -178,15 +193,6 @@ our %return_counts = (
         'get_entity_Genome' => 1,
         'query_entity_Genome' => 1,
         'all_entities_Genome' => 1,
-        'get_entity_Interaction' => 1,
-        'query_entity_Interaction' => 1,
-        'all_entities_Interaction' => 1,
-        'get_entity_InteractionDataset' => 1,
-        'query_entity_InteractionDataset' => 1,
-        'all_entities_InteractionDataset' => 1,
-        'get_entity_InteractionDetectionType' => 1,
-        'query_entity_InteractionDetectionType' => 1,
-        'all_entities_InteractionDetectionType' => 1,
         'get_entity_Locality' => 1,
         'query_entity_Locality' => 1,
         'all_entities_Locality' => 1,
@@ -217,6 +223,12 @@ our %return_counts = (
         'get_entity_ObservationalUnit' => 1,
         'query_entity_ObservationalUnit' => 1,
         'all_entities_ObservationalUnit' => 1,
+        'get_entity_Ontology' => 1,
+        'query_entity_Ontology' => 1,
+        'all_entities_Ontology' => 1,
+        'get_entity_Operon' => 1,
+        'query_entity_Operon' => 1,
+        'all_entities_Operon' => 1,
         'get_entity_PairSet' => 1,
         'query_entity_PairSet' => 1,
         'all_entities_PairSet' => 1,
@@ -229,6 +241,9 @@ our %return_counts = (
         'get_entity_Person' => 1,
         'query_entity_Person' => 1,
         'all_entities_Person' => 1,
+        'get_entity_Platform' => 1,
+        'query_entity_Platform' => 1,
+        'all_entities_Platform' => 1,
         'get_entity_ProbeSet' => 1,
         'query_entity_ProbeSet' => 1,
         'all_entities_ProbeSet' => 1,
@@ -247,6 +262,24 @@ our %return_counts = (
         'get_entity_ReactionInstance' => 1,
         'query_entity_ReactionInstance' => 1,
         'all_entities_ReactionInstance' => 1,
+        'get_entity_Regulator' => 1,
+        'query_entity_Regulator' => 1,
+        'all_entities_Regulator' => 1,
+        'get_entity_Regulog' => 1,
+        'query_entity_Regulog' => 1,
+        'all_entities_Regulog' => 1,
+        'get_entity_RegulogCollection' => 1,
+        'query_entity_RegulogCollection' => 1,
+        'all_entities_RegulogCollection' => 1,
+        'get_entity_Regulome' => 1,
+        'query_entity_Regulome' => 1,
+        'all_entities_Regulome' => 1,
+        'get_entity_Regulon' => 1,
+        'query_entity_Regulon' => 1,
+        'all_entities_Regulon' => 1,
+        'get_entity_ReplicateGroup' => 1,
+        'query_entity_ReplicateGroup' => 1,
+        'all_entities_ReplicateGroup' => 1,
         'get_entity_Role' => 1,
         'query_entity_Role' => 1,
         'all_entities_Role' => 1,
@@ -256,9 +289,18 @@ our %return_counts = (
         'get_entity_SSRow' => 1,
         'query_entity_SSRow' => 1,
         'all_entities_SSRow' => 1,
+        'get_entity_Sample' => 1,
+        'query_entity_Sample' => 1,
+        'all_entities_Sample' => 1,
+        'get_entity_SampleAnnotation' => 1,
+        'query_entity_SampleAnnotation' => 1,
+        'all_entities_SampleAnnotation' => 1,
         'get_entity_Scenario' => 1,
         'query_entity_Scenario' => 1,
         'all_entities_Scenario' => 1,
+        'get_entity_Series' => 1,
+        'query_entity_Series' => 1,
+        'all_entities_Series' => 1,
         'get_entity_Source' => 1,
         'query_entity_Source' => 1,
         'all_entities_Source' => 1,
@@ -301,6 +343,8 @@ our %return_counts = (
         'get_relationship_WasAlignedBy' => 1,
         'get_relationship_AssertsFunctionFor' => 1,
         'get_relationship_HasAssertedFunctionFrom' => 1,
+        'get_relationship_AssociationFeature' => 1,
+        'get_relationship_FeatureInteractsIn' => 1,
         'get_relationship_CompoundMeasuredBy' => 1,
         'get_relationship_MeasuresCompound' => 1,
         'get_relationship_Concerns' => 1,
@@ -317,6 +361,8 @@ our %return_counts = (
         'get_relationship_GroupedBy' => 1,
         'get_relationship_Controls' => 1,
         'get_relationship_IsControlledUsing' => 1,
+        'get_relationship_DefaultControlSample' => 1,
+        'get_relationship_SamplesDefaultControl' => 1,
         'get_relationship_Describes' => 1,
         'get_relationship_IsDescribedBy' => 1,
         'get_relationship_DescribesAlignment' => 1,
@@ -335,6 +381,8 @@ our %return_counts = (
         'get_relationship_IsEncompassedIn' => 1,
         'get_relationship_EvaluatedIn' => 1,
         'get_relationship_IncludesStrain' => 1,
+        'get_relationship_FeatureIsTranscriptionFactorFor' => 1,
+        'get_relationship_HasTranscriptionFactorFeature' => 1,
         'get_relationship_FeatureMeasuredBy' => 1,
         'get_relationship_MeasuresFeature' => 1,
         'get_relationship_Formulated' => 1,
@@ -343,10 +391,18 @@ our %return_counts = (
         'get_relationship_WasGeneratedFrom' => 1,
         'get_relationship_GenomeParentOf' => 1,
         'get_relationship_DerivedFromGenome' => 1,
+        'get_relationship_HasAliasAssertedFrom' => 1,
+        'get_relationship_AssertsAliasFor' => 1,
         'get_relationship_HasCompoundAliasFrom' => 1,
         'get_relationship_UsesAliasForCompound' => 1,
+        'get_relationship_HasEffector' => 1,
+        'get_relationship_IsEffectorFor' => 1,
         'get_relationship_HasExperimentalUnit' => 1,
         'get_relationship_IsExperimentalUnitOf' => 1,
+        'get_relationship_HasExpressionSample' => 1,
+        'get_relationship_SampleBelongsToExperimentalUnit' => 1,
+        'get_relationship_HasGenomes' => 1,
+        'get_relationship_IsInRegulogCollection' => 1,
         'get_relationship_HasIndicatedSignalFrom' => 1,
         'get_relationship_IndicatesSignalFor' => 1,
         'get_relationship_HasKnockoutIn' => 1,
@@ -365,6 +421,8 @@ our %return_counts = (
         'get_relationship_IsProteinMemberOf' => 1,
         'get_relationship_HasReactionAliasFrom' => 1,
         'get_relationship_UsesAliasForReaction' => 1,
+        'get_relationship_HasRegulogs' => 1,
+        'get_relationship_IsInCollection' => 1,
         'get_relationship_HasRepresentativeOf' => 1,
         'get_relationship_IsRepresentedIn' => 1,
         'get_relationship_HasRequirementOf' => 1,
@@ -399,10 +457,6 @@ our %return_counts = (
         'get_relationship_IsPartOf' => 1,
         'get_relationship_IndicatedLevelsFor' => 1,
         'get_relationship_HasLevelsFrom' => 1,
-        'get_relationship_InteractionFeature' => 1,
-        'get_relationship_FeatureInteractsIn' => 1,
-        'get_relationship_InteractionProtein' => 1,
-        'get_relationship_ProteinInteractsIn' => 1,
         'get_relationship_Involves' => 1,
         'get_relationship_IsInvolvedIn' => 1,
         'get_relationship_IsAnnotatedBy' => 1,
@@ -430,7 +484,7 @@ our %return_counts = (
         'get_relationship_IsCoupledTo' => 1,
         'get_relationship_IsCoupledWith' => 1,
         'get_relationship_IsDatasetFor' => 1,
-        'get_relationship_HasInteractionDataset' => 1,
+        'get_relationship_HasAssociationDataset' => 1,
         'get_relationship_IsDeterminedBy' => 1,
         'get_relationship_Determines' => 1,
         'get_relationship_IsDividedInto' => 1,
@@ -448,9 +502,11 @@ our %return_counts = (
         'get_relationship_IsGroupFor' => 1,
         'get_relationship_IsInGroup' => 1,
         'get_relationship_IsGroupingOf' => 1,
-        'get_relationship_InInteractionDataset' => 1,
+        'get_relationship_InAssociationDataset' => 1,
         'get_relationship_IsImplementedBy' => 1,
         'get_relationship_Implements' => 1,
+        'get_relationship_IsInOperon' => 1,
+        'get_relationship_OperonContains' => 1,
         'get_relationship_IsInPair' => 1,
         'get_relationship_IsPairOf' => 1,
         'get_relationship_IsInstantiatedBy' => 1,
@@ -479,6 +535,12 @@ our %return_counts = (
         'get_relationship_UsesReference' => 1,
         'get_relationship_IsRegulatedIn' => 1,
         'get_relationship_IsRegulatedSetOf' => 1,
+        'get_relationship_IsRegulatorFor' => 1,
+        'get_relationship_HasRegulator' => 1,
+        'get_relationship_IsRegulatorForRegulon' => 1,
+        'get_relationship_ReglonHasRegulator' => 1,
+        'get_relationship_IsRegulatorySiteFor' => 1,
+        'get_relationship_HasRegulatorySite' => 1,
         'get_relationship_IsRelevantFor' => 1,
         'get_relationship_IsRelevantTo' => 1,
         'get_relationship_IsRepresentedBy' => 1,
@@ -489,6 +551,8 @@ our %return_counts = (
         'get_relationship_IsRoleFor' => 1,
         'get_relationship_IsSequenceOf' => 1,
         'get_relationship_HasAsSequence' => 1,
+        'get_relationship_IsSourceForAssociationDataset' => 1,
+        'get_relationship_AssociationDatasetSourcedBy' => 1,
         'get_relationship_IsSubInstanceOf' => 1,
         'get_relationship_Validates' => 1,
         'get_relationship_IsSummarizedBy' => 1,
@@ -505,6 +569,8 @@ our %return_counts = (
         'get_relationship_IsBuiltFromAlignment' => 1,
         'get_relationship_Manages' => 1,
         'get_relationship_IsManagedBy' => 1,
+        'get_relationship_OntologyForSample' => 1,
+        'get_relationship_SampleHasOntology' => 1,
         'get_relationship_OperatesIn' => 1,
         'get_relationship_IsUtilizedIn' => 1,
         'get_relationship_OrdersExperimentalUnit' => 1,
@@ -515,20 +581,54 @@ our %return_counts = (
         'get_relationship_IsParticipationOf' => 1,
         'get_relationship_PerformedExperiment' => 1,
         'get_relationship_PerformedBy' => 1,
+        'get_relationship_PersonAnnotatedSample' => 1,
+        'get_relationship_SampleAnnotatedBy' => 1,
+        'get_relationship_PlatformWithSamples' => 1,
+        'get_relationship_SampleRunOnPlatform' => 1,
         'get_relationship_ProducedResultsFor' => 1,
         'get_relationship_HadResultsProducedBy' => 1,
+        'get_relationship_ProtocolForSample' => 1,
+        'get_relationship_SampleUsesProtocol' => 1,
         'get_relationship_Provided' => 1,
         'get_relationship_WasProvidedBy' => 1,
+        'get_relationship_PublishedAssociation' => 1,
+        'get_relationship_AssociationPublishedIn' => 1,
         'get_relationship_PublishedExperiment' => 1,
         'get_relationship_ExperimentPublishedIn' => 1,
-        'get_relationship_PublishedInteraction' => 1,
-        'get_relationship_InteractionPublishedIn' => 1,
         'get_relationship_PublishedProtocol' => 1,
         'get_relationship_ProtocolPublishedIn' => 1,
+        'get_relationship_RegulogHasRegulon' => 1,
+        'get_relationship_RegulonIsInRegolog' => 1,
+        'get_relationship_RegulomeHasGenome' => 1,
+        'get_relationship_GenomeIsInRegulome' => 1,
+        'get_relationship_RegulomeHasRegulon' => 1,
+        'get_relationship_RegulonIsInRegolome' => 1,
+        'get_relationship_RegulomeSource' => 1,
+        'get_relationship_CreatedRegulome' => 1,
+        'get_relationship_RegulonHasOperon' => 1,
+        'get_relationship_OperonIsInRegulon' => 1,
+        'get_relationship_SampleAveragedFrom' => 1,
+        'get_relationship_SampleComponentOf' => 1,
+        'get_relationship_SampleContactPerson' => 1,
+        'get_relationship_PersonPerformedSample' => 1,
+        'get_relationship_SampleHasAnnotations' => 1,
+        'get_relationship_AnnotationsForSample' => 1,
+        'get_relationship_SampleInSeries' => 1,
+        'get_relationship_SeriesWithSamples' => 1,
+        'get_relationship_SampleMeasurements' => 1,
+        'get_relationship_MeasurementInSample' => 1,
+        'get_relationship_SamplesInReplicateGroup' => 1,
+        'get_relationship_ReplicateGroupsForSample' => 1,
+        'get_relationship_SeriesPublishedIn' => 1,
+        'get_relationship_PublicationsForSeries' => 1,
         'get_relationship_Shows' => 1,
         'get_relationship_IsShownOn' => 1,
         'get_relationship_StrainParentOf' => 1,
         'get_relationship_DerivedFromStrain' => 1,
+        'get_relationship_StrainWithPlatforms' => 1,
+        'get_relationship_PlatformForStrain' => 1,
+        'get_relationship_StrainWithSample' => 1,
+        'get_relationship_SampleForStrain' => 1,
         'get_relationship_Submitted' => 1,
         'get_relationship_WasSubmittedBy' => 1,
         'get_relationship_SupersedesAlignment' => 1,
@@ -651,6 +751,15 @@ sub _build_valid_methods
         'get_entity_Assay' => 1,
         'query_entity_Assay' => 1,
         'all_entities_Assay' => 1,
+        'get_entity_Association' => 1,
+        'query_entity_Association' => 1,
+        'all_entities_Association' => 1,
+        'get_entity_AssociationDataset' => 1,
+        'query_entity_AssociationDataset' => 1,
+        'all_entities_AssociationDataset' => 1,
+        'get_entity_AssociationDetectionType' => 1,
+        'query_entity_AssociationDetectionType' => 1,
+        'all_entities_AssociationDetectionType' => 1,
         'get_entity_AtomicRegulon' => 1,
         'query_entity_AtomicRegulon' => 1,
         'all_entities_AtomicRegulon' => 1,
@@ -693,6 +802,9 @@ sub _build_valid_methods
         'get_entity_EcNumber' => 1,
         'query_entity_EcNumber' => 1,
         'all_entities_EcNumber' => 1,
+        'get_entity_Effector' => 1,
+        'query_entity_Effector' => 1,
+        'all_entities_Effector' => 1,
         'get_entity_Environment' => 1,
         'query_entity_Environment' => 1,
         'all_entities_Environment' => 1,
@@ -717,15 +829,6 @@ sub _build_valid_methods
         'get_entity_Genome' => 1,
         'query_entity_Genome' => 1,
         'all_entities_Genome' => 1,
-        'get_entity_Interaction' => 1,
-        'query_entity_Interaction' => 1,
-        'all_entities_Interaction' => 1,
-        'get_entity_InteractionDataset' => 1,
-        'query_entity_InteractionDataset' => 1,
-        'all_entities_InteractionDataset' => 1,
-        'get_entity_InteractionDetectionType' => 1,
-        'query_entity_InteractionDetectionType' => 1,
-        'all_entities_InteractionDetectionType' => 1,
         'get_entity_Locality' => 1,
         'query_entity_Locality' => 1,
         'all_entities_Locality' => 1,
@@ -756,6 +859,12 @@ sub _build_valid_methods
         'get_entity_ObservationalUnit' => 1,
         'query_entity_ObservationalUnit' => 1,
         'all_entities_ObservationalUnit' => 1,
+        'get_entity_Ontology' => 1,
+        'query_entity_Ontology' => 1,
+        'all_entities_Ontology' => 1,
+        'get_entity_Operon' => 1,
+        'query_entity_Operon' => 1,
+        'all_entities_Operon' => 1,
         'get_entity_PairSet' => 1,
         'query_entity_PairSet' => 1,
         'all_entities_PairSet' => 1,
@@ -768,6 +877,9 @@ sub _build_valid_methods
         'get_entity_Person' => 1,
         'query_entity_Person' => 1,
         'all_entities_Person' => 1,
+        'get_entity_Platform' => 1,
+        'query_entity_Platform' => 1,
+        'all_entities_Platform' => 1,
         'get_entity_ProbeSet' => 1,
         'query_entity_ProbeSet' => 1,
         'all_entities_ProbeSet' => 1,
@@ -786,6 +898,24 @@ sub _build_valid_methods
         'get_entity_ReactionInstance' => 1,
         'query_entity_ReactionInstance' => 1,
         'all_entities_ReactionInstance' => 1,
+        'get_entity_Regulator' => 1,
+        'query_entity_Regulator' => 1,
+        'all_entities_Regulator' => 1,
+        'get_entity_Regulog' => 1,
+        'query_entity_Regulog' => 1,
+        'all_entities_Regulog' => 1,
+        'get_entity_RegulogCollection' => 1,
+        'query_entity_RegulogCollection' => 1,
+        'all_entities_RegulogCollection' => 1,
+        'get_entity_Regulome' => 1,
+        'query_entity_Regulome' => 1,
+        'all_entities_Regulome' => 1,
+        'get_entity_Regulon' => 1,
+        'query_entity_Regulon' => 1,
+        'all_entities_Regulon' => 1,
+        'get_entity_ReplicateGroup' => 1,
+        'query_entity_ReplicateGroup' => 1,
+        'all_entities_ReplicateGroup' => 1,
         'get_entity_Role' => 1,
         'query_entity_Role' => 1,
         'all_entities_Role' => 1,
@@ -795,9 +925,18 @@ sub _build_valid_methods
         'get_entity_SSRow' => 1,
         'query_entity_SSRow' => 1,
         'all_entities_SSRow' => 1,
+        'get_entity_Sample' => 1,
+        'query_entity_Sample' => 1,
+        'all_entities_Sample' => 1,
+        'get_entity_SampleAnnotation' => 1,
+        'query_entity_SampleAnnotation' => 1,
+        'all_entities_SampleAnnotation' => 1,
         'get_entity_Scenario' => 1,
         'query_entity_Scenario' => 1,
         'all_entities_Scenario' => 1,
+        'get_entity_Series' => 1,
+        'query_entity_Series' => 1,
+        'all_entities_Series' => 1,
         'get_entity_Source' => 1,
         'query_entity_Source' => 1,
         'all_entities_Source' => 1,
@@ -840,6 +979,8 @@ sub _build_valid_methods
         'get_relationship_WasAlignedBy' => 1,
         'get_relationship_AssertsFunctionFor' => 1,
         'get_relationship_HasAssertedFunctionFrom' => 1,
+        'get_relationship_AssociationFeature' => 1,
+        'get_relationship_FeatureInteractsIn' => 1,
         'get_relationship_CompoundMeasuredBy' => 1,
         'get_relationship_MeasuresCompound' => 1,
         'get_relationship_Concerns' => 1,
@@ -856,6 +997,8 @@ sub _build_valid_methods
         'get_relationship_GroupedBy' => 1,
         'get_relationship_Controls' => 1,
         'get_relationship_IsControlledUsing' => 1,
+        'get_relationship_DefaultControlSample' => 1,
+        'get_relationship_SamplesDefaultControl' => 1,
         'get_relationship_Describes' => 1,
         'get_relationship_IsDescribedBy' => 1,
         'get_relationship_DescribesAlignment' => 1,
@@ -874,6 +1017,8 @@ sub _build_valid_methods
         'get_relationship_IsEncompassedIn' => 1,
         'get_relationship_EvaluatedIn' => 1,
         'get_relationship_IncludesStrain' => 1,
+        'get_relationship_FeatureIsTranscriptionFactorFor' => 1,
+        'get_relationship_HasTranscriptionFactorFeature' => 1,
         'get_relationship_FeatureMeasuredBy' => 1,
         'get_relationship_MeasuresFeature' => 1,
         'get_relationship_Formulated' => 1,
@@ -882,10 +1027,18 @@ sub _build_valid_methods
         'get_relationship_WasGeneratedFrom' => 1,
         'get_relationship_GenomeParentOf' => 1,
         'get_relationship_DerivedFromGenome' => 1,
+        'get_relationship_HasAliasAssertedFrom' => 1,
+        'get_relationship_AssertsAliasFor' => 1,
         'get_relationship_HasCompoundAliasFrom' => 1,
         'get_relationship_UsesAliasForCompound' => 1,
+        'get_relationship_HasEffector' => 1,
+        'get_relationship_IsEffectorFor' => 1,
         'get_relationship_HasExperimentalUnit' => 1,
         'get_relationship_IsExperimentalUnitOf' => 1,
+        'get_relationship_HasExpressionSample' => 1,
+        'get_relationship_SampleBelongsToExperimentalUnit' => 1,
+        'get_relationship_HasGenomes' => 1,
+        'get_relationship_IsInRegulogCollection' => 1,
         'get_relationship_HasIndicatedSignalFrom' => 1,
         'get_relationship_IndicatesSignalFor' => 1,
         'get_relationship_HasKnockoutIn' => 1,
@@ -904,6 +1057,8 @@ sub _build_valid_methods
         'get_relationship_IsProteinMemberOf' => 1,
         'get_relationship_HasReactionAliasFrom' => 1,
         'get_relationship_UsesAliasForReaction' => 1,
+        'get_relationship_HasRegulogs' => 1,
+        'get_relationship_IsInCollection' => 1,
         'get_relationship_HasRepresentativeOf' => 1,
         'get_relationship_IsRepresentedIn' => 1,
         'get_relationship_HasRequirementOf' => 1,
@@ -938,10 +1093,6 @@ sub _build_valid_methods
         'get_relationship_IsPartOf' => 1,
         'get_relationship_IndicatedLevelsFor' => 1,
         'get_relationship_HasLevelsFrom' => 1,
-        'get_relationship_InteractionFeature' => 1,
-        'get_relationship_FeatureInteractsIn' => 1,
-        'get_relationship_InteractionProtein' => 1,
-        'get_relationship_ProteinInteractsIn' => 1,
         'get_relationship_Involves' => 1,
         'get_relationship_IsInvolvedIn' => 1,
         'get_relationship_IsAnnotatedBy' => 1,
@@ -969,7 +1120,7 @@ sub _build_valid_methods
         'get_relationship_IsCoupledTo' => 1,
         'get_relationship_IsCoupledWith' => 1,
         'get_relationship_IsDatasetFor' => 1,
-        'get_relationship_HasInteractionDataset' => 1,
+        'get_relationship_HasAssociationDataset' => 1,
         'get_relationship_IsDeterminedBy' => 1,
         'get_relationship_Determines' => 1,
         'get_relationship_IsDividedInto' => 1,
@@ -987,9 +1138,11 @@ sub _build_valid_methods
         'get_relationship_IsGroupFor' => 1,
         'get_relationship_IsInGroup' => 1,
         'get_relationship_IsGroupingOf' => 1,
-        'get_relationship_InInteractionDataset' => 1,
+        'get_relationship_InAssociationDataset' => 1,
         'get_relationship_IsImplementedBy' => 1,
         'get_relationship_Implements' => 1,
+        'get_relationship_IsInOperon' => 1,
+        'get_relationship_OperonContains' => 1,
         'get_relationship_IsInPair' => 1,
         'get_relationship_IsPairOf' => 1,
         'get_relationship_IsInstantiatedBy' => 1,
@@ -1018,6 +1171,12 @@ sub _build_valid_methods
         'get_relationship_UsesReference' => 1,
         'get_relationship_IsRegulatedIn' => 1,
         'get_relationship_IsRegulatedSetOf' => 1,
+        'get_relationship_IsRegulatorFor' => 1,
+        'get_relationship_HasRegulator' => 1,
+        'get_relationship_IsRegulatorForRegulon' => 1,
+        'get_relationship_ReglonHasRegulator' => 1,
+        'get_relationship_IsRegulatorySiteFor' => 1,
+        'get_relationship_HasRegulatorySite' => 1,
         'get_relationship_IsRelevantFor' => 1,
         'get_relationship_IsRelevantTo' => 1,
         'get_relationship_IsRepresentedBy' => 1,
@@ -1028,6 +1187,8 @@ sub _build_valid_methods
         'get_relationship_IsRoleFor' => 1,
         'get_relationship_IsSequenceOf' => 1,
         'get_relationship_HasAsSequence' => 1,
+        'get_relationship_IsSourceForAssociationDataset' => 1,
+        'get_relationship_AssociationDatasetSourcedBy' => 1,
         'get_relationship_IsSubInstanceOf' => 1,
         'get_relationship_Validates' => 1,
         'get_relationship_IsSummarizedBy' => 1,
@@ -1044,6 +1205,8 @@ sub _build_valid_methods
         'get_relationship_IsBuiltFromAlignment' => 1,
         'get_relationship_Manages' => 1,
         'get_relationship_IsManagedBy' => 1,
+        'get_relationship_OntologyForSample' => 1,
+        'get_relationship_SampleHasOntology' => 1,
         'get_relationship_OperatesIn' => 1,
         'get_relationship_IsUtilizedIn' => 1,
         'get_relationship_OrdersExperimentalUnit' => 1,
@@ -1054,20 +1217,54 @@ sub _build_valid_methods
         'get_relationship_IsParticipationOf' => 1,
         'get_relationship_PerformedExperiment' => 1,
         'get_relationship_PerformedBy' => 1,
+        'get_relationship_PersonAnnotatedSample' => 1,
+        'get_relationship_SampleAnnotatedBy' => 1,
+        'get_relationship_PlatformWithSamples' => 1,
+        'get_relationship_SampleRunOnPlatform' => 1,
         'get_relationship_ProducedResultsFor' => 1,
         'get_relationship_HadResultsProducedBy' => 1,
+        'get_relationship_ProtocolForSample' => 1,
+        'get_relationship_SampleUsesProtocol' => 1,
         'get_relationship_Provided' => 1,
         'get_relationship_WasProvidedBy' => 1,
+        'get_relationship_PublishedAssociation' => 1,
+        'get_relationship_AssociationPublishedIn' => 1,
         'get_relationship_PublishedExperiment' => 1,
         'get_relationship_ExperimentPublishedIn' => 1,
-        'get_relationship_PublishedInteraction' => 1,
-        'get_relationship_InteractionPublishedIn' => 1,
         'get_relationship_PublishedProtocol' => 1,
         'get_relationship_ProtocolPublishedIn' => 1,
+        'get_relationship_RegulogHasRegulon' => 1,
+        'get_relationship_RegulonIsInRegolog' => 1,
+        'get_relationship_RegulomeHasGenome' => 1,
+        'get_relationship_GenomeIsInRegulome' => 1,
+        'get_relationship_RegulomeHasRegulon' => 1,
+        'get_relationship_RegulonIsInRegolome' => 1,
+        'get_relationship_RegulomeSource' => 1,
+        'get_relationship_CreatedRegulome' => 1,
+        'get_relationship_RegulonHasOperon' => 1,
+        'get_relationship_OperonIsInRegulon' => 1,
+        'get_relationship_SampleAveragedFrom' => 1,
+        'get_relationship_SampleComponentOf' => 1,
+        'get_relationship_SampleContactPerson' => 1,
+        'get_relationship_PersonPerformedSample' => 1,
+        'get_relationship_SampleHasAnnotations' => 1,
+        'get_relationship_AnnotationsForSample' => 1,
+        'get_relationship_SampleInSeries' => 1,
+        'get_relationship_SeriesWithSamples' => 1,
+        'get_relationship_SampleMeasurements' => 1,
+        'get_relationship_MeasurementInSample' => 1,
+        'get_relationship_SamplesInReplicateGroup' => 1,
+        'get_relationship_ReplicateGroupsForSample' => 1,
+        'get_relationship_SeriesPublishedIn' => 1,
+        'get_relationship_PublicationsForSeries' => 1,
         'get_relationship_Shows' => 1,
         'get_relationship_IsShownOn' => 1,
         'get_relationship_StrainParentOf' => 1,
         'get_relationship_DerivedFromStrain' => 1,
+        'get_relationship_StrainWithPlatforms' => 1,
+        'get_relationship_PlatformForStrain' => 1,
+        'get_relationship_StrainWithSample' => 1,
+        'get_relationship_SampleForStrain' => 1,
         'get_relationship_Submitted' => 1,
         'get_relationship_WasSubmittedBy' => 1,
         'get_relationship_SupersedesAlignment' => 1,
@@ -1087,39 +1284,161 @@ sub _build_valid_methods
     return $methods;
 }
 
+my $DEPLOY = 'KB_DEPLOYMENT_CONFIG';
+my $SERVICE = 'KB_SERVICE_NAME';
+
+sub get_config_file
+{
+    my ($self) = @_;
+    if(!defined $ENV{$DEPLOY}) {
+        return undef;
+    }
+    return $ENV{$DEPLOY};
+}
+
+sub get_service_name
+{
+    my ($self) = @_;
+    if(!defined $ENV{$SERVICE}) {
+        return undef;
+    }
+    return $ENV{$SERVICE};
+}
+
+sub logcallback
+{
+    my ($self) = @_;
+    $self->loggers()->{serverlog}->set_log_file(
+        $self->{loggers}->{userlog}->get_log_file());
+}
+
+sub log
+{
+    my ($self, $level, $context, $message) = @_;
+    my $user = defined($context->user_id()) ? $context->user_id(): undef; 
+    $self->loggers()->{serverlog}->log_message($level, $message, $user, 
+        $context->module(), $context->method(), $context->call_id(),
+        $context->client_ip());
+}
+
+sub _build_loggers
+{
+    my ($self) = @_;
+    my $submod = $self->get_service_name() || 'CDMI_API';
+    my $loggers = {};
+    my $callback = sub {$self->logcallback();};
+    $loggers->{userlog} = Bio::KBase::Log->new(
+            $submod, {}, {ip_address => 1, authuser => 1, module => 1,
+            method => 1, call_id => 1, changecallback => $callback,
+            config => $self->get_config_file()});
+    $loggers->{serverlog} = Bio::KBase::Log->new(
+            $submod, {}, {ip_address => 1, authuser => 1, module => 1,
+            method => 1, call_id => 1,
+            logfile => $loggers->{userlog}->get_log_file()});
+    $loggers->{serverlog}->set_log_level(6);
+    return $loggers;
+}
+
+#override of RPC::Any::Server
+sub handle_error {
+    my ($self, $error) = @_;
+    
+    unless (ref($error) eq 'HASH' ||
+           (blessed $error and $error->isa('RPC::Any::Exception'))) {
+        $error = RPC::Any::Exception::PerlError->new(message => $error);
+    }
+    my $output;
+    eval {
+        my $encoded_error = $self->encode_output_from_exception($error);
+        $output = $self->produce_output($encoded_error);
+    };
+    
+    return $output if $output;
+    
+    die "$error\n\nAlso, an error was encountered while trying to send"
+        . " this error: $@\n";
+}
+
+#override of RPC::Any::JSONRPC
+sub encode_output_from_exception {
+    my ($self, $exception) = @_;
+    my %error_params;
+    if (ref($exception) eq 'HASH') {
+        %error_params = %{$exception};
+        if(defined($error_params{context})) {
+            my @errlines;
+            $errlines[0] = $error_params{message};
+            push @errlines, split("\n", $error_params{data});
+            $self->log($Bio::KBase::Log::ERR, $error_params{context}, \@errlines);
+            delete $error_params{context};
+        }
+    } else {
+        %error_params = (
+            message => $exception->message,
+            code    => $exception->code,
+        );
+    }
+    my $json_error;
+    if ($self->_last_call) {
+        $json_error = $self->_last_call->return_error(%error_params);
+    }
+    # Default to default_version. This happens when we throw an exception
+    # before inbound parsing is complete.
+    else {
+        $json_error = $self->_default_error(%error_params);
+    }
+    return $self->encode_output_from_object($json_error);
+}
+
 sub call_method {
     my ($self, $data, $method_info) = @_;
 
-    my ($module, $method) = @$method_info{qw(module method)};
+    my ($module, $method, $modname) = @$method_info{qw(module method modname)};
     
-    my $ctx = Bio::KBase::CDMI::ServiceContext->new(client_ip => $self->_plack_req->address);
+    my $ctx = Bio::KBase::CDMI::ServiceContext->new($self->{loggers}->{userlog},
+                           client_ip => $self->_plack_req->address);
+    $ctx->module($modname);
+    $ctx->method($method);
+    $ctx->call_id($self->{_last_call}->{id});
     
     my $args = $data->{arguments};
 
     # Service CDMI_API does not require authentication.
-    
     my $new_isa = $self->get_package_isa($module);
     no strict 'refs';
     local @{"${module}::ISA"} = @$new_isa;
     local $CallContext = $ctx;
     my @result;
     {
-	my $err;
-	eval {
-	    @result = $module->$method(@{ $data->{arguments} });
-	};
-	if ($@)
-	{
-	    #
-	    # Reraise the string version of the exception because
-	    # the RPC lib can't handle exception objects (yet).
-	    #
-	    my $err = $@;
-	    my $str = "$err";
-	    $str =~ s/Bio::KBase::CDMI::Service::call_method.*//s;
-	    $str =~ s/^/>\t/mg;
-	    die "The JSONRPC server invocation of the method \"$method\" failed with the following error:\n" . $str;
-	}
+        my $err;
+        eval {
+            $self->log($Bio::KBase::Log::INFO, $ctx, "start method");
+            @result = $module->$method(@{ $data->{arguments} });
+            $self->log($Bio::KBase::Log::INFO, $ctx, "end method");
+        };
+        if ($@)
+        {
+            my $err = $@;
+            my $nicerr;
+            if(ref($err) eq "Bio::KBase::Exceptions::KBaseException") {
+                $nicerr = {code => -32603, # perl error from RPC::Any::Exception
+                           message => $err->error,
+                           data => $err->trace->as_string,
+                           context => $ctx
+                           };
+            } else {
+                my $str = "$err";
+                $str =~ s/Bio::KBase::CDMI::Service::call_method.*//s; # is this still necessary? not sure
+                my $msg = $str;
+                $msg =~ s/ at [^\s]+.pm line \d+.\n$//;
+                $nicerr =  {code => -32603, # perl error from RPC::Any::Exception
+                            message => $msg,
+                            data => $str,
+                            context => $ctx
+                            };
+            }
+            die $nicerr;
+        }
     }
     my $result;
     if ($return_counts{$method} == 1)
@@ -1179,7 +1498,7 @@ sub get_method
 			 . " '$package' package.");
     }
     
-    return { module => $module, method => $method };
+    return { module => $module, method => $method, modname => $package };
 }
 
 package Bio::KBase::CDMI::ServiceContext;
@@ -1201,16 +1520,80 @@ is available via $context->client_ip.
 
 use base 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated token));
+__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated token
+                             module method call_id));
 
 sub new
 {
-    my($class, %opts) = @_;
+    my($class, $logger, %opts) = @_;
     
     my $self = {
-	%opts,
+        %opts,
     };
+    $self->{_logger} = $logger;
+    $self->{_debug_levels} = {7 => 1, 8 => 1, 9 => 1,
+                              'DEBUG' => 1, 'DEBUG2' => 1, 'DEBUG3' => 1};
     return bless $self, $class;
+}
+
+sub _get_user
+{
+    my ($self) = @_;
+    return defined($self->user_id()) ? $self->user_id(): undef; 
+}
+
+sub _log
+{
+    my ($self, $level, $message) = @_;
+    $self->{_logger}->log_message($level, $message, $self->_get_user(),
+        $self->module(), $self->method(), $self->call_id(),
+        $self->client_ip());
+}
+
+sub log_err
+{
+    my ($self, $message) = @_;
+    $self->_log($Bio::KBase::Log::ERR, $message);
+}
+
+sub log_info
+{
+    my ($self, $message) = @_;
+    $self->_log($Bio::KBase::Log::INFO, $message);
+}
+
+sub log_debug
+{
+    my ($self, $message, $level) = @_;
+    if(!defined($level)) {
+        $level = 1;
+    }
+    if($self->{_debug_levels}->{$level}) {
+    } else {
+        if ($level =~ /\D/ || $level < 1 || $level > 3) {
+            die "Invalid log level: $level";
+        }
+        $level += 6;
+    }
+    $self->_log($level, $message);
+}
+
+sub set_log_level
+{
+    my ($self, $level) = @_;
+    $self->{_logger}->set_log_level($level);
+}
+
+sub get_log_level
+{
+    my ($self) = @_;
+    return $self->{_logger}->get_log_level();
+}
+
+sub clear_log_level
+{
+    my ($self) = @_;
+    $self->{_logger}->clear_user_log_level();
 }
 
 1;

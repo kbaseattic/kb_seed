@@ -16,7 +16,7 @@ get_relationship_FeatureInteractsIn [-c N] [-a] [--fields field-list] < ids > ta
 
 =head1 DESCRIPTION
 
-The InteractionFeature relationship links interactions to
+The AssociationFeature relationship links associations to
 the features that encode their component proteins.
 
 Example:
@@ -90,12 +90,14 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Interaction entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Association entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
+
+=item name
 
 =item description
 
@@ -123,7 +125,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'feature_type', 'source_id', 'sequence_length', 'function', 'alias' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'stoichiometry', 'strength', 'rank' );
-my @all_to_fields = ( 'id', 'description', 'directional', 'confidence', 'url' );
+my @all_to_fields = ( 'id', 'name', 'description', 'directional', 'confidence', 'url' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -165,9 +167,10 @@ Usage: get_relationship_FeatureInteractsIn [arguments] < ids > table.with.fields
         rank
 
 --to field-list
-    Choose a set of fields from the Interaction entity to 
+    Choose a set of fields from the Association entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
+        name
         description
         directional
         confidence

@@ -36,6 +36,10 @@ The Person entity has the following relationship links:
     
 =item PerformedExperiment ExperimentMeta
 
+=item PersonAnnotatedSample SampleAnnotation
+
+=item PersonPerformedSample Sample
+
 
 =back
 

@@ -49,11 +49,13 @@ The Genome entity has the following relationship links:
 
 =over 4
     
+=item GenomeIsInRegulome Regulome
+
 =item GenomeParentOf Strain
 
 =item HadResultsProducedBy ProbeSet
 
-=item HasInteractionDataset InteractionDataset
+=item HasAssociationDataset AssociationDataset
 
 =item HasRepresentativeOf Family
 
@@ -62,6 +64,8 @@ The Genome entity has the following relationship links:
 =item IsComposedOf Contig
 
 =item IsConfiguredBy AtomicRegulon
+
+=item IsInRegulogCollection RegulogCollection
 
 =item IsInTaxa TaxonomicGrouping
 

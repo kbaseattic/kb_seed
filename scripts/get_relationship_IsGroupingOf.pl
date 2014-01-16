@@ -17,7 +17,7 @@ get_relationship_IsGroupingOf [-c N] [-a] [--fields field-list] < ids > table.wi
 =head1 DESCRIPTION
 
 The IsGroupingOf relationship describes which
-interactions are part of a particular interaction
+associations are part of a particular association
 dataset.
 
 Example:
@@ -50,7 +50,7 @@ Select the identifier from column num
 
 =item -from field-list
 
-Choose a set of fields from the InteractionDataset
+Choose a set of fields from the AssociationDataset
 entity to return. Field-list is a comma-separated list of strings. The
 following fields are available:
 
@@ -63,6 +63,8 @@ following fields are available:
 =item data_source
 
 =item url
+
+=item association_type
 
 =back    
 
@@ -81,12 +83,14 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Interaction entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Association entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
+
+=item name
 
 =item description
 
@@ -112,9 +116,9 @@ use Getopt::Long;
 
 #Default fields
  
-my @all_from_fields = ( 'id', 'description', 'data_source', 'url' );
+my @all_from_fields = ( 'id', 'description', 'data_source', 'url', 'association_type' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'description', 'directional', 'confidence', 'url' );
+my @all_to_fields = ( 'id', 'name', 'description', 'directional', 'confidence', 'url' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -136,13 +140,14 @@ Usage: get_relationship_IsGroupingOf [arguments] < ids > table.with.fields.added
     Select the identifier from column num
 
 --from field-list
-    Choose a set of fields from the InteractionDataset
+    Choose a set of fields from the AssociationDataset
     entity to return. Field-list is a comma-separated list of strings. The
     following fields are available:
         id
         description
         data_source
         url
+        association_type
 
 --rel field-list
     Choose a set of fields from the relationship to return. Field-list is a comma-separated list of 
@@ -151,9 +156,10 @@ Usage: get_relationship_IsGroupingOf [arguments] < ids > table.with.fields.added
         to_link
 
 --to field-list
-    Choose a set of fields from the Interaction entity to 
+    Choose a set of fields from the Association entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
+        name
         description
         directional
         confidence

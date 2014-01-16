@@ -104,6 +104,12 @@ strings. The following fields are available:
 
 =item id
 
+=item name
+
+=item url
+
+=item description
+
 =back    
 
 =back
@@ -122,7 +128,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'mod_date', 'name', 'source_id', 'abbr', 'direction', 'deltaG', 'deltaG_error', 'thermodynamic_reversibility', 'default_protons', 'status' );
 my @all_rel_fields = ( 'from_link', 'to_link', 'alias' );
-my @all_to_fields = ( 'id',  );
+my @all_to_fields = ( 'id', 'name', 'url', 'description' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -170,6 +176,9 @@ Usage: get_relationship_UsesAliasForReaction [arguments] < ids > table.with.fiel
     Choose a set of fields from the Source entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
+        name
+        url
+        description
 
 END
 

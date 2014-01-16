@@ -97,6 +97,12 @@ strings. The following fields are available:
 
 =item id
 
+=item name
+
+=item url
+
+=item description
+
 =back    
 
 =back
@@ -115,7 +121,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'version', 'curator', 'notes', 'description', 'usable', 'private', 'cluster_based', 'experimental' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id',  );
+my @all_to_fields = ( 'id', 'name', 'url', 'description' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -160,6 +166,9 @@ Usage: get_relationship_WasProvidedBy [arguments] < ids > table.with.fields.adde
     Choose a set of fields from the Source entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
+        name
+        url
+        description
 
 END
 

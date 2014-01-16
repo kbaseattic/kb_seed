@@ -38,13 +38,19 @@ The Source entity has the following relationship links:
     
 =item Aligned Alignment
 
+=item AssertsAliasFor Feature
+
 =item AssertsFunctionFor ProteinSequence
+
+=item CreatedRegulome Regulome
 
 =item Formulated CoregulatedSet
 
 =item HasCompoundAliasFrom Compound
 
 =item HasReactionAliasFrom Reaction
+
+=item IsSourceForAssociationDataset AssociationDataset
 
 =item Provided Subsystem
 
@@ -67,6 +73,18 @@ The following fields are available:
 
 =over 4    
 
+=item name
+
+The user-readable name for this source.
+
+=item url
+
+The URL to a site with information about this source.
+
+=item description
+
+A short textual description of this source.
+
 
 =back
 
@@ -81,7 +99,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = (  );
+my @all_fields = ( 'name', 'url', 'description' );
 my %all_fields = map { $_ => 1 } @all_fields;
 
 our $usage = <<'END';
@@ -93,6 +111,12 @@ Usage: all_entities_Source [arguments] > entity.data
 
 The following fields are available:
 
+    name
+        The user-readable name for this source.
+    url
+        The URL to a site with information about this source.
+    description
+        A short textual description of this source.
 END
 
 

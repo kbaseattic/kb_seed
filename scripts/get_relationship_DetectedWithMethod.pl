@@ -17,7 +17,7 @@ get_relationship_DetectedWithMethod [-c N] [-a] [--fields field-list] < ids > ta
 =head1 DESCRIPTION
 
 The DetectedWithMethod relationship describes which
-protein-protein interactions were detected or annotated by
+protein-protein associations were detected or annotated by
 particular methods
 
 Example:
@@ -50,7 +50,7 @@ Select the identifier from column num
 
 =item -from field-list
 
-Choose a set of fields from the InteractionDetectionType
+Choose a set of fields from the AssociationDetectionType
 entity to return. Field-list is a comma-separated list of strings. The
 following fields are available:
 
@@ -77,12 +77,14 @@ strings. The following fields are available:
 
 =item -to field-list
 
-Choose a set of fields from the Interaction entity to return. Field-list is a comma-separated list of 
+Choose a set of fields from the Association entity to return. Field-list is a comma-separated list of 
 strings. The following fields are available:
 
 =over 4
 
 =item id
+
+=item name
 
 =item description
 
@@ -110,7 +112,7 @@ use Getopt::Long;
  
 my @all_from_fields = ( 'id', 'description' );
 my @all_rel_fields = ( 'from_link', 'to_link',  );
-my @all_to_fields = ( 'id', 'description', 'directional', 'confidence', 'url' );
+my @all_to_fields = ( 'id', 'name', 'description', 'directional', 'confidence', 'url' );
 
 my %all_from_fields = map { $_ => 1 } @all_from_fields;
 my %all_rel_fields = map { $_ => 1 } @all_rel_fields;
@@ -132,7 +134,7 @@ Usage: get_relationship_DetectedWithMethod [arguments] < ids > table.with.fields
     Select the identifier from column num
 
 --from field-list
-    Choose a set of fields from the InteractionDetectionType
+    Choose a set of fields from the AssociationDetectionType
     entity to return. Field-list is a comma-separated list of strings. The
     following fields are available:
         id
@@ -145,9 +147,10 @@ Usage: get_relationship_DetectedWithMethod [arguments] < ids > table.with.fields
         to_link
 
 --to field-list
-    Choose a set of fields from the Interaction entity to 
+    Choose a set of fields from the Association entity to 
     return. Field-list is a comma-separated list of strings. The following fields are available:
         id
+        name
         description
         directional
         confidence

@@ -45,13 +45,19 @@ The Source entity has the following relationship links:
     
 =item Aligned Alignment
 
+=item AssertsAliasFor Feature
+
 =item AssertsFunctionFor ProteinSequence
+
+=item CreatedRegulome Regulome
 
 =item Formulated CoregulatedSet
 
 =item HasCompoundAliasFrom Compound
 
 =item HasReactionAliasFrom Reaction
+
+=item IsSourceForAssociationDataset AssociationDataset
 
 =item Provided Subsystem
 
@@ -115,6 +121,12 @@ strings. The following fields are available:
 
 =over 4
 
+=item name
+
+=item url
+
+=item description
+
 =back    
    
 =back
@@ -130,7 +142,7 @@ use Getopt::Long;
 
 #Default fields
 
-my @all_fields = (  );
+my @all_fields = ( 'name', 'url', 'description' );
 my %all_fields = map { $_ => 1 } @all_fields, 'id';
 
 our $usage = <<'END';
@@ -168,6 +180,9 @@ query_entity_Source [arguments] > records
     Choose a set of fields to return. Field-list is a comma-separated list of 
     strings. The following fields are available:
 
+        name
+        url
+        description
 END
 
 my $a;

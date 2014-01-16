@@ -5970,23 +5970,20 @@ sub aliases_to_fids
     chop $alist;
     $alist .= ")";
 
-    my @result = $kb->GetAll("Feature",
-			     "Feature(alias) IN $alist",
+    my @result = $kb->GetAll("HasAliasAssertedFrom",
+			     "HasAliasAssertedFrom(alias) IN $alist",
 			     $aliases,
-			     "Feature(id) Feature(alias)");
+			     "HasAliasAssertedFrom(from_link) HasAliasAssertedFrom(alias)");
+
     for my $row (@result)
     {
-	my($fid, @aliases) = @$row;
-	for my $a (@aliases)
+	my($fid, $alias) = @$row;
+	if (my $orig = $aliases{lc($alias)})
 	{
-	    if (my $orig = $aliases{lc($a)})
-	    {
-		push(@{$return->{$orig}}, $fid);
-		last;
-	    }
+	    push(@{$return->{$orig}}, $fid);
 	}
     }
-
+    
     #END aliases_to_fids
     my @_bad_returns;
     (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");

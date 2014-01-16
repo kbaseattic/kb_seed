@@ -40,6 +40,8 @@ The Measurement entity has the following relationship links:
 
 =item IsMeasureOf ExperimentalUnit
 
+=item MeasurementInSample Sample
+
 =item MeasuresCompound Compound
 
 =item MeasuresFeature Feature

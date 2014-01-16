@@ -59,8 +59,6 @@ The ProteinSequence entity has the following relationship links:
 
 =item IsProteinMemberOf Family
 
-=item ProteinInteractsIn Interaction
-
 
 =back
 

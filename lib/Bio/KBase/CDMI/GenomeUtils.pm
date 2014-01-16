@@ -420,7 +420,7 @@ sub LoadGenome {
                 # method will work properly.
                 if (! $slow) {
                     $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
-                            IsOwnerOf Feature FeatureAlias IsLocatedIn IsFunctionalIn
+                            IsOwnerOf Feature HasAliasAssertedFrom IsLocatedIn IsFunctionalIn
                             IsProteinFor Encompasses));
                 }
             }
@@ -937,8 +937,8 @@ sub ProcessFeatureBatch {
             my $aliases = $aliasMap->{$fid};
             if (defined $aliases) {
                 for my $alias (@$aliases) {
-                    $loader->InsertObject('FeatureAlias', id => $fidKBID,
-                            alias => $alias);
+                    $loader->InsertObject('HasAliasAssertedFrom', from_link => $fidKBID,
+                            alias => $alias, to_link => 'load_file');
                     $stats->Add(featureAlias => 1);
                 }
             }

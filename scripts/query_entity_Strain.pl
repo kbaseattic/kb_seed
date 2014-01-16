@@ -53,6 +53,10 @@ The Strain entity has the following relationship links:
 
 =item StrainParentOf Strain
 
+=item StrainWithPlatforms Platform
+
+=item StrainWithSample Sample
+
 
 =back
 

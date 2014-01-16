@@ -48,9 +48,11 @@ The Publication entity has the following relationship links:
     
 =item Concerns ProteinSequence
 
-=item PublishedExperiment ExperimentMeta
+=item PublicationsForSeries Series
 
-=item PublishedInteraction Interaction
+=item PublishedAssociation Association
+
+=item PublishedExperiment ExperimentMeta
 
 =item PublishedProtocol Protocol
 
