@@ -324,6 +324,131 @@ source ID associated with the assay type (informational)
 
     typedef structure {
         string id;
+	string name;
+	string description;
+	int directional;
+	float confidence;
+	string url;
+    } fields_Association;
+
+    /*
+An Association represents a protein complex or a pairwise
+(binary) physical association between proteins.
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+This is the name of the association. 
+
+=item description
+
+This is a description of this association.  If the protein complex has a name, this should be it. 
+
+=item directional
+
+True for directional binary associations (e.g., those detected by a pulldown experiment), false for non-directional binary associations and complexes. Bidirectional associations (e.g., associations detected by reciprocal pulldown experiments) should be encoded as 2 separate binary associations. 
+
+=item confidence
+
+Optional numeric estimate of confidence in the association. Recommended to use a 0-100 scale. 
+
+=item url
+
+Optional URL for more info about this complex.
+
+
+=back
+    */
+
+    funcdef get_entity_Association(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Association>);
+    funcdef query_entity_Association(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Association>);
+    funcdef all_entities_Association(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Association>);
+	
+
+    typedef structure {
+        string id;
+	string description;
+	string data_source;
+	string url;
+	string association_type;
+    } fields_AssociationDataset;
+
+    /*
+An Association Dataset is a collection of PPI
+data imported from a single database or publication.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a description of the dataset.
+
+=item data_source
+
+Optional external source for this dataset; e.g., another database.
+
+=item url
+
+Optional URL for more info about this dataset.
+
+=item association_type
+
+The type of this association.
+
+
+=back
+    */
+
+    funcdef get_entity_AssociationDataset(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_AssociationDataset>);
+    funcdef query_entity_AssociationDataset(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AssociationDataset>);
+    funcdef all_entities_AssociationDataset(int start, int count, list<string> fields)
+	returns(mapping<string, fields_AssociationDataset>);
+	
+
+    typedef structure {
+        string id;
+	string description;
+    } fields_AssociationDetectionType;
+
+    /*
+This documents methods by which associations are detected
+or annotated.
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+This is a brief description of this detection method. 
+
+
+=back
+    */
+
+    funcdef get_entity_AssociationDetectionType(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_AssociationDetectionType>);
+    funcdef query_entity_AssociationDetectionType(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_AssociationDetectionType>);
+    funcdef all_entities_AssociationDetectionType(int start, int count, list<string> fields)
+	returns(mapping<string, fields_AssociationDetectionType>);
+	
+
+    typedef structure {
+        string id;
     } fields_AtomicRegulon;
 
     /*
@@ -890,6 +1015,39 @@ When an obsolete EC number is replaced with another EC number, this string will 
 
     typedef structure {
         string id;
+	string name;
+	string effector_class;
+    } fields_Effector;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+Name of this effector.
+
+=item effector_class
+
+The class of this effector.
+
+
+=back
+    */
+
+    funcdef get_entity_Effector(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Effector>);
+    funcdef query_entity_Effector(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Effector>);
+    funcdef all_entities_Effector(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Effector>);
+	
+
+    typedef structure {
+        string id;
 	float temperature;
 	string description;
 	float oxygenConcentration;
@@ -1299,121 +1457,6 @@ identifier assigned to this genome by the original source
 	returns(mapping<string, fields_Genome>);
     funcdef all_entities_Genome(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Genome>);
-	
-
-    typedef structure {
-        string id;
-	string description;
-	int directional;
-	float confidence;
-	string url;
-    } fields_Interaction;
-
-    /*
-An Interaction represents a protein complex or a pairwise
-(binary) physical interaction between proteins.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a description of this interaction.  If the protein complex has a name, this should be it. 
-
-=item directional
-
-True for directional binary interactions (e.g., those detected by a pulldown experiment), false for non-directional binary interactions and complexes. Bidirectional interactions (e.g., interactions detected by reciprocal pulldown experiments) should be encoded as 2 separate binary interactions. 
-
-=item confidence
-
-Optional numeric estimate of confidence in the interaction. Recommended to use a 0-100 scale. 
-
-=item url
-
-Optional URL for more info about this complex.
-
-
-=back
-    */
-
-    funcdef get_entity_Interaction(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_Interaction>);
-    funcdef query_entity_Interaction(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_Interaction>);
-    funcdef all_entities_Interaction(int start, int count, list<string> fields)
-	returns(mapping<string, fields_Interaction>);
-	
-
-    typedef structure {
-        string id;
-	string description;
-	string data_source;
-	string url;
-    } fields_InteractionDataset;
-
-    /*
-An Interaction Dataset is a collection of PPI
-data imported from a single database or publication.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a description of the dataset.
-
-=item data_source
-
-Optional external source for this dataset; e.g., another database.
-
-=item url
-
-Optional URL for more info about this dataset.
-
-
-=back
-    */
-
-    funcdef get_entity_InteractionDataset(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_InteractionDataset>);
-    funcdef query_entity_InteractionDataset(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_InteractionDataset>);
-    funcdef all_entities_InteractionDataset(int start, int count, list<string> fields)
-	returns(mapping<string, fields_InteractionDataset>);
-	
-
-    typedef structure {
-        string id;
-	string description;
-    } fields_InteractionDetectionType;
-
-    /*
-This documents methods by which interactions are detected
-or annotated.
-
-
-It has the following fields:
-
-=over 4
-
-=item description
-
-This is a brief description of this detection method. 
-
-
-=back
-    */
-
-    funcdef get_entity_InteractionDetectionType(list<string> ids, list<string> fields)
-	returns(mapping<string, fields_InteractionDetectionType>);
-    funcdef query_entity_InteractionDetectionType(list<tuple<string, string, string>> qry, list<string> fields)
-	returns(mapping<string, fields_InteractionDetectionType>);
-    funcdef all_entities_InteractionDetectionType(int start, int count, list<string> fields)
-	returns(mapping<string, fields_InteractionDetectionType>);
 	
 
     typedef structure {
@@ -1896,6 +1939,78 @@ ID of the plant that was tested to produce this observational unit. Observationa
 
     typedef structure {
         string id;
+	string id;
+	string name;
+	string definition;
+	string ontologySource;
+    } fields_Ontology;
+
+    /*
+-- Environmental Ontology. (ENVO Terms) http://environmentontology.org/  
+-- Plant Ontology (PO Terms). http://www.plantontology.org/   
+-- Plant Environmental Ontology (EO Terms). http://www.gramene.org/plant_ontology/index.html#eo
+-- ENVO : http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo
+-- PO : http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co
+-- EO : http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo
+
+
+It has the following fields:
+
+=over 4
+
+=item id
+
+Ontologgy ID.
+
+=item name
+
+Type of the ontology.
+
+=item definition
+
+Definition of the ontology
+
+=item ontologySource
+
+Enumerated value (ENVO, EO, PO).
+
+
+=back
+    */
+
+    funcdef get_entity_Ontology(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Ontology>);
+    funcdef query_entity_Ontology(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Ontology>);
+    funcdef all_entities_Ontology(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Ontology>);
+	
+
+    typedef structure {
+        string id;
+    } fields_Operon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_entity_Operon(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Operon>);
+    funcdef query_entity_Operon(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Operon>);
+    funcdef all_entities_Operon(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Operon>);
+	
+
+    typedef structure {
+        string id;
 	int score;
     } fields_PairSet;
 
@@ -2025,6 +2140,54 @@ The ID of the person used by the data source.
 	returns(mapping<string, fields_Person>);
     funcdef all_entities_Person(int start, int count, list<string> fields)
 	returns(mapping<string, fields_Person>);
+	
+
+    typedef structure {
+        string id;
+	string title;
+	string externalSourceId;
+	string technology;
+	string type;
+	string source_id;
+    } fields_Platform;
+
+    /*
+Platform that the expression sample/experiment was run on.
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the comparison
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GPL514). This will keep them from having to do problematic likes on the source-id field.
+
+=item technology
+
+Ideally enumerated values, but may have to make this free text (spotted DNA/cDNA, spotted oligonucleotide, in situ oligonucleotide, antibody, tissue, SARST, RT-PCR, or MPSS).
+
+=item type
+
+Enumerated Microarray, RNA-Seq, qPCR
+
+=item source_id
+
+The ID used as the data source.
+
+
+=back
+    */
+
+    funcdef get_entity_Platform(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Platform>);
+    funcdef query_entity_Platform(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Platform>);
+    funcdef all_entities_Platform(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Platform>);
 	
 
     typedef structure {
@@ -2277,6 +2440,202 @@ number of protons produced by this reaction when proceeding in the forward direc
 
     typedef structure {
         string id;
+	string name;
+	string rfam_id;
+	string tf_family;
+	string type;
+	string taxonomy;
+    } fields_Regulator;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+A human-readable name for this Regulator. 
+
+=item rfam_id
+
+If this regulator is an RNA regulator, the rfam-id field will contain the RFAM identifier corresponding to it. 
+
+=item tf_family
+
+If this regulator is a transcription factor, then the tf-family field will contain the name of the transcription factor family. 
+
+=item type
+
+Type of the regulator; currently either RNA or TF. 
+
+=item taxonomy
+
+Type of the regulator; currently either RNA or TF. 
+
+
+=back
+    */
+
+    funcdef get_entity_Regulator(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Regulator>);
+    funcdef query_entity_Regulator(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Regulator>);
+    funcdef all_entities_Regulator(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Regulator>);
+	
+
+    typedef structure {
+        string id;
+	string description;
+    } fields_Regulog;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+
+
+
+=back
+    */
+
+    funcdef get_entity_Regulog(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Regulog>);
+    funcdef query_entity_Regulog(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Regulog>);
+    funcdef all_entities_Regulog(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Regulog>);
+	
+
+    typedef structure {
+        string id;
+	string name;
+	string description;
+    } fields_RegulogCollection;
+
+    /*
+A RegulogCollection describes a set of regulogs that are being
+curated on well-defined set of genomes.
+
+
+It has the following fields:
+
+=over 4
+
+=item name
+
+The name of this regulog collection. 
+
+=item description
+
+A brief description of this regulog collection. 
+
+
+=back
+    */
+
+    funcdef get_entity_RegulogCollection(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_RegulogCollection>);
+    funcdef query_entity_RegulogCollection(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_RegulogCollection>);
+    funcdef all_entities_RegulogCollection(int start, int count, list<string> fields)
+	returns(mapping<string, fields_RegulogCollection>);
+	
+
+    typedef structure {
+        string id;
+	string description;
+	string creation_date;
+    } fields_Regulome;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+A short description for this regulome. 
+
+=item creation_date
+
+Creation date for this regulome.
+
+
+=back
+    */
+
+    funcdef get_entity_Regulome(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Regulome>);
+    funcdef query_entity_Regulome(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Regulome>);
+    funcdef all_entities_Regulome(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Regulome>);
+	
+
+    typedef structure {
+        string id;
+	string description;
+    } fields_Regulon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item description
+
+A short description for this regulon. 
+
+
+=back
+    */
+
+    funcdef get_entity_Regulon(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Regulon>);
+    funcdef query_entity_Regulon(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Regulon>);
+    funcdef all_entities_Regulon(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Regulon>);
+	
+
+    typedef structure {
+        string id;
+    } fields_ReplicateGroup;
+
+    /*
+Keeps track of Replicate Groups of Expression Samples.  Has only an ID.  Relationship is the important part.
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_entity_ReplicateGroup(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_ReplicateGroup>);
+    funcdef query_entity_ReplicateGroup(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_ReplicateGroup>);
+    funcdef all_entities_ReplicateGroup(int start, int count, list<string> fields)
+	returns(mapping<string, fields_ReplicateGroup>);
+	
+
+    typedef structure {
+        string id;
 	int hypothetical;
     } fields_Role;
 
@@ -2373,6 +2732,126 @@ Region in the genome for which the row is relevant. Normally, this is an empty s
 
     typedef structure {
         string id;
+	string title;
+	string dataSource;
+	string externalSourceId;
+	string description;
+	string molecule;
+	string type;
+	string kbaseSubmissionDate;
+	string externalSourceDate;
+	string custom;
+	float originalLog2Median;
+	string source_id;
+	int dataQualityLevel;
+    } fields_Sample;
+
+    /*
+A sample is an experiment.  
+In intensity experiment situations the sample will map 1 to 1 to the GSM.  
+In this case there will be corresponding log2level data stored in the Measurement table.
+
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the sample
+
+=item dataSource
+
+The Data Source will be a way to identify where the data came from.  Examples might be : GEO, SEED Expression Pipeline, Enigma, M3D
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSM9514). This will keep them from having to do problematic likes on the source-id field.
+
+=item description
+
+Free-text descibing the experiment.
+
+=item molecule
+
+Enumerated field (total RNA, polyA RNA, cytoplasmic RNA, nuclear RNA, genomic DNA).
+
+=item type
+
+Enumerated Microarray, RNA-Seq, qPCR
+
+=item kbaseSubmissionDate
+
+date of submission to Kbase
+
+=item externalSourceDate
+
+date that may exist in the external source metadata (could be to GEO, M3D etc...)
+
+=item custom
+
+A flag to keep track if this series was generated by custom operations (averaging or comparison)
+
+=item originalLog2Median
+
+The Original Median of the sample in log2space.  If null means the original median was not able to be determined.
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+=item dataQualityLevel
+
+The quality of the data.  Lower the number the better.  Details need to be worked out.
+
+
+=back
+    */
+
+    funcdef get_entity_Sample(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Sample>);
+    funcdef query_entity_Sample(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Sample>);
+    funcdef all_entities_Sample(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Sample>);
+	
+
+    typedef structure {
+        string id;
+	string annotationDate;
+	string source_id;
+    } fields_SampleAnnotation;
+
+    /*
+Keeps track of ontology annotation date (and person if not automated).
+
+
+It has the following fields:
+
+=over 4
+
+=item annotationDate
+
+date of annotation
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+
+=back
+    */
+
+    funcdef get_entity_SampleAnnotation(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_SampleAnnotation>);
+    funcdef query_entity_SampleAnnotation(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_SampleAnnotation>);
+    funcdef all_entities_SampleAnnotation(int start, int count, list<string> fields)
+	returns(mapping<string, fields_SampleAnnotation>);
+	
+
+    typedef structure {
+        string id;
 	string common_name;
     } fields_Scenario;
 
@@ -2406,6 +2885,67 @@ Common name of the scenario. The name, rather than the ID number, is usually dis
 
     typedef structure {
         string id;
+	string title;
+	string summary;
+	string design;
+	string externalSourceId;
+	string kbaseSubmissionDate;
+	string externalSourceDate;
+	string source_id;
+    } fields_Series;
+
+    /*
+A series refers to a group of samples for expression data.
+
+It has the following fields:
+
+=over 4
+
+=item title
+
+free text title of the series
+
+=item summary
+
+free text summary of the series
+
+=item design
+
+free text design of the series
+
+=item externalSourceId
+
+The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSE2365). This will keep them from having to do problematic likes on the source-id field.
+
+=item kbaseSubmissionDate
+
+date of submission (to Kbase)
+
+=item externalSourceDate
+
+date that may exist in the external source metadata (could be to GEO, M3D etc...)
+
+=item source_id
+
+The ID of the environment used by the data source.
+
+
+=back
+    */
+
+    funcdef get_entity_Series(list<string> ids, list<string> fields)
+	returns(mapping<string, fields_Series>);
+    funcdef query_entity_Series(list<tuple<string, string, string>> qry, list<string> fields)
+	returns(mapping<string, fields_Series>);
+    funcdef all_entities_Series(int start, int count, list<string> fields)
+	returns(mapping<string, fields_Series>);
+	
+
+    typedef structure {
+        string id;
+	string name;
+	string url;
+	string description;
     } fields_Source;
 
     /*
@@ -2416,6 +2956,18 @@ to the database.
 It has the following fields:
 
 =over 4
+
+=item name
+
+The user-readable name for this source.
+
+=item url
+
+The URL to a site with information about this source.
+
+=item description
+
+A short textual description of this source.
 
 
 =back
@@ -3033,6 +3585,50 @@ date and time the assertion was downloaded
     typedef structure {
         string from_link;
 	string to_link;
+	int stoichiometry;
+	float strength;
+	int rank;
+    } fields_AssociationFeature;
+
+    /*
+The AssociationFeature relationship links associations to
+the features that encode their component proteins.
+
+It has the following fields:
+
+=over 4
+
+=item stoichiometry
+
+Stoichiometry, if applicable (e.g., for a curated complex.
+
+=item strength
+
+Optional numeric measure of strength of the association (e.g., kD or relative estimate of binding affinity)
+
+=item rank
+
+Numbered starting at 1 within an Association, if directional.  Meaning is method-dependent; e.g., for associations derived from pulldown data, rank 1 should be assigned to the bait.
+
+
+=back
+    */
+
+    funcdef get_relationship_AssociationFeature(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Association,
+			   fields_AssociationFeature,
+			   fields_Feature>>);
+		     
+	
+    funcdef get_relationship_FeatureInteractsIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Feature,
+			   fields_AssociationFeature,
+			   fields_Association>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_CompoundMeasuredBy;
 
     /*
@@ -3353,6 +3949,35 @@ It has the following fields:
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_DefaultControlSample;
+
+    /*
+The Default control for samples to compare against.  (Log2 measurments of Test Sample)/(Log2 measurements of Default Control).
+Really minus instead of divide since the values are already in Log2 Space.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_DefaultControlSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_DefaultControlSample,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SamplesDefaultControl(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_DefaultControlSample,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_Describes;
 
     /*
@@ -3523,7 +4148,7 @@ ID of the node described by the attribute
 
     /*
 The DetectedWithMethod relationship describes which
-protein-protein interactions were detected or annotated by
+protein-protein associations were detected or annotated by
 particular methods
 
 It has the following fields:
@@ -3535,15 +4160,15 @@ It has the following fields:
     */
 
     funcdef get_relationship_DetectedWithMethod(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_InteractionDetectionType,
+        returns(list<tuple<fields_AssociationDetectionType,
 			   fields_DetectedWithMethod,
-			   fields_Interaction>>);
+			   fields_Association>>);
 		     
 	
     funcdef get_relationship_DetectedBy(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Interaction,
+        returns(list<tuple<fields_Association,
 			   fields_DetectedWithMethod,
-			   fields_InteractionDetectionType>>);
+			   fields_AssociationDetectionType>>);
 	
 
     typedef structure {
@@ -3639,6 +4264,34 @@ It has the following fields:
         returns(list<tuple<fields_ExperimentalUnit,
 			   fields_EvaluatedIn,
 			   fields_Strain>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_FeatureIsTranscriptionFactorFor;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_FeatureIsTranscriptionFactorFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Feature,
+			   fields_FeatureIsTranscriptionFactorFor,
+			   fields_Regulon>>);
+		     
+	
+    funcdef get_relationship_HasTranscriptionFactorFeature(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_FeatureIsTranscriptionFactorFor,
+			   fields_Feature>>);
 	
 
     typedef structure {
@@ -3765,6 +4418,39 @@ It has the following fields:
         string from_link;
 	string to_link;
 	string alias;
+    } fields_HasAliasAssertedFrom;
+
+    /*
+A Source may assert aliases for features.
+
+It has the following fields:
+
+=over 4
+
+=item alias
+
+text of the alias for the feature.
+
+
+=back
+    */
+
+    funcdef get_relationship_HasAliasAssertedFrom(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Feature,
+			   fields_HasAliasAssertedFrom,
+			   fields_Source>>);
+		     
+	
+    funcdef get_relationship_AssertsAliasFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Source,
+			   fields_HasAliasAssertedFrom,
+			   fields_Feature>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+	string alias;
     } fields_HasCompoundAliasFrom;
 
     /*
@@ -3799,6 +4485,34 @@ alias for the compound assigned by the source
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_HasEffector;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_HasEffector(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_HasEffector,
+			   fields_Effector>>);
+		     
+	
+    funcdef get_relationship_IsEffectorFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Effector,
+			   fields_HasEffector,
+			   fields_Regulon>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_HasExperimentalUnit;
 
     /*
@@ -3823,6 +4537,62 @@ It has the following fields:
         returns(list<tuple<fields_ExperimentalUnit,
 			   fields_HasExperimentalUnit,
 			   fields_ExperimentMeta>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_HasExpressionSample;
+
+    /*
+This relationship indicating the expression samples for an experimental unit.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_HasExpressionSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_ExperimentalUnit,
+			   fields_HasExpressionSample,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SampleBelongsToExperimentalUnit(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_HasExpressionSample,
+			   fields_ExperimentalUnit>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_HasGenomes;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_HasGenomes(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_RegulogCollection,
+			   fields_HasGenomes,
+			   fields_Genome>>);
+		     
+	
+    funcdef get_relationship_IsInRegulogCollection(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Genome,
+			   fields_HasGenomes,
+			   fields_RegulogCollection>>);
 	
 
     typedef structure {
@@ -4134,6 +4904,34 @@ alias for the reaction assigned by the source
         returns(list<tuple<fields_Reaction,
 			   fields_HasReactionAliasFrom,
 			   fields_Source>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_HasRegulogs;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_HasRegulogs(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_RegulogCollection,
+			   fields_HasRegulogs,
+			   fields_Regulog>>);
+		     
+	
+    funcdef get_relationship_IsInCollection(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulog,
+			   fields_HasRegulogs,
+			   fields_RegulogCollection>>);
 	
 
     typedef structure {
@@ -4736,94 +5534,6 @@ Vector of expression levels (-1, 0, 1) for the experiments, in sequence order.
     typedef structure {
         string from_link;
 	string to_link;
-	int stoichiometry;
-	float strength;
-	int rank;
-    } fields_InteractionFeature;
-
-    /*
-The InteractionFeature relationship links interactions to
-the features that encode their component proteins.
-
-It has the following fields:
-
-=over 4
-
-=item stoichiometry
-
-Stoichiometry, if applicable (e.g., for a curated complex.
-
-=item strength
-
-Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
-
-=item rank
-
-Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
-
-
-=back
-    */
-
-    funcdef get_relationship_InteractionFeature(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Interaction,
-			   fields_InteractionFeature,
-			   fields_Feature>>);
-		     
-	
-    funcdef get_relationship_FeatureInteractsIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Feature,
-			   fields_InteractionFeature,
-			   fields_Interaction>>);
-	
-
-    typedef structure {
-        string from_link;
-	string to_link;
-	int stoichiometry;
-	float strength;
-	int rank;
-    } fields_InteractionProtein;
-
-    /*
-The InteractionProtein relationship links interactions to
-the component proteins.
-
-It has the following fields:
-
-=over 4
-
-=item stoichiometry
-
-Stoichiometry, if applicable (e.g., for a curated complex.
-
-=item strength
-
-Optional numeric measure of strength of the interaction (e.g., kD or relative estimate of binding affinity)
-
-=item rank
-
-Numbered starting at 1 within an Interaction, if directional.  Meaning is method-dependent; e.g., for interactions derived from pulldown data, rank 1 should be assigned to the bait.
-
-
-=back
-    */
-
-    funcdef get_relationship_InteractionProtein(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Interaction,
-			   fields_InteractionProtein,
-			   fields_ProteinSequence>>);
-		     
-	
-    funcdef get_relationship_ProteinInteractsIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_ProteinSequence,
-			   fields_InteractionProtein,
-			   fields_Interaction>>);
-	
-
-    typedef structure {
-        string from_link;
-	string to_link;
 	float coefficient;
 	int cofactor;
     } fields_Involves;
@@ -5299,7 +6009,7 @@ number of times members of the two FIGfams are co-expressed in expression data e
 
     /*
 The IsDatasetFor relationship describes which genomes
-are covered by particular interaction datasets.
+are covered by particular association datasets.
 
 It has the following fields:
 
@@ -5310,15 +6020,15 @@ It has the following fields:
     */
 
     funcdef get_relationship_IsDatasetFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_InteractionDataset,
+        returns(list<tuple<fields_AssociationDataset,
 			   fields_IsDatasetFor,
 			   fields_Genome>>);
 		     
 	
-    funcdef get_relationship_HasInteractionDataset(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+    funcdef get_relationship_HasAssociationDataset(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
         returns(list<tuple<fields_Genome,
 			   fields_IsDatasetFor,
-			   fields_InteractionDataset>>);
+			   fields_AssociationDataset>>);
 	
 
     typedef structure {
@@ -5567,7 +6277,7 @@ It has the following fields:
 
     /*
 The IsGroupingOf relationship describes which
-interactions are part of a particular interaction
+associations are part of a particular association
 dataset.
 
 It has the following fields:
@@ -5579,15 +6289,15 @@ It has the following fields:
     */
 
     funcdef get_relationship_IsGroupingOf(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_InteractionDataset,
+        returns(list<tuple<fields_AssociationDataset,
 			   fields_IsGroupingOf,
-			   fields_Interaction>>);
+			   fields_Association>>);
 		     
 	
-    funcdef get_relationship_InInteractionDataset(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Interaction,
+    funcdef get_relationship_InAssociationDataset(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Association,
 			   fields_IsGroupingOf,
-			   fields_InteractionDataset>>);
+			   fields_AssociationDataset>>);
 	
 
     typedef structure {
@@ -5618,6 +6328,39 @@ It has the following fields:
         returns(list<tuple<fields_SSRow,
 			   fields_IsImplementedBy,
 			   fields_Variant>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+	int rank;
+    } fields_IsInOperon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+=item rank
+
+The rank (order) of this feature in the operon.
+
+
+=back
+    */
+
+    funcdef get_relationship_IsInOperon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Feature,
+			   fields_IsInOperon,
+			   fields_Operon>>);
+		     
+	
+    funcdef get_relationship_OperonContains(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Operon,
+			   fields_IsInOperon,
+			   fields_Feature>>);
 	
 
     typedef structure {
@@ -6088,6 +6831,90 @@ It has the following fields:
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_IsRegulatorFor;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_IsRegulatorFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulator,
+			   fields_IsRegulatorFor,
+			   fields_Regulog>>);
+		     
+	
+    funcdef get_relationship_HasRegulator(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulog,
+			   fields_IsRegulatorFor,
+			   fields_Regulator>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_IsRegulatorForRegulon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_IsRegulatorForRegulon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulator,
+			   fields_IsRegulatorForRegulon,
+			   fields_Regulon>>);
+		     
+	
+    funcdef get_relationship_ReglonHasRegulator(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_IsRegulatorForRegulon,
+			   fields_Regulator>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_IsRegulatorySiteFor;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_IsRegulatorySiteFor(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Feature,
+			   fields_IsRegulatorySiteFor,
+			   fields_Operon>>);
+		     
+	
+    funcdef get_relationship_HasRegulatorySite(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Operon,
+			   fields_IsRegulatorySiteFor,
+			   fields_Feature>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_IsRelevantFor;
 
     /*
@@ -6233,6 +7060,34 @@ It has the following fields:
         returns(list<tuple<fields_Contig,
 			   fields_IsSequenceOf,
 			   fields_ContigSequence>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_IsSourceForAssociationDataset;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_IsSourceForAssociationDataset(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Source,
+			   fields_IsSourceForAssociationDataset,
+			   fields_AssociationDataset>>);
+		     
+	
+    funcdef get_relationship_AssociationDatasetSourcedBy(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_AssociationDataset,
+			   fields_IsSourceForAssociationDataset,
+			   fields_Source>>);
 	
 
     typedef structure {
@@ -6501,6 +7356,34 @@ It has the following fields:
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_OntologyForSample;
+
+    /*
+This relationship the ontology PO#, EO# or ENVO# associatioed with the sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_OntologyForSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Ontology,
+			   fields_OntologyForSample,
+			   fields_SampleAnnotation>>);
+		     
+	
+    funcdef get_relationship_SampleHasOntology(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_SampleAnnotation,
+			   fields_OntologyForSample,
+			   fields_Ontology>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_OperatesIn;
 
     /*
@@ -6664,6 +7547,63 @@ Describes the role the person played in the experiment. Examples are Primary Inv
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_PersonAnnotatedSample;
+
+    /*
+Only stores a person if a person annotates the data by hand.  
+Automated Sample Annotations will not be annotated by a person.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_PersonAnnotatedSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Person,
+			   fields_PersonAnnotatedSample,
+			   fields_SampleAnnotation>>);
+		     
+	
+    funcdef get_relationship_SampleAnnotatedBy(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_SampleAnnotation,
+			   fields_PersonAnnotatedSample,
+			   fields_Person>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_PlatformWithSamples;
+
+    /*
+This relationship indicates the expression samples that were run on a particular platform.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_PlatformWithSamples(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Platform,
+			   fields_PlatformWithSamples,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SampleRunOnPlatform(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_PlatformWithSamples,
+			   fields_Platform>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_ProducedResultsFor;
 
     /*
@@ -6689,6 +7629,34 @@ It has the following fields:
         returns(list<tuple<fields_Genome,
 			   fields_ProducedResultsFor,
 			   fields_ProbeSet>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_ProtocolForSample;
+
+    /*
+This relationship indicates the protocol used in the expression sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_ProtocolForSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Protocol,
+			   fields_ProtocolForSample,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SampleUsesProtocol(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_ProtocolForSample,
+			   fields_Protocol>>);
 	
 
     typedef structure {
@@ -6723,6 +7691,35 @@ It has the following fields:
     typedef structure {
         string from_link;
 	string to_link;
+    } fields_PublishedAssociation;
+
+    /*
+The PublishedAssociation relationship links associations
+to the manuscript they are published in.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_PublishedAssociation(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Publication,
+			   fields_PublishedAssociation,
+			   fields_Association>>);
+		     
+	
+    funcdef get_relationship_AssociationPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Association,
+			   fields_PublishedAssociation,
+			   fields_Publication>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
     } fields_PublishedExperiment;
 
     /*
@@ -6746,35 +7743,6 @@ It has the following fields:
     funcdef get_relationship_ExperimentPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
         returns(list<tuple<fields_ExperimentMeta,
 			   fields_PublishedExperiment,
-			   fields_Publication>>);
-	
-
-    typedef structure {
-        string from_link;
-	string to_link;
-    } fields_PublishedInteraction;
-
-    /*
-The PublishedInteraction relationship links interactions
-to the manuscript they are published in.
-
-It has the following fields:
-
-=over 4
-
-
-=back
-    */
-
-    funcdef get_relationship_PublishedInteraction(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Publication,
-			   fields_PublishedInteraction,
-			   fields_Interaction>>);
-		     
-	
-    funcdef get_relationship_InteractionPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
-        returns(list<tuple<fields_Interaction,
-			   fields_PublishedInteraction,
 			   fields_Publication>>);
 	
 
@@ -6805,6 +7773,343 @@ It has the following fields:
         returns(list<tuple<fields_Protocol,
 			   fields_PublishedProtocol,
 			   fields_Publication>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_RegulogHasRegulon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_RegulogHasRegulon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulog,
+			   fields_RegulogHasRegulon,
+			   fields_Regulon>>);
+		     
+	
+    funcdef get_relationship_RegulonIsInRegolog(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_RegulogHasRegulon,
+			   fields_Regulog>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_RegulomeHasGenome;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_RegulomeHasGenome(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulome,
+			   fields_RegulomeHasGenome,
+			   fields_Genome>>);
+		     
+	
+    funcdef get_relationship_GenomeIsInRegulome(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Genome,
+			   fields_RegulomeHasGenome,
+			   fields_Regulome>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_RegulomeHasRegulon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_RegulomeHasRegulon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulome,
+			   fields_RegulomeHasRegulon,
+			   fields_Regulon>>);
+		     
+	
+    funcdef get_relationship_RegulonIsInRegolome(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_RegulomeHasRegulon,
+			   fields_Regulome>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_RegulomeSource;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_RegulomeSource(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulome,
+			   fields_RegulomeSource,
+			   fields_Source>>);
+		     
+	
+    funcdef get_relationship_CreatedRegulome(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Source,
+			   fields_RegulomeSource,
+			   fields_Regulome>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_RegulonHasOperon;
+
+    /*
+
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_RegulonHasOperon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Regulon,
+			   fields_RegulonHasOperon,
+			   fields_Operon>>);
+		     
+	
+    funcdef get_relationship_OperonIsInRegulon(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Operon,
+			   fields_RegulonHasOperon,
+			   fields_Regulon>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SampleAveragedFrom;
+
+    /*
+Custom averaging of samples (typically replicates).
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SampleAveragedFrom(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleAveragedFrom,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SampleComponentOf(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleAveragedFrom,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SampleContactPerson;
+
+    /*
+The people that performed the expression experiment(sample).
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SampleContactPerson(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleContactPerson,
+			   fields_Person>>);
+		     
+	
+    funcdef get_relationship_PersonPerformedSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Person,
+			   fields_SampleContactPerson,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SampleHasAnnotations;
+
+    /*
+This relationship indicates the sample annotations that belong to the sample.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SampleHasAnnotations(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleHasAnnotations,
+			   fields_SampleAnnotation>>);
+		     
+	
+    funcdef get_relationship_AnnotationsForSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_SampleAnnotation,
+			   fields_SampleHasAnnotations,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SampleInSeries;
+
+    /*
+This relationship indicates what samples are in a series.  Note a sample can be in more than one series.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SampleInSeries(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleInSeries,
+			   fields_Series>>);
+		     
+	
+    funcdef get_relationship_SeriesWithSamples(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Series,
+			   fields_SampleInSeries,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SampleMeasurements;
+
+    /*
+The Measurements for expression microarray data should be in Log2 space and 
+the measurements for a given sample should have the median set to zero.  RNA-Seq data will likely be in FPKM.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SampleMeasurements(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SampleMeasurements,
+			   fields_Measurement>>);
+		     
+	
+    funcdef get_relationship_MeasurementInSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Measurement,
+			   fields_SampleMeasurements,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SamplesInReplicateGroup;
+
+    /*
+The samples that are identified as being part of one replicate group.  All samples in replicate group are replicates of one another.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SamplesInReplicateGroup(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_SamplesInReplicateGroup,
+			   fields_ReplicateGroup>>);
+		     
+	
+    funcdef get_relationship_ReplicateGroupsForSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_ReplicateGroup,
+			   fields_SamplesInReplicateGroup,
+			   fields_Sample>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_SeriesPublishedIn;
+
+    /*
+This relationship indicates where the series was published.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_SeriesPublishedIn(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Series,
+			   fields_SeriesPublishedIn,
+			   fields_Publication>>);
+		     
+	
+    funcdef get_relationship_PublicationsForSeries(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Publication,
+			   fields_SeriesPublishedIn,
+			   fields_Series>>);
 	
 
     typedef structure {
@@ -6868,6 +8173,62 @@ It has the following fields:
     funcdef get_relationship_DerivedFromStrain(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
         returns(list<tuple<fields_Strain,
 			   fields_StrainParentOf,
+			   fields_Strain>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_StrainWithPlatforms;
+
+    /*
+This relationship indicates the platforms for a strain.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_StrainWithPlatforms(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Strain,
+			   fields_StrainWithPlatforms,
+			   fields_Platform>>);
+		     
+	
+    funcdef get_relationship_PlatformForStrain(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Platform,
+			   fields_StrainWithPlatforms,
+			   fields_Strain>>);
+	
+
+    typedef structure {
+        string from_link;
+	string to_link;
+    } fields_StrainWithSample;
+
+    /*
+This indicates which expression samples a strain has.
+
+It has the following fields:
+
+=over 4
+
+
+=back
+    */
+
+    funcdef get_relationship_StrainWithSample(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Strain,
+			   fields_StrainWithSample,
+			   fields_Sample>>);
+		     
+	
+    funcdef get_relationship_SampleForStrain(list<string> ids, list<string> from_fields, list<string> rel_fields, list<string> to_fields)
+        returns(list<tuple<fields_Sample,
+			   fields_StrainWithSample,
 			   fields_Strain>>);
 	
 
