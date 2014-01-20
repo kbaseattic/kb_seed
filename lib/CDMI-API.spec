@@ -754,6 +754,7 @@ module CDMI_API : CDMI_API {
     typedef string alias;
     typedef list<alias> aliases;
     funcdef aliases_to_fids(aliases) returns (mapping<alias, fid>);
+    funcdef aliases_to_fids_by_source(aliases, string source) returns (mapping<alias, fid>);
     
     typedef string external_id;
     typedef list<external_id> external_ids;

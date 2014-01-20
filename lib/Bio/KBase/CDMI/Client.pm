@@ -5807,6 +5807,96 @@ sub aliases_to_fids
 
 
 
+=head2 aliases_to_fids_by_source
+
+  $return = $obj->aliases_to_fids_by_source($aliases, $source)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$aliases is an aliases
+$source is a string
+$return is a reference to a hash where the key is an alias and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$aliases is an aliases
+$source is a string
+$return is a reference to a hash where the key is an alias and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub aliases_to_fids_by_source
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function aliases_to_fids_by_source (received $n, expecting 2)");
+    }
+    {
+	my($aliases, $source) = @args;
+
+	my @_bad_arguments;
+        (ref($aliases) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"aliases\" (value was \"$aliases\")");
+        (!ref($source)) or push(@_bad_arguments, "Invalid type for argument 2 \"source\" (value was \"$source\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to aliases_to_fids_by_source:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'aliases_to_fids_by_source');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.aliases_to_fids_by_source",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'aliases_to_fids_by_source',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method aliases_to_fids_by_source",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'aliases_to_fids_by_source',
+				       );
+    }
+}
+
+
+
 =head2 external_ids_to_fids
 
   $return = $obj->external_ids_to_fids($external_ids, $prefix_match)
