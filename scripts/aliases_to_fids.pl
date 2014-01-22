@@ -43,6 +43,7 @@ the end of the line.
 
 Usage: aliases_to_fids [arguments] < input > output
 
+    -source	  Only pull aliases with the given source
     -c num        Select the identifier from column num
     -i filename   Use filename rather than stdin for input
 
@@ -53,7 +54,7 @@ L<The SEED Project|http://www.theseed.org>
 =cut
 
 
-our $usage = "usage: aliases_to_fids [-c column] < input > output";
+our $usage = "usage: aliases_to_fids [-c column] [-source source] < input > output";
 
 use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::Utilities::ScriptThing;
@@ -61,9 +62,11 @@ use Bio::KBase::Utilities::ScriptThing;
 my $column;
 
 my $input_file;
+my $source;
 
 my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
+						       'source=s' => \$source,
+						       'i=s' => \$input_file);
 if (! $kbO) { print STDERR $usage; exit }
 
 my $ih;
@@ -78,7 +81,15 @@ else
 
 while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, 10, $column)) {
     my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->aliases_to_fids(\@h);
+    my $h;
+    if ($source)
+    {
+	$h = $kbO->aliases_to_fids_by_source(\@h, $source);
+    }
+    else
+    {
+	$h = $kbO->aliases_to_fids(\@h);
+    }
     for my $tuple (@tuples) {
         #
         # Process output here and print.

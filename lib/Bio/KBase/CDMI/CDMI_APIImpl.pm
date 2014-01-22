@@ -6100,7 +6100,7 @@ sub aliases_to_fids_by_source
 
     my @result = $kb->GetAll("HasAliasAssertedFrom",
 			     "HasAliasAssertedFrom(alias) IN $alist AND to_link = ?",
-			     (@$aliases, $source),
+			     [@$aliases, $source],
 			     "HasAliasAssertedFrom(from_link) HasAliasAssertedFrom(alias)");
 
     for my $row (@result)
@@ -6119,6 +6119,99 @@ sub aliases_to_fids_by_source
 	my $msg = "Invalid returns passed to aliases_to_fids_by_source:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'aliases_to_fids_by_source');
+    }
+    return($return);
+}
+
+
+
+
+=head2 source_ids_to_fids
+
+  $return = $obj->source_ids_to_fids($aliases)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$aliases is an aliases
+$return is a reference to a hash where the key is a string and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$aliases is an aliases
+$return is a reference to a hash where the key is a string and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub source_ids_to_fids
+{
+    my $self = shift;
+    my($aliases) = @_;
+
+    my @_bad_arguments;
+    (ref($aliases) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"aliases\" (value was \"$aliases\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to source_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'source_ids_to_fids');
+    }
+
+    my $ctx = $Bio::KBase::CDMI::Service::CallContext;
+    my($return);
+    #BEGIN source_ids_to_fids
+    my $kb = $self->{db};
+    $return = {};
+    if ((! $aliases) || (@$aliases == 0)) { return $return }
+
+    my $n = @$aliases;
+
+    my $alist = "(" . ('?,' x $n);
+    chop $alist;
+    $alist .= ")";
+
+    my @result = $kb->GetAll("Feature",
+			     "Feature(source_id) IN $alist",
+			     @$aliases,
+			     "Feature(id) Feature(source_id)");
+
+    for my $row (@result)
+    {
+	my($fid, $src) = @$row;
+	push(@{$return->{$src}}, $fid);
+    }
+    
+    #END source_ids_to_fids
+    my @_bad_returns;
+    (ref($return) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to source_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'source_ids_to_fids');
     }
     return($return);
 }

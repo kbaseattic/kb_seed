@@ -5897,6 +5897,93 @@ sub aliases_to_fids_by_source
 
 
 
+=head2 source_ids_to_fids
+
+  $return = $obj->source_ids_to_fids($aliases)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$aliases is an aliases
+$return is a reference to a hash where the key is a string and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$aliases is an aliases
+$return is a reference to a hash where the key is a string and the value is a fid
+aliases is a reference to a list where each element is an alias
+alias is a string
+fid is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub source_ids_to_fids
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function source_ids_to_fids (received $n, expecting 1)");
+    }
+    {
+	my($aliases) = @args;
+
+	my @_bad_arguments;
+        (ref($aliases) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"aliases\" (value was \"$aliases\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to source_ids_to_fids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'source_ids_to_fids');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "CDMI_API.source_ids_to_fids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'source_ids_to_fids',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method source_ids_to_fids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'source_ids_to_fids',
+				       );
+    }
+}
+
+
+
 =head2 external_ids_to_fids
 
   $return = $obj->external_ids_to_fids($external_ids, $prefix_match)
