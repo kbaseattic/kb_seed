@@ -6196,7 +6196,7 @@ sub source_ids_to_fids
 
     my @result = $kb->GetAll("Feature",
 			     "Feature(source_id) IN $alist",
-			     @$aliases,
+			     $aliases,
 			     "Feature(id) Feature(source_id)");
 
     for my $row (@result)

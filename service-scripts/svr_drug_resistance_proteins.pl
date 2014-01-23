@@ -23,7 +23,7 @@ my $usage = <<'End_of_Usage';
 Identify the drug resistance proteins in one or more genomes.
 
 Usage: svr_drug_resistance_proteins    [options] < genome_ids         > proteins_found
-       svr_drug_resistance_proteins -c [options]   aa_query_file ...  > proteins_found
+       svr_drug_resistance_proteins -q [options]   aa_query_file ...  > proteins_found
        svr_drug_resistance_proteins -g [options] [ genome_id ... ]    > proteins_found
 
 Output:
@@ -34,12 +34,15 @@ Options:
 
     -a 'role'  #  Proposed assignment for sequences whose closest referece match has no assignment
     -b         #  Add a blank line between genomes (D = no blank)
-    -c         #  Parameters are query file names (D = genome ids from STDIN)
+    -c min-cov #  Min coverage (D = defined in the module of representatives)
     -d domains #  One or more of the letters A, B and/or E, run together
+    -e e-value #  Max e-value for calling proteins (D = defined in the module of representatives)
     -f         #  Fasta output format
     -g         #  Parameters are genome ids. No ids gives all complete genomes.
+    -i ident   #  Min percent identity (D = defined in module of representatives)
     -m module  #  Perl module with reference sequences for the RNA type
     -p         #  Include partial Sapling genomes
+    -q         #  Parameters are query file names (D = genome ids from STDIN)
     -r reffile #  File of reference sequences for the protein type
     -s         #  Do not show sequence
     -t 'tag'   #  A short tage to identify the nature of the feature; allows
@@ -102,7 +105,9 @@ while ( @ARGV && $ARGV[0] =~ s/^-// )
     local $_ = shift;
 
     if ( s/^a// ) { $assignment  = /\S/ ? $_ : shift; next }
+    if ( s/^c// ) { $coverage    = /\S/ ? $_ : shift; next }
     if ( s/^d// ) { $domains     = /\S/ ? $_ : shift; next }
+    if ( s/^e// ) { $expect      = /\S/ ? $_ : shift; next }
     if ( s/^i// ) { $identity    = /\S/ ? $_ : shift; next }
     if ( s/^m// ) { $module      = /\S/ ? $_ : shift; next }
     if ( s/^r// ) { $reffile     = /\S/ ? $_ : shift; next }
@@ -110,7 +115,7 @@ while ( @ARGV && $ARGV[0] =~ s/^-// )
     if ( s/^u// ) { $url         = /\S/ ? $_ : shift; next }
 
     if ( s/b//g ) { $blank       = 1 }
-    if ( s/c//g ) { $queryfiles  = 1 }
+    if ( s/q//g ) { $queryfiles  = 1 }
     if ( s/g//g ) { $genomeids   = 1 }
     if ( s/s//g ) { $no_seq      = 1 }
     if ( s/v//g ) { $verbose     = 1 }
@@ -226,7 +231,8 @@ foreach my $genome ( @genomes )
     my @instances = map { my $qid = $_->{ query_id };
                           my $seq = $_->{ sequence };
                           my $def = $_->{ reference_def } || $assignment;
-                          [ $qid, $def, $seq ] 
+                          my $sid = $_->{ reference_id };
+                          [ $qid, $def, $seq, $sid ] 
                         } 
                     @$instances;
 
@@ -236,6 +242,7 @@ foreach my $genome ( @genomes )
         if ( ! $fasta )
         {
             print join( "\t", @$_[0..1],
+                              $_->[3],
                               ( !$no_seq ? $_->[2] : () ),
                               ( $tag     ? $tag    : () )
                       ), "\n"
@@ -365,7 +372,7 @@ sub find_protein_homologs
                 -e => $max_exp,
                 -v =>  5,
                 -b =>  5,
-                -a =>  2
+                -a =>  8
               );
 
     my $redirect = { stderr => '/dev/null' };

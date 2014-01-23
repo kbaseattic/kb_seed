@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use SeedUtils;
+use gjoseqlib;
 
 use Bio::KBase::GenomeAnnotation::Client;
 use JSON::XS;
@@ -37,6 +38,11 @@ if (!$rc || $help || @ARGV != 1) {
 
 my $format = shift;
 
+if (lc($format) eq 'gff')
+{
+    $format = 'GTF';
+}
+
 my $in_fh;
 if ($input_file) {
     open($in_fh, "<", $input_file) or die "Cannot open $input_file: $!";
@@ -57,6 +63,20 @@ my $genomeTO;
     $genomeTO = $json->decode($genomeTO_txt);
 }
 
+#
+# Simple exports.
+#
+
+if ($format eq 'protein_fasta')
+{
+    export_protein_fasta($genomeTO, $out_fh);
+    exit;
+}
+elsif ($format eq 'contig_fasta')
+{
+    export_contig_fasta($genomeTO, $out_fh);
+    exit;
+}
 
 my $bio;
 
@@ -256,3 +276,29 @@ if ($format eq "GTF") {
 	$sio->write_seq($bio->{$seq});
     }
 }
+
+sub export_protein_fasta
+{
+    my($genomeTO, $out_fh) = @_;
+
+    for my $f (@{$genomeTO->{features}})
+    {
+	my $peg = $f->{id};
+	if ($f->{protein_translation})
+	{
+	    print_alignment_as_fasta($out_fh, [$peg, $f->{function}, $f->{protein_translation}]);
+	}
+    }
+}
+
+sub export_contig_fasta
+{
+    my($genomeTO, $out_fh) = @_;
+
+    for my $c (@{$genomeTO->{contigs}})
+    {
+	my $contig = $c->{id};
+	print_alignment_as_fasta($out_fh, [$contig, undef, $c->{dna}]);
+    }
+}
+
