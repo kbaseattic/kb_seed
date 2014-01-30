@@ -5,6 +5,14 @@ The kb_seed module contains an import of a large body of code from the SEED proj
 imports are performed on a periodic basis as new features developed on the SEED side
 are required in the KBase codebase.
 
+VERSION - 1.073 - January 30, 2014
+----------------------------------
+
+Add backend service scripts for supporting the new RAST2 code.
+
+Update CDMI access routines for the latest central store schema (database
+version v3).
+
 VERSION - 1.059 - August 23, 2013
 ---------------------------------
 
