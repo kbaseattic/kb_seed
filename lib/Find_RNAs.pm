@@ -29,12 +29,11 @@ use warnings;
 use Time::HiRes 'gettimeofday';
 use Scalar::Util qw/ openhandle /;
 use File::Temp qw/ tempfile tempdir /;
+use File::Path qw(rmtree);
 use Data::Dumper;
 use Carp;
 
-use FIG_Config;
 use gjoseqlib;
-
 
 sub find_rnas
 {
@@ -143,6 +142,8 @@ sub find_rnas
     #unlink($tmp2);
     #unlink($tbl);
     #unlink($tbl2);
+
+    rmtree($tmp_dir);
     
     return wantarray ? ($encoded_tbl, $event) : $encoded_tbl;
 }
