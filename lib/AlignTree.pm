@@ -76,10 +76,6 @@ sub align_sequences {
     $opts->{tool}  ||= 'mafft';
     $opts->{reorder} = 1 if $opts->{tool} =~ /mafft/i;
         
-    $opts->{muscle}   = "/home/fangfang/bin/muscle" if -x "/home/fangfang/bin/muscle";
-    $opts->{mafft}    = "/home/fangfang/bin/mafft"  if -x "/home/fangfang/bin/mafft";
-    $opts->{clustalw} = "/home/fangfang/bin/mafft"  if -x "/home/fangfang/bin/clustalw";
-
     if    ($opts->{tool} =~ /muscle/i)  { $program = \&gjoalignment::align_with_muscle  }
     elsif ($opts->{tool} =~ /mafft/i)   { $program = \&gjoalignment::align_with_mafft   }
     elsif ($opts->{tool} =~ /clustal/i) { $program = \&gjoalignment::align_with_clustal }
@@ -518,15 +514,7 @@ sub psiblast_search {
     my $org_dir = "/vol/public-pseed/FIGdisk/FIG/Data/Organisms"; # complete genomes only
     my $psi_dir = $ENV{PsiblastDB} || "/home/fangfang/WB/PsiblastDB";
 
-    if (ref $db ne 'ARRAY') {
-        if ($db =~ /^(\d+\.\d+)$/)  { $db = "$org_dir/$1/Features/peg/fasta" }
-        elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/SEED.ALL.NR" }
-        elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/SEED.ALL.NR" }
-        elsif (uc $db eq 'PPSEED.complete')  { $db = "$psi_dir/public-pseed.complete" }
-        elsif (uc $db eq 'PUBSEED.complete') { $db = "$psi_dir/public-pseed.complete" }
-        elsif (uc $db eq 'PSEED')   { $db = "$psi_dir/ppseed.NR" }
-        elsif (uc $db eq 'SEED')    { $db = "$psi_dir/SEED.complete.fasta" }
-    }
+    if (ref $db ne 'ARRAY') { $db = db_name_to_file($db); }
 
     my $inc = $opts->{incremental} || $opts->{inc};
 
@@ -540,7 +528,7 @@ sub psiblast_search {
 sub db_name_to_file {
     my ($db) = @_;
     my $org_dir = "/vol/public-pseed/FIGdisk/FIG/Data/Organisms"; # complete genomes only
-    my $psi_dir = "/home/fangfang/WB/PsiblastDB/";
+    my $psi_dir = "/home/fangfang/WB/PsiblastDB";
     if ($db =~ /^(\d+\.\d+)$/)  { $db = "$org_dir/$1/Features/peg/fasta" }
     elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013
     elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013

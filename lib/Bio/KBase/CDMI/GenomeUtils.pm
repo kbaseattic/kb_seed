@@ -610,6 +610,7 @@ sub LoadContigs {
                 my $contigKBID = $loader->GetKBaseID("$genomeID.c", 'Contig',
                         $foreignID);
                 $contigMap->{$foreignID} = $contigKBID;
+                print "Contig $foreignID ($contigKBID) has $contigLen letters.\n";
                 # We now have all the information we need to load the contig
                 # into the database. First, check to see if the sequence is
                 # already in the database.
@@ -796,8 +797,8 @@ sub LoadFeatures {
             print "Feature parent $parent not found.\n";
         } elsif (! $validate) {
             # If we are loading for real, store it in the Encompasses table.
-            $loader->InsertObject('Encompasses', from_link => $id_mapping->{$child},
-                    to_link => $id_mapping->{$parent});
+            $loader->InsertObject('Encompasses', from_link => $id_mapping->{$parent},
+                    to_link => $id_mapping->{$child});
         }
     }
     # Accumulate the statistics on the number of features.
