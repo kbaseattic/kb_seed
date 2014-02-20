@@ -26,6 +26,13 @@ my $temp_dir;
 my $id_prefix;
 my $id_server;
 
+my @formats = (gff => "GFF format",
+	       protein_fasta => "Protein translations in fasta format",
+	       contig_fasta => "Contig DNA in fasta format",
+	       genbank => "Genbank format",
+	       embl => "EMBL format");
+		
+
 use Getopt::Long;
 my $rc = GetOptions('help'        => \$help,
 		    'input=s'     => \$input_file,
@@ -78,28 +85,110 @@ elsif ($format eq 'contig_fasta')
     exit;
 }
 
-my $bio;
+my $bio = {};
+my $bio_list = [];
 
 my $gs = $genomeTO->{scientific_name};
 my $genome = $genomeTO->{id};
 
-for my $c (@{$genomeTO->{contigs}})
-{
-    my $contig = $c->{id};
-    $bio->{$contig} = Bio::Seq->new(-id => $contig,
-				    -seq => $c->{dna});
-    $bio->{$contig}->desc("Contig $contig from $gs");
+my $offset = 0;
+my %contig_offset;
 
-    my $feature = Bio::SeqFeature::Generic->new(-start => 1,
-						-end => length($c->{dna}),
-						-tag => {
-						    organism => $gs,
-						    mol_type => "genomic DNA",
-						    genome_id => $genome,
-						},
-						-primary => 'source');
-    $bio->{$contig}->add_SeqFeature($feature);
+#
+# code is similar but subtly different for the
+# merged/non-merged cases.
+#
+
+if ($format eq 'genbank_merged')
+{
+    my $dna = '';
+
+    my @feats;
+    for my $c (@{$genomeTO->{contigs}})
+    {
+	my $contig = $c->{id};
+	$dna .= $c->{dna};
+	
+	my $contig_start = $offset + 1;
+	my $contig_end   = $offset + length($c->{dna});
+	
+	$contig_offset{$contig} = $offset;
+	
+	my $feature = Bio::SeqFeature::Generic->new(-start => $contig_start,
+						    -end => $contig_end,
+						    -tag => {
+							organism => $gs,
+							mol_type => "genomic DNA",
+							note => $genome,
+							note => $contig,
+						    },
+						    -primary => 'source');
+	my $fa_record = Bio::SeqFeature::Generic->new(-start => $contig_start,
+						      -end => $contig_end,
+						      -tag => {
+							  label => $contig,
+							  note => $contig,
+						      },
+						      -primary => 'fasta_record');
+	push(@feats, $feature, $fa_record);
+	
+	$offset += length($c->{dna});
+    }
+    my $bseq = Bio::Seq->new(-id => $genome, -seq => $dna);
+
+    for my $c (@{$genomeTO->{contigs}})
+    {
+	my $contig = $c->{id};
+	$bio->{$contig} = $bseq;
+    }
+
+    $bseq->add_SeqFeature($_) foreach @feats;
+    @$bio_list = $bseq;
 }
+else
+{
+    for my $c (@{$genomeTO->{contigs}})
+    {
+	my $contig = $c->{id};
+	$bio->{$contig} = Bio::Seq->new(-id => $contig,
+					-seq => $c->{dna});
+	$bio->{$contig}->desc("Contig $contig from $gs");
+	push(@$bio_list, $bio->{$contig});
+	
+	my $contig_start = $offset + 1;
+	my $contig_end   = $offset + length($c->{dna});
+	
+	$contig_offset{$contig} = $offset;
+	
+	my $feature = Bio::SeqFeature::Generic->new(-start => $contig_start,
+						    -end => $contig_end,
+						    -tag => {
+							organism => $gs,
+							mol_type => "genomic DNA",
+							note => $genome,
+						    },
+						    -primary => 'source');
+	$bio->{$contig}->add_SeqFeature($feature);
+	
+	my $fa_record = Bio::SeqFeature::Generic->new(-start => $contig_start,
+						      -end => $contig_end,
+						      -tag => {
+							  label => $contig,
+							  note => $contig,
+						      },
+						      -primary => 'fasta_record');
+	$bio->{$contig}->add_SeqFeature($fa_record);
+	
+	if ($format eq 'genbank_merged')
+	{
+	    $offset += length($c->{dna});
+	}
+    }
+}
+#
+# Reset format to genbank since we've computed offsets.
+#
+$format = 'genbank' if $format eq 'genbank_merged';
 
 my %protein_type = (CDS => 1, peg => 1);
 my $strip_ec;
@@ -111,7 +200,15 @@ for my $f (@{$genomeTO->{features}})
     my $note = {};
     my $contig;
 
-    my $func = $f->{function} || "";
+    my $func = "";
+    if (defined($f->{function}) && $f->{function} ne '')
+    {
+	$func = $f->{function};
+    }
+    elsif ($protein_type{$f->{type}})
+    {
+	$func = "hypothetical protein";
+    }
 
     push @{$note->{db_xref}}, "RAST2:$peg";
 
@@ -136,6 +233,7 @@ for my $f (@{$genomeTO->{features}})
     {
 	my($ctg, $start, $strand, $len) = @$l;
 	$contig = $ctg;
+	my $offset = $contig_offset{$contig};
 	my $end = $strand eq '+' ? ($start + $len - 1) : ($start - $len + 1);
 
 	my $bstrand = 0;
@@ -143,6 +241,9 @@ for my $f (@{$genomeTO->{features}})
 	{
 	    $bstrand = ($strand eq '+') ? 1 : -1;
 	}
+
+	$start += $offset;
+	$end += $offset;
 	my $sloc = new Bio::Location::Simple(-start => $start, -end => $end, -strand => $strand);
 	push(@loc_obj, $sloc);
 
@@ -150,6 +251,7 @@ for my $f (@{$genomeTO->{features}})
 	# Compute loc_info for GFF stuff.
 	#
 	my $frame = $start % 3;
+	($start, $end) = ($end, $start) if $strand eq '-';
 	push(@loc_info, [$ctg, $start, $end, (($len == 0) ? "." : $strand), $frame]);
     }
 
@@ -209,10 +311,10 @@ for my $f (@{$genomeTO->{features}})
 	my $primary;
 	if ( $func =~ /tRNA/ ) {
 	    $primary = 'tRNA';
-	} elsif ( $func =~ /(Ribosomal RNA|5S RNA)/ ) {
+	} elsif ( $func =~ /(Ribosomal RNA|5S RNA|rRNA)/ ) {
 	    $primary = 'rRNA';
 	} else {
-	    $primary = 'RNA';
+	    $primary = 'misc_RNA';
 	}
 	
 	$feature = Bio::SeqFeature::Generic->new(-location => $loc,
@@ -228,13 +330,12 @@ for my $f (@{$genomeTO->{features}})
 	$func_ok =~ s/=//g;
 	foreach my $tagtype (keys %$note) {
 	    $feature->add_tag_value($tagtype, @{$note->{$tagtype}});
-	    
-	    # work around to get annotations into gff
-	    for my $l (@loc_info)
-	    {
-		my($contig, $start, $stop, $strand, $frame) = @$l;
-		push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
-	    }
+	}
+	# work around to get annotations into gff
+	for my $l (@loc_info)
+	{
+	    my($contig, $start, $stop, $strand, $frame) = @$l;
+	    push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
 	}
 	
     } else {
@@ -272,8 +373,9 @@ if ($format eq "GTF") {
 #    my $sio = Bio::SeqIO->new(-file => ">tmpout", -format => $format);
     my $sio = Bio::SeqIO->new(-fh => $out_fh, -format => $format);
 
-    foreach my $seq (keys %$bio) {
-	$sio->write_seq($bio->{$seq});
+    foreach my $seq (@$bio_list)
+    {
+	$sio->write_seq($seq);
     }
 }
 

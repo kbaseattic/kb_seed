@@ -8,6 +8,7 @@
 
 usage: representative_sequences [ opts ] [ rep_seqs_0 ] < new_seqs > rep_seqs
 
+       -a                - number of threads used by blastall (D=2)
        -b                - order input sequences by size (long to short)
        -c cluster_type   - behavior of clustering algorithm (0 or 1, D=1)
        -d seq_clust_dir  - directory for files of clustered sequencees
@@ -45,6 +46,10 @@ usage: representative_sequences [ opts ] [ rep_seqs_0 ] < new_seqs > rep_seqs
 =head2 Command-Line options
 
 =over 4
+
+=item -a
+
+Number of threads used by blastall (D=2)
 
 =item -b
 
@@ -128,8 +133,9 @@ use strict;
 
 my $usage = <<"End_of_Usage";
 
-usage: representative_sequences [ opts ] [ rep_seqs_0 ] < new_seqs > rep_seqs
+usage: svr_representative_sequences [ opts ] [ rep_seqs_0 ] < new_seqs > rep_seqs
 
+       -a                - number of threads used by blastall (D=2)
        -b                - order input sequences by size (long to short)
        -c cluster_type   - behavior of clustering algorithm (0 or 1, D=1)
        -d seq_clust_dir  - directory for files of clustered sequencees
@@ -166,6 +172,7 @@ usage: representative_sequences [ opts ] [ rep_seqs_0 ] < new_seqs > rep_seqs
 
 End_of_Usage
 
+my $n_thread      = 2;
 my $by_size       = undef;
 my $cluster_type  = 1;
 my $seq_clust_dir = undef;
@@ -179,7 +186,8 @@ my $keep_gid_file = undef;
 while ( $ARGV[0] =~ /^-/ )
 {
     $_ = shift @ARGV;
-    if    ($_ =~ s/^-b//) { $by_size       = 1 }
+    if    ($_ =~ s/^-a//) { $n_thread      = ($_ || shift @ARGV) }
+    elsif ($_ =~ s/^-b//) { $by_size       = 1 }
     elsif ($_ =~ s/^-c//) { $cluster_type  = ($_ || shift @ARGV) }
     elsif ($_ =~ s/^-d//) { $seq_clust_dir = ($_ || shift @ARGV) }
     elsif ($_ =~ s/^-f//) { $id_clust_file = ($_ || shift @ARGV) }
@@ -219,6 +227,7 @@ my @seqs = &gjoseqlib::read_fasta( \*STDIN );
       and exit 1;
 
 my %options = ( max_sim  => $threshold,
+                n_thread => $n_thread,
                 sim_meas => $measure
               );
 

@@ -7,8 +7,8 @@ use gjoseqlib;
 
 my $usage = "usage: km_process_hits_to_regions -d DataDir < Hits \n";
 my $dataD;
-my $aa;
-my $z;
+my $aa = 0;
+my $z = 0;
 my $rc  = GetOptions('d=s' => \$dataD,
    	  	     'z'   => \$z,
                      'a'   => \$aa);
@@ -67,6 +67,11 @@ sub frame {
     return $x->[4];
 }
 
+sub id {
+    my($x) = @_;
+    return $x->[0];
+}
+
 sub strand {
     my($x) = @_;
     return $x->[3];
@@ -100,6 +105,7 @@ sub process_merged {
     {
 	push(@collapsed,$merged[$i++]);
 	while (($i < @merged) && 
+	       (&id($merged[$i]) eq &strand($collapsed[-1])) &&
 	       (&strand($merged[$i]) eq &strand($collapsed[-1]))  &&
 	       (&function($merged[$i]) eq &function($collapsed[-1])))
 	{
