@@ -28,6 +28,8 @@ use warnings;
 use Data::Dumper;
 use SeedUtils;
 use File::Temp;
+use File::Slurp;
+use JSON::XS;
 use gjoseqlib;
 use Time::HiRes 'gettimeofday';
 use UUID;
@@ -39,6 +41,14 @@ use UUID;
 #    
 #     return bless $self, $class;
 # }
+
+sub create_from_file
+{
+    my($class, $file) = @_;
+    my $txt = read_file($file);
+    my $self = decode_json($txt);
+    return bless $self, $class;
+}
 
 sub initialize
 {
@@ -70,6 +80,17 @@ sub update_indexes
     {
 	$feature_index->{$feature->{id}} = $feature;
     }
+
+    #
+    # Create contig index.
+    #
+    my $contig_index = {};
+    $self->{_contig_index} = $contig_index;
+    for my $contig ($self->contigs)
+    {
+	$contig_index->{$contig->{id}} = $contig;
+    }
+    
     return $self;
 }
 
@@ -77,6 +98,12 @@ sub features
 {
     my($self) = @_;
     return @{$self->{features}};
+}
+
+sub contigs
+{
+    my($self) = @_;
+    return @{$self->{contigs}};
 }
 
 sub add_feature {
@@ -181,6 +208,79 @@ sub extract_contig_sequences_to_temp_file
     return $fn;
 }
 
+sub write_temp_seed_dir
+{
+    my($genomeTO) = @_;
+
+    my $tmp = File::Temp->newdir(undef, CLEANUP => 1);
+
+    open(C, ">", "$tmp/contigs") or die "Cannot create $tmp/contigs: $!";
+    for my $contig (@{$genomeTO->{contigs}})
+    {
+	print C ">$contig->{id}\n";
+	print C "$contig->{dna}\n";
+    }
+    close(C);
+    open(F, ">", "$tmp/assigned_functions") or die "Cannot create $tmp/assigned_functions: $!";
+    mkdir("$tmp/Features");
+    mkdir("$tmp/Features/peg");
+    mkdir("$tmp/Features/CDS");
+    mkdir("$tmp/Features/rna");
+    open(PT, ">", "$tmp/Features/peg/tbl") or die "Cannot write $tmp/Features/peg/tbl: $!";
+    open(CT, ">", "$tmp/Features/CDS/tbl") or die "Cannot write $tmp/Features/CDS/tbl: $!";
+    open(RT, ">", "$tmp/Features/rna/tbl") or die "Cannot write $tmp/Features/rna/tbl: $!";
+    open(PF, ">", "$tmp/Features/peg/fasta") or die "Cannot write $tmp/Features/peg/fasta: $!";
+    open(CF, ">", "$tmp/Features/CDS/fasta") or die "Cannot write $tmp/Features/CDS/fasta: $!";
+    #     "location" : [
+    #        [
+    #           "kb|g.140.c.0",
+    #           "631472",
+    #           "+",
+    #           3216
+    #        ]
+    #     ],
+    
+    for my $feature (@{$genomeTO->{features}})
+    {
+	my $function = $feature->{function} || "hypothetical protein";
+	print F "$feature->{id}\t$function\n";
+	my $loc = $feature->{location};
+	
+	#
+	# Fix this - we may have multipart locations.
+	#
+	my($ctg, $start, $strand, $len) = @{$loc->[0]};
+	my $stop;
+	if ($strand eq '+')
+	{
+	    $stop = $start + $len - 1;
+	}
+	else
+	{
+	    $stop = $start - $len + 1;
+	}
+	my $sloc = join("_", $ctg, $start, $stop);
+	if ($feature->{type} eq 'CDS' || $feature->{type} eq 'peg')
+	{
+	    print CT join("\t", $feature->{id}, $sloc), "\n" if $feature->{type} eq 'CDS';
+	    print PT join("\t", $feature->{id}, $sloc), "\n";
+	    print CF ">$feature->{id}\n$feature->{protein_translation}\n" if $feature->{type} eq 'CDS';
+	    print PF ">$feature->{id}\n$feature->{protein_translation}\n";
+	}
+	else
+	{
+	    print RT join("\t", $feature->{id}, $sloc), "\n";
+	}
+    }
+    close(F);
+    close(RT);
+    close(PT);
+    close(CT);
+    close(PF);
+    close(CF);
+    return $tmp;
+}
+
 sub add_analysis_event
 {
     my($self, $event) = @_;
@@ -220,4 +320,44 @@ sub find_feature
     return $self->{_feature_index}->{$fid};
 }
 
+sub find_contig
+{
+    my($self, $contig) = @_;
+
+    return $self->{_contig_index}->{$contig};
+}
+
+sub get_feature_dna
+{
+    my($self, $feature) = @_;
+
+    my @seq;
+
+    if (!ref($feature))
+    {
+	$feature = $self->find_feature($feature);
+    }
+
+    foreach my $loc (@{$feature->{location}})
+    {
+	my($contig, $beg, $strand, $len) = @$loc;
+
+	my $cobj = $self->find_contig($contig);
+	
+	if ($strand eq '+' || $len == 1)
+	{
+	    
+	    push(@seq, substr($cobj->{dna}, $beg - 1, $len));
+	}
+	else
+	{
+	    push(@seq, &SeedUtils::reverse_comp(substr($cobj->{dna}, $beg - $len, $len)));
+	}
+    }
+    return join("", @seq);
+
+}
+
+
+    
 1;

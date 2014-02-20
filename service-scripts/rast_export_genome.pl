@@ -8,6 +8,7 @@ use gjoseqlib;
 
 use Bio::KBase::GenomeAnnotation::Client;
 use JSON::XS;
+use Digest::MD5 'md5_hex';
 
 use GenomeTypeObject;
 use URI::Escape;
@@ -18,6 +19,7 @@ use Bio::Location::Split;
 use Bio::Location::Simple;
 use Bio::SeqFeature::Generic;
 use Bio::SeqFeature::Annotated;
+use Getopt::Long;
 
 my $help;
 my $input_file;
@@ -25,22 +27,37 @@ my $output_file;
 my $temp_dir;
 my $id_prefix;
 my $id_server;
+my @feature_type;
 
 my @formats = (gff => "GFF format",
 	       protein_fasta => "Protein translations in fasta format",
 	       contig_fasta => "Contig DNA in fasta format",
 	       genbank => "Genbank format",
+	       genbank_merged => "Genbank format as single merged locus, suitable for Artemis",
 	       embl => "EMBL format");
-		
 
-use Getopt::Long;
 my $rc = GetOptions('help'        => \$help,
 		    'input=s'     => \$input_file,
 		    'output=s'    => \$output_file,
+		    'feature-type=s' => \@feature_type,
 		    );
 
 if (!$rc || $help || @ARGV != 1) {
     die "Bad ARGV";
+}
+
+my $feature_type_ok;
+if (@feature_type)
+{
+    my $feature_type = { map { $_ => 1 } @feature_type };
+    $feature_type_ok = sub {
+	my($feat) = @_;
+	return $feature_type->{$feat->{type}} ? 1 : 0;
+    };
+}
+else
+{
+    $feature_type_ok = sub { 1 };
 }
 
 my $format = shift;
@@ -69,6 +86,18 @@ my $genomeTO;
     my $genomeTO_txt = <$in_fh>;
     $genomeTO = $json->decode($genomeTO_txt);
 }
+GenomeTypeObject->initialize($genomeTO);
+
+#
+# For each protein, if the function is blank, make it hypothetical protein.
+for my $f (@{$genomeTO->{features}})
+{
+    next unless &$feature_type_ok($f);
+    if (!defined($f->{function}) || $f->{function} eq '')
+    {
+	$f->{function} = "hypothetical protein";
+    }
+}
 
 #
 # Simple exports.
@@ -82,6 +111,16 @@ if ($format eq 'protein_fasta')
 elsif ($format eq 'contig_fasta')
 {
     export_contig_fasta($genomeTO, $out_fh);
+    exit;
+}
+elsif ($format eq 'feature_data')
+{
+    export_feature_data($genomeTO, $out_fh);
+    exit;
+}
+elsif ($format eq 'feature_dna')
+{
+    export_feature_dna($genomeTO, $out_fh);
     exit;
 }
 
@@ -196,6 +235,7 @@ my $gff_export = [];
 
 for my $f (@{$genomeTO->{features}})
 {
+    next unless &$feature_type_ok($f);
     my $peg = $f->{id};
     my $note = {};
     my $contig;
@@ -385,11 +425,24 @@ sub export_protein_fasta
 
     for my $f (@{$genomeTO->{features}})
     {
+	next unless &$feature_type_ok($f);
 	my $peg = $f->{id};
 	if ($f->{protein_translation})
 	{
 	    print_alignment_as_fasta($out_fh, [$peg, $f->{function}, $f->{protein_translation}]);
 	}
+    }
+}
+
+sub export_feature_dna
+{
+    my($genomeTO, $out_fh) = @_;
+
+    for my $f (@{$genomeTO->{features}})
+    {
+	next unless &$feature_type_ok($f);
+	my $id = $f->{id};
+	print_alignment_as_fasta($out_fh, [$id, $f->{function}, $genomeTO->get_feature_dna($id)]);
     }
 }
 
@@ -404,3 +457,24 @@ sub export_contig_fasta
     }
 }
 
+sub export_feature_data
+{
+    my($genomeTO, $out_fh) = @_;
+    
+    my $features = $genomeTO->{features};
+    foreach my $feature (@$features)
+    {
+	next unless &$feature_type_ok($feature);
+	my $fid = $feature->{id};
+	my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_; 
+				 "$contig\_$beg$strand$len" 
+			       } @{$feature->{location}});
+	my $type = $feature->{type};
+	my $func = $feature->{function};
+	my $md5 = "";
+	$md5 = md5_hex(uc($feature->{protein_translation})) if $feature->{protein_translation};
+	my $aliases = ref($feature->{aliases}) ? join(",",@{$feature->{aliases}}) : "";
+
+	print $out_fh join("\t", $fid,$loc,$type,$func,$aliases,$md5), "\n";
+    }
+}
