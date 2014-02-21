@@ -1,5 +1,5 @@
-#group-name	cs	Central Store Scripts
-#group-name	er	Entity Relationship Scripts
+#group-name	cs	Central Store Data Retrieval
+#group-name	er	Entity Relationship
 #command-set	scripts/([a-z].*).pl	cs
 #command-set	scripts/(get_relationship.*).pl	er
 #command-set	scripts/(get_entity.*).pl	er
