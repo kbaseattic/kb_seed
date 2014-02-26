@@ -16,11 +16,11 @@ Example:
 This uses a Data.kmer directory built to support kmer_guts processing.
 We suggest using the one in pubSEED (Global/Data.kmers).  The invocation causes a
 set of "families" files to be generated in the existing Families directory.  They will all
-be prefixed with the word "famies.".  "families.all" will be the final set of protein
+be prefixed with the word "families.".  "families.all" will be the final set of protein
 families.
 
 Seqs.Fasta is a directory that contains protein fasta files.  The file names
-must be pubSEED genome IDs.  Thus, it is assumed that 
+must be genome IDs.  Thus, it is assumed that 
 
     Seqs.Fasta/83333.1
 
@@ -28,7 +28,7 @@ would be the peg translations for E.coli (assuming that you wished E.coli
 to be one of the genomes from which families get produced).
 
 The files in Seqs.Fast used in constructing the families is determined
-by the contents of STDIN (each input line contains just a genome ID to be included.
+by the contents of STDIN (each input line contains just a genome ID to be included).
 Each included genome must have a corresponding fasta file in Seqs.Fasta.
 
 ------
@@ -42,23 +42,23 @@ Now, let us summarize the steps used to generate the families.  We go through th
 
     1. the script get_families_1.pl runs all of the PEG translations from all of
        the genomes (specified in STDIN) through kmer_search, which uses kmers to attempt
-       assignment of function.  Successfully called PEGs are written to tmp.calls.  Those
-       that were not assigned a function are written to tmp.missed.
+       assignment of function.  Successfully called PEGs are written to tmp.$$.calls.  Those
+       that were not assigned a function are written to tmp.$$.missed.
 
-    2. The PEGs in tmp.missed are thn processed using svr_representative_sequences, which
+    2. The PEGs in tmp.$$.missed are thn processed using svr_representative_sequences, which
        generates sets based on blast for those kmers not handled by kmer_search.  They are
        all assigned the function "hypothetical protein", and the sets are written to
        families.missed.
 
-    3. Then, we go through the PEGs that were called by kmers (and recorded in tmp.calls).
+    3. Then, we go through the PEGs that were called by kmers (and recorded in tmp.$$.calls).
        This is done by get_families_3.
        We form potential sets as all PEGs assigned the same function.  For each "function-based set"
        we count the number of PEGs from each genome.  If 90% of the genomes represented
        in the set have only one PEG in the set, the set is considered "good" and written to
-       "families.good".  Otherwise, the set is written to tmp.bad.
+       "families.good".  Otherwise, the set is written to tmp.$$.bad.
 
-    4. Now, get_families-4 is used to  process the families written to tmp.bad.
-       Note that kmer assignment of function by "group" disparate
+    4. Now, get_families-4 is used to  process the families written to tmp.$$.bad.
+       Note that kmer assignment of function may "group" disparate
        sequences into a single function.  If the manual assignments of
        function upon which the kmers were derived correctly assigned
        one set of sequences to a function F and incorrectly assigned a
@@ -152,13 +152,13 @@ if ((! $rc) || (! $dataD) || (! $seqsD) || (! $families))
     print STDERR $usage; exit ;
 }
 
-&SeedUtils::run("get_families_1 -d $dataD -s $seqsD > tmp.calls 2> tmp.missed");
+&SeedUtils::run("get_families_1 -d $dataD -s $seqsD > tmp.$$.calls 2> tmp.$$.missed");
 print STDERR "got1\n";
-&SeedUtils::run("get_families_2 -i $iden -s $seqsD < tmp.missed > $families.missed");
+&SeedUtils::run("get_families_2 -i $iden -s $seqsD < tmp.$$.missed > $families.missed");
 print STDERR "got2\n";
-&SeedUtils::run("get_families_3 -i $iden -s $seqsD < tmp.calls > $families.good 2> tmp.bad");
+&SeedUtils::run("get_families_3 -i $iden -s $seqsD < tmp.$$.calls > $families.good 2> tmp.$$.bad");
 print STDERR "got3\n";
-&SeedUtils::run("get_families_4 -d $dataD -s $seqsD < tmp.bad > $families.bad.fixed");
+&SeedUtils::run("get_families_4 -d $dataD -s $seqsD < tmp.$$.bad > $families.bad.fixed");
 &SeedUtils::run("get_families_final -f $families -s $seqsD > $families.all");
-# unlink("tmp.missed","tmp.calls","tmp.bad");
+unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
 

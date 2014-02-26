@@ -31,6 +31,11 @@ eval {
     $have_fig = 1;
 };
 
+eval {
+    require gjoseqlib;
+    import gjoseqlib;
+};
+
 use ProtSims;
 
 use Data::Dumper;
@@ -619,7 +624,7 @@ sub process_blast_set
 	foreach my $peg (@pegs)
 	{
 	    my $func = $fig->function_of($peg,1);
-	    if (! &FIG::hypo($func))
+	    if (! &SeedUtils::hypo($func))
 	    {
 		$funcs{$func}++;
 	    }
@@ -719,7 +724,7 @@ sub assign_functions_to_prot_set_compat {
 		foreach my $peg (@pegs)
 		{
 		    my $func = $fig->function_of($peg,1);
-		    if (! &FIG::hypo($func))
+		    if (! &SeedUtils::hypo($func))
 		    {
 			$funcs{$func}++;
 		    }
@@ -799,7 +804,7 @@ sub assign_functions_to_DNA_features {
     push(@ans,&process_hits($self,$motif_sz, $matches,1,length($seq),$motif_sz, $min_hits, $max_gap,$blast,$seq,$details));
     undef %hits;
 
-    $matches = $self->process_dna_seq(&FIG::reverse_comp($seq));
+    $matches = $self->process_dna_seq(&SeedUtils::reverse_comp($seq));
     push(@ans,&process_hits($self,$motif_sz, $matches,length($seq),1,$motif_sz, $min_hits, $max_gap,$blast,$seq,$details));
     return \@ans;
 }
@@ -945,7 +950,7 @@ sub assign_functions_to_PEGs_in_DNA {
     my $matches = $self->process_prot_seq($motif_sz, $seq);
     push(@ans,&process_hits($self,$motif_sz, $matches,1,length($seq),3 * $motif_sz, $min_hits, $max_gap,$blast,$seq,$details));
     undef %hits;
-    $matches = $self->process_prot_seq($motif_sz, &FIG::reverse_comp($seq));
+    $matches = $self->process_prot_seq($motif_sz, &SeedUtils::reverse_comp($seq));
     push(@ans,&process_hits($self,$motif_sz, $matches,length($seq),1,3 * $motif_sz, $min_hits, $max_gap,$blast,$seq,$details));
     return \@ans;
 }    
@@ -960,7 +965,7 @@ sub process_prot_seq {
     {
 	my $ln_tran = int(($ln - $off)/3) * 3;
 	next if $off > $ln;
-	my $tran = uc &FIG::translate(substr($seq,$off,$ln_tran));
+	my $tran = uc &SeedUtils::translate(substr($seq,$off,$ln_tran));
 
 	next if $tran eq '';
 	
@@ -1065,5 +1070,132 @@ sub _handle_args
     }
     return($self, $args);
 }
+
+sub patric_figfam_call
+{
+    my($ff_dir, $fig, $fasta, $annO, $md5_to_fam, $sims_cutoff, $iden, $iden2) = @_;
+
+    my $ffs = FFs->new($ff_dir, $fig);
+
+    my $fh;
+    open($fh,"<",$fasta) || die "failed to open $fasta";
+
+    my $handle = $annO->assign_function_to_prot(-input => $fh,
+						-kmer => 8,
+						-seqHitThreshold => 2,
+						-detailed => 0,
+						-hitThreshold => 3,
+						-all => 1);
+
+    my %kmer_funcs;
+    my %kmer_fams;
+    my %kmer_score;
+    my @pegs;
+    my @nomatch;
+    my %missing;
+    while (my $result = $handle->get_next)
+    {
+	my($peg, $funcK, $otu, $score, $nonoverlap_hits, $overlap_hits, $details, $fam) = @$result;
+
+	if (!$funcK)
+	{
+	    $missing{$peg}++;
+	    next;
+	}
+
+	$kmer_funcs{$peg} = $funcK;
+	$kmer_fams{$peg} = $fam;
+	$kmer_score{$peg} = [$score, $nonoverlap_hits, $overlap_hits, $details];
+	push(@pegs, $peg);
+    }
+
+    seek($fh, 0, 0);
+
+    while (my($peg, $com, $seq) = read_next_fasta_seq($fh))
+    {
+	next unless $missing{$peg};
+	my $md5 = $fig->md5_of_peg($peg);
+	my $len = $fig->translation_length($peg);
+	my $fams = $md5_to_fam->{$md5};
+	if ($fams)
+	{
+	    for my $fam (@$fams)
+	    {
+		# print STDERR join("\t", $peg, $len, $fam, 'EXACT', $ffs->family_function($fam)), "\n";
+		$kmer_funcs{$peg} = $ffs->family_function($fam);
+		$kmer_fams{$peg} = $fam;
+		$kmer_score{$peg} = [1000, 1000, 1000, []];
+	    }
+	    push(@pegs, $peg);
+	    next;
+	}
+
+	my $md5id = "gnl|md5|$md5";
+	my @sims = $fig->sims($md5id, 1000, $sims_cutoff, 'raw');
+
+	if ($iden)
+	{
+	    @sims = grep { $_->iden > $iden } @sims;
+	}
+
+	my %simfams;
+	for my $s (@sims)
+	{
+	    my($sim_md5) = $s->id2 =~ /gnl\|md5\|(.*)/;
+	    
+	    next unless $sim_md5;
+
+	    if ($iden2)
+	    {
+		my $mlen = $s->ln1 > $s->ln2 ? $s->ln1 : $s->ln2;
+		my $parm = $s->iden * $s->ali_ln / $mlen;
+		next if $parm < $iden2;
+	    }
+	    #my @fams = grep { $_ ne '' } $ffs->families_containing_peg($s->id2);
+	    $fams = $md5_to_fam->{$sim_md5};
+	    if (ref($fams) && @$fams)
+	    {
+		push(@{$simfams{$_}}, $s->id2) foreach @$fams;
+		# if ($simout)
+		# {
+		#     print SIMOUT join("\t", $peg, $s->id2, $sim_md5, join(":", @$fams), @$s), "\n";
+		# }
+	    }
+	}
+	
+	if (%simfams)
+	{
+	    my %famlens = map { $_ => scalar(@{$simfams{$_}}) } keys %simfams;
+	    my @sfams = sort { $famlens{$b} <=> $famlens{$a} } keys %famlens;
+	    # die Dumper(\%simfams, \%famlens, \@sfams);
+	    if (@sfams == 1 || $famlens{$sfams[0]} > $famlens{$sfams[1]})
+	    {
+		$kmer_funcs{$peg} = $ffs->family_function($sfams[0]);
+		$kmer_fams{$peg} = $sfams[0];
+		$kmer_score{$peg} = [999, 999, 999, []];
+		push(@pegs, $peg);
+	    }
+	    else
+	    {
+		print STDERR "NOASSIGN " . Dumper(\%simfams, \%famlens, \@sfams);
+	    }
+	    for my $fam (@sfams)
+	    {
+		my @ids = @{$simfams{$fam}};
+		print STDERR join("\t", $peg, $len, $fam, scalar @ids, $ffs->family_function($fam)), "\n";
+	    }
+	}
+	else
+	{
+	    push(@nomatch, $peg);
+	}
+    }
+
+    
+    close($fh);
+    return(\%kmer_funcs, \%kmer_fams, \%kmer_score, \@pegs, \@nomatch);
+}
+
+
 
 1;
