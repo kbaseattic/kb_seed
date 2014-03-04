@@ -6383,17 +6383,14 @@ sub reaction_strings
     my $kb = $self->{db};
     for my $reaction (@$reactions)
     {
-	    my @resultRows = $kb->GetAll("Compound ParticipatesAs Reagent IsInvolvedIn Reaction","Reaction(id) = ?", [$reaction],[qw(
-	    	Reagent(id)
+	my @reagentRows = $kb->GetAll("Compound ParticipatesAs LocalizedCompound IsInvolvedIn Reaction","Reaction(id) = ?", [$reaction],[qw(
+	    	LocalizedCompound(id)
 	    	Compound(label)
-	        Reagent(cofactor)
-	        Reagent(compartment_index)
-	        Reagent(stoichiometry)
-	        Reagent(transport_coefficient)
+                IsInvolvedIn(coefficient)
 	    )]);
 		#Assembling data on reaction reagents
 		my $reactantHash;
-		foreach my $row (@resultRows) {
+		foreach my $row (@reagentRows) {
 			if (!defined($reactantHash->{$row->[0]})) {
 				$reactantHash->{$row->[0]} = {
 					coef => 0,
@@ -6401,15 +6398,9 @@ sub reaction_strings
 					comp => 0
 				};
 			}
-			$reactantHash->{$row->[0]}->{coef} += $row->[4];
-			if ($row->[5] != 0) {
-				$reactantHash->{$row->[0].".".$row->[3]} = {
-					coef => -1*$row->[5],
-					name => $row->[1],
-					comp => $row->[3]
-				};
-				$reactantHash->{$row->[0]}->{coef} += $row->[5];
-			}
+			$reactantHash->{$row->[0]}->{coef} += $row->[2];
+			my @cpdloc = $CDMI_Obj->GetAll("Location IsParticipatingAt LocalizedCompound","LocalizedCompound(id) = ?", [$row->[0]],[qw(Location(source-id))]);
+			$reactantHash->{$row->[0]}->{comp}=$cpdloc[0][0];
 		}
 		#Identifying reactants and products
 		my $reactants = [];
