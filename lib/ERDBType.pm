@@ -122,8 +122,6 @@ sub prettySortValue {
     return 2;
 }
 
-
-
 =head3 validate
 
     my $okFlag = $et->validate($value);

@@ -24,7 +24,7 @@
 
 =head1 CDMI Table Deletion
 
-    CDMIFixRels [options] obj1 obj2 ...
+    CDMIClean [options] obj1 obj2 ...
 
 This script deletes the tables specified by the entities and relationships in the
 parameter list.

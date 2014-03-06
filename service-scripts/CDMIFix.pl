@@ -9,44 +9,48 @@ use SeedUtils;
     $| = 1; # Prevent buffering on STDOUT.
     my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
     my $stats = Stats->new();
-    # Loop through the subsystems.
-    my %subMap = map { $_->[0] => $_->[1] } $cdmi->GetAll('Subsystem', '', [], 'id experimental');
-    for my $sub (sort keys %subMap) {
-        print "Checking $sub.\n";
-        $stats->Add(subsChecked => 1);
-        # We'll set this to 1 if the subsystem should be deleted. Experimental subsystems are
-        # always deleted.
-        my $delete = $subMap{$sub};
-        if ($delete) {
-            $stats->Add(experimental => 1);
-            print "Subsystem is experimental.\n";
-        } else {
-            # It's not experimental, so check for bad roles.
-            my @roles = $cdmi->GetFlat('Includes', 'Includes(from-link) = ?', [$sub], 'to-link');
-            if (scalar(@roles) == 0) {
-                $delete = 1;
-                $stats->Add(noRoles => 1);
-                print "Subsystem has no roles.\n";
+    # Get all the contigs in the FASTA file.
+    open(my $ih, "</homes/parrello/CdmiData/Plants/Genomes/new17/Oglaberrima.AGI1.1/contigs.fa") ||
+        die "Could not open FASTA file.";
+    my %fastaContigs;
+    while (! eof $ih) {
+        my $line = <$ih>;
+        if ($line =~ /^>(\S+)/) {
+            my $contigID = $1;
+            if ($fastaContigs{$contigID}) {
+                print "Duplicate contig ID $contigID.\n";
+                $stats->Add(duplicateContig => 1);
             } else {
-                for my $role (@roles) { last if $delete;
-                    if (! $role) {
-                        $delete = 1;
-                        $stats->Add(nullRole => 1);
-                        print "Subsystem has a null role.\n";
-                    } elsif ($role =~ /hypothetical\s+protein/) {
-                        $delete = 1;
-                        $stats->Add(hypoRole => 1);
-                        print "Subsystem has hypothetical role: $role.\n";
-                    }
-                }
+                $fastaContigs{$contigID} = 1;
+                $stats->Add(fastaContig => 1);
             }
         }
-        if ($delete) {
-            # Delete the bad subsystem.
-            print "Deleting subsystem $sub.\n";
-            my $delStats = $cdmi->Delete(Subsystem => $sub);
-            # Roll up the statistics.
-            $stats->Accumulate($delStats);
+    }
+    print scalar(keys %fastaContigs) . " contigs read from FASTA.\n";
+    # Display the genome's contig count.
+    my ($count) = $cdmi->GetFlat('Genome', 'Genome(id) = ?', ['kb|g.3903'], 'contigs');
+    print "$count contigs recorded in genome record.\n";
+    $stats->Add(GenomeCount => $count);
+    # Get the contigs for the specified genome.
+    my %dbContigs = map { $_->[1] => $_->[0] } $cdmi->GetAll('IsComposedOf Contig',
+        'IsComposedOf(from-link) = ?', ['kb|g.3903'], 'Contig(id) Contig(source-id)');
+    $stats->Add(DbContig => scalar(keys %dbContigs));
+    # Look for contigs in the FASTA that aren't in the database.
+    for my $fastaContig (keys %fastaContigs) {
+        if ($dbContigs{$fastaContig}) {
+            $stats->Add(ContigFoundInDB => 1);
+        } else {
+            print "$fastaContig not found in database.\n";
+            $stats->Add(ContigNotFoundInDB => 1); 
+        }
+    }
+    # Look for contigs in the database that aren't in the FASTA.
+    for my $dbContig (keys %dbContigs) {
+        if ($fastaContigs{$dbContig}) {
+            $stats->Add(ContigFoundInFasta => 1);
+        } else {
+            print "$dbContig not found in FASTA.\n";
+            $stats->Add(ContigNotFoundInFasta => 1);
         }
     }
     # All done.

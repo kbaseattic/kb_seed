@@ -4426,6 +4426,119 @@ sub _ProcessFixRelationshipBatch {
     }
 }
 
+=head3 CleanRelationship
+
+    my $stats = $erdb->CleanRelationship($relName, @fields);
+
+Remove duplicate rows from a relationship. A row is duplicate if the from- and to-links
+match and the zero or more specified additional fields also match.
+
+=over 4
+
+=item relName
+
+Name of the relationship to clean.
+
+=item fields
+
+List of additional fields in the relationship to be used to determine whether or
+not we have a duplicate row. The fields must be scalars and not that they cannot
+
+
+=item RETURN
+
+Returns a L<Stats> object describing what happened during the cleanup.
+
+=back
+
+=cut
+
+sub CleanRelationship {
+    # Get the parameters.
+    my ($self, $relName, @fields) = @_;
+    # Build the ORDER BY clause for the query. For best performance, the extra fields
+    # should be those in the from-index, in order.
+    my $clause = "$relName(from-link) = ? ORDER BY " . 
+            join(", ", map { "$relName($_)" } (@fields, 'to-link'));
+    # Create the return statistics object.
+    my $retVal = Stats->new();
+    # Get the relationship's full field list.
+    my $fieldTable = $self->GetFieldTable($relName);
+    my @allFields = keys %{$fieldTable};
+    # Loop through the possible from-links.
+    my ($fromEntity) = $self->GetRelationshipEntities($relName);
+    my $idQry = $self->Get($fromEntity, "", []);
+    while (my $idRow = $idQry->Fetch()) {
+        my $fromID = $idRow->PrimaryValue('id');
+        # We will create a list of delete requests. Each consists of a 3-tuple of a from-link,
+        # a to-link, and a hash of other fields.
+        my @deletes;
+        # This is a list of insert-back requests. Each consists of a hash of field values.
+        my @inserts;
+        # Set up to loop through the relationship for this from-link value.
+        my $qry = $self->Get($relName, $clause, [$fromID]);
+        # Create a dummy key for the first row.
+        my @key = ("", "", map { "" } @fields);
+        # Remember its size.
+        my $keylen = scalar @key;
+        # Denote that the current key is not being deleted.
+        my $deleteInProgress = 0;
+        # Loop through the rows.
+        while (my $row = $qry->Fetch()) {
+            # Get the key for this row.
+            my @key2 = $row->Values(['from-link', 'to-link', @fields]);
+            $retVal->Add(rowsRead => 1);
+            # Verify that they are different.
+            my $equal = 1;
+            for (my $i = 0; $i < $keylen && $equal; $i++) {
+                if ($key[$i] ne $key2[$i]) {
+                    $equal = 0;
+                }
+            }
+            if (! $equal) {
+                # Here the keys are different. No delete is needed.
+                $deleteInProgress = 0;
+                # Update the key.
+                @key = @key2;
+            } elsif ($deleteInProgress) {
+                # Here the keys are the same, but this key set is already being deleted.
+                # Record the fact in the statistics.
+                $retVal->Add(extraDuplicates => 1);
+            } else {
+                # Here the keys are the same and we have not already scheduled them for
+                # deletion. Save the information we need to delete the duplicates and
+                # re-insert the current record.
+                $retVal->Add(duplicateGroups => 1);
+                my %delHash;
+                for (my $i = 2; $i < $keylen; $i++) {
+                    $delHash{$fields[$i - 2]} = $key2[$i];
+                }
+                push @deletes, [$key2[0], $key2[1], \%delHash];
+                my %insHash;
+                for my $field (@allFields) {
+                    $insHash{$field} = $row->PrimaryValue($field);
+                }
+                push @inserts, \%insHash;
+                # Denote a delete is in progress.
+                $deleteInProgress = 1;
+            }
+        }
+        # Now we have a list of deletions and insertions to perform. These are done outside the
+        # loop so as not to mess up the query progress. We also expect them to be small in number
+        # and capable of fitting in memory.
+        for my $delete (@deletes) {
+            $self->DeleteRow($relName, $delete->[0], $delete->[1], $delete->[2]);
+            $retVal->Add(deletes => 1);
+        }
+        for my $insert (@inserts) {
+            $self->InsertObject($relName, $insert);
+            $retVal->Add(inserts => 1);
+        }
+    }
+    # Return the statistics object.
+    return $retVal;
+}
+
 =head2 Database Update Methods
 
 =head3 BeginTran

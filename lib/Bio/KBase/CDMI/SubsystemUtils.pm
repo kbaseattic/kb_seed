@@ -138,6 +138,15 @@ sub DeleteSubsystem {
     # Delete the subsystem
     print "Deleting old copy of $subsysID.\n";
     my $stats = $cdmi->Delete(Subsystem => $subsysID);
+    # In case of missing variants, we need to delete the SSRows. Look for
+    # SSRows with keys matching the subsystem's MD5.
+    my $digest = Digest::MD5::md5_base64($subsysID);
+    my @rows = $cdmi->GetFlat('SSRow', "SSRow(id) LIKE ?", ["$digest:%"], 'id');
+    for my $row (@rows) {
+        print "Deleting SS row $row.\n";
+        my $subStats = $cdmi->Delete(SSRow => $row);
+        $stats->Accumulate($subStats);
+    }
     # Roll up the statisics.
     $loader->stats->Accumulate($stats);
 }
@@ -699,6 +708,13 @@ sub ProcessBindings {
                 # Next we need the variant code and key.
                 my $variantCode = Starless($variant);
                 my $variantKey = "$subsystemMD5:$variantCode";
+                # Insure that the variant exists.
+                my $created = $loader->InsureEntity(Variant => $variantKey, code => $variantCode,
+                    comment => "", type => "normal");
+                if ($created) {
+                    $stats->Add(newVariantFromBinding => 1);
+                    $cdmi->InsertObject('Describes', from_link => $subsystem, to_link => $variantKey);
+                }
                 # Now we create the molecular machine connecting this genome to the
                 # subsystem variant.
                 my $machineID = "$subsystemMD5:$variantCode:$genome";

@@ -102,19 +102,21 @@ use Data::Dumper;
 use SeedUtils;
 use Getopt::Long;
 
-my $usage = "usage: kmer_search -d DataDir [-a] [-m MinHits] [-g MaxGap] [-p] [-r RastDirs]\n";
+my $usage = "usage: kmer_search -d DataDir [-a] [-m MinHits] [-g MaxGap] [-p] [-r RastDirs] [-z]\n";
 my $dataD;
 my $aa = 0;
 my $min_hits = 5;
 my $max_gap  = 200;
 my $use_pub_seed = 0;
 my $rast_dirs;
+my $zscores = 0;
 my $rc  = GetOptions('d=s' => \$dataD,
 		     'g=i' => \$max_gap,
                      'm=i' => \$min_hits, 
 		     'p'   => \$use_pub_seed,
 		     'r=s' => \$rast_dirs,
-                     'a'   => \$aa);
+                     'a'   => \$aa,
+                     'z'   => \$zscores);
 
 if ((! $rc) || (! $dataD))
 { 
@@ -163,13 +165,14 @@ if (! -s "$dataD/kmer.table.mem_map")
     $write_mem = "-w ";
 }
 my $command;
+my $z = $zscores ? '-z' : '';
 if ((-s "$dataD/genomes") && (! $aa))
 {
-    $command = "kmer_guts -D $dataD $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -d $dataD";
+    $command = "kmer_guts -D $dataD $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -d $dataD $z";
 }
 elsif ((-s "$dataD/genomes") && $aa)
 {
-    $command = "kmer_guts -D $dataD -a $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -a -d $dataD | km_pick_best_hit_in_peg";
+    $command = "kmer_guts -D $dataD -a $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -a -d $dataD $z | km_pick_best_hit_in_peg";
 }
 elsif ((-s "$dataD/properties") && $aa)
 {
@@ -179,7 +182,7 @@ elsif ((-s "$dataD/properties") && (! $aa))
 {
     $command = "kmer_guts -s $hash_size -D $dataD $write_mem -m $min_hits -g $max_gap | kp_process_dna_hits -d $dataD";
 }
-
+# print STDERR $command,"\n";
 open(INPUT,'-') || die "could not transer STDIN";
 open(RUN,"| $command") || die "could not open $command";
 while (defined($_ = <INPUT>))
