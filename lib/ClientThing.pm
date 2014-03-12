@@ -28,7 +28,7 @@ package ClientThing;
     use POSIX;
     use HTTP::Message;
 
-    use constant AGENT_NAME => "myRAST version 1.081";
+    use constant AGENT_NAME => "myRAST version 1.082";
 
 =head1 Base Class for Server Helper Objects
 
