@@ -76,6 +76,7 @@ use SeedAware;
 use Bio::KBase::GenomeAnnotation::Client;
 use Bio::KBase::IDServer::Client;
 use JSON::XS;
+use Time::HiRes 'gettimeofday';
 
 use IDclient;
 use find_special_proteins;
@@ -162,7 +163,7 @@ my $contigs      = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{con
 my $params = { contigs      => $contigs,
 };
 if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
-		   
+
 my @results = ();
 
 if ($seleno) {
@@ -175,6 +176,23 @@ if ($pyrro) {
 }
 print STDERR Dumper(\@results) if $ENV{DEBUG};
 
+#
+# Create event for logging in genome object.
+#
+my $hostname = `hostname`;
+chomp $hostname;
+
+#
+# Remove this so we don't pollute the log.
+#
+delete $params->{contigs};
+my $event = {
+    tool_name => "find_special_proteins",
+    execute_time => scalar gettimeofday,
+    parameters => [ %$params ], 
+    hostname => $hostname,
+};
+my $event_id = GenomeTypeObject::add_analysis_event($genomeTO, $event);
 
 foreach my $entry (@results) {
     my ($contig, $beg, $end, $strand) = &SeedUtils::parse_location( $entry->{location} );
@@ -191,6 +209,7 @@ foreach my $entry (@results) {
 						-annotation => 'Add feature called by find_special_proteins',
 						-function   => $function,
 						-protein_translation => $translation,
+						-analysis_event_id => $event_id,
 				   }
 	);
 }

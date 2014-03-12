@@ -158,11 +158,37 @@ sub get_strep_suis_repeats {
     return $genomeTO;
 }
 
+sub get_raw_repeats
+{
+    my($genomeTO, $prog) = @_;
+
+    my $out = [];
+    for my $contig (@{$genomeTO->{contigs}})
+    {
+	my $tmp = File::Temp->new();
+	print $tmp ">$contig->{id}\n$contig->{dna}\n";
+	close($tmp);
+	my $fh;
+	open($fh, "-|", $prog, $tmp) or die "cannot run $prog $tmp: $!";
+	my $parsed = parse_repeat_output($fh);
+	for my $obj (@$parsed)
+	{
+	    for my $lchunk (@{$obj->{location}})
+	    {
+		unshift(@$lchunk, $contig->{id});
+	    }
+
+	    push(@$out, $obj);
+	}
+	close($fh);
+    }
+    return $out;
+}
+
 sub get_strep_pneumo_repeats {
     my ($genomeTO) = @_;
     
     foreach my $contigO (@ { $genomeTO->{contigs} }) {
-	use File::Temp qw/ :seekable /;
 	my $tmp_contigO  = File::Temp->new(DIR => q(/tmp), TEMPLATE => q(tmp_contig_XXXXXX),  SUFFIX => q(.fna));
 	my $tmp_contig_filename = $tmp_contigO->filename;
 	$tmp_contigO->unlink_on_destroy(0);

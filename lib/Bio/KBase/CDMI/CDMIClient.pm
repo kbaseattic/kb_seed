@@ -217,9 +217,6 @@ sub new_with_type
 
     # We'll put the return value in here.
     my $retVal;
-    my ($url);
-
-    $url = "http://bio-data-1.mcs.anl.gov/services/cdmi_api";
 
     if ($local)
     {
@@ -229,11 +226,10 @@ sub new_with_type
         }
         my $cdmi = Bio::KBase::CDMI::CDMI->new();
         $retVal = $impl_class->new($cdmi);
-
     }
     else
     {
-        $retVal = $client_class->new($url);
+        $retVal = $client_class->new();
     }
     # Return the result.
     return $retVal;

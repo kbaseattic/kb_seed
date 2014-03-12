@@ -385,7 +385,7 @@ for my $f (@{$genomeTO->{features}})
     my $bc = $bio->{$contig};
     if (ref($bc))
     {
-	$bc->add_SeqFeature($feature);
+	$bc->add_SeqFeature($feature) if $feature;
     }
     else
     {

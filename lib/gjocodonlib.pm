@@ -419,7 +419,7 @@ package gjocodonlib;
 
 use strict;
 use Carp qw( croak );
-# use Data::Dumper;
+use Data::Dumper;
 
 use IPC::Open2 qw( open2 );
 
@@ -2348,18 +2348,26 @@ sub version
 
 #-------------------------------------------------------------------------------
 #  $ncpu = n_cpu()
+#
+#  Based upon tim_yates's answer to
+#
+#     http://stackoverflow.com/questions/19619582/get-the-number-of-processors-cores-in-bash
+#
+#  and Sambatyon's answer to
+#
+#     http://superuser.com/questions/226552/how-to-tell-how-many-cpus-cores-you-have-on-windows-7
+#
 #-------------------------------------------------------------------------------
 sub n_cpu
 {
-    if ( my $bin = SeedAware::executable_for( 'sysctl' ) )
-    {
-        my ( $ncpu ) = SeedAware::run_gathering_output( qw( sysctl -n hw.ncpu ) );
-        return 1 if ! $ncpu;
-        chomp $ncpu;
-        return ( $ncpu =~ /^\d+$/ ? $ncpu : 1 );
-    }
+    my $os = $^O;
+    my @cmd = $os =~ /linux/  ? qw(grep -c ^processor /proc/cpuinfo)
+            : $os =~ /darwin/ ? qw(sysctl -n hw.ncpu)
+            : $os =~ /win32/  ? qw(echo %NUMBER_OF_PROCESSORS%)
+            :                   ();
+    my ( $ncpu ) = @cmd ? SeedAware::run_gathering_output( @cmd ) : qw( 1 );
 
-    return 1;
+    $ncpu && ($ncpu =~ /(\d+)/) ? $1 : 1;
 }
 
 
@@ -2368,11 +2376,12 @@ sub n_cpu
 #-------------------------------------------------------------------------------
 sub sysctl
 {
-    my $bin = SeedAware::executable_for( 'sysctl' );
-    return {} if ! $bin;
+    my $bin = SeedAware::executable_for( 'sysctl' )
+        or return {};
 
     my %data = map { chomp; /^(\S+):\s(.*)$/ ? ( $1, $2 ) : () }
-               SeedAware::run_gathering_output( qw( sysctl -n hw.ncpu ) );
+               SeedAware::run_gathering_output( qw( sysctl -a ) );
+
     \%data;
 }
 
