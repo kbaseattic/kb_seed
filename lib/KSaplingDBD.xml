@@ -2262,14 +2262,14 @@
 		<Notes>A series refers to a group of samples for expression data.</Notes>
 		<Asides>This often times will map to a GEO Series aka GSE#.</Asides>
 		<Fields>
-			<Field name="title" type="long-string">
-				<Notes>free text title of the series</Notes>
+			<Field name="title" type="text">
+				<Notes>free text - title of the series</Notes>
 			</Field>
-			<Field name="summary" type="long-string">
-				<Notes>free text summary of the series</Notes>
+			<Field name="summary" type="text">
+				<Notes>free text - summary of the series</Notes>
 			</Field>
-			<Field name="design" type="long-string">
-				<Notes>free text design of the series</Notes>
+			<Field name="design" type="text">
+				<Notes>free text - design of the series</Notes>
 			</Field>
 			<Field name="externalSourceId" type="string">
 				<Notes>The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSE2365).
@@ -2367,7 +2367,7 @@
 			</Notes>
 		<Asides>This often times will map to a GEO GSM.</Asides>
 		<Fields>
-			<Field name="title" type="long-string">
+			<Field name="title" type="text">
 				<Notes>free text title of the sample</Notes>
 			</Field>
 			<Field name="dataSource" type="string">
@@ -2377,7 +2377,7 @@
 				<Notes>The externalSourceId gives users potentially an easy way to find the data of interest (ex:GSM9514).
 				This will keep them from having to do problematic likes on the source-id field.</Notes>
 			</Field>
-			<Field name="description" type="long-string">
+			<Field name="description" type="text">
 				<Notes>Free-text descibing the experiment.</Notes>
 			</Field>
 			<Field name="molecule" type="string">
@@ -2404,6 +2404,12 @@
 			<Field name="dataQualityLevel" type="int">
 			  <Notes>The quality of the data.  Lower the number the better.  Details need to be worked out.</Notes>
 			</Field>
+                        <Field name="shock_url" type="string"> 
+                                <Notes>URL of the file location in Shock.  Ex: the shock url for the RNA-Seq GTF file.</Notes> 
+                        </Field> 
+                        <Field name="processing_comments" type="long-string"> 
+                                <Notes>Processing comments.  Examples how mapping was done.  If representative CDS were used.</Notes> 
+                        </Field> 
 		</Fields>
 		<FulltextIndexes>
 			<FulltextIndex type="field" name="title" in_result="1" />
