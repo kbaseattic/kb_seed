@@ -32,7 +32,18 @@ use File::Slurp;
 use JSON::XS;
 use gjoseqlib;
 use Time::HiRes 'gettimeofday';
-use UUID;
+
+
+our $have_UUID;
+our $have_Data_UUID;
+eval {
+    require UUID;
+    $have_UUID = 1;
+};
+eval {
+    require Data::UUID;
+    $have_Data_UUID = 1;
+};
 
 # my new {
 #     my ($class, $self) = @_;
@@ -290,9 +301,7 @@ sub add_analysis_event
 	die "GenomeTypeObject::add_analysis_event: event must be a hash reference";
     }
 
-    my($uuid, $uuid_str);
-    UUID::generate($uuid);
-    UUID::unparse($uuid, $uuid_str);
+    my $uuid_str = create_uuid();
 
     $event->{id} = $uuid_str;
 
@@ -358,6 +367,24 @@ sub get_feature_dna
 
 }
 
+sub create_uuid
+{
+    if ($have_UUID)
+    {
+	my($uuid, $uuid_str);
+	UUID::generate($uuid);
+	UUID::unparse($uuid, $uuid_str);
+	return $uuid_str;
+    }
+    elsif ($have_Data_UUID)
+    {
+	return Data::UUID->new->create_str();
+    }
+    else
+    {
+	die "No UUID generator found";
+    }
+}
 
     
 1;

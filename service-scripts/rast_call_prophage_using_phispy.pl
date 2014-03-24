@@ -175,6 +175,7 @@ while (<O>)
 	    -annotator  => 'phispy',
 	    -annotation => 'Add feature called by phispy',
 	    -analysis_event_id   => $event_id,
+	    -function => 'phiSpy-predicted prophage',
 	});
     }
 }

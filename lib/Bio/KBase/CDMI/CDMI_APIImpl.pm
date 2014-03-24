@@ -6399,7 +6399,7 @@ sub reaction_strings
 				};
 			}
 			$reactantHash->{$row->[0]}->{coef} += $row->[2];
-			my @cpdloc = $CDMI_Obj->GetAll("Location IsParticipatingAt LocalizedCompound","LocalizedCompound(id) = ?", [$row->[0]],[qw(Location(source-id))]);
+			my @cpdloc = $kb->GetAll("Location IsParticipatingAt LocalizedCompound","LocalizedCompound(id) = ?", [$row->[0]],[qw(Location(source-id))]);
 			$reactantHash->{$row->[0]}->{comp}=$cpdloc[0][0];
 		}
 		#Identifying reactants and products

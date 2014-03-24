@@ -53,7 +53,8 @@ Now, let us summarize the steps used to generate the families.  We go through th
     3. Then, we go through the PEGs that were called by kmers (and recorded in tmp.$$.calls).
        This is done by get_families_3.
        We form potential sets as all PEGs assigned the same function.  For each "function-based set"
-       we count the number of PEGs from each genome.  If 90% of the genomes represented
+       we count the number of PEGs from each genome.  If 90% (i.e., the cutoff parameter 
+       defines this value, which defaults to 0.9) of the genomes represented
        in the set have only one PEG in the set, the set is considered "good" and written to
        "families.good".  Otherwise, the set is written to tmp.$$.bad.
 
@@ -106,6 +107,11 @@ of the sequences left uncalled by kmers (see above)
 The prefix used when writing files recording subfamilies (and the final
 families.all)
 
+=item -c cutoff used to differntiate between "good" and "bad" "called families"
+
+if a fraction more than "cutoff" genomes in a family have just one PEG,
+the family is "good"; else it is "bad", and an attempt will be made to split it.
+
 =item -s Seqs.Fasta
 
 The directory from which the translations of PEGs from each genome are 
@@ -115,17 +121,23 @@ used.
 
 =head2 Output Format
 
-Output is writen to a set of files with the prefix specified in the -f parameter.
-Assuming 
+Output is written to families.all and constitutes the derived protein families (which
+include singletons).  An 8-column, tab-separated table is written:
 
-    -f Families/families
+    FamilyID - an integer
+    Function - function assigned to family
+    SubFunction - the Function and an integer (SubFunction) together uniquely
+                  determine the FamilyID.  Another way to look at it is
 
-were specified, you would get
-
-    Families/families.good
-    Families/families.bad.fixed
-    Families/families.missed     - families formed from PEGs that could not be assigned functions using kmers
-    Families/families.all
+                    a) each family is assigned a unique ID and a function
+                    b) multiple families can have the same function (consider
+                       "hypothetical protein")
+                    c) the Function+SubFunction uniquely determine the FamilyID
+    PEG
+    LengthProt - the length of the translated PEG
+    Mean       - the mean length of PEGs in the family
+    StdDev     - standard deviation of lengths for family
+    Z-sc       - the Z-score associated with the length of this PEG
 
 =cut
 
@@ -140,12 +152,14 @@ my $usage = "usage: get_families -d Data -s Seqs < genomes\n";
 my $dataD;
 my $seqsD;
 my $matchN = 3;
-my $iden = 50;
+my $iden = 0.5;
 my $families;
+my $cutoff = 0.9;  # fraction of members with uniq genomes to be "good"
 my $rc  = GetOptions('d=s' => \$dataD,
 		     'm=i' => \$matchN,
-		     'i=i' => \$iden,
+		     'i=f' => \$iden,
 		     'f=s' => \$families,
+		     'c=f' => \$cutoff,
                      's=s' => \$seqsD);
 if ((! $rc) || (! $dataD) || (! $seqsD) || (! $families))
 { 
@@ -153,11 +167,8 @@ if ((! $rc) || (! $dataD) || (! $seqsD) || (! $families))
 }
 
 &SeedUtils::run("get_families_1 -d $dataD -s $seqsD > tmp.$$.calls 2> tmp.$$.missed");
-print STDERR "got1\n";
 &SeedUtils::run("get_families_2 -i $iden -s $seqsD < tmp.$$.missed > $families.missed");
-print STDERR "got2\n";
-&SeedUtils::run("get_families_3 -i $iden -s $seqsD < tmp.$$.calls > $families.good 2> tmp.$$.bad");
-print STDERR "got3\n";
+&SeedUtils::run("get_families_3 -c $cutoff < tmp.$$.calls > $families.good 2> tmp.$$.bad");
 &SeedUtils::run("get_families_4 -d $dataD -s $seqsD < tmp.$$.bad > $families.bad.fixed");
 &SeedUtils::run("get_families_final -f $families -s $seqsD > $families.all");
 unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
