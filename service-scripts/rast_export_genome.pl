@@ -378,8 +378,55 @@ for my $f (@{$genomeTO->{features}})
 	    push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
 	}
 	
+    } elsif ($type eq "crispr_repeat") {
+	my $primary = "repeat_region";
+	$feature = Bio::SeqFeature::Generic->new(-location => $loc,
+						 -primary  => $primary,
+						 -tag      => {
+						     product => $func,
+						 },
+						 
+						);
+	$feature->add_tag_value("rpt_type", "direct");
+	$func_ok =~ s/ #.+//;
+	$func_ok =~ s/;/%3B/g;
+	$func_ok =~ s/,/%2C/g;
+	$func_ok =~ s/=//g;
+	foreach my $tagtype (keys %$note) {
+	    $feature->add_tag_value($tagtype, @{$note->{$tagtype}});
+	}
+	# work around to get annotations into gff
+	for my $l (@loc_info)
+	{
+	    my($contig, $start, $stop, $strand, $frame) = @$l;
+	    push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
+	}
+	
     } else {
-	print STDERR "unhandled feature type: $type\n";
+	my $primary = "misc_feature";
+	$feature = Bio::SeqFeature::Generic->new(-location => $loc,
+						 -primary  => $primary,
+						 -tag      => {
+						     product => $func,
+						     note => $type,
+						 },
+						 
+						);
+	$func_ok =~ s/ #.+//;
+	$func_ok =~ s/;/%3B/g;
+	$func_ok =~ s/,/%2C/g;
+	$func_ok =~ s/=//g;
+	foreach my $tagtype (keys %$note) {
+	    $feature->add_tag_value($tagtype, @{$note->{$tagtype}});
+	}
+	# work around to get annotations into gff
+	for my $l (@loc_info)
+	{
+	    my($contig, $start, $stop, $strand, $frame) = @$l;
+	    push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
+	}
+	
+
     }
     
     my $bc = $bio->{$contig};
