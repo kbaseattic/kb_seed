@@ -2410,11 +2410,15 @@
                         <Field name="processing_comments" type="long-string"> 
                                 <Notes>Processing comments.  Examples how mapping was done.  If representative CDS were used.</Notes> 
                         </Field> 
+                        <Field name="numerical_interpretation" type="string"> 
+                                <Notes>The numerical space that the data is in.  Examples : Log2 level intensities, Log2 level ratios, FPKM</Notes>
+                        </Field>
 		</Fields>
 		<FulltextIndexes>
 			<FulltextIndex type="field" name="title" in_result="1" />
 			<FulltextIndex type="field" name="description" in_result="1" />
 			<FulltextIndex type="field" name="dataSource" in_result="1" />
+
 		</FulltextIndexes>
 		<Indexes>
 			<Index>
@@ -2435,7 +2439,12 @@
                                         <IndexField name="dataQualityLevel" order="ascending" /> 
                                 </IndexFields> 
                         </Index> 
-
+                        <Index> 
+                                <Notes>Allows for quick retrieval of numeric types.</Notes>
+                                <IndexFields>
+                                        <IndexField name="numerical_interpretation" order="ascending" />
+                                </IndexFields> 
+                        </Index>
 		</Indexes>	
 	</Entity>
 	<Entity name="Ontology" keyType="string">
