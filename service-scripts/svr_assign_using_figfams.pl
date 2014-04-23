@@ -75,11 +75,12 @@ The URL for the FIGfam server, if it is to be different from the default.
 
 =head3 Output Format
 
-The standard output is a tab-delimited file. If no BLAST output is specified, the
-the first column of each record is a feature ID from the FASTA input, and the
-second column is the assigned function. If BLAST output is specified, then the BLAST
-hits found will be listed after each assignment. The columns in a BLAST hit record
-are as follows.
+The standard output is a tab-delimited file. If no BLAST output is
+specified, the the first column of each record is a score, the second
+column is a feature ID from the FASTA input, and the third column is
+the assigned function (higher scores are better). If BLAST output is specified, then the BLAST
+hits found will be listed after each assignment. The columns in a
+BLAST hit record are as follows.
 
 =over 4
 

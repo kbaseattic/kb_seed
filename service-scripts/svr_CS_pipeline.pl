@@ -184,7 +184,7 @@ foreach my $g (@genomes)
 
 if (! -s "$dataD/families.all")
 {
-    &SeedUtils::run("get_families -d $dataD/Data.kmers -s $dataD/Seqs -f $dataD/families < $dataD/rep.genomes");
+    &SeedUtils::run("get_families -d $dataD/Data.kmers -s $dataD/Seqs -f $dataD/families < $dataD/rep.genomes > $dataD/families.all");
 }
 
 if (! -s "$dataD/FastaForPhylogeny/Fasta/1")
@@ -240,12 +240,12 @@ if (! -s "$dataD/families.on.tree")
 
 if (! -s "$dataD/coupled.families")
 {
-    &SeedUtils::run("perl CS_compute_coupling.pl -d $dataD");
+    &SeedUtils::run("CS_compute_coupling -d $dataD");
 }
 
 if (! -s "$dataD/placed.events")
 {
-    &SeedUtils::run("./cs_adjacency_data -d $dataD");
+    &SeedUtils::run("cs_adjacency_data -d $dataD");
 }
 
 sub generate_genomes {

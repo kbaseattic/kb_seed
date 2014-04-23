@@ -166,13 +166,17 @@ if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
 
 my @results = ();
 
+my $qual;
+
 if ($seleno) {
     push @results, &find_special_proteins::find_selenoproteins( $params );
+    $qual = { selenoprotein => 1 };
 }
 
 if ($pyrro) {
     $params->{ pyrrolysine } = 1;
     push @results, &find_special_proteins::find_selenoproteins( $params );
+    $qual = { pyrrolysylprotein => 1 };
 }
 print STDERR Dumper(\@results) if $ENV{DEBUG};
 
@@ -210,6 +214,7 @@ foreach my $entry (@results) {
 						-function   => $function,
 						-protein_translation => $translation,
 						-analysis_event_id => $event_id,
+						-quality_measure => $qual,
 				   }
 	);
 }

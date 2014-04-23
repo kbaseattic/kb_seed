@@ -102,10 +102,10 @@ my %func_of;
 while (defined($_ = <STDIN>))
 {
     chomp;
-    my @set = split(/\t/,$_);
-    my $func = shift @set;
-    push(@sets,\@set);
-    foreach my $peg (@set)
+    my $set = [split(/\t/,$_)];
+    my $func = shift @$set;
+    push(@sets,$set);
+    foreach my $peg (@$set)
     {
 	if ($peg =~ /^fig\|/)
 	{
@@ -130,30 +130,43 @@ close(KMER);
 
 my %seen;
 open(TMP,"<$tmp1") || die "could not read $tmp1";
-while (defined($_ = <TMP>) && ($_ =~ /^(\S+)\t(\S+)/))
+while (defined($_ = <TMP>))
 {
-    foreach my $k (split(/,/,$2))
+    if ($_ =~ /^(\S+)\t(\S*)/)
     {
-	$seen{$k}++;
+	next if (! $2);
+	foreach my $k (split(/,/,$2))
+	{
+	    $seen{$k}++;
+	}
     }
 }
 close(TMP);
-
 my %to_kmers;
 open(TMP,"<$tmp1") || die "could not read $tmp1";
-while (defined($_ = <TMP>) && ($_ =~ /^(\S+)\t(\S+)/))
+while (defined($_ = <TMP>) && ($_ =~ /^(\S+)\t(\S*)/))
 {
     my($peg,$kmers) = ($1,$2);
-    $to_kmers{$peg} = [grep { $seen{$_} > 1 } split(/,/,$kmers)];
+    if ($kmers)
+    {
+	$to_kmers{$peg} = [grep { $seen{$_} > 1 } split(/,/,$kmers)];
+    }
 }
 close(TMP);
-
 foreach my $set (@sets)
 {
-    my @sorted = sort { @{$to_kmers{$b}} <=> @{$to_kmers{$a}} } @$set;
+    my @sorted = sort { &by_size($to_kmers{$b},$to_kmers{$a}) } @$set;
     &process_set(\@sorted,\%to_kmers,$matchN,\%func_of);
 }
 unlink($tmp1);
+
+sub by_size {
+    my($x,$y) = @_;
+
+    my $v1 = ($x ? @$x : 0);
+    my $v2 = ($y ? @$y : 0);
+    return ($v1 <=> $v2);
+}
 
 sub process_set {
     my($sorted_pegs,$to_kmers,$matchN,$func_of) = @_;
@@ -193,8 +206,8 @@ sub match {
     my($peg1,$peg2,$to_kmers,$matchN) = @_;
 
     my $n = 0;
-    my $k1 = $to_kmers->{$peg1};
-    my $k2 = $to_kmers->{$peg2};
+    my $k1 = $to_kmers->{$peg1}; if (! $k1) { $k1 = [] }
+    my $k2 = $to_kmers->{$peg2}; if (! $k2) { $k2 = [] }
     my $i1 = 0;
     my $i2 = 0;
     while (($n < $matchN) && ($i1 < @$k1) && ($i2 < @$k2))

@@ -11,13 +11,13 @@ Generate protein families (of isofunctional homologs) using kmer technology.
 
 Example:
 
-    get_families -d Data.kmers -f Families/families -s Seqs.Fasta < genomes
+    get_families -d Data.kmers -f Families/families -s Seqs.Fasta < genomes > families
 
 This uses a Data.kmer directory built to support kmer_guts processing.
 We suggest using the one in pubSEED (Global/Data.kmers).  The invocation causes a
 set of "families" files to be generated in the existing Families directory.  They will all
-be prefixed with the word "families.".  "families.all" will be the final set of protein
-families.
+be prefixed with the word "families.".  The final set of protein
+families is written to STDOUT.
 
 Seqs.Fasta is a directory that contains protein fasta files.  The file names
 must be genome IDs.  Thus, it is assumed that 
@@ -81,7 +81,7 @@ Now, let us summarize the steps used to generate the families.  We go through th
        a new set written to families.bad.fixed (possibly singletons).
 
 Finally, the sets from families.good, families.bad.fixed, and
-families.missed are all gathered and renumbered into families.all.
+families.missed are all gathered and renumbered and written to STDOUT..
 
 =head2 Command-Line Options
 
@@ -104,8 +104,7 @@ of the sequences left uncalled by kmers (see above)
 
 =item -f FamilyFilesPrefix
 
-The prefix used when writing files recording subfamilies (and the final
-families.all)
+The prefix used when writing files recording subfamilies.
 
 =item -c cutoff used to differntiate between "good" and "bad" "called families"
 
@@ -121,7 +120,7 @@ used.
 
 =head2 Output Format
 
-Output is written to families.all and constitutes the derived protein families (which
+Output is written to STDOUT and constitutes the derived protein families (which
 include singletons).  An 8-column, tab-separated table is written:
 
     FamilyID - an integer
@@ -169,7 +168,7 @@ if ((! $rc) || (! $dataD) || (! $seqsD) || (! $families))
 &SeedUtils::run("get_families_1 -d $dataD -s $seqsD > tmp.$$.calls 2> tmp.$$.missed");
 &SeedUtils::run("get_families_2 -i $iden -s $seqsD < tmp.$$.missed > $families.missed");
 &SeedUtils::run("get_families_3 -c $cutoff < tmp.$$.calls > $families.good 2> tmp.$$.bad");
-&SeedUtils::run("get_families_4 -d $dataD -s $seqsD < tmp.$$.bad > $families.bad.fixed");
-&SeedUtils::run("get_families_final -f $families -s $seqsD > $families.all");
-unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
+&SeedUtils::run("get_families_4 -d $dataD -s $seqsD -m $matchN < tmp.$$.bad > $families.bad.fixed");
+&SeedUtils::run("get_families_final -f $families -s $seqsD");
+#unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
 

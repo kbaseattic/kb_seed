@@ -14,7 +14,10 @@ use strict;
 use ANNOserver;
 use ClientThing;
 use ErrorMessage;
-use ModelSEED::FBAMODELserver;
+eval {
+    require ModelSEED::FBAMODELserver;
+    ModelSEED::FBAMODELserver->import();;
+};
 use RASTserver;
 use SAPserver;
 use ScriptThing;
