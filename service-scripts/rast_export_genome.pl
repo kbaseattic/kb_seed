@@ -378,7 +378,7 @@ for my $f (@{$genomeTO->{features}})
 	    push @$gff_export, "$contig\t$source\t$primary\t$start\t$stop\t.\t$strand\t.\tID=$peg;Name=$func_ok\n";
 	}
 	
-    } elsif ($type eq "crispr_repeat") {
+    } elsif ($type eq "crispr_repeat" || $type eq 'repeat') {
 	my $primary = "repeat_region";
 	$feature = Bio::SeqFeature::Generic->new(-location => $loc,
 						 -primary  => $primary,
@@ -387,7 +387,8 @@ for my $f (@{$genomeTO->{features}})
 						 },
 						 
 						);
-	$feature->add_tag_value("rpt_type", "direct");
+	$feature->add_tag_value("rpt_type",
+				($type eq 'crispr_repeat' ? "direct" : "other"));
 	$func_ok =~ s/ #.+//;
 	$func_ok =~ s/;/%3B/g;
 	$func_ok =~ s/,/%2C/g;

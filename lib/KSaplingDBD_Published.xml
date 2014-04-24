@@ -1200,6 +1200,9 @@
           <Notes>Primary scientific name for this grouping. This is the name used
           when displaying a taxonomy.</Notes>
         </Field>
+        <Field name="type" type="string">
+        <Notes>Type of group, as specified in the NCBI taxonomy database.</Notes>
+        </Field>
         <Field name="alias" type="string" relation="TaxonomicGroupingAlias">
           <Notes>Alternate name for this grouping. A grouping
           may have many alternate names. The scientific name should also
@@ -3796,6 +3799,13 @@
       necessarily to a leaf node. In some cases, the exact species and strain is
       not available when inserting the genome, so it is placed at the lowest node
       that probably contains the actual genome.</Notes>
+      <Fields>
+      <Field name="confidence" type="int">
+      <Notes>Confidence in this assignment. Level 0 means there is an exact scientific
+      name match. Level 1 means the taxonomy ID was provided directly. Level 2 means
+      an alias matched. Level 3 means the taxonomy ID was estimated during loading.</Notes>
+      </Field>
+      </Fields>
     </Relationship>
     <Relationship name="IsRowOf" from="SSRow" to="SSCell"
       arity="1M" converse="IsRoleFor">
