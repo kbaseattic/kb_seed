@@ -29,12 +29,19 @@ my $id_prefix;
 my $id_server;
 my @feature_type;
 
-my @formats = (gff => "GFF format",
-	       protein_fasta => "Protein translations in fasta format",
-	       contig_fasta => "Contig DNA in fasta format",
-	       genbank => "Genbank format",
-	       genbank_merged => "Genbank format as single merged locus, suitable for Artemis",
-	       embl => "EMBL format");
+#
+# Master list of supported formats. When changes happen here please propagate them to
+# the rast2-export-genome script and to the documentation in the API spec.
+#   
+
+my @formats = ([genbank => "Genbank format"],
+	       [genbank_merged => "Genbank format as single merged locus, suitable for Artemis"],
+	       [feature_data => "Tabular form of feature data"],
+	       [protein_fasta => "Protein translations in fasta format"],
+	       [contig_fasta => "Contig DNA in fasta format"],
+	       [feature_dna => "Feature DNA sequences in fasta format"],
+	       [gff => "GFF format"],
+	       [embl => "EMBL format"]);
 
 my $rc = GetOptions('help'        => \$help,
 		    'input=s'     => \$input_file,

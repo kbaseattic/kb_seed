@@ -23,6 +23,36 @@ package GenomeTypeObject;
 # http://www.theseed.org/LICENSE.TXT.
 ########################################################################
 
+=head1 NAME
+
+GenomeTypeObject - a helper class for manipulating GenomeAnnotation service genome objects.
+
+=head1 SYNOPSIS
+
+  $obj = GenomeTypeObject->new()
+
+  $obj = GenomeTypeObject->initialize($raw_genome_object)
+ 
+=head1 DESCRIPTION
+
+The C<GenomeTypeObject> class wraps a number of common operations to be performed
+against the genome object as defined in the KBase GenomeAnnotation service.
+
+To use the methods here it is sufficient to just bless the JSON object containing
+the genome data into the GenomeTypeObject class, but it is more efficient to initialize
+it using the initialize method:
+
+  $obj = GenomeTypeObject->initialize($raw_json)
+
+Doing this will create internal indexes on the feature and contig data structures
+to accelerate access to individual data items.
+
+Before using the genome object as a raw JSON object again, however, you must invoke
+the C<prepare_for_return()> method which strips these indexes out of the data object.
+
+=cut
+
+
 use strict;
 use warnings;
 use Data::Dumper;
@@ -32,7 +62,9 @@ use File::Slurp;
 use JSON::XS;
 use gjoseqlib;
 use Time::HiRes 'gettimeofday';
-
+use IDclient;
+use Data::Structure::Util qw(unbless);
+use base 'Class::Accessor';
 
 our $have_UUID;
 our $have_Data_UUID;
@@ -45,13 +77,38 @@ eval {
     $have_Data_UUID = 1;
 };
 
-# my new {
-#     my ($class, $self) = @_;
-#    
-#     $self ||= {};
-#    
-#     return bless $self, $class;
-# }
+__PACKAGE__->mk_accessors(qw(id_client));
+
+=head2 $obj = GenomeTypeObject->new()
+
+Create a new empty genome object.
+
+=cut
+
+sub new
+{
+    my($class) = @_;
+
+    my $self = {
+	contigs => [],
+	features => [],
+	close_genomes => [],
+	analysis_events => []
+    };
+    bless $self, $class;
+
+    $self->setup_id_allocation();
+    return $self;
+}
+
+=head2 $obj = GenomeTypeObject->create_from_file($filename)
+
+Load the given file, assumed to contain the JSON form of a genome object, and
+return as a GenomeTypeObject instance.
+
+The resulting object has not had the C<initialize> method invoked on it.
+
+=cut
 
 sub create_from_file
 {
@@ -61,13 +118,64 @@ sub create_from_file
     return bless $self, $class;
 }
 
+=head2 $obj->set_metadata({ ... });
+
+Set the metadata fields on this genome object based on a metadata
+object as defined in the GenomeAnnotation typespec:
+
+ typedef structure
+ {
+  genome_id id;
+  string scientific_name;
+  string domain;
+  int genetic_code;
+  string source;
+  string source_id;
+ } genome_metadata
+
+=cut
+    
+sub set_metadata
+{
+    my($self, $meta) = @_;
+
+    my @keys = qw(id scientific_name domain genetic_code source source_id);
+    for my $k (@keys)
+    {
+	if (exists($meta->{$k}))
+	{
+	    $self->{$k} = $meta->{$k};
+	}
+    }
+    return $self;
+}
+
 sub initialize
+{
+    my($class, $self) = @_;
+
+    $self = $class->initialize_without_indexes($self);
+    $self->update_indexes();
+
+    return $self;
+}
+
+sub initialize_without_indexes
 {
     my($class, $self) = @_;
 
     bless $self, $class;
 
-    $self->update_indexes();
+    $self->setup_id_allocation();
+
+    return $self;
+}
+
+sub setup_id_allocation
+{
+    my($self) = @_;
+    $self->{_id_client} = IDclient->new($self);
+    return $self;
 }
 
 sub prepare_for_return
@@ -75,6 +183,17 @@ sub prepare_for_return
     my($self) = @_;
 
     delete $self->{$_} foreach  grep { /^_/ } keys %$self;
+    unbless $self;
+}
+
+sub hostname
+{
+    my($self) = @_;
+
+    return $self->{hostname} if $self->{hostname};
+    $self->{hostname} = `hostname`;
+    chomp $self->{hostname};
+    return $self->{hostname};
 }
 
 sub update_indexes
@@ -117,6 +236,78 @@ sub contigs
     return @{$self->{contigs}};
 }
 
+=head2 $obj->add_contigs($contigs)
+
+Add the given set of contigs to this genome object. C<$contigs> is a list of contig
+objects, which we add to the genome object without further inspection.
+
+=cut
+
+sub add_contigs
+{
+    my($self, $contigs) = @_;
+    push(@{$self->{contigs}}, @$contigs);
+}
+
+=head2 $obj->add_features_from_list($features)
+
+Add the given features to the genome. Features here are instances of the compact_tuple type:
+
+ typedef tuple <string id, string location, string feature_type, string function, string aliases> compact_feature;
+
+used in the importation of features from an external source via a tab-separated text file.
+
+We create an event for this import so that the source of the features so added is tracked.
+
+Returns a hash mapping from the feature ID in the list to the allocated feature ID.
+
+=cut
+
+sub add_features_from_list
+{
+    my($self, $features) = @_;
+
+    my $event = {
+	tool_name => "add_features_from_list",
+	execution_time => scalar gettimeofday,
+	parameters => [],
+	hostname => $self->hostname,
+    };
+    my $event_id = $self->add_analysis_event($event);
+
+    my $map = {};
+    
+    for my $f (@$features)
+    {
+	my($id, $loc_str, $type, $func, $aliases_str) = @$f;
+
+	my @aliases = split(/,/, $aliases_str);
+	my @locs = map { BasicLocation->new($_) } split(/,/, $loc_str);
+	my $new_id = $self->add_feature(-type => $type,
+					-location => \@locs,
+					-function => $func,
+					-aliases => \@aliases,
+					-analysis_event_d => $event_id);
+	$map->{$id} = $new_id;
+    }
+    return $map;
+}
+
+=head2 $obj->add_feature($params)
+
+Add a new feature. The details of the feature are defined in the parameters hash. It has the following
+keys:
+
+=over 4
+
+=item -id
+
+Identifier for this feature. If not provided, a new identifier will be
+created based on the genome id, the type of the feature and the current largest identifier for
+that feature type.
+
+=cut
+
 sub add_feature {
     my ($self, $parms) = @_;
     my $genomeTO = $self;
@@ -133,12 +324,17 @@ sub add_feature {
     my $translation = $parms->{-protein_translation};
     my $event_id    = $parms->{-analysis_event_id};
     my $quality     = $parms->{-quality_measure};
+    my $aliases     = $parms->{-aliases};
 
     if (!defined($id))
     {
-	if (!defined($id_client) || !defined($id_prefix))
+	if (!defined($id_prefix))
 	{
-	    die "No id or id_client/id_prefix provided";
+	    $id_prefix = $self->{id};
+	}
+	if (defined($id_client))
+	{
+	    $id_client = $self->{_id_client};
 	}
 	my $typed_prefix = "$id_prefix.$type";
 	my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
@@ -169,6 +365,7 @@ sub add_feature {
 
     $feature->{quality} = $quality if $quality;
     $feature->{feature_creation_event} = $event_id if $event_id;
+    $feature->{aliases} = $aliases if $aliases;
 
     if ($function) {
 	$feature->{function} = $function;
@@ -184,7 +381,7 @@ sub add_feature {
     
     push @$features, $feature;
     
-    return;
+    return $feature;
 }
 
 sub extract_protein_sequences_to_temp_file

@@ -27,7 +27,7 @@ sub new {
     my ($class, $source) = @_;
     
     my $self = {};
-    if (ref($source) eq q(HASH)) {
+    if (ref($source) eq q(HASH) || (ref($source) && UNIVERSAL::can($source, 'isa') && $source->isa('GenomeTypeObject'))) {
 	#...Hack to fake the service locally
 	$self->{_counters} = {};
 	

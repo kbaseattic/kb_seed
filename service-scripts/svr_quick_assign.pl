@@ -1,3 +1,4 @@
+########################################################################
 #
 # This is a SAS Component
 #
@@ -10,7 +11,7 @@ Use staged-kmers (new, followed by old on hypotheticals)
 
 Example:
 
-    svr_quick_assign [-d Data.kmers] < aa.seq.fasta > id-func.table
+    svr_quick_assign [-dc Data.kmers] [-dp Data.kmers] < aa.seq.fasta > id-func.table
 
 This simple script just runs new kmer annotation, and for sequences that do not
 get asigned a function, an attempt will be made using the older kmers (built on FIGfams).
@@ -23,35 +24,35 @@ use Getopt::Long;
 use SeedEnv;
 use gjoseqlib;
 
-my $usage = "usage: svr_quick_assign [ -d Data] < aa.seq.fasta > id-func.table\n";
-my $dataD ="/homes/overbeek/Ross/MakeCS/Data/Data.kmers";  # get better deafult mechanism someday
-
-my $rc  = GetOptions('d=s' => \$dataD);
-if (! $rc)
-{ 
-    print STDERR $usage; exit ;
-}
+my $usage = "usage: svr_quick_assign < aa.seq.fasta > id-func.table\n";
+my $dataD ="/homes/overbeek/Ross/MakeCS/Data";  # contains Data.kmers for coreSEED, Data.kmers.pub for pubSEED
+my $dataDC = "$dataD/Data.kmers";
+my $dataDP = "$dataD/Data.kmers.pub";
 
 my @all = &gjoseqlib::read_fasta();;
-open(CALLS,"| kmer_search -d $dataD -a 2> /dev/null | cut -f1,2 > tmp.$$.km.calls") || die "could not write to tmp.$$.km.calls";
+open(CALLS,"| kmer_search -d $dataDC -a 2> /dev/null | cut -f1,2 > tmp.$$.km.calls") || die "could not write to tmp.$$.km.calls";
 foreach my $tuple (@all)
 {
     my($id,undef,$seq) = @$tuple;
     print CALLS ">$id\n$seq\n";
 }
 close(CALLS);
-my %called = map { ($_ =~ /^(\S+)\t(\S.*\S)/) ? ($1 => 1) : () } `cat tmp.$$.km.calls`;
-open(CALLS,"| svr_assign_using_figfams 2> /dev/null | cut -f2,3 | grep -v hypothetical -i >> tmp.$$.km.calls") || die "could not extend tmp.$$.km.calls";
-foreach my $tuple (grep { ! $called{$_->[0]} } @all)
+my %called = map { ($_ =~ /^(\S+)\t(\S.*\S)/) ? ($1 => $2) : () } `cat tmp.$$.km.calls`;
+open(CALLS,"| kmer_search -d $dataDP -a 2> /dev/null | cut -f1,2 >> tmp.$$.km.calls") || die "could not write to tmp.$$.km.calls";
+foreach my $tuple (grep { (! $called{$_->[0]}) || ($called{$_->[0]} eq "hypothetical protein") } @all)
 {
     my($id,undef,$seq) = @$tuple;
     print CALLS ">$id\n$seq\n";
 }
 close(CALLS);
-open(CALLS,"<tmp.$$.km.calls") || die "could not open tmp.$$.km.calls";
-while (defined($_ = <CALLS>))
-{
-    print $_;
-}
-close(CALLS);
+%called = map { ($_ =~ /^(\S+)\t(\S.*\S)/) ? ($1 => $2) : () } `cat tmp.$$.km.calls`;
 unlink("tmp.$$.km.calls");
+
+foreach my $tuple (@all)
+{
+    my $id = $tuple->[0];
+    if ($_ = $called{$id})
+    {
+	print $id,"\t",$_,"\n";
+    }
+}
