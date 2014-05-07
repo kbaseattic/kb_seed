@@ -63,7 +63,14 @@ use JSON::XS;
 use gjoseqlib;
 use Time::HiRes 'gettimeofday';
 use IDclient;
-use Data::Structure::Util qw(unbless);
+use BasicLocation;
+
+our $have_unbless;
+eval {
+    require Data::Structure::Util;
+    Data::Structure::Util->import('unbless');
+    $have_unbless = 1;
+};
 use base 'Class::Accessor';
 
 our $have_UUID;
@@ -183,7 +190,16 @@ sub prepare_for_return
     my($self) = @_;
 
     delete $self->{$_} foreach  grep { /^_/ } keys %$self;
-    unbless $self;
+
+    if ($have_unbless)
+    {
+	unbless $self;
+	return $self;
+    }
+    else
+    {
+	return { %$self };
+    }
 }
 
 sub hostname
@@ -332,7 +348,7 @@ sub add_feature {
 	{
 	    $id_prefix = $self->{id};
 	}
-	if (defined($id_client))
+	if (!defined($id_client))
 	{
 	    $id_client = $self->{_id_client};
 	}
@@ -382,6 +398,44 @@ sub add_feature {
     push @$features, $feature;
     
     return $feature;
+}
+
+sub write_protein_translations_to_file
+{
+    my($self, $filename) = @_;
+
+    my $fh;
+    open($fh, ">", $filename) or die "Cannot write $filename: $!";
+
+    for my $feature (@{$self->{features}})
+    {
+	my $trans = $feature->{protein_translation};
+	if ($trans)
+	{
+	    write_fasta($fh, [$feature->{id}, undef, $trans]);
+	}
+    }
+    close($fh);
+}
+
+sub write_feature_locations_to_file
+{
+    my($self, $filename, @feature_types) = @_;
+
+    my %feature_types = map { $_ => 1 } @feature_types;
+
+    my $fh;
+    open($fh, ">", $filename) or die "Cannot write $filename: $!";
+
+    for my $feature (@{$self->{features}})
+    {
+	next if (@feature_types && !$feature_types{$feature->{type}});
+
+	my $loc = $feature->{location};
+	my $loc_str = join(",", map { my $b = BasicLocation->new(@$_); $b->String() } @$loc);
+	print $fh "$feature->{id}\t$loc_str\n";
+    }
+    close($fh);
 }
 
 sub extract_protein_sequences_to_temp_file

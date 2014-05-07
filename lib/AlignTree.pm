@@ -528,7 +528,7 @@ sub psiblast_search {
 sub db_name_to_file {
     my ($db) = @_;
     my $org_dir = "/vol/public-pseed/FIGdisk/FIG/Data/Organisms"; # complete genomes only
-    my $psi_dir = "/home/fangfang/WB/PsiblastDB";
+    my $psi_dir = "/home/fangfang/PsiblastDB";
     if ($db =~ /^(\d+\.\d+)$/)  { $db = "$org_dir/$1/Features/peg/fasta" }
     elsif (uc $db eq 'PPSEED')  { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013
     elsif (uc $db eq 'PUBSEED') { $db = "$psi_dir/SEED.ALL.NR" } # updated in Aug 2013
@@ -536,6 +536,7 @@ sub db_name_to_file {
     elsif (uc $db eq 'PUBSEED.complete') { $db = "$psi_dir/public-pseed.complete" }
     elsif (uc $db eq 'PSEED')   { $db = "$psi_dir/ppseed.NR" }
     elsif (uc $db eq 'SEED')    { $db = "$psi_dir/SEED.complete.fasta" }
+    elsif (uc $db eq 'CORE')    { $db = "$psi_dir/CoreSEED.fasta" }
     return $db;
 }
 

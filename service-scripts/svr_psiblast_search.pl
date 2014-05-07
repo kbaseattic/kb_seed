@@ -37,7 +37,7 @@ genomes, and writes the extracted regions of hits to the standard output.
 usage: svr_psiblast_search [options] < ali.trimmed.fa > hits.fa
 
        -a   n_processor     - number of processors to use (D = 2)
-       -b   database        - database to search against: SEED, PSEED, PUBSEED (D), FASTA file name, FIG genome ID
+       -b   database        - database to search against: SEED, CORE, PSEED, PUBSEED (D), FASTA file name, FIG genome ID
        -c   min_frac_cov    - minimum fraction coverage of query and subject sequence (D = 0.20)
        -cq  min_q_cov       - minimum fraction coverage of query sequence (D = 0.50)
        -cs  min_s_cov       - minimum fraction coverage of subject sequence (D = 0.20)
@@ -72,9 +72,9 @@ Number of processors to use (D = 2)
 =item -b database
 
 Database for psiblast to search against. It can be a FASTA file name,
-a FIG genome ID, or a string, SEED, PSEED or PUBSEED, to indicate one of the
-preconfigured database of all protein sequences from complete
-genomes. The default is PUBSEED.
+a FIG genome ID, or a string, SEED, CORE, PSEED, or PUBSEED, to
+indicate one of the preconfigured database of all protein sequences
+from complete genomes. The default is PUBSEED.
 
 =item -c min_frac_cov
 
@@ -208,7 +208,7 @@ my $usage = <<"End_of_Usage";
 usage: svr_psiblast_search [options] < ali.trimmed.fa > hits.fa
 
        -a   n_processor     - number of processors to use (D = 2)
-       -b   database        - database to search against: SEED (D), PSEED, PUBSEED, FASTA file name, FIG genome ID
+       -b   database        - database to search against: SEED, CORE, PSEED, PUBSEED (D), FASTA file name, FIG genome ID
        -c   min_frac_cov    - minimum fraction coverage of query and subject sequence (D = 0.20)
        -cq  min_q_cov       - minimum fraction coverage of query sequence (D = 0.50)
        -cs  min_s_cov       - minimum fraction coverage of subject sequence (D = 0.20)

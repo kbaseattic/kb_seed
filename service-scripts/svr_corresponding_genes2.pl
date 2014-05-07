@@ -3,6 +3,7 @@ use SeedEnv;
 use gjoseqlib;
 
 use strict;
+use JSON::XS;
 use Data::Dumper;
 use Carp;
 use CorrTableEntry;
@@ -181,7 +182,7 @@ use Getopt::Long;
 my $usage = "usage: svr_corresponding_genes [-u SERVERURL] [-o N1] [-n N2] [-d RASTdirectory] Genome1 Genome2";
 
 my $ignore_ov   = 1000000;
-my $sz_context  = 5;
+my $sz_context  = 4;
 my $url;
 
 my $rc    = GetOptions("o"              => \$ignore_ov,
@@ -695,7 +696,16 @@ sub make_genome_source
 	#
 
 	my @files;
-	foreach my $file (qw(assigned_functions proposed_non_ff_functions proposed_functions))
+	my @base_files;
+	if (-f "$name/RAST")
+	{
+	    @base_files = qw(assigned_functions);
+	}
+	else
+	{
+	    @base_files = qw(assigned_functions proposed_non_ff_functions proposed_functions proposed_user_functions);
+	}
+	foreach my $file (@base_files)
 	{
 	    if (-f "$name/$file")
 	    {
@@ -708,16 +718,8 @@ sub make_genome_source
 	}
 	return SapFileSource->new($fasta, $tbl, \@files, \%deleted);
     }
-    else
+    elsif (my @x = ($name =~ /^([^,]+),([^,]+),([^,]+)$/))
     {
-	#
-	# Must be a comma-sep triple
-	#
-	my @x = split(/,/, $name);
-	if (@x != 3)
-	{
-	    die "Invalid genome specifier: $name\n";
-	}
 	my($fasta, $tbl, $func) = @x;
 	if (! -f $fasta)
 	{
@@ -733,6 +735,99 @@ sub make_genome_source
 	}
 	return SapFileSource->new($fasta, $tbl, [$func], {});
     }
+    elsif (-f $name)
+    {
+	#
+	# Try to parse JSON; is it a genome object?
+	#
+	open(F, "<", $name) or die "Cannot open $name: $!";
+	my $obj;
+	eval {
+	    local $/;
+	    undef $/;
+	    my $txt = <F>;
+	    $obj = decode_json($txt);
+	};
+	if ($@)
+	{
+	    die "Cannot process $name: $@\n";
+	}
+	return GenomeObjectSource->new($obj);
+    }
+}
+
+package GenomeObjectSource;
+use strict;
+use gjoseqlib;
+use BasicLocation;
+use Data::Dumper;
+use GenomeTypeObject;
+
+sub new
+{
+    my($class, $obj) = @_;
+    $obj = GenomeTypeObject->initialize($obj);
+    my $self = {
+	obj => $obj,
+    };
+    bless $self, $class;
+    return $self;
+}
+
+sub init_data
+{
+}
+
+sub get_functions
+{
+    my($self, $functions) = @_;
+
+    for my $feature ($self->{obj}->features())
+    {
+	next unless $feature->{type} eq 'peg' || $feature->{type} eq 'CDS';
+	$functions->{$feature->{id}} = $feature->{function};
+    }
+}
+
+sub get_aliases
+{
+    my($self, $aliases) = @_;
+
+    for my $feature ($self->{obj}->features())
+    {
+	next unless $feature->{type} eq 'peg' || $feature->{type} eq 'CDS';
+	$aliases->{$feature->{id}} = join(",", @{$feature->{aliases}}) if ref($feature->{aliases});
+    }
+}
+
+sub get_fasta
+{
+    my($self, $file) = @_;
+    my $lengths = {};
+
+    open(F, ">", $file) or die "cannot write $file: $!";
+    for my $feature ($self->{obj}->features())
+    {
+	next unless $feature->{type} eq 'peg' || $feature->{type} eq 'CDS';
+	print_alignment_as_fasta(\*F, [$feature->{id}, undef, $feature->{protein_translation}]);
+	$lengths->{$feature->{id}} = length($feature->{protein_translation});
+    }
+    return $lengths;
+}
+
+sub get_peg_loc_tuples
+{
+    my($self) = @_;
+
+    my @locs;
+    for my $feature ($self->{obj}->features())
+    {
+	next unless $feature->{type} eq 'peg' || $feature->{type} eq 'CDS';
+	my $loc = [map { BasicLocation->new(@$_)->String() } @{$feature->{location}}];
+	push(@locs, [$feature->{id}, $loc]);
+    }
+    my @tuples = sort { &main::compare_locs($a->[1], $b->[1]) } @locs;
+    return @tuples;
 }
 
 package SapFileSource;
