@@ -44,12 +44,12 @@ if ((! $rc) || (! $dataD) || (! $seqsD))
 
 while (defined(my $seqsF = <STDIN>))
 {
-    if ($seqsF =~ /(\d+\.\d+)$/)
+    if ($seqsF =~ /(\S+)$/)
     {
 	$seqsF = $1;
-	my %all = map { ($_ =~ /^>(\S+)/) ? ($1 => 1) : () } `grep ">" $seqsD/$seqsF`;
-#	open(CALLS,"kmer_search -d $dataD -a < $seqsD/$seqsF |");
-	open(CALLS,"svr_quick_assign  < $seqsD/$seqsF |");
+	my %all = map { ($_ =~ /^>(\S+)/) ? ($1 => 1) : () } `grep ">" '$seqsD/$seqsF'`;
+#	open(CALLS,"kmer_search -d $dataD -a < '$seqsD/$seqsF' |");
+	open(CALLS,"svr_quick_assign  < '$seqsD/$seqsF' |");
 	while (defined($_ = <CALLS>))
 	{
 	    print $_;

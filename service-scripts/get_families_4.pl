@@ -92,8 +92,8 @@ my $hash_size = $primes->[$i];
 # print STDERR "hash_size=$hash_size\n";
 
 my $tmp1 = "tmp1.$$";
-open(KMER,"| kmer_guts -d 1 -D $dataD -a -s $hash_size | condense_kmer_output > $tmp1")
-    || die "could not open kmer_guts";
+my $tmp2 = "tmp2.$$";
+open(SEQS,">$tmp2") || die "could not open $tmp2";
 
 my %genomes;
 my %needed_pegs;
@@ -107,13 +107,10 @@ while (defined($_ = <STDIN>))
     push(@sets,$set);
     foreach my $peg (@$set)
     {
-	if ($peg =~ /^fig\|/)
-	{
-	    my $g = &SeedUtils::genome_of($peg);
-	    $genomes{$g} = 1;
-	    $needed_pegs{$peg} = 1;
-	    $func_of{$peg} = $func;
-	}
+	my $g = &SeedUtils::genome_of($peg);
+	$genomes{$g} = 1;
+	$needed_pegs{$peg} = 1;
+	$func_of{$peg} = $func;
     }
 }
 
@@ -123,11 +120,11 @@ foreach my $g (keys(%genomes))
     foreach my $tuple (@tuples)
     {
 	my($peg,undef,$seq) = @$tuple;
-	print KMER ">$peg\n$seq\n";
+	print SEQS ">$peg\n$seq\n";
     }
 }
-close(KMER);
-
+close(SEQS);
+&SeedUtils::run("cat $tmp2 | kmer_guts -d 1 -D $dataD -a -s $hash_size | condense_kmer_output > $tmp1");
 my %seen;
 open(TMP,"<$tmp1") || die "could not read $tmp1";
 while (defined($_ = <TMP>))

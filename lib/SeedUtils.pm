@@ -908,6 +908,7 @@ sub genome_of {
     if ($fid =~ /^fig\|(\d+\.\d+)\./) {
         $retVal = $1;
     }
+    elsif ($fid =~ /^(kb\|g.\d+)/) { $retVal = $1 }
     # Return the result.
     return $retVal;
 }

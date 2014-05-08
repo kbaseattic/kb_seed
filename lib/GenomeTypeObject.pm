@@ -191,14 +191,24 @@ sub prepare_for_return
 
     delete $self->{$_} foreach  grep { /^_/ } keys %$self;
 
-    if ($have_unbless)
+    #
+    # There are still some invocations of &GenomeTypeObject::prepare_for_return(obj)
+    #
+    if (ref($self) && ref($self) ne 'HASH')
     {
-	unbless $self;
-	return $self;
+	if ($have_unbless)
+	{
+	    unbless $self;
+	    return $self;
+	}
+	else
+	{
+	    return { %$self };
+	}
     }
     else
     {
-	return { %$self };
+	return $self;
     }
 }
 

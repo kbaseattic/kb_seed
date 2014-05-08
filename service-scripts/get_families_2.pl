@@ -61,13 +61,10 @@ my %needed_pegs;
 my $peg;
 while (defined($peg = <STDIN>))
 {
-    if ($peg =~ /^fig\|/)
-    {
-	chomp $peg;
-	my $g = &SeedUtils::genome_of($peg);
-	$genomes{$g} = 1;
-	$needed_pegs{$peg} = 1;
-    }
+    chomp $peg;
+    my $g = &SeedUtils::genome_of($peg);
+    $genomes{$g} = 1;
+    $needed_pegs{$peg} = 1;
 }
 
 open(REPS,">tmp2.$$") || die "could not open tmp2.$$";
