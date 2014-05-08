@@ -2413,6 +2413,9 @@
                         <Field name="numerical_interpretation" type="string"> 
                                 <Notes>The numerical space that the data is in.  Examples : Log2 level intensities, Log2 level ratios, FPKM</Notes>
                         </Field>
+                        <Field name="characteristics" type="text">
+                                <Notes>Free-text descibing the characteristics of the experiment (potentially for 1 or 2 channels).</Notes>
+                        </Field>
 		</Fields>
 		<FulltextIndexes>
 			<FulltextIndex type="field" name="title" in_result="1" />
