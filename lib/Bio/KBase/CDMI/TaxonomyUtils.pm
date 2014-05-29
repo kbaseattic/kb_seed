@@ -125,7 +125,7 @@ sub ClearTaxonomies {
     # Create the return object.
     my $retVal = Stats->new('tables');
     # Create a list of the tables to clear.
-    my @tables = qw(TaxonomicGrouping IsGroupFor);
+    my @tables = qw(TaxonomicGrouping IsGroupFor TaxonomicGroupingAlias);
     # Loop through the list, truncating the tables.
     for my $table (@tables) {
         $cdmi->TruncateTable($table);
@@ -165,28 +165,35 @@ sub ReadTaxonomies {
     # Initialize the relation loaders.
     $loader->SetRelations(qw(TaxonomicGrouping TaxonomicGroupingAlias IsGroupFor));
     # The first step is to read in all the names. We will build a hash that maps
-    # each taxonomy ID to a list of its names. The first scientific name encountered
-    # will be saved as the primary name. Only scientific names, synonoyms, and
-    # equivalent names will be kept.
-    my (%nameLists, %primaryNames);
+    # each name to a taxonomy ID. The first scientific name encountered
+    # for an ID will be saved as the primary name. Only certain name classes are used. Note that
+    # one scientific name will be assigned to each taxonomy ID, and only one taxonomy ID
+    # (the last) to each name.
+    my %classes = ('synonym' => 1, 'equivalent name' => 1, 'common name' => 1, 'misspelling' => 1);
+    my (%nameTable, %primaryNames);
     my $ih;
+    my %nameHash;
     open($ih, "<$directoryName/names.dmp") || die "Could not open names file: $!\n";
     while (! eof $ih) {
         # Get the next name.
-        my ($taxID, $name, undef, $type) = GetTaxData($ih, $stats);
+        my ($taxID, $name, $unique, $type) = GetTaxData($ih, $stats);
+        # Fix environmental samples.
+        if ($name eq 'environmental samples' && $unique) {
+        	$name = $unique;
+        }
         $stats->Add('taxnames-in' => 1);
         # Is this a scientific name?
-        if ($type =~ /scientific/i) {
+        if ($type eq 'scientific name') {
             # Yes. Save it if it is the first for this ID.
             if (! exists $primaryNames{$taxID}) {
                 $primaryNames{$taxID} = $name;
+	            $stats->Add('taxnames-scientific' => 1);
             }
-            # Add it to the name list.
-            push @{$nameLists{$taxID}}, $name;
-            $stats->Add('taxnames-scientific' => 1);
-        } elsif ($type =~ /synonym|equivalent/i) {
+            # Store it in the names table.
+            $nameTable{$name} = $taxID;
+        } elsif ($classes{$type}) {
             # Here it's not scientific, but it's generally useful, so we keep it.
-            push @{$nameLists{$taxID}}, $name;
+            $nameTable{$name} = $taxID;
             $stats->Add('taxnames-other' => 1);
         }
     }
@@ -212,13 +219,14 @@ sub ReadTaxonomies {
         die "No name found for tax ID $taxID." if ! $name;
         # Create the taxonomy group record.
         $loader->InsertObject('TaxonomicGrouping', id => $taxID, domain => $domain, hidden => $hidden,
-               scientific_name => $name);
-        # Create the aliases.
-        for my $alias (@{$nameLists{$taxID}}) {
-            $loader->InsertObject('TaxonomicGroupingAlias', id => $taxID, alias => $alias);
-        }
+               scientific_name => $name, type => $type);
         # Connect the group to its parent.
         $loader->InsertObject('IsGroupFor', from_link => $parent, to_link => $taxID);
+    }
+    # Create the aliases.
+    for my $alias (keys %nameTable) {
+    	my $taxID = $nameTable{$alias};
+        $loader->InsertObject('TaxonomicGroupingAlias', id => $taxID, alias => $alias);
     }
     # Unspool the relation loaders.
     $loader->LoadRelations();
@@ -232,20 +240,123 @@ sub ReadTaxonomies {
         # Get this merge record.
         my ($oldID, $newID) = GetTaxData($ih, $stats);
         # Look for genomes connected to the old ID.
-        my (@genomes) = $cdmi->GetFlat('IsTaxonomyOf',
-                'IsTaxonomyOf(from_link) = ?', [$oldID], 'to-link');
+        my (@genomes) = $cdmi->GetAll('IsTaxonomyOf',
+                'IsTaxonomyOf(from_link) = ?', [$oldID], 'to-link confidence');
         # Did we find any?
         if (@genomes) {
             # Yes. Disconnect them.
             $cdmi->Disconnect('IsTaxonomyOf', 'TaxonomicGrouping', $oldID);
             # Reconnect them to the new ID.
-            for my $genome (@genomes) {
+            for my $genomeInfo (@genomes) {
+            	my ($genome, $conf) = @$genomeInfo;
                 $cdmi->InsertObject('IsTaxonomyOf', from_link => $newID,
-                to_link => $genome);
+                to_link => $genome, confidence => $conf);
                 $stats->Add(reconnectGenomes => 1);
             }
         }
     }
+}
+
+=head3 AssignTaxonomy
+
+	my $confidence = Bio::KBase::CDMI::TaxonomyUtils::AssignTaxonomy($cdmi, $kbID, $name, $taxID);
+
+Assign a taxonomy ID to the specified genome. The genome's name and an optional taxonomy ID are
+specified. If the taxonomy ID is specified, it is used automatically. Otherwise, an attempt is made
+to match the name to one of the taxonomic aliases. The result will be stored in the B<IsTaxonomyOf>
+table.
+
+=over 4
+
+=item cdmi
+
+L<Bio::KBase::CMDI::CDMI> object for accessing the database.
+
+=item kbID
+
+ID of the target genome.
+
+=item name
+
+Name of the target genome.
+
+=item taxID (optional)
+
+Taxonomic ID of the target genome.
+
+=item RETURN
+
+Returns the confidence level of the assignment made, or C<undef> if no assignment was made.
+
+=back
+
+=cut
+
+sub AssignTaxonomy {
+	# Get the parameters.
+	my ($cdmi, $kbID, $name, $taxID) = @_;
+	# We will store the confidence here.
+	my $retVal;
+	# This will contain the new taxonomy ID.
+	my $assignedTaxID;
+	# Start by checking for an exact match in the alias table.
+	my ($taxon) = $cdmi->GetAll('TaxonomicGrouping', 'TaxonomicGrouping(alias) = ?', [$name], 
+			'id type scientific-name');
+	if ($taxon) {
+		# Get the information about this match.
+		my ($newTaxID, $type, $foundName) = @$taxon;
+		# Determine our confidence in the match.
+		if ($foundName eq $name) {
+			$assignedTaxID = $newTaxID;
+			$retVal = 5;
+		} elsif (defined $taxID && $taxID eq $newTaxID) {
+			$assignedTaxID = $newTaxID;
+			$retVal = 4;
+		} else {
+			$assignedTaxID = $newTaxID;
+			$retVal = 2;
+		}
+	} else {
+		if (defined $taxID) {
+			# Here the name does not match, but we have a taxonomy ID. Verify that it is real.
+			my ($taxon) = $cdmi->GetAll('TaxonomicGrouping', 'TaxonomicGrouping(id) = ?', [$taxID],
+				'type scientific-name');
+			if ($taxon) {
+				# Here it's real. Verify that the assigned taxonomy ID is a leaf.
+				my ($child) = $cdmi->GetFlat('IsGroupFor', 'IsGroupFor(from-link) = ?', [$taxID], 'to-link');
+				if (! $child) {
+					# It is. Go for it.
+					$assignedTaxID = $taxID;
+					$retVal = 3;
+				}
+			}
+		}
+		# Check to see if we have an assignment.
+		if (! defined $retVal) {
+			# No. We have to guess.
+			my @words = split /\s+/, $name;
+			# Try looking for a substring match.
+			while (! defined $retVal && scalar(@words) >= 2) {
+				my $guessName = join(" ", @words);
+				my ($newTaxID) = $cdmi->GetFlat('TaxonomicGrouping', 'TaxonomicGrouping(alias) = ?', [$guessName],
+					'id');
+				if ($newTaxID) {
+					# Match found. Keep it.
+					$assignedTaxID = $newTaxID;
+					$retVal = 0;
+				} else {
+					# No match, so shorten the string.
+					pop @words;
+				}
+			}
+		}
+	}
+	# If we have an assignment, store it.
+	if ($assignedTaxID) {
+		$cdmi->InsertObject('IsTaxonomyOf', from_link => $assignedTaxID, to_link => $kbID, confidence => $retVal);
+	}
+	# Return the confidence.
+	return $retVal;
 }
 
 

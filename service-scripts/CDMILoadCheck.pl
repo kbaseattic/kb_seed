@@ -355,17 +355,25 @@ sub UpdateGenomes {
     my %retVal;
     # Now we loop through the genomes selected, loading them.
     for my $seedGenome (sort values %foundMap) {
-        # Compute the input and output directories for this genome.
-        my $inDirectory = "$FIG_Config::organisms/$seedGenome";
-        my $outDirectory = "$workDir/$seedGenome";
-        # Convert the genome to exchange format.
-        Bio::KBase::CDMI::GenomeUtils::ConvertGenome($stats, $seedGenome,
-                $inDirectory, $outDirectory);
-        # Load the genome from the exchange format.
-        Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $outDirectory,
-                0, 'SEED', 0, 1);
-        # Store its ID in the return hash.
-        $retVal{$seedGenome} = 1;
+    	# Insure this genome has not already been loaded.
+    	print "Checking $seedGenome.\n";
+    	my ($kbID) = $cdmi->GetFlat('Submitted Genome', 'Submitted(from-link) = ? AND Genome(source-id) = ?',
+    			['SEED', $seedGenome], 'Genome(id)');
+    	if ($kbID) {
+    		$stats->Add(SeedGenomeAlreadyLoaded => 1);
+    	} else {
+	        # It hasn't. Compute the input and output directories for this genome.
+	        my $inDirectory = "$FIG_Config::organisms/$seedGenome";
+	        my $outDirectory = "$workDir/$seedGenome";
+	        # Convert the genome to exchange format.
+	        Bio::KBase::CDMI::GenomeUtils::ConvertGenome($stats, $seedGenome,
+	                $inDirectory, $outDirectory);
+	        # Load the genome from the exchange format.
+	        Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $outDirectory,
+	                0, 'SEED', 0, 1);
+	        # Store its ID in the return hash.
+	        $retVal{$seedGenome} = 1;
+    	}
     }
     # Return the result.
     return \%retVal;

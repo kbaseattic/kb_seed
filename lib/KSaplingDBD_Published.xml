@@ -3801,9 +3801,11 @@
       that probably contains the actual genome.</Notes>
       <Fields>
       <Field name="confidence" type="int">
-      <Notes>Confidence in this assignment. Level 0 means there is an exact scientific
-      name match. Level 1 means the taxonomy ID was provided directly. Level 2 means
-      an alias matched. Level 3 means the taxonomy ID was estimated during loading.</Notes>
+      <Notes>Confidence in this assignment. Level 5 means there is an exact scientific
+      name match. Level 4 means the taxonomy ID was provided directly and the name
+      matches an alias. Level 3 means the taxonomy ID was provided directly and the
+      name does not match an alias. Level 2 means no taxonomy ID was provided and
+      an alias matched. Level 0 means the taxonomy ID was estimated during loading.</Notes>
       </Field>
       </Fields>
     </Relationship>

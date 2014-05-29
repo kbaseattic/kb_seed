@@ -40,11 +40,14 @@ my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
 if (! $cdmi) {
     print "usage: CDMITest [options]\n";
 } else {
-    my @genomes = $cdmi->GetAll("Genome WasSubmittedBy", "Genome(dna-size) < ? AND Genome(prokaryotic) = 1 AND Genome(complete) = 1 ORDER BY Genome(dna-size) DESC",
-            [500000], 'Genome(id) Genome(dna-size) Genome(pegs) WasSubmittedBy(to-link) Genome(source-id)');
-    print "ID\tdna size\tpegs\tsource\tsource-id\ttaxonomy\n";
+    my @genomes = $cdmi->GetAll("Genome IsInTaxa TaxonomicGrouping", "", [],
+        'Genome(id) Genome(source-id) Genome(scientific-name) TaxonomicGrouping(id) TaxonomicGrouping(scientific-name)');
     for my $genome (@genomes) {
-        my @taxonomy = $cdmi->Taxonomy($genome->[0]);
-        print join("\t", @$genome, @taxonomy) . "\n";
+        my ($gid, $source, $gname, $tid, $tname) = @$genome;
+        $tname =~ s/[\[\]()]//g;
+        $gname =~ s/[\[\]()]//g;
+        if ($tname ne substr($gname, 0, length($tname))) {
+            print "$gid ($source) $gname => $tid $tname\n";
+        }
     }
 }

@@ -686,7 +686,6 @@ sub ProcessBindings {
             my $line = <$ih>;
             chomp $line;
             my ($subsystem, $variant) = split /\t/, $line;
-            print "Processing subsystem $subsystem variant $variant.\n";
             # Normalize the subsystem name.
             $subsystem = SubsystemID($subsystem);
             # Insure the subsystem is one we're interested in.

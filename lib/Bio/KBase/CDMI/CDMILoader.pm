@@ -430,6 +430,7 @@ sub new {
     # Default to no genome and a source of KBase.
     $retVal->{sourceData} = Bio::KBase::CDMI::Sources->new("KBase");
     $retVal->{genome} = "";
+    $retVal->{useSourceIDs} = 0;
     # Create the relation loader stuff.
     $retVal->{relations} = {};
     $retVal->{reltionList} = [];
@@ -748,18 +749,12 @@ sub CheckRole {
     my $stats = $self->stats;
     # Compute the role ID from the role. They are currently the same.
     my $retVal = $roleText;
-    # Check for the role in the database.
-    if ($cdmi->Exists(Role => $retVal)) {
-         # We found it, so we're done.
-         $stats->Add(roleFound => 1);
-    } else {
-        # We have to add the role. Determine whether or not it is
-        # hypothetical.
-        my $hypo = (hypo($roleText) ? 1 : 0);
-        $stats->Add(newRole => 1);
-        # Create the role.
-        $cdmi->InsertObject('Role', id => $roleText, hypothetical => $hypo);
-    }
+    # We have to add the role. Determine whether or not it is
+    # hypothetical.
+    my $hypo = (hypo($roleText) ? 1 : 0);
+    $stats->Add(newRole => 1);
+    # Create the role.
+    $cdmi->InsertObject('Role', {id => $roleText, hypothetical => $hypo}, ignore => 1);
     # Return the role ID.
     return $retVal;
 }
@@ -798,14 +793,10 @@ sub CheckProtein {
     if ($self->{protCache}->{$retVal}) {
         # It's in the cache, so we're done.
         $stats->Add(proteinCached => 1);
-    } elsif ($cdmi->Exists(ProteinSequence => $retVal)) {
-         # It's in the database, so add it to the cache.
-         $self->{protCache}->{$retVal} = 1;
-         $stats->Add(proteinFound => 1);
     } else {
-        # It isn't, so we must add it.
-        $cdmi->InsertObject('ProteinSequence', id => $retVal,
-                sequence => $sequence);
+        # It isn't, so we must add it. We use "ignore" to suppress duplicate-key errors.
+        $cdmi->InsertObject('ProteinSequence', {id => $retVal,
+                sequence => $sequence}, ignore => 1);
         $stats->Add(proteinAdded => 1);
         # Put it in the cache so we can find it later.
         $self->{protCache}->{$retVal} = 1;
@@ -839,7 +830,7 @@ for the ID.
 
 =item RETURN
 
-Returns TRUE if a new object was created, FALSE if it already existed.
+Returns TRUE always. We no longer know if a new object was created.
 
 =back
 
@@ -854,18 +845,11 @@ sub InsureEntity {
     my $stats = $self->stats;
     # Denote we haven't created a new record.
     my $retVal = 0;
-    # Check the database.
-    if (! $cdmi->Exists($entityType => $id)) {
-        # It's not in the database, so create it.
-        $cdmi->InsertObject($entityType, id => $id, %fields);
-        $stats->Add(insertSupport => 1);
-        $stats->Add("$entityType-added" => 1);
-        $retVal = 1;
-    } else {
-        # It's in the database. Record the stats.
-        $stats->Add(supportFound => 1);
-        $stats->Add("$entityType-found" => 1);
-    }
+    # Check the database. We use an insert-ignore to suppress duplicate-key errors.
+    # If the object is already in the database, the insert will be ignored.
+    $cdmi->InsertObject($entityType, {id => $id, %fields}, ignore => 1);
+    $stats->Add(insertSupport => 1);
+    $stats->Add("$entityType-added" => 1);
     # Return the insertion indicator.
     return $retVal;
 }
@@ -1115,6 +1099,7 @@ sub SimpleLoad {
     }
 }
 
+
 =head2 KBase ID Services
 
 =head3 SetSource
@@ -1138,6 +1123,28 @@ sub SetSource {
     my ($self, $source) = @_;
     # Update the source data.
     $self->{sourceData} = Bio::KBase::CDMI::Sources->new($source);
+}
+
+=head3 UseSourceIDs
+
+	$loader->UseSourceIDs($flag);
+
+If the flag is TRUE, suppress calls to the ID server and return the source ID unchanged.
+If the flag is FALSE, use the ID server.
+
+=over 4
+
+=item flag
+
+TRUE to turn off the ID server, FALSE to turn it on (the normal condition).
+
+=back
+
+=cut
+
+sub UseSourceIDs {
+	my ($self, $flag) = @_;
+	$self->{useSourceIDs} = $flag;
 }
 
 =head3 SetGenome
@@ -1221,14 +1228,22 @@ will not appear in the hash.
 sub FindKBaseIDs {
     # Get the parameters.
     my ($self, $type, $ids) = @_;
-    # Compute the real source and the real IDs.
-    my $realSource = $self->realSource($type);
-    my $idMap = $self->idMap($type, $ids);
-    # Call through to the ID server.
-    my $kbMap = $self->idserver->external_ids_to_kbase_ids($realSource,
-            [map { $idMap->{$_} } @$ids]);
-    # Convert the modified IDs to the original IDs.
-    my %retVal = map { $_ => $kbMap->{$idMap->{$_}} } @$ids;
+    # Declare the return variable.
+    my %retVal;
+    # Are we in source ID mode?
+    if ($self->{useSourceIDs}) {
+    	# Yes. Return an identity mapping.
+    	%retVal = map { $_ => $_ } @$ids;
+    } else {
+	    # No. Compute the real source and the real IDs.
+	    my $realSource = $self->realSource($type);
+	    my $idMap = $self->idMap($type, $ids);
+	    # Call through to the ID server.
+	    my $kbMap = $self->idserver->external_ids_to_kbase_ids($realSource,
+	            [map { $idMap->{$_} } @$ids]);
+	    # Convert the modified IDs to the original IDs.
+	    %retVal = map { $_ => $kbMap->{$idMap->{$_}} } @$ids;
+    }
     # Return the result.
     return \%retVal;
 }
@@ -1272,14 +1287,31 @@ sub GetKBaseIDs {
     if (ref $ids ne 'ARRAY') {
         $ids = [$ids];
     }
-    # Compute the real source and the real IDs.
-    my $realSource = $self->realSource($type);
-    my $idMap = $self->idMap($type, $ids);
-    # Call through to the ID server.
-    my $kbMap = $self->idserver->register_ids($prefix, $realSource,
-            [map { $idMap->{$_} } @$ids]);
-    # Convert the modified IDs to the original IDs.
-    my %retVal = map { $_ => $kbMap->{$idMap->{$_}} } @$ids;
+    # Declare the return variable.
+    my %retVal;
+    # Are we in source ID mode?
+    if ($self->{useSourceIDs}) {
+    	# Yes. Return an identity mapping.
+    	%retVal = map { $_ => $_ } @$ids;
+    } else {
+	    # Compute the real source and the real IDs.
+	    my $realSource = $self->realSource($type);
+	    my $idMap = $self->idMap($type, $ids);
+	    # Call through to the ID server.
+	    my @mapped = map { $idMap->{$_} } @$ids;
+	    my $kbMap;
+	    eval {
+		    $kbMap = $self->idserver->register_ids($prefix, $realSource,
+		            \@mapped);
+	    };
+	    if ($@) {
+	    	print "ID server error: $@\n";
+	    	print "ID server call: $prefix, $realSource; " . join(", ", @mapped) . "\n"; ##DEBUG##
+	    	die "ID server failed.";
+	    }
+	    # Convert the modified IDs to the original IDs.
+	    %retVal = map { $_ => $kbMap->{$idMap->{$_}} } @$ids;
+    }
     # Return the result.
     return \%retVal;
 }

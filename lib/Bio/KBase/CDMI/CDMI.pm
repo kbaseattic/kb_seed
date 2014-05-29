@@ -311,17 +311,51 @@ the named genome, or C<undef> if no such grouping can be found.
 
 sub ComputeTaxonID {
     # Get the parameters.
-    my ($self, $scientificName) = @_;
-    # Search for the scientific name.
-    my ($retVal) = $self->GetFlat('TaxonomicGrouping',
-            'TaxonomicGrouping(alias) = ?', [$scientificName],
-            'id');
+    my ($self, $scientificName, $metaHash) = @_;
+    # Declare the return variable,
+    my $retVal;
+    # Check for a taxonomy ID.
+    if (defined $metaHash) {
+    	$retVal = $metaHash->{taxonomy_id};
+    	if ($retVal) {
+    		# We found one. Insure it's valid. This query will undefine $retVal if the
+    		# ID is not in the taxonomy table.
+    		($retVal) = $self->GetFlat('TaxonomicGrouping', 'TaxonomicGrouping(id) = ?',
+    				[$retVal], 'id');
+    	}
+    	
+    }
+    if (! $retVal) {
+	    # The taxonomy ID was not found. Search for the scientific name.    
+	    ($retVal) = $self->GetFlat('TaxonomicGrouping',
+	            'TaxonomicGrouping(alias) = ?', [$scientificName],
+	            'id');
+    }
     if (! $retVal) {
         # The full name was not found. Look for the genus and
         # species.
         if ($scientificName =~ /^(\S+\s+\S+)/) {
             ($retVal) = $self->GetFlat('TaxonomicGrouping',
             'TaxonomicGrouping(alias) = ?', [$1], 'id');
+            if ($retVal) {
+            	# We found it. Work down the tree for the best match.
+            	my $done = 0;
+            	while (! $done) {
+            		# Get all the children of this group.
+	            	my @groups = $self->GetAll('IsGroupFor TaxonomicGrouping', 'IsGroupFor(from-link) = ?',
+	            		[$retVal], 'TaxonomicGrouping(id) TaxonomicGrouping(scientific-name)');
+	            	# Search for a matching child. If we find one, we'll save it and keep going. Otherwise
+	            	# we stop.
+	            	$done = 1;
+	            	for my $group (@groups) {
+	            		my ($taxID, $name) = @$group;
+	            		if (substr($scientificName, 0, length($name)) eq $name) {
+	            			$retVal = $taxID;
+	            			$done = 0;
+	            		}
+	            	}
+            	}
+            }
         }
     }
     # Return the taxon ID found (if any).
@@ -462,11 +496,19 @@ sub GenesInRegion {
 
 =head3 ComputeDNA
 
-    my $dna = $sap->ComputeDNA($contig, $beg, $dir, $length);
+    my $dna = $cdmi->ComputeDNA($contig, $beg, $dir, $length);
+    
+or
+
+    my $dna = $cdmi->ComputeDNA($loc);
 
 Return the DNA sequence for the specified location.
 
 =over 4
+
+=item loc
+
+L<BasicLocation> object describing the location of the desired DNA.
 
 =item contig
 
@@ -495,6 +537,13 @@ Returns a string containing the desired DNA. The DNA comes back in pure lower-ca
 sub ComputeDNA {
     # Get the parameters.
     my ($self, $contig, $beg, $dir, $length) = @_;
+    # If the user passed in a location object, convert it.
+    if (UNIVERSAL::isa($contig, 'BasicLocation')) {
+        $beg = $contig->Begin;
+        $dir = $contig->Dir;
+        $length = $contig->Length;
+        $contig = $contig->Contig;
+    }
     # Get the contig, left end, and right end of the location. Note we subtract
     # 1 to convert contig positions to string offsets.
     my ($left, $right);

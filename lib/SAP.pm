@@ -3483,6 +3483,11 @@ sub upstream {
     for my $fid (@$ids) {
         # Get the first location for this ID.
         my ($loc) = $sap->GetLocations($fid);
+        ### DEBUG
+        if (! defined $loc) {
+            print "Location undefined for $fid.\n";
+        }
+        ### END DEBUG
         if (defined $loc) {
             # We found a location. Get its length.
             my $locLen = $loc->Length();
@@ -6322,7 +6327,7 @@ sub make_runs {
         # string or a sub-list.
         my $group = $groups->[$gidx];
         if (ref $group ne 'ARRAY') {
-            $group = [split /\s*,\s*/, $group];
+            $group = [split m/\s*,\s*/, $group];
         }
         # This hash is used to remove duplicates.
         my %fids = map { $_ => 1 } @$group;
