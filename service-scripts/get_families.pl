@@ -145,6 +145,7 @@ use Data::Dumper;
 use Getopt::Long;
 use SeedEnv;
 use gjoseqlib;
+use File::Temp 'tempdir';
 
 
 my $usage = "usage: get_families -d Data -s Seqs < genomes\n";
@@ -165,10 +166,13 @@ if ((! $rc) || (! $dataD) || (! $seqsD) || (! $families))
     print STDERR $usage; exit ;
 }
 
-&SeedUtils::run("get_families_1 -d $dataD -s $seqsD > tmp.$$.calls 2> tmp.$$.missed");
-&SeedUtils::run("get_families_2 -i $iden -s $seqsD < tmp.$$.missed > $families.missed");
-&SeedUtils::run("get_families_3 -c $cutoff < tmp.$$.calls > $families.good 2> tmp.$$.bad");
-&SeedUtils::run("get_families_4 -d $dataD -s $seqsD -m $matchN < tmp.$$.bad > $families.bad.fixed");
+my $tmpdir = tempdir();
+
+&SeedUtils::run("get_families_1 -d $dataD -s $seqsD > $tmpdir/calls 2> $tmpdir/missed");
+&SeedUtils::run("get_families_2 -i $iden -s $seqsD < $tmpdir/missed > $families.missed");
+&SeedUtils::run("get_families_3 -c $cutoff < $tmpdir/calls > $families.good 2> $tmpdir/bad");
+&SeedUtils::run("get_families_4 -d $dataD -s $seqsD -m $matchN < $tmpdir/bad > $families.bad.fixed");
 &SeedUtils::run("get_families_final -f $families -s $seqsD");
+
 #unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
 
