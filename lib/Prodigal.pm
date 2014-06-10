@@ -48,8 +48,8 @@ sub run_prodigal
     #
     # Create temporary directory and FASTA for the contig data.
     #
-    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tempdir}) : ();
-    my $tmp_dir = tempdir( @tmpdir, TEMPLATE => 'tmpdir_prodigal_XXXXXXXX');
+    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tmpdir}) : ();
+    my $tmp_dir = tempdir('tmpdir_prodigal_XXXXXXXX', @tmpdir);
 
     print STDERR "contig=$tmp_dir\n" if $ENV{DEBUG};
     

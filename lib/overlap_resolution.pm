@@ -56,39 +56,238 @@ use strict;
 use Data::Dumper;
 
 #
-# Overlap scoring rules:
+#  Adjust the feature set of a genome-typed-object to be consistent.
 #
-# Rule directions are same, conv and div.
-# Rule values are [ $max_over, $over_scr, $opt_scr, $opt_dist, $decay ]
-# The structure of scoring is:
+#    $genomeTO = resolve_overlapping_features( $genomeTO, $opts );
 #
-#   overlap greater than $max_over is forbidden
-#   spacing between $max_over and $opt_dist is linear interpolation from $over_scr to $opt_scr
-#   spacing greater than $opt_dist decays from $opt_scr to zero with rate $decay.
+sub resolve_overlapping_features
+{
+    my( $genomeTO, $opts ) = @_;
+    my $new_features = pick_features($genomeTO, $opts);
+    $genomeTO->{features} = $new_features;
+    return $genomeTO;
+}   
+
+
 #
-# Score is defined by right-most end in the path, except that violating any max_over limit is enforced
+#  Find the highest scoring set of consistent features.
+#
+#     @featureTO = resolve_overlapping_features( $genomeTO, $opts );
+#    \@featureTO = resolve_overlapping_features( $genomeTO, $opts );
+#
+sub pick_features
+{
+    my ( $genomeTO, $opts ) = @_;
+    $genomeTO or return;
+    $opts ||= {};
+
+    my $ftrTOs = $genomeTO->{ features } || [];
+
+    #  For score calculation, copy %$opts and add the genome analysis tool names,
+    #  keyed by event id.
+
+    my $event_list  =   $genomeTO->{ analysis_events } || [];
+    my $event_tools = { map { $_->{id} => $_->{tool_name} } @$event_list };
+    my $scr_opts    = { %$opts, tools => $event_tools };
+
+    #
+    #  Add rule data to features and sort them:
+    #
+    #  [ $ftrTO, $type, $exempt, $score, $rules, [ $contig, $left, $right, $dir, $size ] ]
+    #
+    my @ftrs = sort { $a->[5]->[0] cmp $b->[5]->[0]    # contig
+                   || $a->[5]->[1] <=> $b->[5]->[1]    # left end of feature
+                   || $b->[5]->[2] <=> $a->[5]->[2]    # right end of feature
+                   || $a->[5]->[3] cmp $b->[5]->[3]    # dir
+                   || $a->[1]      cmp $b->[1]         # type
+                   || $b->[3]      <=> $a->[3]         # score
+                    }
+               map  { [ $_, overlap_rules( $_, $scr_opts ) ] }
+               @$ftrTOs;
+
+    #
+    #  Remove lower-scoring (later) duplicates (same type and location):
+    #
+    # if ( 0 )
+    {
+        my %seen;
+        @ftrs = grep { my $bounds = $_->[5];
+                       my $key    = join( '.', $_->[1], @$bounds[0,1,2,3] );
+                       ! $seen{ $key }++
+                     }
+                @ftrs;
+    }
+
+    #
+    #  A path is an endpoint in a linked list of consistent features.
+    #
+    #  $path = [ $ftr,       # This feature
+    #            $scr,       # Total score for best path including this feature
+    #            $path0,     # Path to which this feature was added
+    #            $scr_max    # Best score of any earlier path in stack
+    #          ]
+    #
+    #  $ftr = [ $ftrTO, $type, $exempt, $score, $rules, $bounds ]
+    #
+    #  We start with an empty path
+    #
+    my $path0  = [ undef, 0.0, [], -1000 ];
+    my @paths  = ( $path0 );
+    my @exempt = ();        # Features that are exempt from overlap constraints
+    my $contig = "";        # Current contig
+    my @kept   = ();        # Features in traceback of completed contigs
+
+    #  Work through the features, adding to existing prefixes:
+
+    foreach my $ftr2 ( @ftrs )
+    {
+        my ( $ftrTO2, $type2, $exempt2, $score2, $rules2, $bounds2 ) = @$ftr2;
+        my ( $con2, $beg2, $end2, $dir2, $size2 ) = @$bounds2;
+
+        if ( $contig && ( $con2 ne $contig ) ) # end of contig; report best path
+        {
+            push @kept, report( \@paths, \@exempt );
+            @paths  = ( $path0 );
+            @exempt = ();
+        }
+
+        $contig = $con2;
+
+        #  If exempt from overlap, record it.
+
+        if ( $exempt2 )
+        {
+            push @exempt, $ftr2;
+            next;
+        }
+
+        #  Okay, let's try adding the new feature to each of the current
+        #  candidate prefixes. Barring a very poorly defined feature, there
+        #  will always be a valid addition point.
+
+        my $best_pre = undef;
+        my $best_scr = -1000;
+        my $i;
+        for ( $i = @paths-1; $i >= 0; $i-- )
+        {
+            my $prefix1 = $paths[$i];
+            my ( $ftr1, $scr1, $prefix0, $scr_max ) = @$prefix1;
+            my ( $sp_scr ) = path_join_scr( $prefix1, $ftr2 );
+
+            #  If the feature score plus the space score is negative,
+            #  we cannot add it.
+            next if ( $score2 + $sp_scr < 0 );
+
+            my $score = $scr1 + $score2 + $sp_scr;
+            if ( $score > $best_scr ) { $best_scr = $score; $best_pre = $prefix1 }
+
+            #  Break the loop if there is no chance of a better addition point.
+
+            last if $scr_max + $score2 + 10 < $best_scr;
+        }
+
+        #  Add the feature to the list of paths, with its optimal prefix.
+
+        push @paths, [ $ftr2,
+                       $best_scr,
+                       $best_pre,
+                       max( $best_scr, $paths[-1]->[3])
+                     ];
+
+        # print STDERR join( "\t", $type2,                       # ftr type
+        #                          $beg2, $end2, $dir2,          # loc
+        #                          $ftrTO2->{id},                # ID
+        #                          sprintf( '%.2f', $best_scr ), # score
+        #                          @paths - ($i+1)               # search depth
+        #                 ), "\n";
+    }
+
+    #  Done; report the features on the last contig
+
+    push @kept, report( \@paths, \@exempt ) if $contig;
+
+    # print STDERR scalar @kept, " features kept.\n";
+
+    #  For debugging, allow restoration of the deleted features, marking their functions
+
+    if ( $opts->{ show_deleted } )
+    {
+        my %kept = map { $_->{id} => 1 } @kept;
+        push @kept, map  { $_->{function} = "*** deleted *** " . ($_->{function}||''); $_ }
+                    grep { ! $kept{ $_->{id} } }
+                    map  { $_->[0] }
+                    @ftrs;
+    }
+
+    wantarray ? @kept : \@kept;
+}
+
+
+sub max { $_[0] > $_[1] ? $_[0] : $_[1] }
+
+
+#
+#  Overlap scoring rules:
+#
+#     Rule directions are same, conv and div.
+#
+#     Rule values are [ $max_over, $over_scr, $opt_scr, $opt_dist_min, $opt_dist_max, $decay ]
+#
+#  The structure of scoring is:
+#
+#    overlap greater than $max_over is forbidden
+#    spacing between $max_over and $opt_dist is linear interpolation from $over_scr to $opt_scr
+#    spacing greater than $opt_dist decays from $opt_scr to zero with rate $decay.
+#
+#  Score is defined by right-most end in the path, except that violating any max_over limit is enforced
 #
 
-my $tRNA_rules = { tRNA => { same => [  0, -1.0, 1.0, 20, 50 ], conv => [  0, -1.0, 1.0, 100, 100 ], div => [  0, -1.0, 1.0, 100, 100 ] },
-                   rRNA => { same => [  0, -1.0, 1.0, 20, 50 ], conv => [  0, -1.0, 1.0, 100, 100 ], div => [  0, -1.0, 1.0, 100, 100 ] },
-                   rna  => { same => [  0, -1.0, 1.0, 20, 50 ], conv => [  0, -1.0, 1.0, 100, 100 ], div => [  0, -1.0, 1.0, 100, 100 ] },
-                   CDS  => { same => [ 10, -1.0, 1.0, 20, 50 ], conv => [ 10, -1.0, 1.0, 100, 100 ], div => [ 10, -1.0, 1.0, 100, 100 ] },
+my $tRNA_rules = { tRNA => { same => [  0, -5.0, 1.0,   1,  20,  50 ],
+                             conv => [  0, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [  0, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   rRNA => { same => [  0, -5.0, 1.0,   1,  20,  50 ],
+                             conv => [  0, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [  0, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   rna  => { same => [  0, -5.0, 1.0,   1,  20,  50 ],
+                             conv => [  0, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [  0, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   CDS  => { same => [ 10, -5.0, 1.0,   1,  20,  50 ],
+                             conv => [ 10, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [ 10, -5.0, 1.0,  20, 100, 100 ]
+                           },
                    default => { allow => 1 }
                  };
 
 my $rRNA_rules = $tRNA_rules;
 
-my $CDS_rules  = { tRNA => { same => [ 10, -1.0, 1.0, 20, 100 ], conv => [ 10, -1.0, 1.0, 100, 100 ], div => [ 10, -1.0, 1.0, 100, 100 ] },
-                   rRNA => { same => [ 10, -1.0, 1.0, 20, 100 ], conv => [ 10, -1.0, 1.0, 100, 100 ], div => [ 10, -1.0, 1.0, 100, 100 ] },
-                   rna  => { same => [ 10, -1.0, 1.0, 20, 100 ], conv => [ 10, -1.0, 1.0, 100, 100 ], div => [ 10, -1.0, 1.0, 100, 100 ] },
-                   CDS  => { same => [ 30, -1.0, 1.0, 10,  50 ], conv => [ 30, -1.0, 1.0, 100, 100 ], div => [ 30, -1.0, 1.0, 100, 100 ] },
+my $CDS_rules  = { tRNA => { same => [ 10, -5.0, 1.0,   1,  20, 100 ],
+                             conv => [ 10, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [ 10, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   rRNA => { same => [ 10, -5.0, 1.0,   1,  20, 100 ],
+                             conv => [ 10, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [ 10, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   rna  => { same => [ 10, -5.0, 1.0,   1,  20, 100 ],
+                             conv => [ 10, -5.0, 1.0,  20, 100, 100 ],
+                             div  => [ 10, -5.0, 1.0,  20, 100, 100 ]
+                           },
+                   CDS  => { same => [ 50, -5.0, 1.0,  -4,  20,  50 ],
+                             conv => [ 50, -5.0, 1.0,  20,  50, 100 ],
+                             div  => [ 50, -5.0, 1.0,  20,  50, 100 ]
+                           },
                    default => { allow => 1 }
                  };
 
 #
-#  [ $type, $exempt, $score, $rules, \@bound ] = overlap_rules( $ftr, $opts );
-#  ( $type, $exempt, $score, $rules, \@bound ) = overlap_rules( $ftr, $opts );
-#  ( $contig, $left, $right, $dir, $size ) = @bound;
+#     [ $type, $exempt, $score, $rules, \@bound ] = overlap_rules( $ftrTO, $opts );
+#     ( $type, $exempt, $score, $rules, \@bound ) = overlap_rules( $ftrTO, $opts );
+#
+#     ( $contig, $left, $right, $dir, $size ) = @bound;
+#
 #  $left and $right are the min and max coordinates on the contig.
 #
 
@@ -100,8 +299,8 @@ sub overlap_rules
     my $type   = $ftr->{type}     || 'CDS';
     my $loc    = $ftr->{location} || [];
     my $func   = $ftr->{function} || '';
-    my $events = $opts->{events}  || {};
-    my $event  = $events->{ $ftr->{feature_creation_event} || "" } || {};
+    my $tools  = $opts->{tools}   || {};
+    my $tool   = $tools->{ $ftr->{feature_creation_event} || '' } || '';
     my $qual   = $ftr->{quality}  ||= {};
     my @bound  = bounds( $ftr );         # ( $contig, $left, $right, $dir, $size )
     my $size   = $bound[4];              # feature size in nt
@@ -119,10 +318,10 @@ sub overlap_rules
     my $hits   = $qual->{hit_count}            ||  0;
 
     my $exempt = 0;
-    my $score  = 1.0;
+    my $score  = 5 * ($size/900)**0.75;
 
-    my $tool = $event->{tool_name} || '';
-    $score  += 1.0  if $tool eq 'prodigal';
+    #  Give prodigal calls a two-fold bonus over glimmer (or other tool).
+    $score    += 1.0  if ( ( $type eq 'CDS' ) && ( $tool eq 'prodigal' ) );
 
     #  Interpret rules supplied with the feature:
 
@@ -130,9 +329,9 @@ sub overlap_rules
     foreach ( @$rules0 )
     {
         if    ( s/^+// ) { $rules->{ $_ }->{ default => { allow => 1 } } }
-        elsif ( s/^-// ) { $rules->{ $_ }->{ default => { same => [ 0, 0.0, 0.0, 0, 0 ],
-                                                          conv => [ 0, 0.0, 0.0, 0, 0 ],
-                                                          div  => [ 0, 0.0, 0.0, 0, 0 ]
+        elsif ( s/^-// ) { $rules->{ $_ }->{ default => { same => [ 0, 0.0, 0.0, 0, 0, 0 ],
+                                                          conv => [ 0, 0.0, 0.0, 0, 0, 0 ],
+                                                          div  => [ 0, 0.0, 0.0, 0, 0, 0 ]
                                                         }
                                            };
                          }
@@ -151,12 +350,12 @@ sub overlap_rules
     elsif ( $type eq 'tRNA' )
     {
         $rules = $tRNA_rules;
-        $score += 10;
+        $score += 20;
     }
     elsif ( $type eq 'rRNA' )
     {
         $rules = $rRNA_rules;
-        $score += 10;
+        $score += 20;
     }
     elsif ( $type eq 'CDS' )
     {
@@ -164,9 +363,9 @@ sub overlap_rules
 
         # $conf   = 0.99 if $conf > 0.99;
         # $score += log(1-$conf) / log(0.5);  # This may be redundant with $hits
-        $score += 10 if $tool =~ /selenocys/i;
-        $score += 10 if $tool =~ /pyrrolys/i;
-        $score +=  0.1 * $hits / ($size/1000)**0.25 if $hits;
+        $score += 20 if $tool =~ /selenocys/i;
+        $score += 20 if $tool =~ /pyrrolys/i;
+        $score +=  0.5 * $hits / ($size/900)**0.25 if $hits > 2;
     }
     else
     {
@@ -183,7 +382,9 @@ sub overlap_rules
 
 
 #
-#  ( $contig, $left, $right, $dir, $size ) = bounds( $ftr );
+#  Provide a brief summary of the location of a feature. 
+#
+#      ( $contig, $left, $right, $dir, $size ) = bounds( $ftrTO );
 #
 sub bounds
 {
@@ -198,14 +399,14 @@ sub bounds
     my ( $c0, $b, $d, $len ) = @{ shift @parts };
     my $size += $len;
     my $e = $b + ( $d eq '+' ? $len-1 : -($len-1) );
-    my ( $left, $right ) = $d eq '+' ? ( $b, $b+$len-1 ) : ( $b-$len, $b );
+    my ( $left, $right ) = $d eq '+' ? ( $b, $e ) : ( $e, $b );
     foreach ( @parts )
     {
         my ( $c, $b, $d, $len ) = @$_;
         my $size += $len;
         $c eq $c0 or next;
         my $e = $b + ( $d eq '+' ? $len-1 : -($len-1) );
-        my ( $l, $r ) = $d eq '+' ? ( $b, $b+$len-1 ) : ( $b-$len+1, $b );
+        my ( $l, $r ) = $d eq '+' ? ( $b, $e ) : ( $e, $b );
         $left  = $l if $l < $left;
         $right = $r if $r > $right;
     }
@@ -213,30 +414,133 @@ sub bounds
     ( $c0, $left, $right, $d, $size );
 }
 
-sub resolve_overlapping_features
-{
-    my($genomeTO, $opts) = @_;
-    my $new_features = pick_features($genomeTO, $opts);
-    $genomeTO->{features} = $new_features;
-    return $genomeTO;
-}   
 
-sub pick_features
+#
+#    $sp_scr = path_join_scr( $path, $ftr2 );
+#
+sub path_join_scr
+{
+    my ( $path, $ftr2 ) = @_;
+
+    my ( $ftr1, $scr1, $path0 ) = @$path;
+    my ( $ftrTO2, $type2, $exempt2, $score2, $rules2, $bounds2 ) = @$ftr2;
+
+    #  We can always add if there is no path
+
+    return 0  if ! $ftr1;
+
+    #  In the following, $beg and $end are really min and max coordinates:
+
+    my ( $ftrTO1, $type1, $exempt1, $score1, $rules1, $bounds1 ) = @$ftr1;
+    my ( $con1, $beg1, $end1, $dir1, $size1 ) = @$bounds1;
+    my ( $con2, $beg2, $end2, $dir2, $size2 ) = @$bounds2;
+
+    #  We prohibit adding two CDS features with same stop points. To override
+    #  this, the shorter one(s) should be made exempt from overlap testing.
+
+    if ( ( $type1 eq 'CDS' ) && ( $type2 eq 'CDS' ) && ( $dir1 eq $dir2 ) )
+    {
+        if ( $dir1 eq '+' ? $end1 == $end2 : $beg1 == $beg2 )
+        {
+            return -1000;
+        }
+    }
+
+    my $space = $beg2 - $end1 - 1;
+    my $rules = $rules2->{ $type1 }
+             || $rules2->{ default }
+             || { allow => 1 };
+
+    $rules->{ allow } ? 0 : spacing_scr( $end1, $beg2, scr_param( $rules, $dir1, $dir2 ) );
+}
+
+
+sub scr_param
+{
+    my ( $rules, $dir1, $dir2 ) = @_;
+    $rules && $dir1 && $dir2 or return undef;
+
+    return ( $dir1 eq $dir2 )               ? $rules->{ same }
+         : ( $dir1 eq '+' && $dir2 eq '-' ) ? $rules->{ conv }
+         : ( $dir1 eq '-' && $dir2 eq '+' ) ? $rules->{ div }
+         :                                    undef;
+}
+
+
+#
+#  Score for the length of space (or overlap) between prev stop and new start
+#  "Ideal" intervals give max score
+#
+sub spacing_scr
+{
+    my ( $end1, $beg2, $scr_param ) = @_;
+    return 0 unless $scr_param && ref( $scr_param ) eq 'ARRAY' && @$scr_param >= 5;
+
+    my ( $max_over, $over_scr, $opt_scr, $opt_sp_min, $opt_sp_max, $decay ) = @$scr_param;
+    my $min_sp = -$max_over;
+    my $space = $beg2 - $end1 - 1;
+
+    return ( $space <  $min_sp )     ? -1000
+         : ( $space <  $opt_sp_min ) ? ( $opt_scr - $over_scr ) * ( $space - $min_sp ) / ( $opt_sp_min - $min_sp ) + $over_scr
+         : ( $space <= $opt_sp_max ) ? $opt_scr
+         :                             $opt_scr * exp( -( $space - $opt_sp_max ) / $decay );
+}
+
+#
+#  @ftrTO = report( \@current, \@exempt );
+#
+sub report
+{
+    my ( $paths, $exempt ) = @_;
+
+    my ( $path ) = sort { $b->[1] <=> $a->[1] } @{ $paths || [] };
+
+    my @ftrTO = map { $_->[0] } @{ $exempt || [] };
+
+    report1( $path, \@ftrTO )  if $path;
+
+    wantarray ? @ftrTO : \@ftrTO;
+}
+
+
+sub report1
+{
+    my ( $path, $ftrTO ) = @_;
+    return unless ( $path && $path->[0] && $path->[0]->[0] );
+
+    push @$ftrTO, $path->[0]->[0];
+    report1( $path->[2], $ftrTO );
+}
+
+
+#
+#  Find the highest scoring set of consistent features.
+#  This is way to complicated unless we end up with some really strange
+#  addition rules.
+#
+#     @featureTO = resolve_overlapping_features( $genomeTO, $opts );
+#    \@featureTO = resolve_overlapping_features( $genomeTO, $opts );
+#
+sub pick_features0
 {
     my ( $genomeTO, $opts ) = @_;
     $genomeTO or return;
     $opts ||= {};
 
-    my $ftrTO  = $genomeTO->{ features } || [];
-    my $events = $genomeTO->{ analysis_events } || [];
-    $opts->{ events } = { map { $_->{id} => $_ } @$events };
+    my $ftrTOs = $genomeTO->{ features } || [];
+
+    #  For score calculation, copy %$opts and add the genome analysis tool names,
+    #  keyed by event id.
+
+    my $event_list  =   $genomeTO->{ analysis_events } || [];
+    my $event_tools = { map { $_->{id} => $_->{tool_name} } @$event_list };
+    my $scr_opts    = { %$opts, tools => $event_tools };
 
     #
     #  Add rule data to features and sort them:
     #
     #  [ $ftrTO, $type, $exempt, $score, $rules, [ $contig, $left, $right, $dir, $size ] ]
     #
-
     my @ftrs = sort { $a->[5]->[0] cmp $b->[5]->[0]    # contig
                    || $a->[5]->[1] <=> $b->[5]->[1]    # left end of feature
                    || $b->[5]->[2] <=> $a->[5]->[2]    # right end of feature
@@ -244,29 +548,32 @@ sub pick_features
                    || $a->[1]      cmp $b->[1]         # type
                    || $b->[3]      <=> $a->[3]         # score
                     }
-               map  { [ $_, overlap_rules( $_, $opts ) ] }
-               @$ftrTO;
+               map  { [ $_, overlap_rules( $_, $scr_opts ) ] }
+               @$ftrTOs;
 
     #
-    #  Remove duplicates lower-scoring (later) duplicates:
+    #  Remove lower-scoring (later) duplicates (same type and location):
     #
-
+    # if ( 0 )
     {
-        # my $m1 = @ftrs;
         my %seen;
-        @ftrs = grep { ! $seen{ "$_->[1].$_->[5]->[0].$_->[5]->[1].$_->[5]->[2].$_->[5]->[3]" }++ } @ftrs;
-        # my $m2 = @ftrs;
-        # print STDERR "$m1 features -> $m2 features\n";
+        @ftrs = grep { my $bounds = $_->[5];
+                       my $key    = join( '.', $_->[1], @$bounds[0,1,2,3] );
+                       ! $seen{ $key }++
+                     }
+                @ftrs;
     }
 
     #
     #  A path is an endpoint in a linked list of consistent features.
     #
-    #  $path = [ $ftr,         # last added feature
-    #            $scr,         # total score for path
-    #            $end,         # rightmost end of all features in path
-    #            $path0        # path to which this feature was added
+    #  $path = [ $ftr,       # last added feature (this is more that the ftrTO)
+    #            $scr,       # total score for path
+    #            $end,       # rightmost end of all features in path
+    #            $path0      # path to which this feature was added
     #          ]
+    #
+    #  $ftr = [ $ftrTO, $type, $exempt, $score, $rules, $bounds ]
     #
     #  We start with one path with no prefix
     #
@@ -285,8 +592,7 @@ sub pick_features
 
         if ( $contig && ( $con2 ne $contig ) ) # end of contig; report best path
         {
-            # print STDERR "Reporting contig '$contig'.\n";
-            push @kept, report( \@current, \@exempt );
+            push @kept, report0( \@current, \@exempt );
             @current = ( $path0 );
             @exempt  = ();
         }
@@ -300,22 +606,22 @@ sub pick_features
         }
 
         #
-        #  Reduce @current if we can. Keep only the best score of the
-        #  current paths that end more than 1000 nt before the left end
-        #  of the new feature.
+        #  Reduce @current if we can. Of paths that end more than 500 nt
+        #  before this new feature begins, keep only those with a score that
+        #  is within 20 of the best score.
         #
 
-        my $gap       =  1000;  # Okay, I will parameterize this spacing
-        my $best_path = undef;
-        my $best_scr  =    -1;
+        my $gap      =  250;
+        my $within   =   10;
+        my $best_scr =    0;
         foreach ( @current )
         {
-            next if ( $beg2 - $_->[2] <= $gap );
-            ( $best_path, $best_scr ) = ( $_, $_->[1] ) if $_->[1] > $best_scr;
+            my ( $path_end, $path_scr ) = @$_[2,1];
+            $best_scr = $path_scr if ($path_end + $gap) < $beg2 && $path_scr > $best_scr;
         }
 
-        @current = grep { $beg2 - $_->[2] <= $gap } @current;
-        push @current, $best_path if $best_path;
+        @current = grep { $beg2 - $_->[2] <= $gap || $_->[1] >= $best_scr }
+                   @current;
 
         #  Okay, let's try adding the new feature to each of the current
         #  candidate prefixes:
@@ -327,7 +633,7 @@ sub pick_features
         foreach my $pre1 ( @current )
         {
             my ( $ftr1, $scr1, $end0, $pre0 ) = @$pre1;
-            my ( $sp_scr, $end ) = path_join_scr( $pre1, $ftr2 );
+            my ( $sp_scr, $end ) = path_join_scr0( $pre1, $ftr2 );
             if ( $score2 + $sp_scr >= 0 )
             {
                 my $score = $scr1 + $score2 + $sp_scr;
@@ -336,14 +642,26 @@ sub pick_features
         }
 
         push @current, @added;
+        print STDERR "$type2\t$beg2\t$end2\t$dir2\t$ftrTO2->{id}: @{[scalar @current]}\n";
     }
 
-    #  Done; report the features on the contig
+    #  Done; report the features on the last contig
 
-    # print STDERR "Reporting contig '$contig'.\n";
-    push @kept, report( \@current, \@exempt ) if $contig;
+    push @kept, report0( \@current, \@exempt ) if $contig;
 
     print STDERR scalar @kept, " features kept.\n";
+
+
+    #  For debugging, allow restoration of the deleted features, marking their functions
+
+    if ( $opts->{ show_deleted } )
+    {
+        my %kept = map { $_->{id} => 1 } @kept;
+        push @kept, map  { $_->{function} = "*** deleted *** " . ($_->{function}||''); $_ }
+                    grep { ! $kept{ $_->{id} } }
+                    map  { $_->[0] }
+                    @ftrs;
+    }
 
     wantarray ? @kept : \@kept;
 }
@@ -352,7 +670,7 @@ sub pick_features
 #
 #  ( $sp_scr, $end )
 #
-sub path_join_scr
+sub path_join_scr0
 {
     my ( $path, $ftr2 ) = @_;
 
@@ -425,40 +743,10 @@ sub path_join_scr
 }
 
 
-sub scr_param
-{
-    my ( $rules, $dir1, $dir2 ) = @_;
-    $rules && $dir1 && $dir2 or return undef;
-
-    return ( $dir1 eq $dir2 )               ? $rules->{ same }
-         : ( $dir1 eq '+' && $dir2 eq '-' ) ? $rules->{ conv }
-         : ( $dir1 eq '-' && $dir2 eq '+' ) ? $rules->{ div }
-         :                                    undef;
-}
-
-
 #
-#  Score for the length of space (or overlap) between prev stop and new start
-#  "Ideal" intervals give max score
+#  @ftrTO = report0( \@current, \@exempt );
 #
-sub spacing_scr
-{
-    my ( $end1, $beg2, $scr_param ) = @_;
-    return 0 unless $scr_param && ref( $scr_param ) eq 'ARRAY' && @$scr_param >= 5;
-
-    my ( $max_over, $over_scr, $opt_scr, $opt_space, $decay ) = @$scr_param;
-    my $min_space = -$max_over;
-    my $space = $beg2 - $end1 - 1;
-
-    return ( $space < $min_space ) ? -1000
-         : ( $space < $opt_space ) ? ( $opt_scr - $over_scr ) * ( $space - $min_space ) / ( $opt_space - $min_space ) + $over_scr
-         :                           $opt_scr * exp( -( $space - $opt_space ) / $decay );
-}
-
-#
-#  @ftrTO = report( \@current, \@exempt );
-#
-sub report
+sub report0
 {
     my ( $paths, $exempt ) = @_;
 
@@ -466,13 +754,13 @@ sub report
 
     my @ftrTO = map { $_->[0] } @{ $exempt || [] };
 
-    report1( $path, \@ftrTO )  if $path;
+    report01( $path, \@ftrTO )  if $path;
 
     wantarray ? @ftrTO : \@ftrTO;
 }
 
 
-sub report1
+sub report01
 {
     my ( $path, $ftrTO ) = @_;
     ($path && $path->[0] && $path->[0]->[0]) or return;
