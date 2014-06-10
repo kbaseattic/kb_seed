@@ -180,7 +180,12 @@ sub run_prodigal
     
 #...Cleanup...
     unless ($ENV{DEBUG}) {
-	rmtree($tmp_dir);
+	my $err;
+	rmtree($tmp_dir, { error => \$err});
+	if ($err)
+	{
+	    warn "Error during rmtree $tmp_dir: $err";
+	}
     }
     
     return wantarray ? ($encoded_tbl, $event) : $encoded_tbl;
