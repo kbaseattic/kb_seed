@@ -305,74 +305,77 @@ sub overlap_rules
     my @bound  = bounds( $ftr );         # ( $contig, $left, $right, $dir, $size )
     my $size   = $bound[4];              # feature size in nt
 
-    $type = 'CDS' if $type eq 'peg';
-    if ( lc $type eq 'rna' )
-    {
-        $type = ( $func =~ /^tRNA/i ) ? 'tRNA'
-              : ( $func =~ /^rRNA/i ) ? 'rRNA'
-              :                         $type;
-    }
-
-    my $conf   = $qual->{existence_confidence} || 0.5;
-    my $rules0 = $qual->{overlap_rules}        || [];   # not yet implemented
-    my $hits   = $qual->{hit_count}            ||  0;
-
-    my $exempt = 0;
-    my $score  = 5 * ($size/900)**0.75;
-
-    #  Give prodigal calls a two-fold bonus over glimmer (or other tool).
-    $score    += 1.0  if ( ( $type eq 'CDS' ) && ( $tool eq 'prodigal' ) );
-
     #  Interpret rules supplied with the feature:
 
+    my $rules0 = $qual->{overlap_rules}        || [];   # not yet implemented
     my $rules  = {};
     foreach ( @$rules0 )
     {
         if    ( s/^+// ) { $rules->{ $_ }->{ default => { allow => 1 } } }
-        elsif ( s/^-// ) { $rules->{ $_ }->{ default => { same => [ 0, 0.0, 0.0, 0, 0, 0 ],
-                                                          conv => [ 0, 0.0, 0.0, 0, 0, 0 ],
-                                                          div  => [ 0, 0.0, 0.0, 0, 0, 0 ]
+        elsif ( s/^-// ) { $rules->{ $_ }->{ default => { same => [ 0, 0.0, 0.0, 0, 0, 1 ],
+                                                          conv => [ 0, 0.0, 0.0, 0, 0, 1 ],
+                                                          div  => [ 0, 0.0, 0.0, 0, 0, 1 ]
                                                         }
                                            };
                          }
     }
 
-    #
-    #  If we got rules, we just need to do a little interpretation,
-    #  otherwise we need to supply some default rules that are reasonable
-    #  for the feature type.
-    #
-
+    my $exempt = 0;
     if ( %$rules )
     {
         $exempt = 1 if ( keys %$rules == 1 && $rules->{all} && $rules->{all}->{default}->{allow} );
     }
-    elsif ( $type eq 'tRNA' )
+
+    my $conf     = $qual->{existence_confidence} || 0.5;
+    my $hits     = $qual->{hit_count}            ||  0;
+    my $priority = $qual->{priority};
+    my $score    = $priority || 0;
+
+    $type = 'CDS' if $type eq 'peg';
+    if ( lc $type eq 'rna' )
     {
-        $rules = $tRNA_rules;
-        $score += 20;
+        $type = ( $func =~ /^tRNA/i ) ? 'tRNA'
+              : ( $func =~ /rRNA/i )  ? 'rRNA'
+              :                         $type;
+    }
+
+    if    ( $type eq 'tRNA' )
+    {
+        $rules   = $tRNA_rules  if ! %$rules;
+        $score ||= 30;
     }
     elsif ( $type eq 'rRNA' )
     {
-        $rules = $rRNA_rules;
-        $score += 20;
+        $rules   = $rRNA_rules  if ! %$rules;
+        $score ||= 30;
     }
     elsif ( $type eq 'CDS' )
     {
-        $rules = $CDS_rules;
+        $rules = $CDS_rules  if ! %$rules;
 
-        # $conf   = 0.99 if $conf > 0.99;
-        # $score += log(1-$conf) / log(0.5);  # This may be redundant with $hits
-        $score += 20 if $tool =~ /selenocys/i;
-        $score += 20 if $tool =~ /pyrrolys/i;
-        $score +=  0.5 * $hits / ($size/900)**0.25 if $hits > 2;
+        #  This first group of rules only have an effect if $priority is
+        #  not defined.  View them as defaults for the tools.
+
+        $score ||= $tool =~ /selenocys/i ? 30
+                 : $tool =~ /pyrrolys/i  ? 30
+                 : $tool =~ /prodigal/i  ?  6 * ($size/900)**0.90
+                 :                          5 * ($size/900)**0.90;
+
+        #  Some bonuses:
+
+        $conf   = 0.99 if $conf > 0.99;
+        $score += $hits > 2   ? 0.5 * $hits / ($size/900)**0.25
+                : $conf > 0.5 ? log(1-$conf) / log(0.5)
+                :               0;
     }
-    else
+    elsif ( ! %$rules )
     {
         $exempt = 1;
     }
 
-    #  This is adding data to the feature itself:
+    #  This is adding data to the feature itself.  Feature picking is based
+    #  upon the value of score.
+
     $qual->{priority} = $score if ! defined( $qual->{priority} );
 
     my @rules = ( $type, $exempt, $score, $rules, \@bound );

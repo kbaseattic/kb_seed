@@ -309,11 +309,13 @@ sub add_features_from_list
 
 	my @aliases = split(/,/, $aliases_str);
 	my @locs = map { BasicLocation->new($_) } split(/,/, $loc_str);
-	my $new_id = $self->add_feature(-type => $type,
-					-location => \@locs,
-					-function => $func,
-					-aliases => \@aliases,
-					-analysis_event_d => $event_id);
+	my $new_id = $self->add_feature({
+	    -type => $type,
+	    -location => \@locs,
+	    -function => $func,
+	    -aliases => \@aliases,
+	    -analysis_event_d => $event_id,
+	});
 	$map->{$id} = $new_id;
     }
     return $map;
