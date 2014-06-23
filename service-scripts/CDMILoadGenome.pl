@@ -187,7 +187,8 @@ before loading.
 =item idserver
 
 URL to use for the ID server. The default uses the standard KBase ID
-server.
+server. If C<none> is specified, source IDs will be used instead of
+the ID server.
 
 =item validate
 
@@ -198,6 +199,14 @@ Validate the input files without loading them.
 Use individual INSERT commands to load the database instead of spooling into
 sequential load files.
 
+=item noProteins
+
+If specified, protein sequences will not be loaded.
+
+=item noContigs
+
+If specified, contigs will not be loaded.
+
 =back
 
 There are two positional parameters-- the source database name (e.g. C<SEED>,
@@ -206,7 +215,7 @@ C<MOL>, ...) and the name of the directory containing the genome data.
 =cut
 
 # Create the command-line option variables.
-my ($recursive, $newOnly, $clear, $id_server_url, $validate, $slow);
+my ($recursive, $newOnly, $clear, $id_server_url, $validate, $slow, $noContigs, $noProteins);
 # Turn off buffering for progress messages.
 $| = 1;
 # Connect to the database. If we are validating, we parse the command
@@ -219,7 +228,8 @@ $validate = grep { $_ =~ /^--?validate$/ } @ARGV;
 my ($rc, $cdmi);
 my %parms = ("recursive" => \$recursive, "newOnly" => \$newOnly,
         "clear" => \$clear, "idserver=s" => \$id_server_url,
-        "validate" => \$validate, "slow" => \$slow);
+        "validate" => \$validate, "slow" => \$slow, "noContigs" => \$noContigs,
+        "noProteins" => \$noProteins);
 if ($validate) {
     $rc = GetOptions(%parms);
 } else {
@@ -233,6 +243,7 @@ if (! $rc) {
     print "usage: CDMILoadGenome [options] source genomeDirectory\n";
     exit;
 }
+my $time = time;
 # Get the source and genome directory.
 my ($source, $genomeDirectory) = @ARGV;
 if (! $source) {
@@ -242,9 +253,14 @@ if (! $source) {
 } elsif (! -d $genomeDirectory) {
     die "Genome directory $genomeDirectory not found.\n";
 } else {
+	# Build our options hash.
+	my $options = { slow => $slow, noContigs => $noContigs, newOnly => $newOnly,
+					noProteins => \$noProteins };
     # Connect to the KBID server and create the loader utility object.
     my $id_server;
-    if ($id_server_url) {
+    if ($id_server_url eq 'none') {
+    	$options->{sourceIDs} = 1;
+    } elsif ($id_server_url) {
         $id_server = IDServerAPIClient->new($id_server_url);
     }
     my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi, $id_server);
@@ -266,7 +282,7 @@ if (! $source) {
     # Are we in recursive mode?
     if (! $recursive) {
         # No. Load the one genome.
-        Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $genomeDirectory, $validate, $source, $slow, $newOnly);
+        Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $genomeDirectory, $validate, $source, $options);
     } else {
         # Yes. Get the subdirectories.
         opendir(TMP, $genomeDirectory) || die "Could not open $genomeDirectory.\n";
@@ -276,11 +292,13 @@ if (! $source) {
         for my $subDir (@subDirs) {
             my $fullPath = "$genomeDirectory/$subDir";
             if (-d $fullPath) {
-                Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $fullPath, $validate, $source, $slow, $newOnly);
+                Bio::KBase::CDMI::GenomeUtils::LoadGenome($loader, $fullPath, $validate, $source, $options);
             }
         }
     }
     # Display the statistics.
+    my $duration = time - $time;
+    print "Load completed in $duration seconds.\n";
     print "All done.\n" . $loader->stats->Show();
 }
 

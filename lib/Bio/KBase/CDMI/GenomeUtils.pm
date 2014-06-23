@@ -22,6 +22,7 @@ package Bio::KBase::CDMI::GenomeUtils;
     use Bio::KBase::CDMI::CDMILoader;
     use Bio::KBase::CDMI::CDMI;
     use MD5Computer;
+    use Digest::MD5;
 
 =head1 CDMI Genome Load Utilities
 
@@ -362,11 +363,42 @@ Source database from which the genomes have been taken.
 =item slow
 
 TRUE if the data is to be loaded using INSERTs, FALSE if it is to be loaded
-using files.
+using files. Note that the I<options> hash can be specified here, for
+convenience. The intent is to use a hash of options instead of the old
+list of flags going forward.
 
 =item newOnly
 
 TRUE if the genome should only be loaded if it is not already in the database.
+
+=item options
+
+Reference to a hash of options (if any). The options include the following.
+
+=over 8
+
+=item noContigs
+
+If TRUE, then contigs will not be loaded. the default is FALSE.
+
+=item noProteins
+
+If specified, protein sequences will not be loaded.
+
+=item sourceIDs
+
+If TRUE, then source IDs will be used instead of generated IDs from the ID server. The
+default is FALSE.
+
+=item slow
+
+Same as the I<slow> parameter above.
+
+=item newOnly
+
+Same as the I<newOnly> parameter above.
+
+=back
 
 =back
 
@@ -374,16 +406,29 @@ TRUE if the genome should only be loaded if it is not already in the database.
 
 sub LoadGenome {
     # Get the parameters.
-    my ($loader, $genomeDirectory, $validate, $source, $slow, $newOnly) = @_;
+    my ($loader, $genomeDirectory, $validate, $source, $slow, $newOnly, $options) = @_;
+    # Convert to an options hash.
+    if (ref $slow eq 'HASH') {
+    	$options = $slow;
+    } else {
+    	if (! defined $options) {
+    		$options = {};
+    	}
+    	$options->{slow} = $slow;
+    	$options->{newOnly} = $newOnly;
+    }
     # Get the CDMI object.
     my $cdmi = $loader->cdmi;
     # Indicate our progress.
     print "Processing $genomeDirectory.\n";
     # Compute the genome ID from the directory name.
-    my @parts = split /\//, $genomeDirectory;
+    my @parts = split m/\//, $genomeDirectory;
     my $genomeOriginalID = pop @parts;
     print "Computed genome ID is $genomeOriginalID.\n";
     $loader->SetGenome($genomeOriginalID);
+    if ($options->{sourceIDs}) {
+    	$loader->UseSourceIDs(1);
+    }
     # Read the metadata file.
     my $metaName = $loader->genome_load_file_name($genomeDirectory, "metadata.tbl");
     print "Reading metadata from $metaName.\n";
@@ -393,32 +438,42 @@ sub LoadGenome {
     if (! $scientificName) {
         die "No scientific name found in metadata for $genomeDirectory.\n";
     }
-    # Ensure the genome has data.
-    my $contigName = $loader->genome_load_file_name($genomeDirectory, "contigs.fa");
-    if (! -s $contigName) {
-        print "Genome skipped: no contig data.\n";
-    } else {
-        # This will be set to FALSE if this genome cannot be processed.
-        my $processing = 1;
+    # This will be set to FALSE if this genome cannot be processed.
+    my $processing = 1;
+    my $contigName;
+    # Are we including contigs?
+    if (! $options->{noContigs}) {
+	    # Ensure the genome has data.
+	    $contigName = $loader->genome_load_file_name($genomeDirectory, "contigs.fa");
+	    if (! -s $contigName) {
+	        print "Genome skipped: no contig data.\n";
+	        $processing = 0;
+	    }
+    }
+    if ($processing) {
         # The KBase genome ID will be put in here.
         my $genomeID;
         # If we are not validating, we must prepare the database for
         # loading this genome.
         if (! $validate) {
             # Get the KBID for this genome.
-            $genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
+          	$genomeID = $loader->GetKBaseID('kb|g', 'Genome', $genomeOriginalID);
             # If this genome exists and we are only loading new genomes, skip it.
-            if ($newOnly && $cdmi->Exists(Genome => $genomeID)) {
-                $loader->stats->Add(genomeSkipped => 1);
-                print "Genome skipped: already in database.\n";
-                $processing = 0;
-            } else {
-                # Delete any existing data for this genome.
-                DeleteGenome($loader, $genomeID);
+            if ($cdmi->Exists(Genome => $genomeID)) {
+            	if ($options->{newOnly}) {
+	                $loader->stats->Add(genomeSkipped => 1);
+	                print "Genome skipped: already in database.\n";
+	                $processing = 0;
+	            } else {
+	                # Delete any existing data for this genome.
+	                DeleteGenome($loader, $genomeID);
+	            }
+            }
+            if ($processing) {
                 # Initialize the relation loaders. The order of the relations is
                 # important, since it determines whether or not the DeleteGenome
                 # method will work properly.
-                if (! $slow) {
+                if (! $options->{slow}) {
                     $loader->SetRelations(qw(IsComposedOf Contig IsSequenceOf
                             IsOwnerOf Feature HasAliasAssertedFrom IsLocatedIn IsFunctionalIn
                             IsProteinFor Encompasses));
@@ -427,18 +482,25 @@ sub LoadGenome {
         }
         if ($processing) {
             # Process the contigs.
-            my ($contigMap, $dnaSize, $gcContent, $md5) = LoadContigs($loader,
-                    $genomeID, $genomeOriginalID, $contigName, $validate);
+            my ($contigMap, $dnaSize, $gcContent, $md5);
+            if ($options->{noContigs}) {
+            	$dnaSize = 0;
+            	$md5 = "";
+            	$gcContent = 0;
+            } else {
+	            ($contigMap, $dnaSize, $gcContent, $md5) = LoadContigs($loader,
+	                    $genomeID, $genomeOriginalID, $contigName, $validate);
+            }
             # Process the features.
             my ($pegs, $rnas, $id_mapping) = LoadFeatures($loader, $genomeID,
                     $genomeDirectory, $contigMap, $validate);
             # Process the proteins.
             my $protName = $loader->genome_load_file_name($genomeDirectory, "proteins.fa");
-            LoadProteins($loader, $id_mapping, $protName, $validate);
+            LoadProteins($loader, $id_mapping, $protName, $validate, $options->{noProteins});
             # If we are loading for real, store everything in the database here.
             if (! $validate) {
                 # Unspool the relation loaders.
-                if (! $slow) {
+                if (! $options->{slow}) {
                     $loader->LoadRelations();
                 }
                 # Create the genome record.
@@ -566,7 +628,7 @@ sub LoadContigs {
     # pairs found, not the percentage.
     my ($contigMap, $dnaSize, $gcContent) = ({}, 0, 0);
     # Open the contig FASTA file.
-    open(my $ih, "<$contigFastaFile") || die "Could not open contig file: $!\n";
+    open(my $ih, "<$contigFastaFile") || die "Could not open contig file $contigFastaFile: $!\n";
     # Get the length of a DNA segment.
     my $segmentLength = ($validate ? 10000 : $cdmi->TuningParameter('maxSequenceLength'));
     # Each contig is separated into a real contig that belongs to the
@@ -610,7 +672,6 @@ sub LoadContigs {
                 my $contigKBID = $loader->GetKBaseID("$genomeID.c", 'Contig',
                         $foreignID);
                 $contigMap->{$foreignID} = $contigKBID;
-                print "Contig $foreignID ($contigKBID) has $contigLen letters.\n";
                 # We now have all the information we need to load the contig
                 # into the database. First, check to see if the sequence is
                 # already in the database.
@@ -687,7 +748,8 @@ Directory containing the feature files-- C<features.tab> and C<functions.tab>.
 =item contigMap
 
 Reference to a hash that maps each contig's foreign identifier to
-its KBase ID.
+its KBase ID. If undefined, then the genome is being loaded without
+contigs and no ID translation is performed.
 
 =item validate
 
@@ -850,7 +912,8 @@ and (2) the feature's functional assignment.
 =item contigMap
 
 Reference to a hash that maps each contig's foreign identifier to
-its KBase ID.
+its KBase ID. If undefined, then contigs are not being loaded
+and the contig IDs will be untranslated.
 
 =item aliasMap
 
@@ -950,14 +1013,17 @@ sub ProcessFeatureBatch {
         $$rnas++ if $type eq 'rna';
         # Check the contig IDs in the locations.  If we find an
         # invalid contig ID, we must skip the location data for
-        # this feature.
+        # this feature. This is only an issue if we are loading
+        # contigs.
         my $badContig = 0;
-        for my $loc (@locs) {
-            if (! defined $contigMap->{$loc->Contig}) {
-                $badContig++;
-                print "Contig " . $loc->Contig . " not found for feature $fid.\n";
-            }
-        }
+        if (defined $contigMap) {
+	        for my $loc (@locs) {
+	            if (! defined $contigMap->{$loc->Contig}) {
+	                $badContig++;
+	                print "Contig " . $loc->Contig . " not found for feature $fid.\n";
+	            }
+	        }
+        }	        
         if ($badContig) {
             $stats->Add(badContigs => $badContig);
             $stats->Add(featureContigError => 1);
@@ -968,7 +1034,10 @@ sub ProcessFeatureBatch {
             # Loop through the sub-locations.
             for my $loc (@locs) {
                 # Compute this location's contig.
-                my $contigKBID = $contigMap->{$loc->Contig};
+                my $contigKBID = $loc->Contig;
+                if (defined $contigMap) {
+                	$contigKBID = $contigMap->{$contigKBID};
+                }
                 # Divide the location into segments.
                 while (my $segment = $loc->Peel($segmentLength)) {
                     # Output this segment.
@@ -1033,13 +1102,18 @@ Name of a FASTA file containing the protein translation for each feature.
 
 If TRUE, the input files will be validated but not loaded.
 
+=item noProteins
+
+If TRUE, the proteins will be connected to the features, but the sequences will
+not be loaded.
+
 =back
 
 =cut
 
 sub LoadProteins {
     # Get the parameters.
-    my ($loader, $id_mapping, $proteinFastaFile, $validate) = @_;
+    my ($loader, $id_mapping, $proteinFastaFile, $validate, $noProteins) = @_;
     # Get the statistics object.
     my $stats = $loader->stats;
     # Ensure the protein file exists and is nonempty.
@@ -1061,11 +1135,19 @@ sub LoadProteins {
                 # Get this feature's protein.
                 my ($sequence, $nextFid, $comment) = $loader->ReadFastaRecord($ih);
                 $protCount++;
+                # Insure the protein has no stop codon at the end.
+                if ($sequence =~ /\*$/) {
+                    $stats->Add(stopCodonRemovedFromProtein => 1);
+                    chop $sequence;
+                }
                 # The protein ID goes in here.
                 my $protID;
                 # If we are loading for real, we need to insure the protein
-                # sequence is in the database and get its ID.
-                if (! $validate) {
+                # sequence is in the database and get its ID. If we are not
+                # loading sequences, we just compute the ID.
+                if ($noProteins) {
+                	$protID = Digest::MD5::md5_hex($sequence);
+                } elsif (! $validate) {
                     $protID = $loader->CheckProtein($sequence);
                 }
                 # Look for the feature.
@@ -1170,7 +1252,7 @@ sub CreateGenome {
         die "Invalid or missing name for $genomeOriginalID.\n";
     }
     # Try to find the taxon ID for this genome.
-    my $taxID = $cdmi->ComputeTaxonID($scientificName);
+    my $taxID = $cdmi->ComputeTaxonID($scientificName, $metaHash);
     # If we didn't find one, check for a SEED source ID and adapt it.
     if (! defined $taxID) {
         if ($source eq 'SEED') {

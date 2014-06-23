@@ -58,7 +58,8 @@ C<Pg> for PostGres.
 
 =item dbname
 
-The name of the database to use.
+The name of the database to use., or a connect string to use. If a connect string is
+specified, only the user and password parameters are used.
 
 =item dbuser
 
@@ -131,8 +132,13 @@ sub new {
     # was introduced for performance testing.
     my $preload = $FIG_Config::preIndex;
     # Now connect to the database.
-    my $opts = join(";", @opts);
-    my $data_source = "DBI:$dbms(AutoCommit => 1):dbname=$dbname;$opts";
+    my $data_source;
+    if ($dbname =~ /^DBI:/) {
+    	$data_source = $dbname;
+    } else {
+    	my $opts = join(";", @opts);
+    	$data_source = "DBI:$dbms(AutoCommit => 1):dbname=$dbname;$opts";
+    }
     Trace("Connect string is: $data_source") if T(3);
     my $dbh = Connect($data_source, $dbuser, $dbpass, $dbms);
     bless {

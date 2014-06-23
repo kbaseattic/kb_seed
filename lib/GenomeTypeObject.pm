@@ -308,12 +308,15 @@ sub add_features_from_list
 	my($id, $loc_str, $type, $func, $aliases_str) = @$f;
 
 	my @aliases = split(/,/, $aliases_str);
-	my @locs = map { BasicLocation->new($_) } split(/,/, $loc_str);
-	my $new_id = $self->add_feature(-type => $type,
-					-location => \@locs,
-					-function => $func,
-					-aliases => \@aliases,
-					-analysis_event_d => $event_id);
+	my @locs = map { my $l = BasicLocation->new($_);
+		         [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
+	my $new_id = $self->add_feature({
+	    -type => $type,
+	    -location => \@locs,
+	    -function => $func,
+	    -aliases => \@aliases,
+	    -analysis_event_d => $event_id,
+	});
 	$map->{$id} = $new_id;
     }
     return $map;

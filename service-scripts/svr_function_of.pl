@@ -62,7 +62,6 @@ file with an extra column added (the function associated with the PEG).
 
 use SeedUtils;
 use SAPserver;
-my $sapObject = SAPserver->new();
 use Getopt::Long;
 use ScriptThing;
 
@@ -72,11 +71,13 @@ my $column;
 my $keep = 1;
 my $i = "-";
 my $s;
+my $url = '';
 my $rc  = GetOptions('c=i' => \$column, 
 		     'keep' => \$keep,
-		     's' => \$s,
+		     's' => \$s, 'url=s' => \$url,
 		     'i=s' => \$i);
 if (! $rc) { print STDERR $usage; exit }
+my $sapObject = SAPserver->new(url => $url);
 open my $ih, "<$i";
 while (my @tuples = ScriptThing::GetBatch($ih, undef, $column)) {
     my @ids = map { $_->[0] } @tuples;

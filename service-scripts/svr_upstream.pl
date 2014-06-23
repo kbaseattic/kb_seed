@@ -4,6 +4,7 @@ use strict;
 use Getopt::Long;
 use SAPserver;
 use ScriptThing;
+use Data::Dumper;
 
 #
 #	This is a SAS Component.

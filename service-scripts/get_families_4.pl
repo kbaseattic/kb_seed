@@ -63,6 +63,7 @@ use Data::Dumper;
 use Getopt::Long;
 use SeedEnv;
 use gjoseqlib;
+use File::Temp 'tempfile';
 
 
 my $usage = "usage: get_families_4 -d Data -s Seqs\n";
@@ -91,9 +92,8 @@ if ($i == @$primes) { die "$sz is too large - adjust the '$primes' above" }
 my $hash_size = $primes->[$i];
 # print STDERR "hash_size=$hash_size\n";
 
-my $tmp1 = "tmp1.$$";
-my $tmp2 = "tmp2.$$";
-open(SEQS,">$tmp2") || die "could not open $tmp2";
+my ($seqs_fh, $seqs_file) = tempfile();
+my ($kout_fh, $kout_file) = tempfile();
 
 my %genomes;
 my %needed_pegs;
@@ -120,13 +120,14 @@ foreach my $g (keys(%genomes))
     foreach my $tuple (@tuples)
     {
 	my($peg,undef,$seq) = @$tuple;
-	print SEQS ">$peg\n$seq\n";
+	print $seqs_fh ">$peg\n$seq\n";
     }
 }
-close(SEQS);
-&SeedUtils::run("cat $tmp2 | kmer_guts -d 1 -D $dataD -a -s $hash_size | condense_kmer_output > $tmp1");
+close($seqs_fh);
+close($kout_fh);
+&SeedUtils::run("kmer_guts -d 1 -D $dataD -a -s $hash_size < $seqs_file | condense_kmer_output > $kout_file");
 my %seen;
-open(TMP,"<$tmp1") || die "could not read $tmp1";
+open(TMP,"<$kout_file") || die "could not read $kout_file";
 while (defined($_ = <TMP>))
 {
     if ($_ =~ /^(\S+)\t(\S*)/)
@@ -140,7 +141,7 @@ while (defined($_ = <TMP>))
 }
 close(TMP);
 my %to_kmers;
-open(TMP,"<$tmp1") || die "could not read $tmp1";
+open(TMP,"<$kout_file") || die "could not read $kout_file";
 while (defined($_ = <TMP>) && ($_ =~ /^(\S+)\t(\S*)/))
 {
     my($peg,$kmers) = ($1,$2);
@@ -155,7 +156,7 @@ foreach my $set (@sets)
     my @sorted = sort { &by_size($to_kmers{$b},$to_kmers{$a}) } @$set;
     &process_set(\@sorted,\%to_kmers,$matchN,\%func_of);
 }
-unlink($tmp1);
+unlink($kout_file);
 
 sub by_size {
     my($x,$y) = @_;

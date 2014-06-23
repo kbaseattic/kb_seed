@@ -63,14 +63,15 @@ file with an extra column added (the location associated with the feature).
 use SeedUtils;
 use SAPserver;
 use ScriptThing;
-my $sapObject = SAPserver->new();
 use Getopt::Long;
 
 my $usage = "usage: svr_location_of [-c column] [-bounds]";
 
 my $column;
 my $bounds = 0;
-my $rc  = GetOptions('c=i' => \$column, "bounds" => \$bounds);
+my $url = '';
+my $rc  = GetOptions('c=i' => \$column, "bounds" => \$bounds, "url=s" => \$url);
+my $sapObject = SAPserver->new(url => $url);
 if (! $rc) { print STDERR $usage; exit }
 while (my @tuples = ScriptThing::GetBatch(\*STDIN, undef, $column)) {
     # Get the locations for this batch of features.

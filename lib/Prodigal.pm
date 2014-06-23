@@ -48,8 +48,8 @@ sub run_prodigal
     #
     # Create temporary directory and FASTA for the contig data.
     #
-    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tempdir}) : ();
-    my $tmp_dir = tempdir( @tmpdir, TEMPLATE => 'tmpdir_prodigal_XXXXXXXX');
+    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tmpdir}) : ();
+    my $tmp_dir = tempdir('tmpdir_prodigal_XXXXXXXX', @tmpdir);
 
     print STDERR "contig=$tmp_dir\n" if $ENV{DEBUG};
     
@@ -180,7 +180,12 @@ sub run_prodigal
     
 #...Cleanup...
     unless ($ENV{DEBUG}) {
-	rmtree($tmp_dir);
+	my $err;
+	rmtree($tmp_dir, { error => \$err});
+	if ($err)
+	{
+	    warn "Error during rmtree $tmp_dir: $err";
+	}
     }
     
     return wantarray ? ($encoded_tbl, $event) : $encoded_tbl;

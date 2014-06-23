@@ -4724,6 +4724,10 @@ sub InsertValue {
 =head3 InsertObject
 
     $erdb->InsertObject($objectType, %fieldHash);
+    
+    or
+    
+    $erdb->InsertObject($objectType, \%fieldHash, %options);
 
 Insert an object into the database. The object is defined by a type name and
 then a hash of field names to values. All field values should be
@@ -4760,6 +4764,19 @@ object being inserted. The values will be encoded for storage by this method.
 Note that this can be an inline hash (for backward compatibility) or a hash
 reference.
 
+=item options
+
+Hash of insert options. The current list of options is
+
+=over 8
+
+=item ignore
+
+If TRUE, then duplicate-record errors will be suppressed. If the record already exists, the insert
+will not take place.
+
+=back
+
 =back
 
 =cut
@@ -4770,11 +4787,13 @@ sub InsertObject {
     # Denote that so far we appear successful.
     my $retVal = 1;
     # Create the field hash.
-    my $fieldHash;
+    my ($fieldHash, $options);
     if (ref $first eq 'HASH') {
         $fieldHash = $first;
+        $options = { @leftOvers }
     } else {
         $fieldHash = { $first, @leftOvers };
+        $options = {}
     }
     # Get the database handle.
     my $dbh = $self->{_dbh};
@@ -4829,7 +4848,11 @@ sub InsertObject {
             join(' ', @missing)) if T(1);
     } else {
         # Build the INSERT statement.
-        my $statement = "INSERT INTO $self->{_quote}$newObjectType$self->{_quote} (" . join (', ', @fieldNameList) .
+        my $optional = "";
+        if ($options->{ignore}) {
+        	$optional = "IGNORE";
+        }
+        my $statement = "INSERT $optional INTO $self->{_quote}$newObjectType$self->{_quote} (" . join (', ', @fieldNameList) .
             ") VALUES (";
         # Create a marker list of the proper size and put it in the statement.
         my @markers = ();
@@ -4959,6 +4982,106 @@ sub UpdateEntity {
         }
     }
     # Return the success indication.
+    return $retVal;
+}
+
+=head3 Reconnect
+
+    my $changeCount = $erdb->Reconnect($relName, $linkType, $oldID, $newID);
+
+Move a relationship so it points to a new entity instance. All instances that reference
+a specified ID will be updated to specify a new ID.
+
+=over 4
+
+=item relName
+
+Name of the relationship to update.
+
+=item linkType
+
+C<from> to update the from-link. C<to> to update the to-link.
+
+=item oldID
+
+Old ID value to be changed.
+
+=item new ID
+
+New ID value to be substituted for the old one.
+
+=item RETURN
+
+Returns the number of rows updated.
+
+=back
+
+=cut
+
+sub Reconnect {
+    # Get the parameters.
+    my ($self, $relName, $linkType, $oldID, $newID) = @_;
+    # Get the database handle.
+    my $dbh = $self->{_dbh};
+    # Compute the link name.
+    my $linkName = $linkType . "_link";
+    # Create the update statement.
+    my $stmt = "UPDATE $relName SET $linkName = ? WHERE $linkName = ?";
+    # Apply the update.
+    my $retVal = $dbh->SQL($stmt, 0, $newID, $oldID);
+    # Return the number of rows changed.
+    return $retVal;
+}
+
+=head3 MoveEntity
+
+    my $stats = $erdb->MoveEntity($entityName, $oldID, $newID);
+
+Transfer all relationship records pointing to a specified entity instance so they
+point to a different entity instance. This requires calling L</Reconnect> on all
+the relationships that connect to the entity.
+
+=over 4
+
+=item entityName
+
+Name of the relevant entity type.
+
+=item oldID
+
+ID of the obsolete entity instance. All relationship records containing this ID will be
+changed.
+
+=item newID
+
+ID of the new entity instance. The relationship records containing the old ID will have
+this ID substituted for it.
+
+=item RETURN
+
+Returns a L<Stats> object describing the updates.
+
+=back
+
+=cut
+
+sub MoveEntity {
+    # Get the parameters.
+    my ($self, $entityName, $oldID, $newID) = @_;
+    # Create the statistics object.
+    my $retVal = Stats->new();
+    # Find the entity's connecting relationships.
+    my ($froms, $tos) = $self->GetConnectingRelationshipData($entityName);
+    # Process the relationship directions.
+    my %dirHash = (from => $froms, to => $tos);
+    for my $dir (keys %dirHash) {
+        # Reconnect the relationships in this direction.
+        for my $relName (keys %{$dirHash{$dir}}) {
+            my $changes = $self->Reconnect($relName, $dir, $oldID, $newID);
+            $retVal->Add("$dir-$relName" => $changes);
+        }
+    }
+    # Return the statistics.
     return $retVal;
 }
 

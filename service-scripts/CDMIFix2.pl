@@ -5,15 +5,22 @@ use Bio::KBase::CDMI::CDMI;
 use Bio::KBase::CDMI::CDMILoader;
 use Stats;
 use SeedUtils;
+use Bio::KBase::CDMI::TaxonomyUtils;
 
     $| = 1; # Prevent buffering on STDOUT.
-    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
-    my $loader = Bio::KBase::CDMI::CDMILoader->new($cdmi);
-    $loader->SetSource('EnsemblPlant');
-    $loader->SetGenome('Oglaberrima.AGI1.1');
-    my @ids = qw(Oglab05_unplaced019 Oglab04_unplaced014 Oglab04_unplaced051 Oglab04_unplaced122 12 5 10 11);
-    my $idMapping = $loader->FindKBaseIDs('Contig', \@ids);
-    for my $id (@ids) {
-        print "$id is mapped to $idMapping->{$id}.\n"
-    }
-
+    my %names;
+    my $counter = 0;
+    my $stats = Stats->new();
+    my %classes = ('scientific name' => 1); #, 'synonym' => 1, 'equivalent name' => 1, 'common name' => 1, 'misspelling' => 1);
+	open(my $ih, "</Users/Bruce/FIG/taxdump/names.dmp") || die "Could not open names file: $!";
+	while (! eof $ih) {
+		my ($id, $name, $unique, $class) = Bio::KBase::CDMI::TaxonomyUtils::GetTaxData($ih, $stats);
+		if ($classes{$class} && $name ne 'environmental samples') {
+			$names{$name}++;
+			$counter++;
+			if ($names{$name} > 1) {
+				print "Non-unique name $name for $id, unique variant $unique, class $class.\n";
+			}
+		}
+	}
+	print $counter;

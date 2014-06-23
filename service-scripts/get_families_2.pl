@@ -44,6 +44,7 @@ use Data::Dumper;
 use Getopt::Long;
 use gjoseqlib;
 use SeedEnv;
+use File::Temp 'tempfile';
 
 my $usage = "usage: get_families_2 -s Seqs < non_hits > non_hit_families\n";
 my $seqsD;
@@ -67,20 +68,25 @@ while (defined($peg = <STDIN>))
     $needed_pegs{$peg} = 1;
 }
 
-open(REPS,">tmp2.$$") || die "could not open tmp2.$$";
+my($reps_fh, $reps_file) = tempfile();
+
 foreach my $g (keys(%genomes))
 {
     my @tuples = grep { $needed_pegs{$_->[0]} } &read_fasta("$seqsD/$g");
     foreach my $tuple (@tuples)
     {
 	my($peg,undef,$seq) = @$tuple;
-	print REPS ">$peg\n$seq\n";
+	print $reps_fh ">$peg\n$seq\n";
     }
 }
-close(REPS);
-&SeedUtils::run("svr_representative_sequences -s $iden -b -f tmp1.$$ > /dev/null < tmp2.$$");
+close($reps_fh);
+
+my($fams_fh, $fams_file) = tempfile();
+close($fams_fh);
+
+&SeedUtils::run("svr_representative_sequences -s $iden -b -f $fams_file > /dev/null < $reps_file");
 my $n = 1;
-foreach my $fam (`cat tmp1.$$`)
+foreach my $fam (`cat $fams_file`)
 {
     chomp $fam;
     foreach $_ (split(/\t/,$fam))
@@ -90,4 +96,4 @@ foreach my $fam (`cat tmp1.$$`)
     $n++;
 }
 
-unlink("tmp1.$$","tmp2.$$");
+unlink($fams_file, $reps_file);
