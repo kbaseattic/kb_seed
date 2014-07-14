@@ -788,10 +788,10 @@
           <Notes>Number of RNA features found for this organism.</Notes>
         </Field>
         <Field name="scientific-name" type="string">
-          <Notes>Full genus/species/strain name of the genome sequence.</Notes>
+          <Notes>Source name given in the genome source file.  Normally, the name includes Genus/Species/Strain.  May be different than the names from other sources or from the unifying name in the TaxonomicGrouping.</Notes>
         </Field>
         <Field name="complete" type="boolean">
-          <Notes>TRUE if the genome sequence is complete, else FALSE</Notes>
+          <Notes>TRUE if the genome sequence is complete, else FALSE. Complete is defined as having enough information from the source that a meaningful analysis can be performed.</Notes>
         </Field>
         <Field name="prokaryotic" type="boolean">
           <Notes>TRUE if this is a prokaryotic genome sequence, else FALSE</Notes>
@@ -3861,7 +3861,7 @@
       </DisplayInfo>
       <Notes>A Source may assert aliases for features.</Notes>
       <Fields>
-	<Field name="alias" type="text">
+	<Field name="alias" type="long-string">
 	  <Notes>text of the alias for the feature.</Notes>
 	</Field>
       </Fields>
@@ -4029,7 +4029,7 @@
       will frequently have thousands of features connected to it.</Notes>
       <Fields>
         <Field name="ordinal" type="int">
-          <Notes>Sequence number of this segment, starting from 1
+          <Notes>Sequence number of this segment, starting from 0
           and proceeding sequentially forward from there.</Notes>
         </Field>
         <Field name="begin" type="int">
@@ -4061,6 +4061,14 @@
           <IndexField name="begin" order="ascending" />
         </IndexFields>
       </ToIndex>
+    </Relationship>
+    <Relationship name="HasSection" from="ContigSequence"
+      to="ContigChunk" arity="1M" converse="IsSectionOf">
+      <DisplayInfo caption="Has Section" theme="red">
+        <RegionInfo name="" />
+      </DisplayInfo>
+      <Notes>This relationship connects a contig's sequence to its DNA
+      sequences.</Notes>
     </Relationship>
     <Relationship name="HasSection" from="ContigSequence"
       to="ContigChunk" arity="1M" converse="IsSectionOf">

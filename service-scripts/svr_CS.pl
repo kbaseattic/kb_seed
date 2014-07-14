@@ -9,6 +9,23 @@ use SeedEnv;
 #
 $ENV{PATH} .= ":$FIG_Config::bin";
 
+
+#===============================================================================
+# This code takes a CS directory containing at least a rep.genomes file as input.
+# The rep.genome entries represent pubSEED, CS (i.e., Kbase), and RAST genomes.
+# The genome list in rep.genomes is used to construct a directory ($csD/GTOs) of
+# typed genome objects.  These GTOs are independent of source, freeing the remainer
+# of the code from worrying about where the genomes came from.
+#
+# The lines in the rep.genomes file can be
+#
+#       a genome id (implying PubSEED)
+#       rast|JOB\tUSERNAME\tPASSWORD  (implying a RAST job)
+#       kb|g.\d+ implying a CS genome
+#       rast2|genomeID\tRAST2DIR (I am uncertain of what this does; I would guess
+#            that is specifies a directory and a GTO in the directory
+
+
 my $DataKmers = "/homes/overbeek/Ross/MakeCS.Kbase/Data/Data.kmers";
 my $usage = "usage: svr_CS -d CloseStrainDir [--fill-in-refs] \n";
 my $csD;

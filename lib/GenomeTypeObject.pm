@@ -64,6 +64,7 @@ use gjoseqlib;
 use Time::HiRes 'gettimeofday';
 use IDclient;
 use BasicLocation;
+use IO::Handle;
 
 our $have_unbless;
 eval {
@@ -485,27 +486,60 @@ sub extract_contig_sequences_to_temp_file
 
 sub write_temp_seed_dir
 {
-    my($genomeTO) = @_;
+    my($self, $options) = @_;
 
     my $tmp = File::Temp->newdir(undef, CLEANUP => 1);
 
-    open(C, ">", "$tmp/contigs") or die "Cannot create $tmp/contigs: $!";
-    for my $contig (@{$genomeTO->{contigs}})
+    $self->write_seed_dir($tmp, $options);
+    return $tmp;
+}
+
+sub write_seed_dir
+{
+    my($self, $dir, $options) = @_;
+
+    open(my $ctg_fh, ">", "$dir/contigs") or die "Cannot create $dir/contigs: $!";
+    for my $contig (@{$self->{contigs}})
     {
-	print C ">$contig->{id}\n";
-	print C "$contig->{dna}\n";
+	write_fasta($ctg_fh, [$contig->{id}, undef, $contig->{dna}]);
     }
-    close(C);
-    open(F, ">", "$tmp/assigned_functions") or die "Cannot create $tmp/assigned_functions: $!";
-    mkdir("$tmp/Features");
-    mkdir("$tmp/Features/peg");
-    mkdir("$tmp/Features/CDS");
-    mkdir("$tmp/Features/rna");
-    open(PT, ">", "$tmp/Features/peg/tbl") or die "Cannot write $tmp/Features/peg/tbl: $!";
-    open(CT, ">", "$tmp/Features/CDS/tbl") or die "Cannot write $tmp/Features/CDS/tbl: $!";
-    open(RT, ">", "$tmp/Features/rna/tbl") or die "Cannot write $tmp/Features/rna/tbl: $!";
-    open(PF, ">", "$tmp/Features/peg/fasta") or die "Cannot write $tmp/Features/peg/fasta: $!";
-    open(CF, ">", "$tmp/Features/CDS/fasta") or die "Cannot write $tmp/Features/CDS/fasta: $!";
+    close($ctg_fh);
+
+    my $features = $self->{features};
+    my %types = map { $_->{type} => 1 } @$features;
+
+    my %typemap;
+    if ($options->{map_CDS_to_peg})
+    {
+	delete $types{CDS};
+	$types{peg} = 1;
+    }
+    my @types = keys %types;
+    $typemap{$_} = $_ foreach @types;
+    $typemap{CDS} = 'peg' if $options->{map_CDS_to_peg};
+    print Dumper(\@types, \%typemap);
+
+    open(my $func_fh, ">", "$dir/assigned_functions") or die "Cannot create $dir/assigned_functions: $!";
+    open(my $anno_fh, ">", "$dir/annotations") or die "Cannot create $dir/assigned_functions: $!";
+
+    mkdir("$dir/Features");
+    
+    my(%tbl_fh, %fasta_fh);
+	
+    for my $type (@types)
+    {
+	my $tdir = "$dir/Features/$type";
+	-d $tdir or mkdir($tdir) or die "Cannot mkdir $tdir: $!";
+	
+	my $fh;
+	open($fh, ">", "$tdir/tbl") or die "Cannot create $dir/tbl:$ !";
+	$tbl_fh{$type} = $fh;
+
+	my $fafh;
+	open($fafh, ">", "$tdir/fasta") or die "Cannot create $dir/fasta:$ !";
+	$fasta_fh{$type} = $fafh;
+    }
+
     #     "location" : [
     #        [
     #           "kb|g.140.c.0",
@@ -515,45 +549,65 @@ sub write_temp_seed_dir
     #        ]
     #     ],
     
-    for my $feature (@{$genomeTO->{features}})
+    for my $feature (@$features)
     {
+	my $fid = $feature->{id};
+	my $type = $feature->{type};
+	my @aliases;
+	
+	if ($options->{correct_fig_id} && $fid =~ /^\d+\.\d+\.$type/)
+	{
+	    $fid = "fig|$fid";
+	}
+	if ($type eq 'CDS' && $options->{map_CDS_to_peg})
+	{
+	    $type = 'peg';
+	    $fid =~ s/\.CDS\./.peg./;
+	}
 	my $function = $feature->{function} || "hypothetical protein";
-	print F "$feature->{id}\t$function\n";
+	print $func_fh "$fid\t$function\n";
+
 	my $loc = $feature->{location};
 	
-	#
-	# Fix this - we may have multipart locations.
-	#
-	my($ctg, $start, $strand, $len) = @{$loc->[0]};
-	my $stop;
-	if ($strand eq '+')
+	my @bloc;
+	for my $loc_part (@$loc)
 	{
-	    $stop = $start + $len - 1;
+	    my($ctg, $start, $strand, $len) = @$loc_part;
+	    my $bl = BasicLocation->new($ctg, $start, $strand, $len);
+	    push(@bloc, $bl);
+	}
+	my $sloc = join(",", map { $_->SeedString() } @bloc);
+
+	print { $tbl_fh{$type} } join("\t", $fid, $sloc, @aliases), "\n";
+
+	if ($feature->{protein_translation})
+	{
+	    write_fasta($fasta_fh{$type}, [$fid, undef, $feature->{protein_translation}]);
 	}
 	else
 	{
-	    $stop = $start - $len + 1;
+	    write_fasta($fasta_fh{$type}, [$fid, undef, $self->get_feature_dna($feature->{id})]);
 	}
-	my $sloc = join("_", $ctg, $start, $stop);
-	if ($feature->{type} eq 'CDS' || $feature->{type} eq 'peg')
+
+	# typedef tuple<string comment, string annotator, int annotation_time, analysis_event_id> annotation;
+	
+	for my $anno (@{$feature->{annotations}})
 	{
-	    print CT join("\t", $feature->{id}, $sloc), "\n" if $feature->{type} eq 'CDS';
-	    print PT join("\t", $feature->{id}, $sloc), "\n";
-	    print CF ">$feature->{id}\n$feature->{protein_translation}\n" if $feature->{type} eq 'CDS';
-	    print PF ">$feature->{id}\n$feature->{protein_translation}\n";
+	    my($txt, $annotator, $time, $event_id) = @$anno;
+	    print $anno_fh join("\n", $fid, $time, $annotator, $txt);
+	    print $anno_fh "\n" if substr($txt, -1) ne "\n";
+	    print $anno_fh "//\n";
 	}
-	else
-	{
-	    print RT join("\t", $feature->{id}, $sloc), "\n";
-	}
+	    
     }
-    close(F);
-    close(RT);
-    close(PT);
-    close(CT);
-    close(PF);
-    close(CF);
-    return $tmp;
+
+    for my $type (@types)
+    {
+	$fasta_fh{$type}->close();
+	$tbl_fh{$type}->close();
+    }
+    close($anno_fh);
+    close($func_fh);
 }
 
 sub add_analysis_event
