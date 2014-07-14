@@ -147,7 +147,7 @@ sub set_metadata
 {
     my($self, $meta) = @_;
 
-    my @keys = qw(id scientific_name domain genetic_code source source_id);
+    my @keys = qw(id scientific_name domain genetic_code source source_id taxonomy);
     for my $k (@keys)
     {
 	if (exists($meta->{$k}))
@@ -505,6 +505,19 @@ sub write_seed_dir
     }
     close($ctg_fh);
 
+    #
+    # Some individual file metadata.
+    #
+    my $write_md = sub { my($name, $value) = @_;
+			 my $fh;
+			 open($fh, ">", "$dir/$name") or die "Cannot open $dir/$name: $!";
+			 print $fh "$value\n";
+			 close($fh);
+		    };
+    $write_md->("GENETIC_CODE", $self->{genetic_code});
+    $write_md->("GENOME", $self->{scientific_name});
+    $write_md->("TAXONOMY", $self->{taxonomy}) if $self->{taxonomy};
+
     my $features = $self->{features};
     my %types = map { $_->{type} => 1 } @$features;
 
@@ -518,6 +531,21 @@ sub write_seed_dir
     $typemap{$_} = $_ foreach @types;
     $typemap{CDS} = 'peg' if $options->{map_CDS_to_peg};
     print Dumper(\@types, \%typemap);
+
+    #
+    # closest.genomes file.
+    #
+
+    my $close = $self->{close_genomes};
+    if (ref($close) && @$close)
+    {
+	open(my $close_fh, ">", "$dir/closest.genomes") or die "cannot open $dir/closest.genomes: $!";
+	for my $c (@$close)
+	{
+	    print $close_fh join("\t", $c->{genome_id}, $c->{closeness_measure}, $c->{genome_name}), "\n";
+	}
+	close($close_fh);
+    }
 
     open(my $func_fh, ">", "$dir/assigned_functions") or die "Cannot create $dir/assigned_functions: $!";
     open(my $anno_fh, ">", "$dir/annotations") or die "Cannot create $dir/assigned_functions: $!";

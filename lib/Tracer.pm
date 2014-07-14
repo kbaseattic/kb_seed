@@ -44,6 +44,7 @@ package Tracer;
     use Fcntl qw(:DEFAULT :flock);
     use Data::Dumper;
 
+    our $tracer_tmp = "/tmp";
 
     #
     # These are made optional in order to facilitate the SAS release
@@ -52,11 +53,8 @@ package Tracer;
     BEGIN {
 	eval {
 	    require FIG_Config;
+	    $tracer_tmp = $FIG_Config::temp;
 	};
-	if ($@)
-	{
-	    $FIG_Config::temp = "/tmp";
-	}
     }
 
 =head1 Tracing and Debugging Helpers
@@ -925,7 +923,7 @@ sub Warn {
                 # The RSS document goes in here.
                 my $rss;
                 # Get the name of the RSS file. It's in the FIG temporary directory.
-                my $fileName = "$FIG_Config::temp/$FIG_Config::error_feed";
+                my $fileName = "$tracer_tmp/$FIG_Config::error_feed";
                 # Open the config file and lock it.
                 $lock = Open(undef, "<$FIG_Config::fig_disk/config/FIG_Config.pm");
                 flock $lock, LOCK_EX;
@@ -1206,7 +1204,7 @@ sub EmergencyFileName {
     # Get the parameters.
     my ($tkey) = @_;
     # Compute the emergency tracing file name.
-    return "$FIG_Config::temp/Emergency$tkey.txt";
+    return "$tracer_tmp/Emergency$tkey.txt";
 }
 
 =head3 EmergencyFileTarget
@@ -1234,7 +1232,7 @@ sub EmergencyFileTarget {
     # Get the parameters.
     my ($tkey) = @_;
     # Compute the emergency tracing file name.
-    return "$FIG_Config::temp/trace$tkey.log";
+    return "$tracer_tmp/trace$tkey.log";
 }
 
 =head3 EmergencyTracingDest
@@ -1851,7 +1849,7 @@ sub StandardSetup {
         # Now we set up the trace mode.
         my $traceMode;
         # Verify that we can open a file in the FIG temporary directory.
-        my $traceFileName = "$FIG_Config::temp/trace$suffix.log";
+        my $traceFileName = "$tracer_tmp/trace$suffix.log";
         my $traceFileSpec = ($retOptions->{forked} ? ">>$traceFileName" : ">$traceFileName");
         if (open TESTTRACE, "$traceFileSpec") {
             # Here we can trace to a file.
@@ -1878,8 +1876,8 @@ sub StandardSetup {
     }
     # Check for background mode.
     if ($retOptions->{background}) {
-        my $outFileName = "$FIG_Config::temp/out$suffix$$.log";
-        my $errFileName = "$FIG_Config::temp/err$suffix$$.log";
+        my $outFileName = "$tracer_tmp/out$suffix$$.log";
+        my $errFileName = "$tracer_tmp/err$suffix$$.log";
         # Spool the output.
         open STDOUT, ">$outFileName";
         # If we have a trace file, trace the errors to the log. Otherwise,
@@ -1912,7 +1910,7 @@ sub StandardSetup {
     } elsif ($retOptions->{config}) {
         # Here we want to dump some useful config information and exit.
         print "Command is $0.\n";
-        print "Temp directory is $FIG_Config::temp.\n";
+        print "Temp directory is $tracer_tmp.\n";
         exit(0);
     }
     # Trace the options, if applicable.

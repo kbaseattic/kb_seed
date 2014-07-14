@@ -66,6 +66,7 @@ sub new {
         $figfams->{family2function} = &SeedUtils::open_berk_table("$fam_data/family2function.db");
         $figfams->{family2pegs} = &SeedUtils::open_berk_table("$fam_data/family2pegs.db", -results_as_list => 1);
         $figfams->{proteinlengths} = &SeedUtils::open_berk_table("$fam_data/length.btree");
+	$figfams->{translation} = &SeedUtils::open_berk_table("$fam_data/translation.btree");
     }
 
     bless $figfams,$class;
