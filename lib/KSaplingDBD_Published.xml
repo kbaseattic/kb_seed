@@ -35,13 +35,14 @@
     <Region name="GenoPheno">
       <Notes>The Genotype to Phenotype region contains data about the relationship between experimentally determined alleles in a DNA sequence and observed traits for plants.</Notes>
     </Region>
+<!--   This region is being suppressed because the display is all mixed up.  The tables are under revision and there is no reason to display
     <Region name="Experiment">
       <Notes>The Experiment region contains general experimental data. More
       specialized experimental data, such as expression data, links to
       ExperimentalUnit such that multiple experiment types (e.g. fitness
       and gene expression) may be tracked as part of one overarching
       experiment.</Notes>
-    </Region>
+    </Region>  -->
     <Region name="Strain">
       <Notes>The Strain region contains data modeling strains of organisms derived
       from a parent genome and their relationships.</Notes>
@@ -1043,12 +1044,12 @@
       <DisplayInfo theme="brown" col="5" row="13" caption="Pair Set">
         <RegionInfo name="Annotations" row="3" col="6.5" />
       </DisplayInfo>
-      <Notes>A PairSet is a precompute set of pairs or genes.  Each
-      pair occurs close to one another of the chromosome.  We believe
+      <Notes>A PairSet is a precomputed set of pairs of genes.  The pairs
+      in a set occur close to one another of the chromosome.  We believe
       that all of the first members of the pairs correspond to one another
       (are quite similar), as do all of the second members of the pairs.
       These pairs (from prokaryotic genomes) offer one of the most
-      powerful clues relating to uncharacterized genes/peroteins.</Notes>
+      powerful clues relating to uncharacterized genes/proteins.</Notes>
       <Asides>The pairings for a particular evidence set will contain
       protein sequences that are significantly similar. In other words, if
       (A,B) and (X,Y) are both pairings in a single evidence set, then (A
@@ -2526,28 +2527,38 @@
       </DisplayInfo>
       <Notes>
         This relationship connects a protein sequence with the conserved domains
-        that have been computed to be associated with it.
+        that have been computed to be associated with it. Connections were determined using RPS-BLAST.
       </Notes>
       <Fields>
         <Field name="percent-identity" type="float">
+          <Notes>Percent identity over the length of the alignment.</Notes>
         </Field>
         <Field name="alignment-length" type="int">
+          <Notes>Length of the aligned region.</Notes>
         </Field>
         <Field name="mismatches" type="int">
+          <Notes>Number of mismatches in the alignment.</Notes>
         </Field>
         <Field name="gap-openings" type="int">
+          <Notes>Number of gaps in the alignment.</Notes>
         </Field>
         <Field name="protein-start" type="int">
+          <Notes>Alignment start on the protein.</Notes>
         </Field>
         <Field name="protein-end" type="int">
+          <Notes>Alignment end on the protein.</Notes>
         </Field>
         <Field name="domain-start" type="int">
+          <Notes>Alignment start on the CDD domain.</Notes>
         </Field>
         <Field name="domain-end" type="int">
+          <Notes>Alignment end on the CDD domain.</Notes>
         </Field>
         <Field name="e-value" type="float">
+          <Notes>The E-value is a parameter that describes the number of hits one can “expect” to see by chance when searching a database of a particular size. Essentially, the E-value describes the random background noise that exists for matches between sequences. </Notes>
         </Field>
         <Field name="bit-score" type="float">
+          <Notes>The bit-score is derived from the raw alignment score S in which the statistical properties of the scoring system used have been taken into account. By normalizing a raw score, a “bit score” is attained, which has a standard set of units.  </Notes>
         </Field>
       </Fields>
     </Relationship>
@@ -4330,7 +4341,7 @@
           <Notes>Numbered starting at 1 within an Association, if
           directional.  Meaning is method-dependent; e.g., for
           associations derived from pulldown data, rank 1 should be
-          assigned to the bait.</Notes>
+          assigned to the bait.  A rank of 0 indicates that there are no ordered relationships.</Notes>
         </Field>
       </Fields>
     </Relationship>
