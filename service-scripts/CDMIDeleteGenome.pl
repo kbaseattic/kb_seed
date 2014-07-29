@@ -43,6 +43,11 @@ tab-delimited input file. The file name may be specified as an option
 value, or if the option is specified without a value, the file will be
 taken from the standard input.
 
+=item idSource
+
+If specified, the IDs are presumed to be source IDs from the specified source. They
+are translated before deletion.
+
 =item verbose
 
 If specified, a detailed list of the delete commands used will be output.
@@ -57,10 +62,12 @@ the positional parameters.
 # Turn off buffering for progress messages.
 $| = 1;
 # These will hold the option parameters.
-my ($file, $verbose);
+my ($file, $verbose, $idSource);
+# Create the statistics object.
+my $stats = Stats->new();
 # Connect to the database.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("file:s" => \$file, 
-        "verbose" => \$verbose);
+        "verbose" => \$verbose, "idSource:s" => \$idSource);
 # Normalize the verbose parameter.
 $verbose = ($verbose ? 1 : 0);
 # Get the genome IDs. We need to figure out if we have a file or not.
@@ -89,8 +96,25 @@ if (defined $file) {
     push @genomeIDs, @ARGV;
     print scalar(@genomeIDs) . " genome IDs found on command line.\n";
 }
+# Do we need to translate?
+if (defined $idSource) {
+	# Yes. Search for the genomes.
+	print "Translating IDs from source $idSource.\n";
+	my @sourceIDs = @genomeIDs;
+	@genomeIDs = ();
+	for my $sourceID (@sourceIDs) {
+		my ($genomeID) = $cdmi->GetFlat('Genome WasSubmittedBy', 'Genome(source-id) = ? AND WasSubmittedBy(to-link) = ?',
+			[$idSource, $sourceID], 'Genome(id)');
+		if (! $genomeID) {
+			print "Could not find genome for $sourceID.\n";
+			$stats->Add(translateFailure => 1);
+		} else {
+			push @genomeIDs, $genomeID;
+			$stats->Add(translateFound => 1);
+		}
+	}
+}
 # Delete the genomes.
-my $stats = Stats->new();
 for my $genomeID (@genomeIDs) {
     print "Deleting $genomeID.\n";
     my $subStats = $cdmi->Delete(Genome => $genomeID, 'print' => $verbose);

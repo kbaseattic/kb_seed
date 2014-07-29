@@ -83,6 +83,10 @@ Alternate database access port for the SEED. This is useful for testing.
 
 Alternate directory for the SEED. This is useful for testing.
 
+=item figdb
+
+Alternate database for the SEED. This is useful for testing.
+
 =back
 
 =cut
@@ -91,12 +95,12 @@ Alternate directory for the SEED. This is useful for testing.
 $| = 1;
 # The command-line options are kept in here.
 my ($notaxon, $blackList, $fighost, $figport, $figdisk, $nogenome, $noexpr, $nofam,
-    $nosubsys);
+    $nosubsys, $figdb);
 # Connect to the database using the command-line options.
 my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("notaxon" => \$notaxon,
     "nogenome" => \$nogenome, "noexpr" => \$noexpr, "nofam" => \$nofam,
     "nosubsys" => \$nosubsys, "blackList=s" => \$blackList, "fighost=s" => \$fighost,
-    "figport=s" => \$figport, "figdisk=s" => \$figdisk);
+    "figport=s" => \$figport, "figdisk=s" => \$figdisk, "figdb=s" => \$figdb);
 if (! $cdmi) {
     print "usage: CDMILoadCheck [options] workDirectory \n";
 } else {
@@ -112,6 +116,9 @@ if (! $cdmi) {
         $FIG_Config::global = "$figdisk/FIG/Data/Global";
         $FIG_Config::organisms = "$figdisk/FIG/Data/Organisms";
         $FIG_Config::data = "$figdisk/FIG/Data";
+    }
+    if ($figdb) {
+    	$FIG_Config::db = $figdb;
     }
     my $fig = FIG->new();
     # Create the CDMI loader.

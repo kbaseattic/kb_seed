@@ -1300,14 +1300,25 @@ sub GetKBaseIDs {
 	    # Call through to the ID server.
 	    my @mapped = map { $idMap->{$_} } @$ids;
 	    my $kbMap;
-	    eval {
-		    $kbMap = $self->idserver->register_ids($prefix, $realSource,
-		            \@mapped);
-	    };
-	    if ($@) {
-	    	print "ID server error: $@\n";
-	    	print "ID server call: $prefix, $realSource; " . join(", ", @mapped) . "\n"; ##DEBUG##
-	    	die "ID server failed.";
+	    my $counter = 0;
+	    while (! defined $kbMap) {
+		    eval {
+			    $kbMap = $self->idserver->register_ids($prefix, $realSource,
+			            \@mapped);
+		    };
+		    if ($@) {
+		    	my $msg = $@;
+		    	if ($counter < 10 && $msg =~ /500\s+Internal\s+Server\s+Error/i) {
+		    		print "Retrying ID server call.\n";
+		    		$self->{stats}->Add(idServerRetry => 1);
+		    		$counter++;
+		    		sleep 1;
+		    	} else {
+			    	print "ID server error ($counter retries): $msg\n";
+			    	print "ID server call: $prefix, $realSource; " . join(", ", @mapped) . "\n";
+		    		die "ID server failed.";
+		    	}
+		    }
 	    }
 	    # Convert the modified IDs to the original IDs.
 	    %retVal = map { $_ => $kbMap->{$idMap->{$_}} } @$ids;

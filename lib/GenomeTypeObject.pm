@@ -452,15 +452,32 @@ sub write_feature_locations_to_file
     close($fh);
 }
 
+#
+# $filter is an optional parameter that is a code ref.
+# It is invoked for each feature; only those features that
+# have a translation and for which the filter returns true are written.
+#
 sub extract_protein_sequences_to_temp_file
 {
-    my($self) = @_;
+    my($self, $filter) = @_;
 
     my($fh, $fn) = tmpnam();
 
     for my $feature (@{$self->{features}})
     {
 	my $trans = $feature->{protein_translation};
+	if (ref($filter))
+	{
+	    if ($filter->($feature))
+	    {
+		print STDERR "keeping $feature->{id} $feature->{function}\n";
+	    }
+	    else
+	    {
+		print STDERR "skippinging $feature->{id} $feature->{function}\n";
+		next;
+	    }
+	}
 	if ($trans)
 	{
 	    write_fasta($fh, [$feature->{id}, undef, $trans]);

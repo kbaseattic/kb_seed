@@ -6,6 +6,7 @@ use strict;
 use gjoseqlib;
 use gjostat;
 use Data::Dumper;
+# use Time::HiRes qw(time);
 
 require Exporter;
 our @ISA    = qw( Exporter );
@@ -63,8 +64,7 @@ sub find_crisprs
 
     my $debug       = defined $opts->{ debug } ? $opts->{ debug } : 0; 
 
-    my $replen  = $minreplen;
-    my $min_nid = $min_mat_id ? int( $min_mat_id * $replen )
+    my $min_nid = $min_mat_id ? int( $min_mat_id * $minreplen )
                               : gjostat::binomial_critical_value_m_ge( $minreplen, 0.3, $p_match );
 
     $minrep--;                    #  The first occurrance is not counted
@@ -79,8 +79,8 @@ sub find_crisprs
 
         my $pos0 = 0;
         my @parts;
-        my $maxgap = $maxsp + ( $maxreplen - $replen );
-        while ( $seq =~ m/([acgt]{$replen})((?:[acgt]{$minsp,$maxgap}\1){2,})/g )
+        my $maxgap = $maxsp + ( $maxreplen - $minreplen );
+        while ( $seq =~ m/([acgt]{$minreplen})((?:[acgt]{$minsp,$maxgap}\1){2,})/g )
         {
             my $n1      = $-[0];
             my $n2      = $+[0];
@@ -126,8 +126,8 @@ sub find_crisprs
                 next;
             }
 
-            print STDERR "  $rept (requires $min_nid / $replen):\n",
-                         ( map { sprintf "%12d  %s\n", $_, substr( $seq, $_, $replen ) } @locs ),
+            print STDERR "  $rept (requires $min_nid / $minreplen):\n",
+                         ( map { sprintf "%12d  %s\n", $_, substr( $seq, $_, $minreplen ) } @locs ),
                          "\n" if $debug;
 
             #  Find the repeat profile:
@@ -140,7 +140,7 @@ sub find_crisprs
                 push @data, [ $i, consensus_at_offset( \$seq, \@locs, $i ) ];
             }
 
-# print STDERR Dumper( @data );
+            # print STDERR Dumper( @data );
 
             my $max_chg = int( 0.1 * ( @locs + 5 ) );
             my @runs;
@@ -156,7 +156,7 @@ sub find_crisprs
             @runs or next;   #  This would be very bad
 
             ( $run ) = sort { @$b <=> @$a } @runs;
-            $replen = @$run;
+            my $replen = @$run;
             my $repseq = join( '', map { $_->[1] } @$run );
             if ( $replen < $minreplen )
             {
@@ -223,6 +223,7 @@ sub find_crisprs
             #  Move past this repeat array:
 
             pos( $seq ) = $pos0 = $end + 1;
+
         }
     }
 

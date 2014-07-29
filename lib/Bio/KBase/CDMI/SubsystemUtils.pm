@@ -742,16 +742,20 @@ sub ProcessBindings {
                 # Compute the machine role.
                 my $machineRoleID = $machineRoles{$subsystem}{$role};
                 # Insure it exists.
-                my $created = $loader->InsureEntity(SSCell => $machineRoleID);
-                if ($created) {
-                    # We created the machine role, so connect it to the machine.
-                    my $machineID = $machines{$subsystem};
-                    $cdmi->InsertObject('IsRowOf', from_link => $machineID, to_link => $machineRoleID);
-                    # Connect it to the role, too.
-                    $cdmi->InsertObject('IsRoleOf', from_link => $role, to_link => $machineRoleID);
+                if (! $machineRoleID) {
+                	$stats->Add(machineRoleMismatch => 1);
+                } else {
+	                my $created = $loader->InsureEntity(SSCell => $machineRoleID);
+	                if ($created) {
+	                    # We created the machine role, so connect it to the machine.
+	                    my $machineID = $machines{$subsystem};
+	                    $cdmi->InsertObject('IsRowOf', from_link => $machineID, to_link => $machineRoleID);
+	                    # Connect it to the role, too.
+	                    $cdmi->InsertObject('IsRoleOf', from_link => $role, to_link => $machineRoleID);
+	                }
+	                # Connect the feature.
+	                $cdmi->InsertObject('Contains', from_link => $machineRoleID, to_link => $fidMap{$fid});
                 }
-                # Connect the feature.
-                $cdmi->InsertObject('Contains', from_link => $machineRoleID, to_link => $fidMap{$fid});
             }
         }
     }

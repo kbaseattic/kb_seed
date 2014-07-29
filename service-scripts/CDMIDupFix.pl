@@ -28,25 +28,57 @@
 
 This script analyzes a relationship in a CDMI and deletes duplicate rows.
 
-The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>.
+The command-line options are as specified in L<Bio::KBase::CDMI::CDMI/new_for_script>. plus the following.
 
 The positional parameters are the relationship name and the names of any additional
 fields that should be used to determine whether or not a row is a duplicate.
+
+=over 4
+
+=item file
+
+Name of a tab-delimited file containing a list of relationship names. Each row contains the relationship
+name in the first column and the additional field names in the remaining columns. The utility will be
+run on each relationship listed.
+
+=back
 
 =cut
 
 # Prevent buffering on STDOUT.
 $| = 1;
+my $file;
 # Connect to the database.
-my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script();
+my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script("file=s" => \$file);
 if (! $cdmi) {
     print "usage: CDMIDupFix [options] relName field1 field2 ... \n";
 } else {
-    # Get the relationship name and the list of fields.
-    my ($relName, @fields) = @ARGV;
-    print "Processing $relName with " . scalar(@fields) . " extra fields.\n";
-    # Call the processing method.
-    my $stats = $cdmi->CleanRelationship($relName, @fields);
+    # We'll put the relationship name and the list of fields in @rows. Each individual
+    # row will be parsed into $relName and @fields.
+    my (@rows, $relName, @fields);
+ 	# Do we have a file?
+    if ($file) {
+    	# Yes. Read the instruction sets from the file.
+    	open(my $ih, "<$file") || die "Could not open input file: $!";
+    	while (! eof $ih) {
+    		my $line = <$ih>;
+    		chomp $line;
+    		push @rows, [split /\t/, $line];
+    	}	
+    } else {
+    	# No file. Use the parameters.
+    	push @rows, [@ARGV];	
+    }
+    # Accumulate the stats in here.
+    my $stats = Stats->new();
+    for my $row (@rows) {
+    	($relName, @fields) = @$row;
+	    print "Processing $relName with " . scalar(@fields) . " extra fields.\n";
+	    # Call the processing method.
+	    my $subStats = $cdmi->CleanRelationship($relName, @fields);
+	    # Fold in the statistics.
+	    $stats->Accumulate($subStats);
+    }
     # Denote we're done.
     print "All done.\n" . $stats->Show();
 }

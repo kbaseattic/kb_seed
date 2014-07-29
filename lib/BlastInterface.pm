@@ -304,6 +304,185 @@ sub alignment_to_pssm
 
 
 #-------------------------------------------------------------------------------
+#  Do psiblast against tranlated genomic DNA. Most of this can be done by
+#  psiblast( $profile, $db, \%options ).
+#
+#   $records = psi_tblastn(  $prof_file,  $nt_file, \%options )
+#   $records = psi_tblastn(  $prof_file, \@nt_seq,  \%options )
+#   $records = psi_tblastn( \@prof_seq,   $nt_file, \%options )
+#   $records = psi_tblastn( \@prof_seq,  \@nt_seq,  \%options )
+#
+#  Required:
+#
+#     $prof_file or \@prof_seq
+#     $nt_file   or \@nt_seq
+#
+#  Options unique to psi_tblastn:
+#
+#     aa_db  =>  $trans_file    # put translated db here
+#
+#-------------------------------------------------------------------------------
+
+sub psi_tblastn
+{
+    my ( $profile, $nt_db, $opts ) = @_;
+    $opts ||= {};
+
+    my $aa_db = $opts->{ aa_db };
+    my $rm_db  = ! ( $aa_db && -f $aa_db );
+    if ( defined $aa_db && -f $aa_db && -s $aa_db )
+    {
+        #  The tranaslated sequence database exists
+    }
+    elsif ( defined $nt_db )
+    {
+        if ( ref $nt_db eq 'ARRAY' && @$nt_db )
+        {
+            ref $nt_db eq 'ARRAY' && @$nt_db
+                or print STDERR "Bad nucleotide sequence reference passed to psi_tblastn.\n"
+                    and return undef;
+            my $dbfh;
+            if ( $aa_db )
+            {
+                open( $dbfh, '>', $aa_db );
+            }
+            else
+            {
+                ( $dbfh, $aa_db ) = SeedAware::open_tmp_file( "psi_tblastn_db", '' );
+                $opts->{ aa_db }  = $aa_db;
+            }
+            $dbfh or print STDERR 'Could not open $dbfile.'
+                and return undef;
+            foreach ( @$nt_db )
+            {
+                gjoseqlib::write_fasta( $dbfh, six_translations( $_ ) );
+            }
+            close( $dbfh );
+        }
+        elsif ( -f $nt_db && -s $nt_db )
+        {
+            my $dbfh;
+            ( $dbfh, $aa_db ) = SeedAware::open_tmp_file( "psi_tblastn_db", '' );
+            close( $dbfh );   # Tacky, but it avoids the warning
+
+            my $redir = { 'stdin'  => $nt_db,
+                          'stdout' => $aa_db
+                        };
+            my $gencode = $opts->{ dbCode }
+                       || $opts->{ dbGenCode }
+                       || $opts->{ db_gen_code };
+            SeedAware::system_with_redirect( 'translate_fasta_6',
+                                             $gencode ? ( -g => $gencode ) : (),
+                                             $redir
+                                           );
+        }
+        else
+        {
+            print STDERR "psi_tblastn requires a sequence database."
+                and return undef;
+        }
+    }
+    else
+    {
+        die "psi_tblastn requires a sequence database.";
+    }
+
+    my $blast_opts = { %$opts, outForm => 'hsp' };
+    my @hsps = blast( $profile, $nt_db, $blast_opts );
+
+    if ( $rm_db )
+    {
+        my @files = grep { -f $_ } map { ( $_, "$_.psq", "$_.pin", "$_.phr" ) } $aa_db;
+        unlink @files if @files;
+    }
+
+    #  Fix the data "in place"
+
+    foreach ( @hsps )
+    {
+        my ( $sid, $sdef ) = @$_[3,4];
+        my $fr;
+        ( $sid, $fr ) = $sid =~ m/^(.*)\.([-+]\d)$/;
+        my ( $beg, $end, $slen ) = $sdef =~ m/(\d+)-(\d+)\/(\d+)$/;
+        $sdef =~ s/ ?\S+$//;
+        @$_[3,4,5] = ( $sid, $sdef, $slen );
+        adjust_hsp( $_, $fr, $beg );
+    }
+
+    @hsps = sort { $a->[3] cmp $b->[3] || $b->[6] <=> $a->[6] } @hsps;
+
+    if ( $opts->{ outForm } ne 'hsp' )
+    {
+        @hsps = map { format_hsp( $_, 'psi_tblastn', $opts ) } @hsps;
+    }
+
+    wantarray ? @hsps : \@hsps;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  When search is versus six frame translation, there is a need to adjust
+#  the frame and location information in the hsp back to the DNA coordinates.
+#
+#     adjust_hsp( $hsp, $frame, $begin )
+#
+#   6   7    8    9    10  11   12   13  14 15 16  17  18 19  20
+#  scr Eval nseg Eval naln nid npos ngap fr q1 q2 qseq s1 s2 sseq
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub adjust_hsp
+{
+    my ( $hsp, $fr, $b ) = @_;
+    $hsp->[14] = $fr;
+    if ( $fr > 0 )
+    {
+        $hsp->[18] = $b + 3 * ( $hsp->[18] - 1 );
+        $hsp->[19] = $b + 3 * ( $hsp->[19] - 1 ) + 2;
+    }
+    else
+    {
+        $hsp->[18] = $b - 3 * ( $hsp->[18] - 1 );
+        $hsp->[19] = $b - 3 * ( $hsp->[19] - 1 ) - 2;
+    }
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Do a six frame translation for use by psi_tblastn.  This modifications of
+#  the identifiers and definitions are essential to the interpretation of
+#  the blast results.  The program 'translate_fasta_6' produces the same
+#  output format, and is much faster.
+#
+#   @translations = six_translations( $nucleotide_entry )
+#
+#  The ids are modified by adding ".frame" (+1, +2, +3, -1, -2, -3).
+#  The definition is mofidified by adding " begin-end/of_length".
+#  NCBI frame numbers reverse strand translation frames from the end of the
+#  sequence (i.e., the beginning of the complement of the strand).
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub six_translations
+{
+    my ( $id, $def, $seq ) = map { defined($_) ? $_ : '' } @{ $_[0] };
+    my $l = length( $seq );
+
+    return () if $l < 15;
+
+    #                    fr   beg    end
+    my @intervals = ( [ '+1',  1,   $l - (  $l    % 3 ) ],
+                      [ '+2',  2,   $l - ( ($l-1) % 3 ) ],
+                      [ '+3',  3,   $l - ( ($l-2) % 3 ) ],
+                      [ '-1', $l,    1 + (  $l    % 3 ) ],
+                      [ '-2', $l-1,  1 + ( ($l-1) % 3 ) ],
+                      [ '-3', $l-2,  1 + ( ($l-2) % 3 ) ]
+                    );
+    my ( $fr, $b, $e );
+
+    map { ( $fr, $b, $e ) = @$_;
+          [ "$id.$fr", "$def $b-$e/$l", gjoseqlib::translate_seq( gjoseqlib::DNA_subseq( \$seq, $b, $e ) ) ]
+        } @intervals;
+}
+
+
+#-------------------------------------------------------------------------------
 #  Determine whether a user-supplied parameter will result in reading from STDIN
 #
 #      $bool = is_stdin( $source )
@@ -626,7 +805,7 @@ sub remove_blast_db_dir
 sub run_blast
 {
     my( $queryF, $dbF, $blast_prog, $parms ) = @_;
-    
+
     if ( lc ( $parms->{outForm} || '' ) ne 'hsp' )
     {
         eval { require Sim; }
@@ -716,15 +895,18 @@ sub form_blast_command
     $queryF && $dbF && $blast_prog && $prog_ok{ $blast_prog }
         or return wantarray ? () : [];
 
-    my $blastplus = ( ( ! $parms->{ blastall } ) && $parms->{ blastplus } )
-                  ? SeedAware::executable_for( $blast_prog )
-                  : '';
+    my $try_plus = $parms->{ blastplus }
+                || $blast_prog eq 'psiblast'
+                || $blast_prog eq 'rpsblast';
+    my $blastplus = $try_plus ? SeedAware::executable_for( $blast_prog ) : '';
     # FIXME: rpsblast will be installed on SEED machines
-    $blastplus = '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast' if $blast_prog eq 'rpsblast';
+    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast' if $blast_prog eq 'rpsblast';
+    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast' if $blast_prog eq 'psiblast';
 
-    my $blastall  = ! $blastplus
-                  ? SeedAware::executable_for( 'blastall' )
-                  : '';
+    my $try_all = ! $blastplus
+               && $blast_prog ne 'psiblast'
+               && $blast_prog ne 'rpsblast';
+    my $blastall = $try_all ? SeedAware::executable_for( 'blastall' ) : '';
 
     $blastplus || $blastall
         or return wantarray ? () : [];
@@ -745,7 +927,7 @@ sub form_blast_command
     my $filteringDB      = $parms->{ filteringDB }      || $parms->{ filtering_db };
 
     my $maxE             = $parms->{ maxE }             || $parms->{ evalue }           || 0.01;
-    my $percentIdentity  = $parms->{ percIdentity }     || $parms->{ perc_identity };
+    my $percentIdentity  = $parms->{ percIdentity }     || $parms->{ perc_identity }    || 0;
     my $maxHSP           = $parms->{ maxHSP }           || $parms->{ numAlignments }    || $parms->{ num_alignments };
     my $dbLen            = $parms->{ dbLen }            || $parms->{ dbSize }           || $parms->{ dbsize };
     my $searchSp         = $parms->{ searchSp }         || $parms->{ searchsp };
@@ -821,6 +1003,11 @@ sub form_blast_command
         push @cmd, -t => $maxIntronLength         if $maxIntronLength;
 
         push @cmd, -I => $showGIs    ? 'T' : 'F'  if defined $showGIs;
+
+        #  blastall does not have a percent identity option, so we must set the
+        #  filter.
+
+        $parms->{minIden} ||= 0.01 * $percentIdentity if $blast_prog eq 'blastn';
     }
     else
     {

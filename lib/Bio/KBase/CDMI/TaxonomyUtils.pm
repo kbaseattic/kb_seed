@@ -257,14 +257,13 @@ sub ReadTaxonomies {
     }
 }
 
-=head3 AssignTaxonomy
+=head3 ComputeTaxonomy
 
-	my $confidence = Bio::KBase::CDMI::TaxonomyUtils::AssignTaxonomy($cdmi, $kbID, $name, $taxID);
+	my ($conf, $newTaxID) = Bio::KBase::CDMI::TaxonomyUtils::ComputeTaxonomy($cdmi, $kbID, $name, $taxID);
 
-Assign a taxonomy ID to the specified genome. The genome's name and an optional taxonomy ID are
+Compute a taxonomy ID for the specified genome. The genome's name and an optional taxonomy ID are
 specified. If the taxonomy ID is specified, it is used automatically. Otherwise, an attempt is made
-to match the name to one of the taxonomic aliases. The result will be stored in the B<IsTaxonomyOf>
-table.
+to match the name to one of the taxonomic aliases.
 
 =over 4
 
@@ -286,17 +285,18 @@ Taxonomic ID of the target genome.
 
 =item RETURN
 
-Returns the confidence level of the assignment made, or C<undef> if no assignment was made.
+Returns a two-element list containing the confidence level of the assignment made
+(or C<undef> if no assignment was made), and the new taxonomy ID.
 
 =back
 
 =cut
 
-sub AssignTaxonomy {
+sub ComputeTaxonomy {
 	# Get the parameters.
 	my ($cdmi, $kbID, $name, $taxID) = @_;
 	# We will store the confidence here.
-	my $retVal;
+	my $conf;
 	# This will contain the new taxonomy ID.
 	my $assignedTaxID;
 	# Start by checking for an exact match in the alias table.
@@ -308,13 +308,13 @@ sub AssignTaxonomy {
 		# Determine our confidence in the match.
 		if ($foundName eq $name) {
 			$assignedTaxID = $newTaxID;
-			$retVal = 5;
+			$conf = 5;
 		} elsif (defined $taxID && $taxID eq $newTaxID) {
 			$assignedTaxID = $newTaxID;
-			$retVal = 4;
+			$conf = 4;
 		} else {
 			$assignedTaxID = $newTaxID;
-			$retVal = 2;
+			$conf = 2;
 		}
 	} else {
 		if (defined $taxID) {
@@ -327,36 +327,32 @@ sub AssignTaxonomy {
 				if (! $child) {
 					# It is. Go for it.
 					$assignedTaxID = $taxID;
-					$retVal = 3;
+					$conf = 3;
 				}
 			}
 		}
 		# Check to see if we have an assignment.
-		if (! defined $retVal) {
+		if (! defined $conf) {
 			# No. We have to guess.
 			my @words = split /\s+/, $name;
 			# Try looking for a substring match.
-			while (! defined $retVal && scalar(@words) >= 2) {
+			while (! defined $conf && scalar(@words) >= 2) {
 				my $guessName = join(" ", @words);
 				my ($newTaxID) = $cdmi->GetFlat('TaxonomicGrouping', 'TaxonomicGrouping(alias) = ?', [$guessName],
 					'id');
 				if ($newTaxID) {
 					# Match found. Keep it.
 					$assignedTaxID = $newTaxID;
-					$retVal = 0;
+					$conf = 0;
 				} else {
 					# No match, so shorten the string.
 					pop @words;
 				}
 			}
-		}
+		}	
 	}
-	# If we have an assignment, store it.
-	if ($assignedTaxID) {
-		$cdmi->InsertObject('IsTaxonomyOf', from_link => $assignedTaxID, to_link => $kbID, confidence => $retVal);
-	}
-	# Return the confidence.
-	return $retVal;
+	# Return the confidence and the assignment.
+	return ($conf, $assignedTaxID);
 }
 
 

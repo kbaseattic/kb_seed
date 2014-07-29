@@ -975,6 +975,7 @@ sub ProcessFeatureBatch {
         $stats->Add(featureLocations => scalar @locs);
         # The feature length will be computed in here.
         my $len = 0;
+        my $numLocs = scalar(@locs);
         # Recover from bad locations.
         eval {
             # Compute the total feature length.
@@ -1029,31 +1030,8 @@ sub ProcessFeatureBatch {
             $stats->Add(featureContigError => 1);
         } elsif (! $validate) {
             # If we are loading for real, we need to create the feature's
-            # location segments. This variable counts the segments created.
-            my $locIndex = 0;
-            # Loop through the sub-locations.
-            for my $loc (@locs) {
-                # Compute this location's contig.
-                my $contigKBID = $loc->Contig;
-                if (defined $contigMap) {
-                	$contigKBID = $contigMap->{$contigKBID};
-                }
-                # Divide the location into segments.
-                while (my $segment = $loc->Peel($segmentLength)) {
-                    # Output this segment.
-                    $loader->InsertObject('IsLocatedIn', from_link => $fidKBID,
-                            to_link => $contigKBID, begin => $segment->Left,
-                            dir => $segment->Dir, 'len' => $segmentLength,
-                            ordinal => $locIndex++);
-                    $stats->Add(locSegments => 1);
-                }
-                # Output the residual part of the location.
-                $loader->InsertObject('IsLocatedIn', from_link => $fidKBID,
-                        to_link => $contigKBID, begin => $loc->Left,
-                        dir => $loc->Dir, 'len' => $loc->Length,
-                        ordinal => $locIndex++);
-                $stats->Add(locSegments => 1);
-            }
+            # location segments.
+            CreateLocations($loader, $contigMap, $segmentLength, $fidKBID, \@locs);
         }
         # Finally, we associate the feature with its roles.
         my ($roles, $errors) = SeedUtils::roles_for_loading($function);
@@ -1078,6 +1056,68 @@ sub ProcessFeatureBatch {
     }
 }
 
+=head3 CreateLocations
+
+	Bio::KBase::CDMI::GenomeUtils::CreateLocations($loader, \%contigMap, $segmentLength, $fidKBID, \@locs);
+
+Create the C<IsLocatedIn> records for a feature based on the specified list of 
+L<BasicLocation> objects.
+	
+=over 4
+
+=item loader
+
+L<Bio::KBase::CDMI::CDMILoader> object for accessing the database.
+
+=item contigMap
+
+Reference to a hash mapping source contig IDs to KBase contig IDs.
+
+=item segmentLength
+
+Maximum length of the location chunk that can be stored. Larger sequences will be split to this size.
+
+=item fidKBID
+
+KBase feature ID for the feature whose location information is being processed.
+
+=item locs
+
+Reference to a list of L<BasicLocation> objects representing the feature DNA location.
+	
+=cut
+
+sub CreateLocations {
+	# Get the parameters.
+	my ($loader, $contigMap, $segmentLength, $fidKBID, $locs) = @_;
+	# Get the statistics object.
+	my $stats = $loader->stats;
+    # This variable counts the segments created.
+    my $locIndex = 0;
+    # Loop through the sub-locations.
+    for my $loc (@$locs) {
+        # Compute this location's contig.
+        my $contigKBID = $loc->Contig;
+        if (defined $contigMap) {
+           	$contigKBID = $contigMap->{$contigKBID};
+        }
+        # Divide the location into segments.
+        while (my $segment = $loc->Peel($segmentLength)) {
+            # Output this segment.
+            $loader->InsertObject('IsLocatedIn', from_link => $fidKBID,
+                     to_link => $contigKBID, begin => $segment->Left,
+                     dir => $segment->Dir, 'len' => $segmentLength,
+                     ordinal => $locIndex++);
+            $stats->Add(locSegments => 1);
+        }
+        # Output the residual part of the location.
+        $loader->InsertObject('IsLocatedIn', from_link => $fidKBID,
+                 to_link => $contigKBID, begin => $loc->Left,
+                 dir => $loc->Dir, 'len' => $loc->Length,
+                 ordinal => $locIndex++);
+        $stats->Add(locSegments => 1);
+    }
+}
 =head3 LoadProteins
 
     LoadProteins($loader, $id_mapping, $proteinFastaFile, $validate);
@@ -1268,40 +1308,25 @@ sub CreateGenome {
         $cdmi->InsertObject('IsTaxonomyOf', from_link => $taxID,
                 to_link => $genomeID);
         $stats->Add(genomeHasTaxon => 1);
-        # Now we need to compute the domain. We do a looping climb up
-        # the taxonomy tree.
-        my $currentTaxID = $taxID;
-        while ($currentTaxID && ! $domain) {
-            my ($taxTuple) = $cdmi->GetAll('IsInGroup TaxonomicGrouping',
-                    "IsInGroup(from_link) = ?", [$currentTaxID],
-                    "TaxonomicGrouping(id) TaxonomicGrouping(domain) TaxonomicGrouping(scientific_name)");
-            if (! $taxTuple) {
-                # We've run off the end, so we stop the loop without a
-                # domain.
-                undef $currentTaxID;
-            } else {
-                # Get the data about this group.
-                my ($nextTaxID, $domainFlag, $nextTaxName) = @$taxTuple;
-                if ($domainFlag) {
-                    # Here we've found a domain group, so save its name.
-                    $domain = $nextTaxName;
-                    # Decide if it's prokaryotic.
-                    if ($nextTaxID == 2 || $nextTaxID == 2157) {
-                        $prokaryotic = 1;
-                    }
-                } else {
-                     # Here we have to keep looking.
-                     $currentTaxID = $nextTaxID;
-                }
-            }
-        }
+        ($domain, $prokaryotic) = ComputeDomain($cdmi, $taxID);
     }
     # Connect the genome to its submitting source.
     $cdmi->InsertObject('Submitted', from_link => $source, to_link => $genomeID);
     $loader->InsureEntity(Source => $source);
     # Get the attributes.
-    my $geneticCode = $metaHash->{genetic_code} || 11;
+    my $geneticCode = $metaHash->{genetic_code};
     my $complete = $metaHash->{complete} || 1;
+    # Fix the genetic code if it was not found.
+    if (! $geneticCode) {
+    	$stats->Add(geneticCodeNotFound => 1);
+    	if ($domain eq 'Eukaryota') {
+    		$geneticCode = 1;
+    	} elsif ($scientificName =~ /^(Achole|Meso|Myco|Spiro|Urea)plasma/) {
+    		$geneticCode = 4;
+    	} else {
+    		$geneticCode = 11;
+    	}
+    }
     # Now we create the genome record itself.
     $cdmi->InsertObject('Genome', id => $genomeID, complete => $complete,
             contigs => $contigs, dna_size => $dnaSize, domain => $domain,
@@ -1311,6 +1336,69 @@ sub CreateGenome {
             source_id => $genomeOriginalID);
     $stats->Add(genomesAdded => 1);
     print "Genome $genomeID created.\n";
+}
+
+=head3 ComputeDomain
+
+	my ($domain, $prokaryotic) = Bio::KBase::CDMI::GenomeUtils::ComputeDomain($cdmi, $taxID);
+	
+Compute the domain associated with a specified taxonomicID. The domain name will be returned,
+along with a flag indicating whether or not it is prokaryotic.
+
+=over 4
+
+=item cdmi
+
+The L<Bio::KBase::KBaseCDMI::CDMI> object used to access the databse.
+
+=item taxID
+
+The taxonomic ID of the genome whose domain is desired.
+
+=item RETURN
+
+Returns a two-element list. The first element is the domain name, and the second is C<1> for a
+prokaryotic genome and C<0> otherwise.
+
+=back
+
+=cut
+
+sub ComputeDomain {
+	# Get the parameters.
+	my ($cdmi, $taxID) = @_;
+    # Default the domain to an empty string (unknown).
+    my $domain = "";
+    my $prokaryotic = 0;
+    # Now we need to compute the domain. We do a looping climb up
+    # the taxonomy tree.
+    my $currentTaxID = $taxID;
+    while ($currentTaxID && ! $domain) {
+        my ($taxTuple) = $cdmi->GetAll('IsInGroup TaxonomicGrouping',
+        		"IsInGroup(from_link) = ?", [$currentTaxID],
+                "TaxonomicGrouping(id) TaxonomicGrouping(domain) TaxonomicGrouping(scientific_name)");
+        if (! $taxTuple) {
+            # We've run off the end, so we stop the loop without a
+            # domain.
+            undef $currentTaxID;
+        } else {
+            # Get the data about this group.
+            my ($nextTaxID, $domainFlag, $nextTaxName) = @$taxTuple;
+            if ($domainFlag) {
+                # Here we've found a domain group, so save its name.
+                $domain = $nextTaxName;
+                # Decide if it's prokaryotic.
+                if ($nextTaxID == 2 || $nextTaxID == 2157) {
+                    $prokaryotic = 1;
+                }
+            } else {
+                # Here we have to keep looking.
+                $currentTaxID = $nextTaxID;
+            }
+        }
+    }
+    # Return the computed results.
+    return ($domain, $prokaryotic);
 }
 
 

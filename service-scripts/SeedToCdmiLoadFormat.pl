@@ -20,6 +20,7 @@
 use strict;
 use Tracer;
 use Bio::KBase::CDMI::CDMI;
+use Bio::KBase::CDMI::GenomeUtils;
 use Stats;
 use Time::HiRes;
 use File::Copy;
@@ -142,164 +143,10 @@ genome IDs for the genomes to load in its first column.
             Trace("Genome $genomeID skipped: already created.") if T(2);
             $stats->Add(genomeSkipped => 1);
         } else {
-            CreateDirectory($genomeID, $genomeHash->{$genomeID},
+        	Bio::KBase::CDMI::GenomeUtils::ConvertGenome($stats, $genomeID, $genomeHash->{$genomeID},
                 "$outDirectory/$genomeID");
         }
     }
     # Output the statistics.
     Trace("Processing complete:\n" . $stats->Show()) if T(1);
 
-# This method actually creates the CDMI directory from the SEED
-# directory.
-sub CreateDirectory {
-    # Get the parameters.
-    my ($genomeID, $inDirectory, $outDirectory) = @_;
-    # These will be used for file handles.
-    my ($ih, $oh);
-    # Insure the output directory exists.
-    if (! -d $outDirectory) {
-        mkdir $outDirectory;
-    }
-    Trace("Processing $genomeID from $inDirectory.") if T(2);
-    # Now we must copy the contig FASTA file. The contig IDs have
-    # to have the genome ID put in front.
-    Trace("Copying contigs for $genomeID.") if T(3);
-    $ih = Open(undef, "<$inDirectory/contigs");
-    $oh = Open(undef, ">$outDirectory/contigs.fa");
-    while (! eof $ih) {
-        my $line = <$ih>;
-        if ($line =~ /^>(.+)/) {
-            print $oh ">$genomeID:$1\n";
-        } else {
-            print $oh $line;
-        }
-    }
-    close $ih;
-    close $oh;
-    # This will hold a map of the deleted features.
-    my %deleted;
-    # Open the feature output file.
-    $oh = Open(undef, ">$outDirectory/features.tab");
-    # Loop through the feature types. Each is in a separate directory.
-    my @types = grep { $_ =~ /^[a-zA-Z]+$/ } OpenDir("$inDirectory/Features");
-    for my $fidType (@types) {
-        Trace("Processing $fidType features.") if T(3);
-        $stats->Add(featureType => 1);
-        # Check for deleted features.
-        my $deletedFidFile = "$inDirectory/Features/$fidType/deleted.features";
-        if (-f $deletedFidFile) {
-            $ih = Open(undef, "<$deletedFidFile");
-            while (! eof $ih) {
-                my $line = <$ih>;
-                chomp $line;
-                $deleted{$line} = 1;
-                $stats->Add(deletedFid => 1);
-            }
-            close $ih;
-        }
-        # Now open the tbl file for these features.
-        $ih = Open(undef, "<$inDirectory/Features/$fidType/tbl");
-        # Loop through the features in the file.
-        while (! eof $ih) {
-            my ($fid, $locs) = Tracer::GetLine($ih);
-            # Insure the feature is not deleted.
-            if ($deleted{$fid}) {
-                $stats->Add(deletedInTbl => 1);
-            } else {
-                # Parse the locations.
-                my @locs = split m/\s*,\s*/, $locs;
-                my $convertedLocs = join(",", map { "$genomeID:" . BasicLocation->new($_)->String() } @locs);
-                # Translate the feature type.
-                if ($fidType eq 'peg') {
-                    $fidType = 'CDS';
-                }
-                # Output the feature information.
-                print $oh join("\t", $fid, $fidType, $convertedLocs) . "\n";
-                $stats->Add(outputFromTbl => 1);
-            }
-        }
-    }
-    close $oh;
-    close $ih;
-    # Check for a protein FASTA file.
-    if (-f "$inDirectory/Features/peg/fasta") {
-        # We have one. We must copy it to the protein output file,
-        # keeping on the lookout for deleted features.
-        $ih = Open(undef, "<$inDirectory/Features/peg/fasta");
-        $oh = Open(undef, ">$outDirectory/proteins.fa");
-        Trace("Copying protein FASTA file.") if T(3);
-        # We'll set this to TRUE if we're handling a deleted feature.
-        my $deleting = 0;
-        # Loop through the input.
-        while (! eof $ih) {
-            my $line = <$ih>;
-            $stats->Add(proteinFastaLineIn => 1);
-            if ($line =~ /^>(\S+)/) {
-                # Here we have a header line. Check the feature ID.
-                if ($deleted{$1}) {
-                    # It's deleted. Suppress this section.
-                    $deleting = 1;
-                    $stats->Add(deletedProtein => 1);
-                } else {
-                    $deleting = 0;
-                    $stats->Add(keepingProtein => 1);
-                }
-            }
-            # Output this line if we're not deleting.
-            if (! $deleting) {
-                print $oh $line;
-                $stats->Add(proteinFastaLineOut => 1);
-            } else {
-                $stats->Add(proteinFastaLineSkipped => 1);
-            }
-        }
-        close $oh;
-        close $ih;
-    }
-    # Now we need to output the assignments.
-    Trace("Copying assignments.") if T(3);
-    $ih = Open(undef, "<$inDirectory/assigned_functions");
-    $oh = Open(undef, ">$outDirectory/functions.tab");
-    while (! eof $ih) {
-        # Get this assignment.
-        my ($fid, $assignment) = Tracer::GetLine($ih);
-        $stats->Add(assignmentLineIn => 1);
-        # Is it deleted?
-        if ($deleted{$fid}) {
-            # Yes. Skip it.
-            $stats->Add(assignmentLineSkipped => 1);
-        } else {
-            # No. Write it out.
-            print $oh "$fid\t$assignment\n";
-            $stats->Add(assignmentLineOut => 1);
-        }
-    }
-    close $ih;
-    close $oh;
-    # Finally, we must create the metadata file.
-    $oh = Open(undef, ">$outDirectory/metadata.tbl");
-    Trace("Writing genome attributes.") if T(3);
-    my ($genomeName) = Tracer::GetFile("$inDirectory/GENOME");
-    print $oh "name\n$genomeName\n//\n";
-    if (-f "$inDirectory/COMPLETE") {
-        print $oh "complete\n1\n//\n";
-    } else {
-        print $oh "complete\n0\n//\n";
-    }
-    $stats->Add(attribute => 1);
-    my ($taxonomy) = Tracer::GetFile("$inDirectory/TAXONOMY");
-    print $oh "taxonomy\n$taxonomy\n//\n";
-    $stats->Add(attribute => 1);
-    for my $attribute (qw(PROJECT VERSION TAXONOMY_ID GENETIC_CODE)) {
-        my $fileName = "$inDirectory/$attribute";
-        if (-f $fileName) {
-            my ($value) = Tracer::GetFile($fileName);
-            print $oh lc($attribute) . "\n$value\n//\n";
-            $stats->Add(attribute => 1);
-        } else {
-            $stats->Add(attributeNotFound => 1);
-        }
-    }
-    close $oh;
-    Trace("Genome completed.") if T(3);
- }

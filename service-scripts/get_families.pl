@@ -27,7 +27,7 @@ must be genome IDs.  Thus, it is assumed that
 would be the peg translations for E.coli (assuming that you wished E.coli
 to be one of the genomes from which families get produced).
 
-The files in Seqs.Fast used in constructing the families is determined
+The files in Seqs.Fasta used in constructing the families is determined
 by the contents of STDIN (each input line contains just a genome ID to be included).
 Each included genome must have a corresponding fasta file in Seqs.Fasta.
 
@@ -174,5 +174,6 @@ my $tmpdir = tempdir();
 &SeedUtils::run("get_families_4 -d $dataD -s $seqsD -m $matchN < $tmpdir/bad > $families.bad.fixed");
 &SeedUtils::run("get_families_final -f $families -s $seqsD");
 
-#unlink("tmp.$$.missed","tmp.$$.calls","tmp.$$.bad");
+unlink("$tmpdir/tmp.$$.missed","$tmpdir/tmp.$$.calls","$tmpdir/tmp.$$.bad");
+system("rm", "-r", $tmpdir);
 
