@@ -2555,10 +2555,10 @@
           <Notes>Alignment end on the CDD domain.</Notes>
         </Field>
         <Field name="e-value" type="float">
-          <Notes>The E-value is a parameter that describes the number of hits one can “expect” to see by chance when searching a database of a particular size. Essentially, the E-value describes the random background noise that exists for matches between sequences. </Notes>
+          <Notes>The E-value is a parameter that describes the number of hits one can expect to see by chance when searching a database of a particular size. Essentially, the E-value describes the random background noise that exists for matches between sequences. </Notes>
         </Field>
         <Field name="bit-score" type="float">
-          <Notes>The bit-score is derived from the raw alignment score S in which the statistical properties of the scoring system used have been taken into account. By normalizing a raw score, a “bit score” is attained, which has a standard set of units.  </Notes>
+          <Notes>The bit-score is derived from the raw alignment score S in which the statistical properties of the scoring system used have been taken into account. By normalizing a raw score, a [i]bit score[/i] is attained, which has a standard set of units.  </Notes>
         </Field>
       </Fields>
     </Relationship>

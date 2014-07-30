@@ -564,8 +564,11 @@ sub write_seed_dir
 	close($close_fh);
     }
 
-    open(my $func_fh, ">", "$dir/assigned_functions") or die "Cannot create $dir/assigned_functions: $!";
-    open(my $anno_fh, ">", "$dir/annotations") or die "Cannot create $dir/assigned_functions: $!";
+    my $fn_file = $options->{assigned_functions_file};
+    $fn_file = "assigned_functions" if !$fn_file;
+			      
+    open(my $func_fh, ">", "$dir/$fn_file") or die "Cannot create $dir/fn_file: $!";
+    open(my $anno_fh, ">", "$dir/annotations") or die "Cannot create $dir/annotations: $!";
 
     mkdir("$dir/Features");
     

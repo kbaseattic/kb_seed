@@ -72,7 +72,8 @@ else
     $id_client = IDclient->new($genomeTO);
 }
 
-my $seed_dir = GenomeTypeObject::write_temp_seed_dir($genomeTO);
+$genomeTO = GenomeTypeObject->initialize($genomeTO);
+my $seed_dir = $genomeTO->write_temp_seed_dir({ map_CDS_to_peg => 1 });
 
 #
 # Find our KBase top. In a hacked SEED environment KB_RUNTIME might not be set so find it based on
