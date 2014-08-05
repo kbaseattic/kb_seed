@@ -43,9 +43,13 @@ sub new {
 			$self->{_counters}->{$prefix} = 0;
 		    }
 		}
-		else {
-		    die "Could not parse ID for feature: \'$feature->{id}\'";
-		}
+		#
+		# If we can't parse, we'll just assume that
+		# we'll start with zero.
+		#
+		#else {
+		#    die "Could not parse ID for feature: \'$feature->{id}\'";
+		#}
 	    }
 	}
     }
