@@ -79,7 +79,6 @@ use crispr;
 my $help;
 my $input_file;
 my $output_file;
-my ($temp_dir) = &SeedAware::temporary_directory();
 
 my $id_prefix = 'rast|0';
 my $id_server;
@@ -91,7 +90,6 @@ my $rc = GetOptions(
 		     'id-server=s' => \$id_server,
                      'input=s'      => \$input_file,
                      'output=s'     => \$output_file,
-                     'tmpdir=s'     => \$temp_dir,
                    );
 
 

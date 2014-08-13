@@ -249,6 +249,8 @@ sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 #    msa_master_id     => ID of the sequence in in MSA for psiblast to use as a master
 #    msa_master_idx    => 1-based index of the sequence in MSA for psiblast to use as a master
 #
+#    min_sim_id        => [ min_sim_fract, @IDs ]   # eliminate divergent sequences (D = undef)
+#
 #-------------------------------------------------------------------------------
 
 my $n_pssm = 0;
@@ -273,7 +275,8 @@ sub alignment_to_pssm
 
     my @args = ( -in_msa   => $alignF,
                  -subject  => $subjectF,
-                 -out_pssm => $pssmF
+                 -out_pssm => $pssmF,
+                 "-ignore_msa_master"
                );
 
     my $rc = SeedAware::system_with_redirect( $prog, @args, { stdout => '/dev/null', stderr => '/dev/null' } );
