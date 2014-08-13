@@ -186,6 +186,12 @@ package gjoseqlib;
 #
 #  @sims = oligomer_similarity( $seq1, $seq2, \%opts )
 #
+#  Verify the structure of an [ id, desc, sequence ] triple and 
+#  the structure of an array of sequence triples:
+#
+#  $bool = is_sequence_triple( $triple )
+#  $bool = is_array_of_sequence_triples( \@triples )
+#
 #===============================================================================
 
 use strict;
@@ -2647,5 +2653,25 @@ sub oligomer_similarity
         } ( $min .. $max );
 }
 
+
+#-------------------------------------------------------------------------------
+#  Verify the structure of an [ id, desc, sequence ] triple and 
+#  the structure of an array of sequence triples
+#
+#     $bool = is_sequence_triple( $triple )
+#     $bool = is_array_of_sequence_triples( \@triples )
+#
+#-------------------------------------------------------------------------------
+sub is_sequence_triple
+{
+    local $_ = $_[0];
+    $_ && ref( $_ eq 'ARRAY' ) && ( @$_ == 3 ) && defined( $_->[0] ) && defined( $_->[2] );
+}
+
+sub is_array_of_sequence_triples
+{
+    local $_ = $_[0];
+    $_ && ref( $_ eq 'ARRAY' ) && @$_ == grep { is_sequence_triple( $_ ) } @$_;
+}
 
 1;

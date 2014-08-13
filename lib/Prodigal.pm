@@ -48,7 +48,7 @@ sub run_prodigal
     #
     # Create temporary directory and FASTA for the contig data.
     #
-    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tmpdir}) : ();
+    my @tmpdir = defined($params->{-tmpdir}) ? (DIR => $params->{-tmpdir}) : (TMPDIR => 1);
     my $tmp_dir = tempdir('tmpdir_prodigal_XXXXXXXX', @tmpdir);
 
     print STDERR "contig=$tmp_dir\n" if $ENV{DEBUG};
@@ -176,15 +176,16 @@ sub run_prodigal
 	    warn "Could not parse calls for \"$sco_file\" line: $line\n";
 	}
     }
+    close($fh_sco);
 #   die Dumper($encoded_tbl);
     
 #...Cleanup...
     unless ($ENV{DEBUG}) {
 	my $err;
 	rmtree($tmp_dir, { error => \$err});
-	if ($err)
+	if (ref($err) && @$err)
 	{
-	    warn "Error during rmtree $tmp_dir: $err";
+	    warn "Error during rmtree $tmp_dir: " . Dumper($err);
 	}
     }
     

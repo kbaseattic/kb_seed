@@ -73,6 +73,12 @@ Build kmers from a directory, in which each subdirectory is a RAST genome direct
 =back
 
 =head2 Output Format
+The output depends on whether you have dna or aa.  For
+
+ kmer_search -d Data -a < input.fasta > 4-column.table [id,function,hits,weighted-sc]
+
+----------------
+If DNA and genomes are used, the following might apply (I need to recheck things)
 
 The output is separated into two parts: first we have estimates of OTU 
 for each contig.  You get lines like

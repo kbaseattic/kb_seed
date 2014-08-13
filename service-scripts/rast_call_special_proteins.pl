@@ -85,7 +85,8 @@ use GenomeTypeObject;
 my $help;
 my $input_file;
 my $output_file;
-my ($temp_dir) = &SeedAware::temporary_directory();
+my $temp_dir;
+my $remove_temp;
 
 my $seleno;
 my $pyrro;
@@ -120,6 +121,12 @@ if (!$rc || $help || @ARGV != 0) {
 	print $_;
     }
     exit($help ? 0 : 1);
+}
+
+if (!$temp_dir)
+{
+    $temp_dir = &SeedAware::temporary_directory();
+    $remove_temp = 1;
 }
 
 my $in_fh;
@@ -222,5 +229,9 @@ foreach my $entry (@results) {
 $json->pretty(1);
 print $out_fh $json->encode($genomeTO);
 close($out_fh);
+if ($remove_temp)
+{
+    system("rm", "-rf", $temp_dir);
+}
 
 __DATA__

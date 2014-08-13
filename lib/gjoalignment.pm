@@ -1446,6 +1446,73 @@ sub remove
 
 
 #===============================================================================
+#  Extract a representative set from an alignment
+#
+#    \@alignment = representative_alignment( \@alignment, \%options );
+#
+#  Options:
+#
+#     max_sim  => fract_ident   # maximum identity of retained sequenced (D = 0.8)
+#
+#===============================================================================
+
+sub representative_alignment
+{
+    my ($align, $opts) = @_;
+
+    return undef unless $align && ref($align) eq 'ARRAY';
+    $opts = {} unless $opts && ref($opts) eq 'HASH';
+
+    my $max_id = $opts->{ max_sim } || 0.8;
+
+    #  Original order
+    my $n = 0;
+    my %order = map { $_->[0] => ++$n } @$align;
+    
+    #  Gap score (big is bad)
+    my %g_scr = map { my ($gb) = $_->[2] =~ /^(-*)/;
+                      my ($ge) = $_->[2] =~ /(-*)$/;
+                      my $gall = $_->[2] =~ tr/-//;
+                      ( $_->[0] => 4*length($gb.$ge) + $gall );
+                  }
+        @$align;
+    
+    my @input = sort { $g_scr{ $a->[0] } <=> $g_scr{ $b->[0] } } @$align;
+    
+    my $ext_id = $max_id ** 0.8;
+    #
+    #  If the greatest identity is <= keep, then it is a new representative.
+    #  If the greatest identity is <= iffy, then it is an extra
+    #  representative of an existing group
+    #
+    #   0                      max   ext     1
+    #   |-----------------------|-----|------|   identity
+    #   |         new rep       | new |ignore|
+    #   |                       |extra|      |
+    #
+    my ( @reps, @extras );
+    foreach my $try ( @input )
+    {
+        my $status = 0;
+        foreach ( @reps, @extras )
+        {
+            #  ( $nmat, $nid, ... ) = gjoseqlib::interpret_aa_align( $seq1, $seq2 )
+            my ( $nmat, $nid ) = gjoseqlib::interpret_aa_align( $try->[2], $_->[2] );
+            if ( $nid > $nmat * $ext_id ) { $status = 2; last } # too similar for extra
+            if ( $nid > $nmat * $max_id ) { $status = 1 }       # too similar for rep
+        }
+        if    ( $status == 0 ) { push @reps,   $try }
+        elsif ( $status == 1 ) { push @extras, $try }
+    }
+    
+    @$align = sort { $order{ $a->[0] } <=> $order{ $b->[0] } }
+              gjoseqlib::pack_alignment( \@reps );
+    
+    wantarray ? @$align : $align;
+}
+
+
+#===============================================================================
 #  Do a bootstrap sample of columns from an alignment:
 #
 #    \@alignment = bootstrap_sample( \@alignment );

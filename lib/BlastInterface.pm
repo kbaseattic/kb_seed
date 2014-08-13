@@ -24,6 +24,7 @@ use Data::Dumper;
 
 use strict;
 use SeedAware;
+use gjoalignment;
 use gjoseqlib;
 use gjoparseblast;
 
@@ -222,8 +223,8 @@ sub    blastn { &blast( $_[0], $_[1],    'blastn', $_[2] ) }
 sub    blastp { &blast( $_[0], $_[1],    'blastp', $_[2] ) }
 sub    blastx { &blast( $_[0], $_[1],    'blastx', $_[2] ) }
 sub   tblastn { &blast( $_[0], $_[1],   'tblastn', $_[2] ) }
-sub psiblast  { &blast( $_[0], $_[1], 'psiblast',  $_[2] ) }
-sub rpsblast  { &blast( $_[0], $_[1], 'rpsblast',  $_[2] ) }
+sub psiblast  { &blast( $_[0], $_[1],  'psiblast', $_[2] ) }
+sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 
 
 #-------------------------------------------------------------------------------
@@ -236,29 +237,39 @@ sub rpsblast  { &blast( $_[0], $_[1], 'rpsblast',  $_[2] ) }
 #
 #  Options:
 #
-#    title    => title to be set in the output PSSM 
-#    out_pssm => output PSSM filename or handle (D = stdout)
-#    outPSSM  => output PSSM filename or handle (D = stdout)
+#    title             => title to be set in the output PSSM 
+#    max_sim           => maximum identity of sequences in profile (D = undef)
+#    out_pssm          => output PSSM filename or handle (D = stdout)
+#    outPSSM           => output PSSM filename or handle (D = stdout)
+#
+#    TODO: support these options
+#
+#    ignore_msa_master => ignore the master sequence when psiblast creates PSSM (D = 0)
+#    ignoreMaster      => ignore the master sequence when psiblast creates PSSM (D = 0)
+#    msa_master_id     => ID of the sequence in in MSA for psiblast to use as a master
+#    msa_master_idx    => 1-based index of the sequence in MSA for psiblast to use as a master
 #
 #-------------------------------------------------------------------------------
+
+my $n_pssm = 0;
+
 sub alignment_to_pssm
 {
     my ( $align, $parms ) = @_;
 
-    my $title = $parms->{ title };
+    my $title = $parms->{ title } || ( 'untitled_' . ++$n_pssm );
     my( $tempD, $save_temp ) = SeedAware::temporary_directory($parms);
-    $parms->{tmp_dir}        = $tempD;
 
     my $alignF   = valid_fasta( $align, "$tempD/align" );
     my @align    = gjoseqlib::read_fasta( $alignF );
+    @align       = gjoalignment::representative_alignment( \@align, $parms ) if $parms->{ max_sim };
     my $subject  = gjoseqlib::pack_sequences( [ $align[0] ] );
     my $subjectF = "$tempD/subject";
     my $pssmF    = "$tempD/pssm";
     gjoseqlib::write_fasta( $subjectF, $subject );
     
-    # FIXME: psiblast will be installed on SEED machines
-    # my $prog = SeedAware::executable_for( 'psiblast' );
-    my $prog = '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast';
+    my $prog = SeedAware::executable_for( 'psiblast' );
+    $prog ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast';
 
     my @args = ( -in_msa   => $alignF,
                  -subject  => $subjectF,
@@ -278,30 +289,202 @@ sub alignment_to_pssm
     open( PSSM, "<$pssmF" ) or die "Could not open $pssmF";
     while ( <PSSM> )
     {
-        if ( $title )
-        {
-            s/local id 1/local id $title/;
-            if ( /inst {/ )
-            {
-                print $fh "      descr {\n";
-                print $fh "        title \"$title\"\n";
-                print $fh "      },\n";
-            }            
-        }
-        $skip = 1 if /intermediateData {/;
-        $skip = 0 if /finalData {/;
+        # s/local id 1/local id $title/; # only numerical ids are supported; this is no longer needed
+        if ( /inst \{/ ) {
+            print $fh "      descr {\n";
+            print $fh "        title \"$title\"\n";
+            print $fh "      },\n";
+        }            
+        $skip = 1 if /intermediateData \{/;
+        $skip = 0 if /finalData \{/;
         print $fh $_ unless $skip;
     }
-    close(PSSM);
+    close( PSSM );
     close $fh if $close;
 
     if ( ! $save_temp )
     {
-        delete $parms->{tmp_dir};
-        system( "rm", "-r", $tempD );
+        system( "rm", "-rf", $tempD );
     }
+
+    return 1;
 }
 
+
+#-------------------------------------------------------------------------------
+#  Build an RPS database from a list of alignments and/or alignment files
+#
+#      $db_file = build_rps_db( \@aligns, \%options )
+#
+#  The first argument supplies the list of alignments and/or alignment files. 
+#
+#  Three forms of alignments are supported:
+#
+#       [ [ 'alignment-id', 'optional title', [ @seqs1 ] ], ... ]
+#       [ [ 'alignment-id', 'optional title', 'align1.fa' ], ... ];
+#       [ 'align1.pssm', ... ];
+#
+# 
+#  Options:
+# 
+#      
+#
+#-------------------------------------------------------------------------------
+
+sub build_rps_db
+{
+    my ( $aligns, $db, $opts ) = @_;
+    
+    return '' unless $aligns && ref( $aligns ) eq 'ARRAY' && @$aligns;
+    return '' unless defined( $db ) && ! ref( $db ) && $db ne '';
+    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
+
+    my @pssms;
+    my %title_to_pssm;
+    foreach ( @$aligns )
+    {
+        my $pssm = verify_pssm( $_ , \%title_to_pssm, $opts )
+            or next;
+        
+        push @pssms, $pssm;
+    }
+    @pssms
+        or warn "BlastInterface::build_rps_db: no valid pssm found.\n"
+            and return '';
+
+    open( DB, ">", $db ) or die "Could not open '$db'.\n";
+    print DB map { $_ . "\n" } @pssms;
+    close( DB );
+
+    # makeprofiledb (v2.2.29+) works but only supports numerical subject IDs (v2.2.27+ does not work).
+    # the subject IDs need to be provided in the id field
+
+    # my $prog_name = 'makeprofiledb';
+    # my @args = ( -in => $db );
+
+    # formatrpsdb (v2.2.26) supports text subject IDs given in the title "subject_id" field
+    my $prog_name = 'formatrpsdb';
+    my @args = ( -i => $db );
+
+    my $prog = SeedAware::executable_for( $prog_name );
+
+    if ( ! $prog )
+    {
+        warn "BlastInterface::build_rps_db: $prog_name program not found.\n";
+        return '';
+    }
+    
+    my $rc = SeedAware::system_with_redirect( $prog, @args );
+    if ( $rc != 0 )
+    {
+        my $cmd = join( ' ', $prog, @args );
+        warn "BlastInterface::build_rps_db: $prog_name failed with rc = $rc: $cmd\n";
+        return '';
+    }
+    
+    return $db;
+}
+
+sub verify_pssm
+{
+    my ( $align, $title_to_pssm, $opts ) = @_;
+
+    $align
+        or warn "BlastInterface::verify_pssm: invalid alignment"
+            and return undef;
+
+    $title_to_pssm && ref($title_to_pssm) eq 'HASH'
+        or warn "BlastInterface::verify_pssm: invalid title hash"
+            and return undef;
+
+    $opts = {} unless $opts && ref($opts) eq 'HASH';
+
+    my $title;
+    my $pssm;
+
+    if ( ! ref( $align ) )
+    {
+        $title = pssm_title( $align );
+        
+        if ( ! ( defined $title && length( $title ) ) )
+        {
+            $align ||= 'undefined';
+            warn "BlastInterface::verify_pssm: failed for alignment '$align'."
+                and return undef;
+        }
+
+        $pssm = $align;
+    }
+    elsif ( ref( $align ) eq 'ARRAY' && @$align == 3 )
+    {
+        my ( $id, $desc, $data ) = @$align;
+        defined( $id ) && length( $id ) && $data
+            or warn "BlastInterface::verify_pssm: invalid alignment definition"
+                and return undef;
+
+        $title = $id;
+        $title .= " $desc" if $desc;
+        $title =~ s/\s+/_/g;    # rpsblast+ only returns the first word in outfmt 6
+
+        if ( gjoseqlib::is_array_of_sequence_triples( $data )
+             || ( ! ref( $data ) && -s $data )
+           )
+        {
+            my ( $fh, $path_name ) = SeedAware::open_tmp_file( "verify_pssm", "pssm" );
+            
+            my %parms = %$opts;
+            $parms{ title } = $title;
+            $parms{ out_pssm } = $fh;
+
+            alignment_to_pssm( $data, \%parms );
+
+            $pssm = $path_name;
+        }
+        else 
+        {
+            warn "BlastInterface::verify_pssm: invalid alignment definition data"
+                and return undef;
+        }
+    
+    }
+    else
+    {    
+        warn "BlastInterface::verify_pssm: invalid alignment structure"
+            and return undef;
+    }
+
+    # check if title is seen before
+    if ( $title_to_pssm->{ $title } )
+    {
+        warn "BlastInterface::verify_pssm: duplicated title '$title' in '$pssm'"
+            and return undef;
+    }
+
+    $title_to_pssm->{ $title } = $pssm;
+
+    return $pssm;
+}
+
+sub pssm_title
+{
+    my ( $pssm, $opts ) = @_;
+    my $title;
+
+    if ( $pssm && -s $pssm && open( PSSM, '<', $pssm ) )
+    {
+        while ( <PSSM> )
+        {
+            if (/\btitle\s+"(.*)"/)
+            {
+                $title = $1;
+                last;
+            }
+        }
+        close( PSSM );
+    }
+
+    return $title;
+}
 
 #-------------------------------------------------------------------------------
 #  Do psiblast against tranlated genomic DNA. Most of this can be done by
@@ -891,17 +1074,20 @@ sub form_blast_command
     my( $queryF, $dbF, $blast_prog, $parms ) = @_;
     $parms ||= {};
 
-    my %prog_ok = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx psiblast rpsblast );
+    my %prog_ok = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx psiblast rpsblast);
     $queryF && $dbF && $blast_prog && $prog_ok{ $blast_prog }
         or return wantarray ? () : [];
 
     my $try_plus = $parms->{ blastplus }
                 || $blast_prog eq 'psiblast'
                 || $blast_prog eq 'rpsblast';
-    my $blastplus = $try_plus ? SeedAware::executable_for( $blast_prog ) : '';
-    # FIXME: rpsblast will be installed on SEED machines
-    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast' if $blast_prog eq 'rpsblast';
-    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast' if $blast_prog eq 'psiblast';
+
+    my $blastplus = ! $try_plus ? ''
+                  : $blast_prog eq 'rpsblast' ? SeedAware::executable_for( 'rpsblast+' ) 
+                                              : SeedAware::executable_for( $blast_prog );
+
+    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast+' if $blast_prog eq 'rpsblast';
+    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast'  if $blast_prog eq 'psiblast';
 
     my $try_all = ! $blastplus
                && $blast_prog ne 'psiblast'

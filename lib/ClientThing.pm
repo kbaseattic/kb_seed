@@ -28,7 +28,7 @@ package ClientThing;
     use POSIX;
     use HTTP::Message;
 
-    use constant AGENT_NAME => "myRAST version 1.102";
+    use constant AGENT_NAME => "myRAST version 1.103";
 
 =head1 Base Class for Server Helper Objects
 
@@ -373,6 +373,9 @@ sub ComputeURL {
             $retVal = "http://pubseed.theseed.org/$name/server.cgi";
         } elsif ($envParm eq 'PUBSEED_TEST') {
             $retVal = "http://pubseed.theseed.org/saptest/$name/server.cgi";
+        } elsif ($envParm eq 'CORE') {
+        	my $lcName = lc $name;
+        	$retVal = "http://core.theseed.org/FIG/$cgi";        	
         } elsif ($envParm eq 'localhost') {
             $retVal = 'localhost';
         } else {
