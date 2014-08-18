@@ -501,6 +501,28 @@ sub extract_contig_sequences_to_temp_file
     return $fn;
 }
 
+sub compute_contigs_gc
+{
+    my($self) = @_;
+
+    my %gc;
+    my $gc = 0;
+    my $at = 0;
+    for my $ctg (@{$self->{contigs}})
+    {
+	my $this_gc = ($ctg->{dna} =~ tr/gcGC//);
+	my $this_at = ($ctg->{dna} =~ tr/atAT//);
+	my $div = $this_gc + $this_at;
+	$gc{$ctg->{id}} = 100 * $this_gc / $div if $div;
+	$gc += $this_gc;
+	$at += $this_at;
+    }
+
+    my $div = $gc + $at;
+    my $all_gc = 100 * $gc / $div if $div;
+    return($all_gc, \%gc);
+}
+
 sub write_temp_seed_dir
 {
     my($self, $options) = @_;
