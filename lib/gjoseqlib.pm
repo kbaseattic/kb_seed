@@ -2665,13 +2665,13 @@ sub oligomer_similarity
 sub is_sequence_triple
 {
     local $_ = $_[0];
-    $_ && ref( $_ eq 'ARRAY' ) && ( @$_ == 3 ) && defined( $_->[0] ) && defined( $_->[2] );
+    $_ && ref( $_ ) eq 'ARRAY' && ( @$_ == 3 ) && defined( $_->[0] ) && defined( $_->[2] );
 }
 
 sub is_array_of_sequence_triples
 {
     local $_ = $_[0];
-    $_ && ref( $_ eq 'ARRAY' ) && @$_ == grep { is_sequence_triple( $_ ) } @$_;
+    $_ && ref( $_ ) eq 'ARRAY' && @$_ == grep { is_sequence_triple( $_ ) } @$_;
 }
 
 1;

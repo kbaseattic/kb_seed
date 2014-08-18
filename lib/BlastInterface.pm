@@ -237,62 +237,185 @@ sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 #
 #  Options:
 #
-#    title             => title to be set in the output PSSM 
-#    max_sim           => maximum identity of sequences in profile (D = undef)
-#    out_pssm          => output PSSM filename or handle (D = stdout)
-#    outPSSM           => output PSSM filename or handle (D = stdout)
-#
-#    TODO: support these options
-#
 #    ignore_msa_master => ignore the master sequence when psiblast creates PSSM (D = 0)
 #    ignoreMaster      => ignore the master sequence when psiblast creates PSSM (D = 0)
+#    max_sim           => maximum identity of sequences in profile (D = undef)
+#    min_sim           => [ min_fract_ident, @IDs ]   # eliminate divergent sequences (D = undef)
 #    msa_master_id     => ID of the sequence in in MSA for psiblast to use as a master
 #    msa_master_idx    => 1-based index of the sequence in MSA for psiblast to use as a master
-#
-#    min_sim_id        => [ min_sim_fract, @IDs ]   # eliminate divergent sequences (D = undef)
+#    out_pssm          => output PSSM filename or handle (D = stdout)
+#    outPSSM           => output PSSM filename or handle (D = stdout)
+#    pseudo_master     => create a consensus master sequence with all columns in alignment
+#    pseudoMaster      => create a consensus master sequence with all columns in alignment
+#    title             => title to be set in the output PSSM 
 #
 #-------------------------------------------------------------------------------
 
 my $n_pssm = 0;
-
 sub alignment_to_pssm
 {
-    my ( $align, $parms ) = @_;
+    my ( $align, $opts ) = @_;
+    $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
 
-    my $title = $parms->{ title } || ( 'untitled_' . ++$n_pssm );
-    my( $tempD, $save_temp ) = SeedAware::temporary_directory($parms);
+    my $ignore_master  = $opts->{ ignore_msa_master } || $opts->{ ignoreMaster };
+    my $pseudo_master  = $opts->{ pseudo_master } || $opts->{ pseudoMaster };
+    my $msa_master_id  = $opts->{ msa_master_id };
+    my $msa_master_idx = $opts->{ msa_master_idx } || 0;
+    my $max_sim        = $opts->{ max_sim };
+    my $min_opt        = $opts->{ min_sim };
 
-    my $alignF   = valid_fasta( $align, "$tempD/align" );
-    my @align    = gjoseqlib::read_fasta( $alignF );
-    @align       = gjoalignment::representative_alignment( \@align, $parms ) if $parms->{ max_sim };
-    my $subject  = gjoseqlib::pack_sequences( [ $align[0] ] );
-    my $subjectF = "$tempD/subject";
-    my $pssmF    = "$tempD/pssm";
-    gjoseqlib::write_fasta( $subjectF, $subject );
+    my ( $min_sim, @ref_ids );
+    if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
+    {
+        ( $min_sim, @ref_ids ) = @$min_opt;
+    }
+
+    my $fh;
+    my $write_file;
+    my ( $alignF, $subjectF, $pssm0F );
+
+    my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
+
+    if ( $is_array || $msa_master_id || $max_sim || $min_sim || $pseudo_master )
+    {
+        my @align;
+
+        if ( $is_array )
+        {
+            @align = @$align;
+            $write_file = 1;
+        }
+        elsif ( $align && ! ref( $align ) && -s $align )
+        {
+            @align = gjoseqlib::read_fasta( $align );
+            $alignF = $align;
+        }
+        elsif ( $align && ref( $align ) eq 'GLOB' )
+        {
+            @align = gjoseqlib::read_fasta( $align );
+            $write_file = 1;
+        }
+
+        @align
+            or warn "BlastInterface::alignment_to_pssm: No alignment supplied."
+                and return undef;
+
+        $msa_master_id ||= $align[ $msa_master_idx - 1 ]->[0] if $msa_master_idx;
+        
+        my @keep = ();
+        push @keep, $msa_master_id if $msa_master_id;
+
+        my $keep = $opts->{ keep };
+        if ( $keep )
+        {
+            push @keep, ( ref( $keep ) eq 'ARRAY' ? @$keep : $keep );
+        }
+
+        my $n_seq = @align;
+        if ( $max_sim )
+        {
+            my %rep_opts = ( max_sim => $max_sim );
+
+            $rep_opts{ keep }    = \@keep   if @keep;
+            $rep_opts{ min_sim } = $min_sim if $min_sim;
+
+            @align = gjoalignment::representative_alignment( \@align, \%rep_opts );
+        }
+        elsif ( $min_sim )
+        {
+            my %keep = map { $_ => 1 } @keep;
+            foreach ( gjoalignment::filter_by_similarity( \@align, $min_sim, @ref_ids ) )
+            {
+                $keep{ $_->[0] } = 1;
+            }
+            @align = grep { $keep{ $_->[0] } } @align;
+            @align = gjoseqlib::pack_alignment( \@align ) if @align < $n_seq;
+        }
+
+        $write_file ||= ( @align < $n_seq );
+        
+        if ( $pseudo_master )
+        {
+            my $master = gjoalignment::consensus_sequence( \@align );
+            unshift @align, [ 'consensus', '', $master ];
+            $write_file = 1;
+            $msa_master_id = 'consensus';
+            $msa_master_idx = 1;
+            $ignore_master = 1;
+        }
+
+        if ( $msa_master_id && ! $msa_master_idx )
+        {
+            for (my $i = 0; $i < @align; $i++)
+            {
+                next unless $msa_master_id eq $_->[0];
+                $msa_master_idx = $i + 1;
+                last;
+            }
+            $msa_master_idx
+                or warn "BlastInterface::alignment_to_pssm: msa_master_id '$msa_master_id' not found in alignment.";
+        }
+
+        # In psiblast 2.2.29+ command flags -ignore_master and
+        # -msa_master_idx are imcompatible, so we move the master
+        # sequence to be sequence 1 (the default master sequence).
+        if ( $ignore_master && $msa_master_idx > 1 )
+        {
+            my $master = splice( @align, $msa_master_idx-1, 1 );
+            unshift @align, $master;
+            $msa_master_idx = 1; 
+        }
+
+        if ( $write_file )
+        {
+            ( $fh, $alignF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_align', 'fasta' );
+            gjoseqlib::write_fasta( $fh, \@align );
+            close( $fh );
+        } 
+    }
+
+    my $subject = [ 'subject', '', 'MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILS' ]; 
+
+    ( $fh, $subjectF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_subject', 'fasta' );
+    gjoseqlib::write_fasta( $fh, $subject );
+    close( $fh );
+
+    ( $fh, $pssm0F ) = SeedAware::open_tmp_file( 'alignment_to_pssm', 'pssm0' );
+    close( $fh );
     
-    my $prog = SeedAware::executable_for( 'psiblast' );
-    $prog ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast';
+    my $prog = SeedAware::executable_for( 'psiblast' )
+        or warn "BlastInterface::alignment_to_pssm: psiblast program not found.\n"
+            and return undef;
 
     my @args = ( -in_msa   => $alignF,
                  -subject  => $subjectF,
-                 -out_pssm => $pssmF,
-                 "-ignore_msa_master"
+                 -out_pssm => $pssm0F
                );
+    push @args, "-ignore_msa_master"  if $ignore_master;
+    push @args, ( -msa_master_idx => $msa_master_idx ) if $msa_master_idx > 1;
 
     my $rc = SeedAware::system_with_redirect( $prog, @args, { stdout => '/dev/null', stderr => '/dev/null' } );
     if ( $rc != 0 )
     {
         my $cmd = join( ' ', $prog, @args );
         warn "BlastInterface::alignment_to_pssm: psiblast failed with rc = $rc: $cmd\n";
-        return '';
+        return undef;
     }
 
-    my ( $fh, $close ) = output_file_handle( $parms->{ outPSSM } || $parms->{ out_pssm });
+    unlink $alignF if $write_file;
+    unlink $subjectF;
+
+    my $title = $opts->{ title } || ( 'untitled_' . ++$n_pssm );
+
+    my $close;
+    my $pssmF = $opts->{ outPSSM } || $opts->{ out_pssm };
+
+    ( $fh, $close ) = output_file_handle( $pssmF );
+    
     my $skip;
-    open( PSSM, "<$pssmF" ) or die "Could not open $pssmF";
-    while ( <PSSM> )
+    open( PSSM0, "<", $pssm0F ) or die "Could not open $pssm0F";
+    while ( <PSSM0> )
     {
-        # s/local id 1/local id $title/; # only numerical ids are supported; this is no longer needed
         if ( /inst \{/ ) {
             print $fh "      descr {\n";
             print $fh "        title \"$title\"\n";
@@ -302,15 +425,12 @@ sub alignment_to_pssm
         $skip = 0 if /finalData \{/;
         print $fh $_ unless $skip;
     }
-    close( PSSM );
+    close( PSSM0 );
     close $fh if $close;
 
-    if ( ! $save_temp )
-    {
-        system( "rm", "-rf", $tempD );
-    }
+    unlink $pssm0F;
 
-    return 1;
+    return $close ? $pssmF : 1;
 }
 
 
@@ -330,7 +450,7 @@ sub alignment_to_pssm
 # 
 #  Options:
 # 
-#      
+#      title => DB title
 #
 #-------------------------------------------------------------------------------
 
@@ -367,7 +487,8 @@ sub build_rps_db
 
     # formatrpsdb (v2.2.26) supports text subject IDs given in the title "subject_id" field
     my $prog_name = 'formatrpsdb';
-    my @args = ( -i => $db );
+    my $title = $opts->{ title } || 'Untitled RPS DB';
+    my @args = ( -i => $db, -t => $title );
 
     my $prog = SeedAware::executable_for( $prog_name );
 
