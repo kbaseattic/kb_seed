@@ -528,21 +528,27 @@ sub create_fasta_record {
     # If we're in stripped mode, we just return the sequence.
     if ($stripped) {
         $retVal = $sequence;
-    } else {
+    # Test for valid data so that we do not die in a string operation
+    } elsif ( defined( $id ) && defined( $sequence ) ) {
         # Here we have to do the FASTA conversion. Start with the ID.
         my $header = ">$id";
-        # Add a comment, if any.
-        if ($comment) {
+        # Add a comment, if a valid one exists.
+        if ( defined( $comment ) && $comment =~ /\S/ ) {
             $header .= " $comment";
         }
         # Clean up the sequence.
         $sequence =~ s/\s+//g;
+
         # We need to format the sequence into 60-byte chunks. We use the infamous
         # grep-split trick. The split, because of the presence of the parentheses,
         # includes the matched delimiters in the output list. The grep strips out
         # the empty list items that appear between the so-called delimiters, since
         # the delimiters are what we want.
-        my @chunks = grep { $_ } split /(.{1,60})/, $sequence;
+        # my @chunks = grep { $_ } split /(.{1,60})/, $sequence;
+
+        # ~35% faster to do it with just a global regex match -- gjo
+        my @chunks = $sequence =~ /(.{1,60})/g;
+
         # Add the chunks and the trailer.
         $retVal = join("\n", $header, @chunks) . "\n";
     }
@@ -1158,13 +1164,15 @@ an undefined value if an empty list is passed in.
 
 =cut
 
+# Changed to survive a list with undefined values. -- gjo
 sub max {
-    my ($retVal, @nums) = @_;
-    for my $num (@nums) {
-        if ($num > $retVal) {
-            $retVal = $num;
-        }
-    }
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    shift while ( @_ && ! defined( $_[0] ) );
+    return undef unless @_;
+
+    my $retVal = shift;
+    foreach ( @_ ) { $retVal = $_ if defined($_) && ( $_ > $retVal ) }
+
     return $retVal;
 }
 
@@ -1189,13 +1197,15 @@ an undefined value if an empty list is passed in.
 
 =cut
 
+# Changed to survive a list with undefined values. -- gjo
 sub min {
-    my ($retVal, @nums) = @_;
-    for my $num (@nums) {
-        if ($num < $retVal) {
-            $retVal = $num;
-        }
-    }
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    shift while ( @_ && ! defined( $_[0] ) );
+    return undef unless @_;
+
+    my $retVal = shift;
+    foreach ( @_ ) { $retVal = $_ if defined($_) && ( $_ < $retVal ) }
+
     return $retVal;
 }
 

@@ -226,44 +226,53 @@ package gjocodonlib;
 #  ( $freq, $scr, $descr ) = read_next_frequencies( \*FH )
 #
 #-------------------------------------------------------------------------------
-#  Raw codon usages are typed codon usages, intended for a more robust exchange.
-#  Types / subtype combinations are:
-#
+#  Raw codon usages are typed codon usages, intended for a robust exchange.
+#  Current type / subtype combinations are:
 #  -------------------------------------------------------------------------
 #  Type          Subtype   Description
 #  -------------------------------------------------------------------------
-#  Current types
-#  -------------------------------------------------------------------------
-#  average                 genome avearge codon usage
-#  modal                   genome modal codon usage
-#  high_expr        0      modal usage of high expression candidates
-#  high_expr        1      modal usage of high expression candidates
+#  average                 average codon usage of genome
+#  modal                   modal codon usage of genome
+#  high_expr        0      modal codon usage of candidate highly expressed genes
+#  high_expr        1      modal codon usage of candidate highly expressed genes
 #                               differing from mode
-#  high_expr        2      iterated modal usage of high expression
-#                               candidates differing from mode
-#  nonnative               modal usage of nonnative genes
+#  high_expr        2      iterated modal codon usage of candidate highly
+#                               expressed genes differing from mode
+#  nonnative               modal codon usage of nonnative genes
 #  -------------------------------------------------------------------------
 #  Anticipated types
 #  -------------------------------------------------------------------------
-#  genome        average   genome avearge codon usage (synonym)
-#  genome         modal    genome modal codon usage (synonym)
-#  mito          average   mitochondion
-#  mito           modal    mitochondion
-#  nonnative     average   average usage of nonnative genes
-#  nonnative      modal    modal usage of nonnative genes (synonym)
-#  plasmid:id    average   plasmid (with optional element id)
-#  plasmid:id     modal    plasmid (with optional element id)
-#  plastid       average   plastid
-#  plastid        modal    plastid
-#  prophage:id   average   prophage (with optional element id)
-#  prophage:id    modal    prophage (with optional element id)
-#  region:id     average   genomic region (with optional element id)
-#  region:id      modal    genomic region (with optional element id)
-#  shared        average   average usage for core genes of species
-#  shared         modal    modal usage for core genes of species
-#  unique        average   average usage for genes unique to a strain
-#  unigue         modal    modal usage for genes unique to a strain
-#  -------------------------------------------------------------------------
+#  genome                  modal codon usage of genome (=modal)
+#  genome_avg              average codon usage of genome (=average)
+#  genome_mode             modal codon usage of genome (=modal)
+#  high_expr               modal codon usage of candidate highly expressed genes
+#  high_expr_avg           average codon usage of candidate highly expressed genes
+#  high_expr_mode          modal codon usage of candidate highly expressed genes
+#  mito                    modal codon usage of mitochondrial genes
+#  mito_avg                average codon usage of mitochondrial genes
+#  mito_mode               modal codon usage of mitochondrial genes
+#  nonnative               modal codon usage of nonnative genes (=nonnative)
+#  nonnative_avg           average codon usage nonnative genes
+#  nonnative_mode          modal codon usage of nonnative genes (=nonnative)
+#  plasmid         id      modal codon usage of plasmid genes (with optional plasmid id)
+#  plasmid_avg     id      average codon usage of plasmid genes (with optional plasmid id)
+#  plasmid_mode    id      modal codon usage of plasmid genes (with optional plasmid id)
+#  plastid                 modal codon usage of plastid genes
+#  plastid_avg             average codon usage of plastid genes
+#  plastid_mode            modal codon usage of plastid genes
+#  prophage        id      modal codon usage of prophage genes (with optional prophage id)
+#  prophage_avg    id      average codon usage of prophage genes (with optional prophage id)
+#  prophage_mode   id      modal codon usage of prophage genes (with optional prophage id)
+#  region          id      modal codon usage of gene region (with optional region id)
+#  region_avg      id      average codon usage of gene region (with optional region id)
+#  region_mode     id      modal codon usage of gene region (with optional region id)
+#  shared                  modal codon usage for core genes of species
+#  shared_avg              average codon usage of core genes of species
+#  shared_mode             modal codon usage for core genes of species
+#  unique                  modal codon usage for strain-specific genes of species
+#  unique_avg              average codon usage of strain-specific genes of species
+#  unique_mode             modal codon usage for strain-specific genes of species
+#-------------------------------------------------------------------------------
 #
 #  Raw codon usages file format (file extension .rawcu)
 #

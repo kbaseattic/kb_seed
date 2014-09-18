@@ -452,7 +452,7 @@ sub tree_with_raxml {
     gjoseqlib::print_alignment_as_phylip($tmpin, $ali2);
 
     my ($vals, $flags) = process_options_string($opts->{params});
-
+    
     $opts->{search}   ||= 'SPR';
     $opts->{rate}       = uc $opts->{rate}  || 'GAMMA';
     $opts->{rate}       = 'CAT'   if $opts->{rate}     =~ /Uniform/i;
@@ -468,6 +468,8 @@ sub tree_with_raxml {
     $vals->{w}          = "$tmpdir/";
     $vals->{n}          = $tmpkey;
     $vals->{s}          = $tmpin;
+    $vals->{T}          = $opts->{nproc} || 2;
+    $vals->{p}          = 1023;
     
     if (($opts->{optimize} =~ /eval/i || $opts->{eval}) && $opts->{input}) {
         my $tr2 = read_tree($opts->{input});
@@ -481,8 +483,8 @@ sub tree_with_raxml {
 
     my @params = make_params_from_vals_and_flags($vals, $flags);
 
-    my $raxml = SeedAware::executable_for($opts->{raxml} || $opts->{program} || 'raxmlHPC');
-
+    my $raxml = SeedAware::executable_for($opts->{raxml} || $opts->{program} || 'raxmlHPC-PTHREADS-SSE3');
+    
     SeedAware::system_with_redirect($raxml, @params, { stdout => $tmplog, stderr => '/dev/null' });
     # print STDERR join(" ", $raxml, @params). "\n";
 
@@ -511,7 +513,7 @@ sub tree_with_raxml {
         qw(result info log);
 
     for ($tmpin, $tmptr2, $tmplog, $tmplog2, @tmpfiles) {
-        unlink $_ if -e $_;
+        # unlink $_ if -e $_;
     }
 
     wantarray() ? ($tree, $stats) : $tree;
@@ -762,6 +764,24 @@ sub distances_from_tip_helper {
         return $lbl;
     }
 }
+
+
+#-----------------------------------------------------------------------------
+#  Functionally coupled trees 
+#
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+#  Read hash from a two-column table:
+#
+#    ( [ tip, peg, set-id, trim-beg, trim-end, seq-len ] ) = 
+#-----------------------------------------------------------------------------
+
+sub min_paralog_tree {
+
+}
+
+
 
 #-----------------------------------------------------------------------------
 #  Read hash from a two-column table:
@@ -1086,7 +1106,7 @@ sub fig_id_of {
 }
 
 sub is_md5 {
-    (length($_[0]) == 32) && ( ($_[0] =~ tr/0-9a-z//) == 32);
+    ( length($_[0]) == 32 && (($_[0] =~ tr/0-9a-z//) == 32) );
 }
 
 #-------------------------------------------------------------------------------
@@ -1101,15 +1121,15 @@ sub assign_tip_fig_attributes {
     my $sap  = SAPserver->new();
 
     my @tips = gjonewicklib::newick_tip_list($tree);
+    @tips    = map { s/^gnl\|md5\|//; $_ } @tips;
     my @md5s = grep { is_md5($_) } @tips;
+    
     my $md5s = $sap->proteins_to_fids(-prots => \@md5s);
     
     my %peg  = map { my $p = fig_id_of($_. $opts->{alias}->{$_}) ||
                              (is_md5($_) && $md5s->{$_} ? $md5s->{$_}->[0] : undef) ||
                              (is_md5($opts->{alias}->{$_}) && $md5s->{$opts->{alias}->{$_}} ? $md5s->{$opts->{alias}->{$_}}->[0] : undef);
                      $p ? ($_ => $p) : () } @tips;
-    # print STDERR '\%peg = '. Dumper(\%peg); die "here";
-    # return unless %peg;
     
     my @pegs = values %peg;
     my %org  = map { $_ => SeedUtils::genome_of($peg{$_}) ? SeedUtils::genome_of($peg{$_}) : ( $_ =~ /^\d+\.\d+$/ ? $_ : undef ) } @tips;

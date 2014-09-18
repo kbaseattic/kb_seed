@@ -774,5 +774,13 @@ sub create_uuid
     }
 }
 
+sub seed_location_to_location_list
+{
+    my($loc_str) = @_;
+    
+    my @locs = map { my $l = BasicLocation->new($_);
+		     [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
+    return wantarray ? @locs : \@locs;
+}
     
 1;

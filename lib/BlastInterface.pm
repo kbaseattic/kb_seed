@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2003-2013 University of Chicago and Fellowship
+# Copyright (c) 2003-2014 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -95,6 +95,7 @@ use gjoparseblast;
 #      minCovQ            => minimum fraction of query covered by match
 #      minCovS            => minimum fraction of the DB sequence covered by the match
 #      minIden            => fraction (0 to 1) that is a minimum required identity
+#      minNBScr           => minimum normalized bit-score (bit-score per alignment position)
 #      minPos             => fraction of aligned residues with positive score
 #      minScr             => minimum required bit-score
 #      msa_master_id      => ID of the sequence in in MSA for psiblast to use as a master
@@ -228,39 +229,80 @@ sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 
 
 #-------------------------------------------------------------------------------
-#  Convert a multiple sequence alignment into a PSSM file
+#  Convert a multiple sequence alignment into a PSSM file suitable for the
+#  -in_pssm parameter of psiblast, or the input file list of build_rps_db.
+#  (Note: the psiblast -in_msa option takes the name of a fasta alignment
+#  file, not a pssm file.)
 #
-#      alignment_to_pssm( $alignment, \%options )
+#      $db_name = alignment_to_pssm(  $align_file, \%options )
+#      $db_name = alignment_to_pssm( \@alignment,  \%options )
+#      $db_name = alignment_to_pssm( \*ALIGN_FH,   \%options )
 #
-#  The first argument supplies the MSA to be converted. It can be
-#  filename, file handle or a list of sequence triples.
+#  The first argument supplies the MSA to be converted. It can be a list of
+#  sequence triple, a file name, or an open file handle.
 #
-#  Options:
+#  General options:
 #
-#    ignore_msa_master => ignore the master sequence when psiblast creates PSSM (D = 0)
-#    ignoreMaster      => ignore the master sequence when psiblast creates PSSM (D = 0)
-#    max_sim           => maximum identity of sequences in profile (D = undef)
-#    min_sim           => [ min_fract_ident, @IDs ]   # eliminate divergent sequences (D = undef)
-#    msa_master_id     => ID of the sequence in in MSA for psiblast to use as a master
-#    msa_master_idx    => 1-based index of the sequence in MSA for psiblast to use as a master
-#    out_pssm          => output PSSM filename or handle (D = stdout)
-#    outPSSM           => output PSSM filename or handle (D = stdout)
-#    pseudo_master     => create a consensus master sequence with all columns in alignment
-#    pseudoMaster      => create a consensus master sequence with all columns in alignment
-#    title             => title to be set in the output PSSM 
+#    out_pssm =>  $file   #  output PSSM filename or handle (D = STDOUT)
+#    outPSSM  =>  $file   #  output PSSM filename or handle (D = STDOUT)
+#    title    =>  $title  #  title of the PSSM (D = "untitled_$i")
+#
+#  Sequence filtering options:
+#
+#    keep    => \@ids           #  ids of sequences to keep in the MSA, regardless
+#                               #      of similarity filtering.
+#    max_sim =>  $fract         #  maximum identity of sequences in profile; i.e., build
+#                               #      the PSSM from a representative set (D = no_limit).
+#    min_sim =>  $min_sim_spec  #  exclude sequences with less than the specified identity 
+#                               #     to all specified sequences (D = no_limit).
+#
+#  where the minimum similarity specification is one of:
+#
+#    $min_sim_spec = [ $min_ident,  @ref_ids ]
+#    $min_sim_spec = [ $min_ident, \@ref_ids ]
+#
+#
+#  Master sequence options:
+#
+#    ignore_msa_master =>  $bool   #  do not include the master sequence in the PSSM (D = 0)
+#    ignoreMaster      =>  $bool   #  do not include the master sequence in the PSSM (D = 0)
+#    msa_master_id     =>  $id     #  ID of the sequence to use as a master
+#    msa_master_idx    =>  $int    #  1-based index of the sequence to use as a master (D = 1)
+#    pseudo_master     =>  $bool   #  add a master sequence covering all columns in the MSA (D = 0)
+#    pseudoMaster      =>  $bool   #  add a master sequence covering all columns in the MSA (D = 0)
+#
+#  Master sequence notes:
+#
+#    A psiblast PSSM is a query for a database search. The search output
+#    alignments are shown against the "msa_master" sequence, which defaults
+#    to the first sequence in the alignment supplied. The PSSM only includes
+#    alignment columns that are in the master sequence, so the reported
+#    match statistics (E-value, identity, positives, and gaps) and the
+#    alignment are all evaluated relative to the master sequence. For this
+#    reason, we provide a 'pseudo_master' option that adds a master sequence
+#    that is the plurality residue type in every column of the alignment.
+#    Thus, PSSM and the output alignments will reflect all columns in the
+#    original alignment, but the query sequence shown is unlikely to
+#    correspond to any of the input sequences. If this option is chosen,
+#    ignore_msa_master is set to true, so that the consensus is not included
+#    in the calculation of the PSSM. Any msa_master_id or msa_master_idx option
+#    value will be ignored.
 #
 #-------------------------------------------------------------------------------
 
+#  Keep a counter for untitled PSSMs, so that they get unique names.
+
 my $n_pssm = 0;
+
 sub alignment_to_pssm
 {
     my ( $align, $opts ) = @_;
     $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
 
     my $ignore_master  = $opts->{ ignore_msa_master } || $opts->{ ignoreMaster };
-    my $pseudo_master  = $opts->{ pseudo_master } || $opts->{ pseudoMaster };
+    my $pseudo_master  = $opts->{ pseudo_master }     || $opts->{ pseudoMaster };
     my $msa_master_id  = $opts->{ msa_master_id };
-    my $msa_master_idx = $opts->{ msa_master_idx } || 0;
+    my $msa_master_idx = $opts->{ msa_master_idx }    || 0;
     my $max_sim        = $opts->{ max_sim };
     my $min_opt        = $opts->{ min_sim };
 
@@ -268,6 +310,7 @@ sub alignment_to_pssm
     if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
     {
         ( $min_sim, @ref_ids ) = @$min_opt;
+        @ref_ids = @{$ref_ids[0]} if ( ( @ref_ids == 1 ) && ( ref( $ref_ids[0] ) eq 'ARRAY' ) )
     }
 
     my $fh;
@@ -479,13 +522,16 @@ sub build_rps_db
     print DB map { $_ . "\n" } @pssms;
     close( DB );
 
-    # makeprofiledb (v2.2.29+) works but only supports numerical subject IDs (v2.2.27+ does not work).
-    # the subject IDs need to be provided in the id field
-
+    #  makeprofiledb (v2.2.29+) works, but only supports numerical subject IDs
+    #  (v2.2.27+ does not work). The subject IDs need to be provided in the id
+    #  field.
+    #
     # my $prog_name = 'makeprofiledb';
     # my @args = ( -in => $db );
+    #
+    #  formatrpsdb (v2.2.26) supports text subject IDs given in the title
+    #  "subject_id" field.
 
-    # formatrpsdb (v2.2.26) supports text subject IDs given in the title "subject_id" field
     my $prog_name = 'formatrpsdb';
     my $title = $opts->{ title } || 'Untitled RPS DB';
     my @args = ( -i => $db, -t => $title );
@@ -508,6 +554,7 @@ sub build_rps_db
     
     return $db;
 }
+
 
 sub verify_pssm
 {
@@ -589,6 +636,13 @@ sub verify_pssm
     return $pssm;
 }
 
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Read the title from a PSSM file.
+#
+#    $title = pssm_title( $pssm_file, \%opts )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub pssm_title
 {
     my ( $pssm, $opts ) = @_;
@@ -609,6 +663,7 @@ sub pssm_title
 
     return $title;
 }
+
 
 #-------------------------------------------------------------------------------
 #  Do psiblast against tranlated genomic DNA. Most of this can be done by
@@ -1120,7 +1175,9 @@ sub run_blast
                 and return wantarray ? () : [];
     }
 
-    my $cmd   = &form_blast_command( $queryF, $dbF, $blast_prog, $parms );
+    my $cmd   = &form_blast_command( $queryF, $dbF, $blast_prog, $parms )
+        or warn "BlastInterface::run_blast: Failed to create a blast command."
+            and return wantarray ? () : [];
     my $redir = { $parms->{ warnings } ? () : ( stderr => "/dev/null" ) };
     my $fh    = &SeedAware::read_from_pipe_with_redirect( $cmd, $redir )
         or return wantarray ? () : [];
@@ -1129,8 +1186,13 @@ sub run_blast
                     : defined( $parms->{ excludeSelf } ) ? ! $parms->{ excludeSelf }
                     :                                        $queryF ne $dbF;
 
+    #  With blastall, we must parse the output; with the new blast programs
+    #  we can get the desired tabular output directly, so, hm, no alignments.
+    #
+    # my $blastall = $cmd->[0] =~ /blastall$/;
+
     my @output;
-    while (my $hsp = &gjoparseblast::next_blast_hsp( $fh, $includeSelf ) )
+    while ( my $hsp = &gjoparseblast::next_blast_hsp( $fh, $includeSelf ) )
     {
         if ( &keep_hsp( $hsp, $parms ) )
         {
@@ -1159,11 +1221,14 @@ sub keep_hsp
 {
     my( $hsp, $parms ) = @_;
 
-    return 0 if ($parms->{minIden} && ($parms->{minIden} > ($hsp->[11]/$hsp->[10])));
-    return 0 if ($parms->{minPos}  && ($parms->{minPos}  > ($hsp->[12]/$hsp->[10])));
-    return 0 if ($parms->{minScr}  && ($parms->{minScr}  >  $hsp->[6]));
-    return 0 if ($parms->{minCovQ} && ($parms->{minCovQ} > ((abs($hsp->[16]-$hsp->[15])+1)/$hsp->[2])));
-    return 0 if ($parms->{minCovS} && ($parms->{minCovS} > ((abs($hsp->[19]-$hsp->[18])+1)/$hsp->[5])));
+    local $_;
+    return 0 if (($_ = $parms->{minIden})  && ($_ > ($hsp->[11]/$hsp->[10])));
+    return 0 if (($_ = $parms->{minPos})   && ($_ > ($hsp->[12]/$hsp->[10])));
+    return 0 if (($_ = $parms->{minScr})   && ($_ >  $hsp->[6]));
+    #  This could be defined with the min aligned length, not the alignment length
+    return 0 if (($_ = $parms->{minNBScr}) && ($_ >  $hsp->[6]/$hsp->[10]));
+    return 0 if (($_ = $parms->{minCovQ})  && ($_ > ((abs($hsp->[16]-$hsp->[15])+1)/$hsp->[2])));
+    return 0 if (($_ = $parms->{minCovS})  && ($_ > ((abs($hsp->[19]-$hsp->[18])+1)/$hsp->[5])));
     return 1;
 }
 
@@ -1396,6 +1461,7 @@ sub form_blast_command
         push @cmd, -show_gis            => ()                 if $showGIs;
 
         # PSI-BLAST and PSSM engine options in blast+/psiblast
+
         push @cmd, -num_iterations      => $iterations        if $iterations;
         push @cmd, -msa_master_idx      => $queryIndex        if $queryIndex;
         push @cmd, -pseudocount         => $pseudoCount       if $pseudoCount;

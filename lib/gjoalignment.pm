@@ -1494,41 +1494,81 @@ sub remove
 #
 #  Options:
 #
-#     keep    =>   $id                   # keep this sequence unconditionally
-#     keep    =>  \@ids                  # keep these sequences unconditionally
-#     max_sim =>   $fract_ident          # maximum identity to retained sequences (D = 0.8)
-#     min_sim => [ $fract_ident, @ids ]  # remove sequences more diverged than
-#                                        #     this identity to these refs
+#     keep    =>   $id                    # keep this sequence unconditionally
+#     keep    =>  \@ids                   # keep these sequences unconditionally
+#     max_sim =>   $fract_ident           # maximum identity to retained sequences (D = 0.8)
+#     min_sim => [ $fract_ident,  @ids ]  # remove sequences more diverged than
+#     min_sim => [ $fract_ident, \@ids ]  # remove sequences more diverged than
+#                                         #     this identity to these refs
+#    nopack   =>   $bool                  # do not pack the resulting alignment
+#
+#  If the greatest identity is <= max_id, then it is a new similarity group.
+#  If the greatest identity is <= ext_id, then it is an extra rep of an
+#  existing group.
+#
+#                              new
+#                             group
+#   |        new group      |  rep  |  ignore  |
+#   |-----------------------|-------|----------|->  identity
+#   0                     max_id  ext_id       1
 #
 #===============================================================================
 
 sub representative_alignment
 {
-    my ($align, $opts) = @_;
+    my ( $align, $opts ) = @_;
 
     return undef unless gjoseqlib::is_array_of_sequence_triples( $align );
+
     $opts = {} unless $opts && ref($opts) eq 'HASH';
 
     my $max_id = $opts->{ max_sim } || 0.8;
+    my $ext_id = $max_id ** 0.8;
 
-    #  Original order to restore on output
-
-    my $n = 0;
-    my %order = map { $_->[0] => ++$n } @$align;
-
-    #  Collect sequences to keep unconditionally
-
-    my @align;
-    my @reps;
     my $keep = $opts->{ keep };
+    my %keep;
     if ( $keep )
     {
-        my %keep = map { $_ => 1 }
-                   ( ref( $keep ) eq 'ARRAY' ) ? @$keep : $keep;
-        foreach ( @$align )
+        %keep = map { $_ => 1 }
+                ( ref( $keep ) eq 'ARRAY' ) ? @$keep : $keep;
+    }
+
+    #  Remove sequences of low similarity to specified references
+
+    my @align;
+    my $min_opt = $opts->{ min_sim };
+    if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
+    {
+        my ( $min_sim, @ref_ids ) = @$min_opt;
+        @ref_ids = @{ $ref_ids[0] } if @ref_ids == 1 && $ref_ids[0] && ref( $ref_ids[0] ) eq 'ARRAY';
+        my %ref_id  = map  { defined($_) ? ( $_ => 1 ) : () } @ref_ids;
+        my @ref_seq = grep { $ref_id{ $_->[0] } } @$align;
+        if ( @ref_seq )
         {
-            if ( $keep{ $_->[0] } ) { push @reps,  $_ }
-            else                    { push @align, $_ }
+            foreach my $aln_seq ( @$align )
+            {
+                if ( $keep && $keep{ $aln_seq->[0] } )
+                {
+                    push @align, $aln_seq;
+                    next;
+                }
+
+                foreach ( @ref_seq )
+                {
+                    my $ident = fraction_aa_identity( $aln_seq->[2], $_->[2] );
+                    if ( $ident && ( $ident >= $min_sim ) )
+                    {
+                        push @align, $aln_seq;
+                        last;
+                    }
+                }
+            }
+        }
+        else
+        {
+            #  No valid filter ids should have a warning;
+            #  Of course we could just return an empty list.
+            @align = @$align;
         }
     }
     else
@@ -1536,57 +1576,95 @@ sub representative_alignment
         @align = @$align;
     }
 
-    #  Remove sequences of low similarity to one or more references
+    #  Original order to restore on output
 
-    my $min_opt = $opts->{ min_sim };
-    if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
+    my $n = 0;
+    my %order = map { $_->[0] => ++$n } @align;
+
+    my %id_to_group;
+    my @groups;
+    my @reps;
+    foreach my $try ( @align )
     {
-        my ( $min_sim, @ref_ids ) = @$min_opt;
-        @align = filter_by_similarity( \@align, $min_sim, @ref_ids );
-    }
-
-    #  Okay, the filtering is done. 
-    #  Gap score by id (big is bad)
-
-    my %g_scr = map { my ($gb) = $_->[2] =~ /^(-*)/;
-                      my ($ge) = $_->[2] =~ /(-*)$/;
-                      my $gall = $_->[2] =~ tr/-//;
-                      ( $_->[0] => 4*(length($gb)+length($ge)) + $gall )
-                   }
-                @align;
-
-    my @input = sort { $g_scr{ $a->[0] } <=> $g_scr{ $b->[0] } } @align;
-    
-    my $ext_id = $max_id ** 0.8;
-    #
-    #  If the greatest identity is <= keep, then it is a new representative.
-    #  If the greatest identity is <= iffy, then it is an extra
-    #  representative of an existing group
-    #
-    #   0                      max   ext     1
-    #   |-----------------------|-----|------|   identity
-    #   |         new rep       | new |ignore|
-    #   |                       |extra|      |
-    #
-    my ( @extras );
-    foreach my $try ( @input )
-    {
-        my $status = 0;
-        foreach ( @reps, @extras )
+        my $gr;
+        my $status = 0;            # Highest identity so far, or 2 for redundant
+        foreach ( reverse @reps )  # likely to produce hit sooner
         {
-            #  ( $nid/$nmat ) = gjoseqlib::fraction_aa_identity( $seq1, $seq2 )
-            my $ident = gjoseqlib::fraction_aa_identity( $try->[2], $_->[2] ) || 0;
-            if ( $ident > $ext_id ) { $status = 2; last } # too similar for extra
-            if ( $ident > $max_id ) { $status = 1 }       # too similar for rep
+            #  ( $nid/$nmat ) = fraction_aa_identity( $seq1, $seq2 )
+            my $ident = fraction_aa_identity( $try->[2], $_->[2] ) || 0;
+
+            #  Too similar for extra rep of group; add to group of sim sequence
+            if ( $ident > $ext_id )
+            {
+                $gr     = $id_to_group{ $_->[0] };
+                $status = 2;
+                last;
+            }
+
+            #  Too similar for new group, but possible extra rep of a group
+            if ( ( $ident > $max_id ) && ( $ident > $status ) )
+            {
+                $gr     = $id_to_group{ $_->[0] };
+                $status = $ident
+            }
         }
-        if    ( $status == 0 ) { push @reps,   $try }
-        elsif ( $status == 1 ) { push @extras, $try }
+
+        push @reps, $try  if ( $status <= 1 );  # add a new diverse rep
+
+        my $id = $try->[0];
+        if ( $status == 0 )     # start a new group
+        {
+            $id_to_group{ $id } = @groups;
+            push @groups, [ $try ];
+        }
+        else                    # add to existing group
+        {
+            $id_to_group{ $id } = $gr;
+            push @{ $groups[$gr] }, $try;
+        }
     }
 
-    @align = sort { $order{ $a->[0] } <=> $order{ $b->[0] } }
-             gjoseqlib::pack_alignment( \@reps );
+    #  Okay, we now need to pick one or more representatives from each
+    #  similarity cluster.
+
+    my %is_rep = ();
+    foreach my $group ( @groups )
+    {
+        #  The rep of a group of 1 is unambiguous
+        if ( @$group == 1 )
+        {
+            $is_rep{ $group->[0]->[0] } = 1;
+            next;
+        }
+
+        # A keep option can give a group multiple reps
+        my @gr_rep;
+        if ( $keep && ( @gr_rep = grep { $keep{ $_->[0] } } @$group ) )
+        {
+            foreach ( @gr_rep ) { $is_rep{ $_->[0] } = 1 }
+            next;
+        }
+
+        #  Prioritize by fewest gaps (counting terminal at 5x internal)
+         my $rep;
+         my $rep_scr = 1e100;
+         foreach ( @$group )
+         {
+             my ($gb) = $_->[2] =~ /^(-*)/;   #  the zero or more avoids undef
+             my ($ge) = $_->[2] =~ /(-*)$/;   #  the zero or more avoids undef
+             my $gall = $_->[2] =~ tr/-//;
+             my $scr  = $gall + 4 * ( length($gb) + length($ge) );
+             next if $scr >= $rep_scr;
+             $rep = $_;
+             $rep_scr = $scr;
+        }
+        $is_rep{ $rep->[0] } = 1;
+    }
+
+    @reps = grep { $is_rep{ $_->[0] } } @align;
+    @reps = gjoseqlib::pack_alignment( \@reps ) unless $opts->{ nopack };
     
-    wantarray ? @align : \@align;
+    wantarray ? @reps : \@reps;
 }
 
 
@@ -1623,14 +1701,12 @@ sub filter_by_similarity
     my @are_sim;
     foreach my $aln_seq ( @$align )
     {
-        my $done = 0;
         foreach ( @ref_seq )
         {
-            my $ident = gjoseqlib::fraction_aa_identity( $aln_seq->[2], $_->[2] );
+            my $ident = fraction_aa_identity( $aln_seq->[2], $_->[2] );
             if ( $ident && ( $ident >= $min_sim ) )
             {
                 push @are_sim, $aln_seq;
-                $done = 1;
                 last;
             }
         }
@@ -1653,60 +1729,229 @@ sub filter_by_similarity
 #
 #  Options:
 #
-#    dna      => $bool   # Find a DNA consensus (D = protein)
-#    gap_ok   => $bool   # Allow gaps in the consensus (D = nongap residues)
+#    dna      => $bool   # Find a DNA consensus (D = guess)
+#    gap_ok   => $bool   # Allow gaps in the consensus (D = no gap residues)
 #    min_freq => $fract  # Minimum occurrence frequency of residue (D = >0)
-#    rna      => $bool   # Find an RNA consensus (D = protein)
+#    protein  => $bool   # Find a protein consensus (D = guess)
+#    rna      => $bool   # Find an RNA consensus (D = guess)
 #
 #-------------------------------------------------------------------------------
 sub consensus_sequence
 {
     my ( $align, $opts ) = @_;
+    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align &&  $align->[0];
+
+    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
+
+    my $aa  = $opts->{ protein };
+    my $rna = $opts->{ rna } || $opts->{ RNA };
+    my $nt  = $opts->{ dna } || $opts->{ DNA } || $rna;
+
+    if ( ! ( $aa || $nt ) )
+    {
+        my $type = gjoseqlib::guess_seq_type( $align->[0] );
+        $nt = $type =~ /^.NA/i;
+        $opts->{ rna } = 1 if $type =~ /^RNA/i
+    }
+
+    $nt ? consensus_sequence_nt( $align, $opts )
+        : consensus_sequence_aa( $align, $opts );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Find the consensus sequence for an amino acid sequence alignment.
+#
+#       $sequence = consensus_sequence_aa( \@align, $options )
+#       $sequence = consensus_sequence_aa( \@seq,   $options )
+#       $sequence = consensus_sequence_aa( \@seqR,  $options )
+#
+#  The first form takes a reference to an array of sequence triples, while
+#  the second form takes a reference to an array of sequences, and the
+#  third form takes a reference to an array of sequence references.
+#
+#  Options:
+#
+#    gap_ok   => $bool   # Allow gaps in the consensus (D = no gap residues)
+#    min_freq => $fract  # Minimum occurrence frequency of residue (D = >0)
+#
+#-------------------------------------------------------------------------------
+sub consensus_sequence_aa
+{
+    my ( $align, $opts ) = @_;
+    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align &&  $align->[0];
+
     $opts = {} unless $opts && ref( $opts ) eq 'HASH';
 
     my $gap_ok = $opts->{ gap_ok }   || 0;
     my $min_fr = $opts->{ min_freq } || 1e-100;
-    my $rna    = $opts->{ rna } || $opts->{ RNA };
-    my $nt     = $opts->{ dna } || $opts->{ DNA } || $rna;
 
     # Normalize the alignment to be references to the sequences.
 
+    my $len;
+    my @align;
     if ( gjoseqlib::is_array_of_sequence_triples( $align ) )
     {
-        $align = [ map { \$_->[2] } @$align ];
+        $len = length( $align->[0]->[2] );
+        @align = map { length( $_->[2] ) == $len ? \$_->[2] : () } @$align;
     }
-    elsif ( $align      && ( ref( $align ) eq 'ARRAY' )
-         && $align->[0] && ! ref( $align->[0] )
-          )
+    elsif ( ! ref( $align->[0] ) )
     {
-        $align = [ map { \$_ } @$align ];
+        $len = length( $align->[0] );
+        @align = map { $_ && ! ref( $_ ) && length( $_ ) == $len ? \$_ : () } @$align;
     }
-    elsif ( $align      && ( ref( $align )      eq 'ARRAY' )
-         && $align->[0] && ( ref( $align->[0] ) eq 'SCALAR' )
-          )
+    elsif ( ref( $align->[0] ) eq 'SCALAR' )
     {
-        # All is good, though we could sanity check every entry in the list
+        $len = length( ${$align->[0]} );
+        @align = map { $_ && ref( $_ ) eq 'SCALAR' && length( $$_ ) == $len ? $_ : () } @$align;
     }
-    else
+    return undef unless @align == @$align;
+
+    my @cnts = map { [ (0) x 22 ] } ( 1 .. $len );
+    foreach my $seqR ( @align )
     {
-        return undef;
+        #  Copy the sequences so that we do not destroy the original.
+        my $seq = $$seqR;
+        #  Transliterate nonresidues to \000.
+        $seq =~ tr/ACDEFGHIKLMNPQRSTVWYUacdefghiklmnpqrstvwyu-/\000/c;
+        #  Transliterate residues to an index, with U going to the same index as C.
+        $seq =~ tr/ACDEFGHIKLMNPQRSTVWYUacdefghiklmnpqrstvwyu-/\001-\024\002\001-\024\002\025/;
+        #  Count the residues by column.
+        for ( my $i = 0; $i < $len; $i++ ) { $cnts[$i]->[ord(substr($seq,$i,1))]++ }
     }
 
-    my $len = length( ${$align->[0]} );
+    my @consensus;
+    foreach ( @cnts )
+    {
+        my $n;
+        my $nmax = 0;
+        my $imax = 0;
+        my $ttl  = 0;
+        for ( my $i = 1; $i <= 20; $i++ )
+        {
+            $n = $_->[$i];
+            if ( $n > $nmax ) { $nmax = $n; $imax = $i }
+            $ttl += $n;
+        }
 
-    join( '', map { my ( $res, $fr ) = $nt ? consensus_nt_in_column( $align, $_, $gap_ok )
-                                           : consensus_aa_in_column( $align, $_, $gap_ok );
-                    $res = $nt ? 'N' : 'X'  if $fr < $min_fr && $res ne '-';
-                    $res = 'U'              if $rna && $res eq 'T';
-                    $res;
-                  }
-              ( 1 .. $len )
-        );
+        my $res = 'X';
+        #  Gaps allowed and more common than nongaps?
+        if ( $gap_ok && ( $_->[21] > $ttl ) )
+        {
+            $res = '-';
+        }
+        #  Majority residue is sufficiently abundant?
+        elsif ( $ttl && ( $nmax/$ttl >= $min_fr ) )
+        {
+            $res = qw( . A C D E F G H I K L M N P Q R S T V W Y )[$imax];
+        }
+        push @consensus, $res;
+    }
+
+    join( '', @consensus );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Find the consensus sequence for a nucleotide sequence alignment.
+#
+#       $sequence = consensus_sequence_nt( \@align, $options )
+#       $sequence = consensus_sequence_nt( \@seq,   $options )
+#       $sequence = consensus_sequence_nt( \@seqR,  $options )
+#
+#  The first form takes a reference to an array of sequence triples, while
+#  the second form takes a reference to an array of sequences, and the
+#  third form takes a reference to an array of sequence references.
+#
+#  Options:
+#
+#    gap_ok   => $bool   # Allow gaps in the consensus (D = no gap residues)
+#    min_freq => $fract  #  Minimum occurrence frequency of residue (D = >0)
+#    rna      => $bool   #  Output U instead of T.
+#
+#-------------------------------------------------------------------------------
+sub consensus_sequence_nt
+{
+    my ( $align, $opts ) = @_;
+    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align &&  $align->[0];
+
+    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
+
+    my $gap_ok = $opts->{ gap_ok }   || 0;
+    my $min_fr = $opts->{ min_freq } || 1e-100;
+    my $rna    = $opts->{ rna }      || 0;
+
+    # Normalize the alignment to be references to the sequences.
+
+    my $len;
+    my @align;
+    if ( gjoseqlib::is_array_of_sequence_triples( $align ) )
+    {
+        $len = length( $align->[0]->[2] );
+        @align = map { length( $_->[2] ) == $len ? \$_->[2] : () } @$align;
+    }
+    elsif ( ! ref( $align->[0] ) )
+    {
+        $len = length( $align->[0] );
+        @align = map { $_ && ! ref( $_ ) && length( $_ ) == $len ? \$_ : () } @$align;
+    }
+    elsif ( ref( $align->[0] ) eq 'SCALAR' )
+    {
+        $len = length( ${$align->[0]} );
+        @align = map { $_ && ref( $_ ) eq 'SCALAR' && length( $$_ ) == $len ? $_ : () } @$align;
+    }
+    return undef unless @align == @$align;
+
+    my @cnts = map { [ (0) x 6 ] } ( 1 .. $len );
+    foreach my $seqR ( @align )
+    {
+        #  Copy the sequences so that we do not destroy the original.
+        my $seq = $$seqR;
+        #  Transliterate nonresidues to \000.
+        $seq =~ tr/ACGTUacgtu-/\000/c;
+        #  Transliterate residues to an index, with U going to the same index as T.
+        $seq =~ tr/ACGTUacgtu-/\001-\004\004\001-\004\004\005/;
+        #  Count the residues by column.
+        for ( my $i = 0; $i < $len; $i++ ) { $cnts[$i]->[ord(substr($seq,$i,1))]++ }
+    }
+
+    my @consensus;
+    foreach ( @cnts )
+    {
+        my $n;
+        my $nmax = 0;
+        my $imax = 0;
+        my $ttl  = 0;
+        for ( my $i = 1; $i <= 4; $i++ )
+        {
+            $n = $_->[$i];
+            if ( $n > $nmax ) { $nmax = $n; $imax = $i }
+            $ttl += $n;
+        }
+
+        my $res = 'N';
+        #  Gaps allowed and more common than nongaps?
+        if ( $gap_ok && ( $_->[5] > $ttl ) )
+        {
+            $res = '-';
+        }
+        #  Majority residue is sufficiently abundant?
+        elsif ( $ttl && ( $nmax/$ttl >= $min_fr ) )
+        {
+            $res = $rna ? qw( . A C G U )[$imax]
+                        : qw( . A C G T )[$imax];
+        }
+        push @consensus, $res;
+    }
+
+    join( '', @consensus );
 }
 
 
 #-------------------------------------------------------------------------------
 #  Find the consensus amino acid residue at specified alignment column.
+#  For evaluating a whole alignment, this routine is more than 5x slower
+#  than consensus_sequence_aa().
 #
 #       $residue              = consensus_aa_in_column( \@align, $column, $gap_ok )
 #     ( $residue, $fraction ) = consensus_aa_in_column( \@align, $column, $gap_ok )
@@ -1772,6 +2017,8 @@ sub consensus_aa_in_column
 
 #-------------------------------------------------------------------------------
 #  Find the consensus nucleotide residue at specified alignment column.
+#  For evaluating a whole alignment, this routine is much slower than
+#  consensus_sequence_nt().
 #
 #       $residue              = consensus_nt_in_column( \@align, $column )
 #     ( $residue, $fraction ) = consensus_nt_in_column( \@align, $column )
@@ -1782,6 +2029,7 @@ sub consensus_aa_in_column
 #  The first form takes a reference to an array of sequence triples, while
 #  the second form takes a reference to an array of references to sequences.
 #  Column numbers are 1-based.
+#
 #-------------------------------------------------------------------------------
 sub consensus_nt_in_column
 {

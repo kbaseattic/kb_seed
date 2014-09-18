@@ -186,6 +186,18 @@ package gjoseqlib;
 #
 #  @sims = oligomer_similarity( $seq1, $seq2, \%opts )
 #
+#  Guess type of a sequence:
+#
+#  $type = guess_seq_type(  $sequence )
+#  $bool = is_dna(  $sequence )   # not RNA or prot
+#  $bool = is_rna(  $sequence )   # not DNA or prot
+#  $bool = is_na(  $sequence )    # nucleic acid, not prot
+#  $bool = is_prot(  $sequence )  # not DNA or RNA
+#
+#  $sequence can be a sequence string, a reference to a sequence string,
+#      or a [$id, $def, $seq] triple.
+#  $type will be keyword 'DNA', 'RNA' or 'protein', or undef in case of error.
+#
 #  Verify the structure of an [ id, desc, sequence ] triple and 
 #  the structure of an array of sequence triples:
 #
@@ -360,8 +372,6 @@ sub read_fasta_seqs { read_fasta( @_ ) }
 #    \@seq_entries = read_fasta( \*FILEHANDLE )
 #     @seq_entries = read_fasta(  $filename )
 #    \@seq_entries = read_fasta(  $filename )
-#  #  @seq_entries = read_fasta( "command |" )   #  open and read from pipe
-#  # \@seq_entries = read_fasta( "command |" )   #  open and read from pipe
 #     @seq_entries = read_fasta( \$string )      #  reference to file as string
 #    \@seq_entries = read_fasta( \$string )      #  reference to file as string
 #
@@ -394,7 +404,7 @@ sub read_fasta
         }
     }
 
-    wantarray() ? @seqs : \@seqs;
+    wantarray ? @seqs : \@seqs;
 }
 
 #-----------------------------------------------------------------------------
@@ -2655,6 +2665,44 @@ sub oligomer_similarity
 
 
 #-------------------------------------------------------------------------------
+#  Guess type of a sequence:
+#
+#     $type = guess_seq_type(  $sequence )
+#     $bool = is_dna(  $sequence )   # not RNA or prot
+#     $bool = is_rna(  $sequence )   # not DNA or prot
+#     $bool = is_na(  $sequence )    # nucleic acid, not prot
+#     $bool = is_prot(  $sequence )  # not DNA or RNA
+#
+#  $sequence can be a string, a reference to a string, or an id_def_seq triple.
+#  $type will be a keyword: 'DNA', 'RNA' or 'protein', or '' in case of error.
+#-------------------------------------------------------------------------------
+sub guess_seq_type
+{
+    local $_ = ( !      $_[0]               ) ?   undef
+             : ( ! ref( $_[0] )             ) ?   $_[0]
+             : (   ref( $_[0] ) eq 'SCALAR' ) ? ${$_[0]}
+             : (   ref( $_[0] ) eq 'ARRAY'  ) ?   $_[0]->[2]
+             :                                    undef;
+
+    return '' unless $_;
+
+    my $nt = tr/ACGNTUacgntu//;                                # nucleotides
+    my $aa = tr/ACDEFGHIKLMNPQRSTVWXYacdefghiklmnpqrstvwxy//;  # amino acids
+    return '' unless $nt + $aa > 10;
+
+    return  $nt < 0.75 * $aa  ? 'protein'    # amino acids > nucleotides
+          : tr/EFILPQefilpq// ? ''           # nonnucleotides are very bad
+          : tr/Uu// > tr/Tt// ? 'RNA'
+          :                     'DNA';
+}
+
+sub is_dna  { local $_ = guess_seq_type( $_[0] ); /DNA/   }
+sub is_rna  { local $_ = guess_seq_type( $_[0] ); /RNA/   }
+sub is_na   { local $_ = guess_seq_type( $_[0] ); /^.NA$/ }
+sub is_prot { local $_ = guess_seq_type( $_[0] ); /^prot/ }
+
+
+#-------------------------------------------------------------------------------
 #  Verify the structure of an [ id, desc, sequence ] triple and 
 #  the structure of an array of sequence triples
 #
@@ -2664,14 +2712,19 @@ sub oligomer_similarity
 #-------------------------------------------------------------------------------
 sub is_sequence_triple
 {
-    local $_ = $_[0];
-    $_ && ref( $_ ) eq 'ARRAY' && ( @$_ == 3 ) && defined( $_->[0] ) && defined( $_->[2] );
+    local $_ = shift;
+    $_ && ( ref($_) eq 'ARRAY' )
+       && ( @$_ == 3 )
+       && defined( $_->[0] )
+       && defined( $_->[2] );
 }
+
 
 sub is_array_of_sequence_triples
 {
     local $_ = $_[0];
     $_ && ref( $_ ) eq 'ARRAY' && @$_ == grep { is_sequence_triple( $_ ) } @$_;
 }
+
 
 1;

@@ -15,8 +15,9 @@ $var = rand_normal()
 $mean = mean( @x )
 ( $mean, $stdev ) = mean_stddev( @x )
 $cc = correl_coef( \@x, \@y )
-$cc = correl_coef_z_val( $cc, $n_samples )
+$Z  = correl_coef_z_val( $cc, $n_samples )
 
+$median = median( @list )
 $median = general_median( $fraction, @list )
 
 ( $chi_sqr, $df, $n ) = chi_square( \@expected, \@observed )
@@ -56,6 +57,7 @@ Notes:  Exponentiation by int uses **.
         Should consider explicit multiplication
 
         No checking for integer values is performed
+
 End_of_Usage
 }
 
@@ -69,6 +71,7 @@ our @EXPORT = qw(
         mean_stddev
         correl_coef
         correl_coef_z_val
+        median
         general_median
         chi_square
         contingency_chi_sqr
@@ -102,7 +105,7 @@ our @EXPORT = qw(
 sub rand_normal
 {
     my $sum = -6;
-    for (my $i = 1; $i <= 12; $i++) { $sum += rand }
+    for ( my $i = 1; $i <= 12; $i++ ) { $sum += rand }
     $sum;
 }
 
@@ -112,10 +115,11 @@ sub rand_normal
 #-----------------------------------------------------------------------------
 sub mean
 {
-    @_ || return undef;
+    my $n   = 0;
     my $sum = 0;
-    foreach ( @_ ) { $sum += $_ }
-    $sum / @_;
+    foreach ( @_ ) { if ( defined $_ ) { $n++; $sum += $_ } }
+
+    $n ? $sum / $n : undef;
 }
 
 
@@ -124,12 +128,12 @@ sub mean
 #-----------------------------------------------------------------------------
 sub mean_stddev
 {
-    my $n = @_;
-    return $n ? ( shift, undef) : ( undef, undef ) if $n < 2;
-    my ( $sum, $sum2 ) = ( 0, 0 );
-    foreach ( @_ ) { $sum += $_; $sum2 += $_ * $_ }
+    my ( $n, $sum, $sum2 ) = ( 0, 0, 0 );
+    foreach ( @_ ) { if ( defined $_ ) { $n++; $sum += $_; $sum2 += $_ * $_ } }
+    return $n ? ( $sum, undef) : ( undef, undef ) if $n < 2;
+
     my $x = $sum / $n;
-    ( $x, sqrt( ( $sum2 - $n * $x * $x ) / ( $n - 1 ) ) );
+    ( $x, sqrt( ( $sum2 - $sum * $x ) / ( $n - 1 ) ) );
 }
 
 
@@ -165,7 +169,7 @@ sub correl_coef
 
 
 #-----------------------------------------------------------------------------
-#  $cc = correl_coef_z_val( $cc, $n_samples )
+#  $Z = correl_coef_z_val( $cc, $n_samples )
 #
 #  arctanh(x) = ln( ( 1 + x ) / ( 1 - x ) ) / 2
 #-----------------------------------------------------------------------------
@@ -179,9 +183,27 @@ sub correl_coef_z_val
 
 
 #-----------------------------------------------------------------------------
+#  Value that 50% of n sample values are below. Discarding undef.
+#
+#     $median = median( @list )
+#-----------------------------------------------------------------------------
+sub median
+{
+    my @list = sort { $a <=> $b } grep { defined $_ } @_
+        or return undef;
+
+    #  Find midpoint for odd and even cases
+    ( @list % 2 ) ? $list[ int( @list/2 ) ]
+                  : 0.5 * ( $list[ @list/2 ] + $list[ @list/2 + 1 ] );
+}
+
+
+#-----------------------------------------------------------------------------
 #  Value that fraction of n sample values are below
 #
-#  $median = general_median( $fraction, @list )
+#     $median = general_median( $fraction, @list )
+#
+#  Musings on splitting the intervals between sample values
 #-----------------------------------------------------------------------------
 #                                     n
 #        ----------------------------------------------------------------
@@ -195,24 +217,23 @@ sub correl_coef_z_val
 sub general_median
 {
     my $fr = shift;
-    defined( $fr ) && ( $fr > 0 )
-                   && ( $fr < 1 )
-                   || confess "gjostat::general_median called with bad fraction: $fr\n";
+    ( defined( $fr ) && ( $fr > 0 ) && ( $fr < 1 ) )
+        or confess "gjostat::general_median called with bad fraction: $fr\n";
 
-    my $n = @_;
+    my @list = sort { $a <=> $b } grep { defined $_ } @_;
+    my $n = @list;
     my $nbelow = $n * $fr;
     ( $n > 1 ) && ( $nbelow - 0.5 >=  0 )
                && ( $nbelow + 0.5 <= $n )
                || return undef;
 
-    my (@list) = sort { $a <=> $b } @_;
     my $ibelow = int($nbelow - 0.5);
     my $frac   = $nbelow - 0.5 - $ibelow;
 
     my $median = $list[ $ibelow ];
     $median += $frac * ( $list[ $ibelow+1 ] - $median )  if $frac;
 
-    return $median;
+    $median;
 }
 
 
@@ -582,7 +603,7 @@ sub ln_binomial_coef
 
     ( 2 * $m <= $n ) ? ln_binomial_coef_1($n, $m)
                      : ln_binomial_coef_1($n, $n-$m);
-    }
+}
 
 
 sub ln_binomial_prob_eq_m
@@ -706,7 +727,7 @@ sub binomial_prob_eq_m_0 {            # no error checking
     my ($n, $m, $p) = @_;
     if ($p == 0) { return ($m ==  0) ? 1 : 0 }
     if ($p == 1) { return ($m == $n) ? 1 : 0 }
-    return (($n <= 1020) && ($m*log($p) + ($n-$m)*log(1-$p) > -744))
+    (($n <= 1020) && ($m*log($p) + ($n-$m)*log(1-$p) > -744))
         ? binomial_coef_0($n, $m) * $p**$m * (1-$p)**($n-$m)
         : exp(ln_binomial_coef_0($n, $m) + $m*log($p) + ($n-$m)*log(1-$p));
 }
@@ -1213,7 +1234,7 @@ sub  factorial
     ( 1 == @_ ) || confess "gjostat::factorial called without 1 arg\n";
     my $n = shift;
     ( $n >= 0 ) && ( $n <= 170)
-                || confess "gjostat::factorial called with out of range argument\n";
+                || confess "gjostat::factorial called with out of range argument: '$n'\n";
 
     factorial_0( $n );
 }

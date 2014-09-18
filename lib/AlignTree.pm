@@ -1142,7 +1142,7 @@ sub print_string {
 
 sub make_tree {
     my ($ali, $opts) = ffxtree::process_input_args_w_ali(@_);
-
+    
     return unless @$ali >= 3;
 
     my $program;
@@ -1151,7 +1151,7 @@ sub make_tree {
 
     if    ($opts->{tool} =~ /fasttree/i) { $program = \&ffxtree::tree_with_fasttree;  $opts->{fasttree} = "/home/fangfang/bin/fasttree" }
     elsif ($opts->{tool} =~ /phyml/i)    { $program = \&ffxtree::tree_with_phyml;     $opts->{phyml}    = "/home/fangfang/bin/phyml" }
-    elsif ($opts->{tool} =~ /raxml/i)    { $program = \&ffxtree::tree_with_raxml;     $opts->{raxml}    = "/home/fangfang/bin/raxmlHPC" }
+    elsif ($opts->{tool} =~ /raxml/i)    { $program = \&ffxtree::tree_with_raxml;     $opts->{raxml}    = "/home/fangfang/bin/raxmlHPC-PTHREADS-SSE3" }
 
     my $nb = $opts->{bootstrap};
     my $np = $opts->{nproc};
