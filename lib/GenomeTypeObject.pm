@@ -247,7 +247,16 @@ sub update_indexes
     {
 	$contig_index->{$contig->{id}} = $contig;
     }
-    
+
+    #
+    # Event index.
+    #
+    my $event_index = {};
+    $self->{_event_index} = $event_index;
+    for my $e (@{$self->{analysis_events}})
+    {
+	$event_index->{$e->{id}} = $e;
+    }
     return $self;
 }
 
@@ -782,5 +791,117 @@ sub seed_location_to_location_list
 		     [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
     return wantarray ? @locs : \@locs;
 }
-    
+
+#
+# Renumber the features such that they are in order along the contigs.
+#
+# We use the order of the contigs in the contigs to set the overall ordering.
+# 
+sub renumber_features
+{
+    my($self, $user, $event_id) = @_;
+
+    my %contig_order;
+    my $i = 0;
+    for my $c (@{$self->{contigs}})
+    {
+	$contig_order{$c->{id}} = $i++;
+    }
+
+
+    my @f = sort {
+	my($ac, $apos) = sort_position($a);
+	my($bc, $bpos) = sort_position($b);
+	($a->{type} cmp $b->{type}) or
+	($contig_order{$ac} <=> $contig_order{$bc}) or
+	$apos <=> $bpos } @{$self->{features}};
+
+    my $nf = [];
+
+    my $id = 1;
+    my $last_type = '';
+    for my $f (@f)
+    {
+	my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_; 
+				 "$contig\_$beg$strand$len" 
+			       } @{$f->{location}});
+
+	my($c, $left) = sort_position($f);
+
+	if ($f->{type} ne $last_type)
+	{
+	    $id = 1;
+	    $last_type = $f->{type};
+	}
+	if ($f->{id} =~ /(.*\.)(\d+)$/)
+	{
+	    my $new_id = $1 . $id++;
+
+	    my $annotation = ["Feature renumbered from $f->{id} to $new_id", $user, scalar gettimeofday, $event_id];
+	    push(@{$f->{annotations}}, $annotation);
+	    
+	    $f->{id} = $new_id;
+	}
+	else
+	{
+	    warn "Cannot renumber feature with id $f->{id}\n";
+	}
+
+	push(@$nf, $f);
+	
+	# print join("\t", $f->{id}, $c, $left, $loc), "\n";
+	
+    }
+    $self->{features} = $nf;
+}
+
+#
+# compute the contig and coordinate to use for sorting for this feature.
+#
+sub sort_position
+{
+    my($f) = @_;
+    my $min = 1e6;
+    my $contig;
+
+    for my $l (@{$f->{location}})
+    {
+	my($c, $beg, $str, $len) = @$l;
+	$contig = $c;
+	my $left;
+	if ($str eq '+')
+	{
+	    $left = $beg;
+	}
+	else
+	{
+	    $left = $beg - $len + 1;
+	}
+	$min = $min < $left ? $min : $left;
+    }
+    return ($contig, $min);
+}
+
+sub get_creation_info
+{
+    my($self, $feature) = @_;
+
+    my $fcid = $feature->{feature_creation_event};
+    my $cevent = $self->{_event_index}->{$fcid} if $fcid;
+
+    my $anno_id;
+    my $anno_tool;
+    for my $anno (@{$feature->{annotations}})
+    {
+	my($str, $tool, $date, $eid) = @$anno;
+	if ($str =~ /Function updated/ && defined($eid) && $eid)
+	{
+	    $anno_id = $eid;
+	    $anno_tool = $tool;
+	}
+    }
+    my $aevent = $self->{_event_index}->{$anno_id} if $anno_id;
+    return($cevent, $aevent, $anno_tool);
+}
+
 1;

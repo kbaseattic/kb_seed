@@ -272,6 +272,12 @@ for my $f (@{$genomeTO->{features}})
 	push @{$note->{"EC_number"}}, keys(%ecs);
     }
 
+    my($creation_event, $annotation_event, $annotation_tool) = $genomeTO->get_creation_info($f);
+
+    $annotation_tool ||= $annotation_event->{tool_name};
+    push(@{$note->{note}}, "rasttk_feature_creation_tool=$creation_event->{tool_name}") if $creation_event;
+    push(@{$note->{note}}, "rasttk_feature_annotation_tool=$annotation_tool") if $annotation_tool;
+
     my $loc;
 
     my @loc_obj;
