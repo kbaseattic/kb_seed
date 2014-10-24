@@ -982,6 +982,7 @@ sub report_counts
         $label = $cnts->[1] unless defined $label;
         $cnts  = $cnts->[0];
     }
+
     print $fh join( '  ', map { join( ' ', map { $_ || 0 } @$_ ) } @$cnts ),
               ( defined $label ? "\t$label" : () ),
               "\n";
@@ -2603,6 +2604,7 @@ sub simulate_genome
 #      pipes      => n_pipe    #  number of processes to use in evaluation (D = 4)
 #      pseudo     => float     #  per aa pseudo count in codon frequencies (D = 1)
 #      root       => temp_file #  root name for count_file
+#      trust_cnt  => boolean   #  trust the counts file (don't clobber it)
 #      verbose    => int       #  reporting interval for opt steps (D = never)
 #      vertices   => int       #  minimum vertices in simplex optimization (D = 50)
 #
@@ -2634,6 +2636,7 @@ sub modal_codon_usage
     my $pipes     = option_by_regexp( $options, qr/pipe/i, $dfl_pipe );
     my $pseudo    = option_by_regexp( $options, qr/^pseudo/i,      1 );
     my $root_name = option_by_regexp( $options, qr/root/i,     undef );
+    my $trust_cnt = option_by_regexp( $options, qr/^trust/i,       0 );
     my $verbose   = option_by_regexp( $options, qr/^verb/i,    undef );
     my $vertices  = option_by_regexp( $options, qr/vert/i,        50 );
     $n_top = $vertices if $n_top < $vertices;
@@ -2645,10 +2648,12 @@ sub modal_codon_usage
     my $save_cnt_file = -f $cnt_file;
 
     #  The mode optimization needs a counts file.  This is configured to not
-    #  clobber and existing file of nonzero size.  Other subroutines in this
+    #  clobber an existing file of nonzero size.  Other subroutines in this
     #  module will overwrite it with the data supplied. 
 
-    if ( ( @$counts >= 6 ) || $save_cnt_file )
+    if ( ( ( @$counts >= 6 ) || $save_cnt_file )
+      && ( ( ! -s $cnt_file ) || ! $trust_cnt )
+       )
     {
         my $cntFH;
         if ( length $cnt_file )

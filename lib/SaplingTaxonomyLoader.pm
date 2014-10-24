@@ -116,9 +116,9 @@ L<Sapling> object used to access the target database.
 
 Name of the directory containing the taxonomic dump files from the NCBI.
 
-=item setFile
+=item setFile (optional)
 
-Name of the file containing the OTU information.
+Name of the file containing the OTU information. If omitted, the OTU information is not loaded.
 
 =item RETURN
 
@@ -134,7 +134,9 @@ sub LoadTaxonomies {
     # Create the helper object.
     my $loaderObject = SaplingTaxonomyLoader->new($sap);
     # Load the OTUs.
-    $loaderObject->ReadGenomeSets($setFile);
+    if ($setFile) {
+    	$loaderObject->ReadGenomeSets($setFile);
+    }
     # Load the taxonomy data.
     $loaderObject->ReadTaxonomies($dumpDirectory);
     # Return the statistics.

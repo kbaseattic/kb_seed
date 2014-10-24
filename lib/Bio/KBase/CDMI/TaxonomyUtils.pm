@@ -220,8 +220,11 @@ sub ReadTaxonomies {
         # Create the taxonomy group record.
         $loader->InsertObject('TaxonomicGrouping', id => $taxID, domain => $domain, hidden => $hidden,
                scientific_name => $name, type => $type);
-        # Connect the group to its parent.
-        $loader->InsertObject('IsGroupFor', from_link => $parent, to_link => $taxID);
+        # Connect the group to its parent. Note the special check to avoid creating the loop at the
+        # top in the NCBI data, where the root is the parent of itself.
+        if ($parent ne $taxID) {
+        	$loader->InsertObject('IsGroupFor', from_link => $parent, to_link => $taxID);
+        }
     }
     # Create the aliases.
     for my $alias (keys %nameTable) {

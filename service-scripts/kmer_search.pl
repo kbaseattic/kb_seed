@@ -21,6 +21,7 @@ take hours.  The second time It builds a memory map.  The third time
 it moves the memory map into cache.  Thereafter, as long as the map
 does not drift out of cache, it should run quickly.  
 
+ALSO NOTE: The genomes file MUST have the genome ID (number) as the SECOND column.
 ------
 
 The standard input should be a fasta file (use -a for protein sequences; leave

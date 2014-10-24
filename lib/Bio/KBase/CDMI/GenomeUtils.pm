@@ -167,26 +167,44 @@ sub ConvertGenome {
         close $oh; undef $oh;
         close $ih; undef $ih;
     }
-    # Now we need to output the assignments.
+    # Now we need to output the assignments. We loop through the three files in priority order.
     print "Copying assignments.\n";
-    open($ih, "<$inDirectory/assigned_functions") || die "Error opening assigned functions input: $!";
-    open($oh, ">$outDirectory/functions.tab") || die "Error opening functions output: $!";
-    while (! eof $ih) {
-        # Get this assignment.
-        my ($fid, $assignment) = Tracer::GetLine($ih);
-        $stats->Add(assignmentLineIn => 1);
-        # Is it deleted?
-        if ($deleted{$fid}) {
-            # Yes. Skip it.
-            $stats->Add(assignmentLineSkipped => 1);
-        } else {
-            # No. Write it out.
-            print $oh "$fid\t$assignment\n";
-            $stats->Add(assignmentLineOut => 1);
-        }
+    my %functions;
+    my $fileCount = 0;
+    for my $funFile ("assigned_functions", "proposed_non_ff_functions", "proposed_functions") {
+    	my $fullName = "$inDirectory/$funFile";
+    	if (-f $fullName) {
+		    open($ih, "<$fullName") || die "Error opening $funFile input: $!";
+		    $stats->Add("$funFile-open" => 1);
+		    $fileCount++;
+		    while (! eof $ih) {
+		        # Get this assignment.
+		        my ($fid, $assignment) = Tracer::GetLine($ih);
+		        $stats->Add(assignmentLineIn => 1);
+		        # Is it deleted?
+		        if ($deleted{$fid}) {
+		            # Yes. Skip it.
+		            $stats->Add(assignmentLineSkipped => 1);
+		        } else {
+		            # No. Save it.
+		            $functions{$fid} = $assignment;
+		            $stats->Add("$funFile-stored" => 1);
+		        }
+		    }
+		    close $ih; undef $ih;
+    	}
     }
-    close $ih; undef $ih;
+    if (! $fileCount) {
+    	die "No assignment files found for $genomeID";
+    }
+    # Write out the assignments.
+    open($oh, ">$outDirectory/functions.tab") || die "Error opening functions output: $!";
+    for my $fid (sort keys %functions) {
+        print $oh "$fid\t$functions{$fid}\n";
+        $stats->Add(assignmentLineOut => 1);
+    }
     close $oh; undef $oh;
+    %functions = ();
     # Finally, we must create the metadata file.
     open($oh, ">$outDirectory/metadata.tbl") || die "Error opening metadata output: $!";
     print "Writing genome attributes.\n";
@@ -1071,7 +1089,8 @@ L<Bio::KBase::CDMI::CDMILoader> object for accessing the database.
 
 =item contigMap
 
-Reference to a hash mapping source contig IDs to KBase contig IDs.
+Reference to a hash mapping source contig IDs to KBase contig IDs, or C<undef> if the locations already
+contain KBase contig IDs.
 
 =item segmentLength
 
@@ -1450,20 +1469,32 @@ sub GetSeedGenomeHash {
             } elsif (! -f "$genomeDir/assigned_functions") {
                 print "WARNING: $genome is missing its assigned functions file.\n";
                 $stats->Add(genomeFunctionFileNotFound => 1);
-            } elsif (! open(my $ih, "<$genomeDir/MD5SUM")) {
-                print "WARNING: $genome has bad MD5 file: $!\n";
-                $stats->Add(genomeMD5FileNotFound => 1);
             } else {
                 # Try to read the MD5.
-                my $md5 = <$ih>;
-                if (! $md5) {
-                    print "WARNING: MD5 file for $genome is empty.\n";
-                    $stats->Add(genomeMD5FileEmpty => 1);
+                if (! -f "$genomeDir/KB_MD5") {
+                	# This genome doesn't have one, so we create it.
+                	my $md5Object = MD5Computer->new_from_fasta("$genomeDir/contigs");
+                	my $md5 = $md5Object->genomeMD5();
+                	open(my $oh, ">$genomeDir/KB_MD5") || die "Could not open KB_MD5 for $genome: $!";
+                	print $oh $md5;
+                	close $oh;
+                	$stats->Add(genomeMD5Created => 1);
+                }
+                # Now try to read the MD5 file. We know it's there.
+                if (! open(my $ih, "$genomeDir/KB_MD5")) {
+                	print "WARNING: $genome has a bad KB_MD5 file.\n";
+                	$stats->Add(genomeMD5FileError => 1);
                 } else {
-                    # We read in the MD5. Clean the line-end and put it in
-                    # the hash.
-                    chomp $md5;
-                    $retVal{$genome} = $md5;
+	                my $md5 = <$ih>;
+	                if (! $md5) {
+	                    print "WARNING: MD5 file for $genome is empty.\n";
+	                    $stats->Add(genomeMD5FileEmpty => 1);
+	                } else {
+	                    # We read in the MD5. Clean the line-end and put it in
+	                    # the hash.
+	                    chomp $md5;
+	                    $retVal{$genome} = $md5;
+	                }
                 }
             }
         }

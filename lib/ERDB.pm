@@ -4338,7 +4338,7 @@ sub FixEntity {
 
 =head3 FixRelationship
 
-    my $stats = $erdb->FixRelationship($name);
+    my $stats = $erdb->FixRelationship($name, $testOnly);
 
 This method scans a relationship and insures that all of the
 instances connect to valid entities on both sides. If any instance
@@ -4351,6 +4351,10 @@ memory-intensive.
 
 Name of the relationship to scan.
 
+=item testOnly
+
+If TRUE, then statistics will be accumulated but no deletions will be performed.
+
 =item RETURN
 
 Returns a L<Stats> object describing the scan results.
@@ -4361,7 +4365,7 @@ Returns a L<Stats> object describing the scan results.
 
 sub FixRelationship {
     # Get the parameters.
-    my ($self, $name) = @_;
+    my ($self, $name, $testOnly) = @_;
     # Create the statistics object to return.
     my $retVal = Stats->new();
     # Compute the names of the entities on either side.
@@ -4389,12 +4393,14 @@ sub FixRelationship {
             $retVal->Add("key$name$dir" => 1);
             push @idList, $id;
             if (scalar(@idList) >= 50) {
-                $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList);
+                $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList, $testOnly);
                 @idList = ();
             }
         }
         # Process the residual batch (if any).
-        $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList);
+        if (@idList) {
+        	$self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList, $testOnly);
+        }
     }
     # Return the statistics object with the results.
     return $retVal;
@@ -4405,7 +4411,7 @@ sub FixRelationship {
 # relationship rows are deleted.
 sub _ProcessFixRelationshipBatch {
     # Get the parameters.
-    my ($self, $stats, $name, $entity, $dir, $idList) = @_;
+    my ($self, $stats, $name, $entity, $dir, $idList, $testOnly) = @_;
     # Construct a query to look up the entity IDs.
     my $n = scalar(@$idList);
     my $filter = "$entity(id) IN (" . join(", ", ('?') x $n) . ")";
@@ -4420,8 +4426,10 @@ sub _ProcessFixRelationshipBatch {
         if (! $keysFound{$id}) {
             # Key was not found, so delete its relationship rows.
             $stats->Add("$entity-keyNotFound" => 1);
-            my $count = $self->DeleteLike($name, $filter, [$id]);
-            $stats->Add("$name-delete$dir" => $count);
+            if (! $testOnly) {
+	            my $count = $self->DeleteLike($name, $filter, [$id]);
+	            $stats->Add("$name-delete$dir" => $count);
+            }
         }
     }
 }

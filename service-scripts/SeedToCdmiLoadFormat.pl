@@ -143,8 +143,15 @@ genome IDs for the genomes to load in its first column.
             Trace("Genome $genomeID skipped: already created.") if T(2);
             $stats->Add(genomeSkipped => 1);
         } else {
-        	Bio::KBase::CDMI::GenomeUtils::ConvertGenome($stats, $genomeID, $genomeHash->{$genomeID},
-                "$outDirectory/$genomeID");
+        	Trace("Processing $genomeID.") if T(2);
+        	eval {
+	        	Bio::KBase::CDMI::GenomeUtils::ConvertGenome($stats, $genomeID, $genomeHash->{$genomeID},
+	                "$outDirectory/$genomeID");
+        	};
+        	if ($@) {
+        		Trace("Error processing $genomeID: $@") if T(1);
+        		$stats->Add(badGenomes => 1);
+        	}
         }
     }
     # Output the statistics.

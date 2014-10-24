@@ -666,6 +666,59 @@ sub LoadRelations {
 
 =head2 Loader Utility Methods
 
+=head3 UpdateFunction
+
+	$loader->UpdateFunction($fid, $function);
+
+Update the functional assignment of a feature. The functional assignment is changed and the role links
+are reconnected to reflect the new role.
+
+=over 4
+
+=item fid
+
+ID of the feature whose functional assignment is to be updated.
+
+=item function
+
+new functional assignment to give to the feature
+
+=back
+
+=cut
+
+sub UpdateFunction {
+	# Get the parameters.
+	my ($self, $fid, $function) = @_;
+	# Get the support objects.
+	my $cdmi = $self->cdmi;
+	my $stats = $self->stats;
+    # Compute the new roles.
+	my ($roles, $errors) = SeedUtils::roles_for_loading($function);
+    # Disconnect the feature from its current roles.
+	$cdmi->Disconnect('IsFunctionalIn', Feature => $fid);
+	if (! defined $roles) {
+		# Here the function does not appear to be a role.
+		$stats->Add(roleRejected => 1);
+	} else {
+		# Here the function contained one or more roles. We will also count
+		# the number of roles that were rejected for being too
+		# long.
+		$stats->Add(rolesTooLong => $errors);
+		# Loop through the roles found.
+		for my $role (@$roles) {
+		    # Insure this role is in the database.
+		    my $roleID = $self->CheckRole($role);
+		    # Connect it to the feature.
+		    $cdmi->InsertObject('IsFunctionalIn', from_link => $roleID,
+		        to_link => $fid);
+		    $stats->Add(connectRole => 1);
+		}
+	}
+	# Update the feature with the new function.
+	$cdmi->UpdateEntity('Feature', $fid, function => $function);
+}
+
 =head3 genome_load_file_name
 
     my $fileName = $loader->genome_load_file_name($directory, $name);

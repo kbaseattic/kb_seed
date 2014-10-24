@@ -429,7 +429,9 @@ sub ParseSpreadsheet {
         $stats->Add(roles => 1);
     }
     # The final section is the role table itself. Here we get the rest of the variant data, as well.
-    my %varsAdded;
+    # We do this in two passes. First pass accumulates the data in a hash table. The second processes
+    # the data. This insures that the last version of any molecular machine is the one we keep.
+    my (%varsAdded, %machines);
     $done = 0;
     Trace("Processing role table.") if T(SaplingDataLoader => 3);
     while (! eof $ih && ! $done) {
@@ -461,37 +463,45 @@ sub ParseSpreadsheet {
                 $varsAdded{$variantID} = {};
                 $stats->Add(variants => 1);
             }
-            # Create the molecular machine.
-            $sap->InsertObject('IsImplementedBy', from_link => $variantID, to_link => $machineID);
-            $sap->InsertObject('MolecularMachine', id => $machineID, curated => $curated,
-                               region => $regionString);
-            # Now loop through the cells.
-            my @rolesFound;
-            for (my $i = 0; $i <= $#cells; $i++) {
-                my $cell = $cells[$i];
-                # Is this cell occupied?
-                if ($cell) {
-                    # Yes. Get this cell's role abbreviation and add it to the list of roles found
-                    # in this row.
-                    my $abbr = $roleList[$i];
-                    push @rolesFound, $abbr;
-                    # Create the machine role.
-                    my $machineRoleID = "$ssMD5:$genomeID:$regionString:$abbr";
-                    $sap->InsertObject('IsMachineOf', from_link => $machineID, to_link => $machineRoleID);
-                    $sap->InsertObject('MachineRole', id => $machineRoleID);
-                    $sap->InsertObject('IsRoleOf', from_link => $roleHash{$abbr},
-                                       to_link => $machineRoleID);
-                    # Connect the pegs in this cell to it.
-                    for my $pegN (split m/\s*,\s*/, $cell) {
-                        $sap->InsertObject('Contains', from_link => $machineRoleID,
-                                           to_link => "fig|$genomeID.peg.$pegN");
-                    }
+            # Store this machine.
+            $machines{$machineID} = [$variantID, $genomeID, $curated, $regionString, @cells];
+        }
+    }
+    for my $machineID (keys %machines) {
+       	# Get this machine's data.
+       	my $machineData = $machines{$machineID};
+       	my ($variantID, $genomeID, $curated, $regionString, @cells) = @$machineData;
+      	Trace("Processing machine $machineID for genome $genomeID/$regionString.") if T(SaplingDataLoader => 3);
+        # Create the molecular machine.
+        $sap->InsertObject('IsImplementedBy', from_link => $variantID, to_link => $machineID);
+        $sap->InsertObject('MolecularMachine', id => $machineID, curated => $curated,
+                           region => $regionString);
+        # Now loop through the cells.
+        my @rolesFound;
+        for (my $i = 0; $i <= $#cells; $i++) {
+            my $cell = $cells[$i];
+            # Is this cell occupied?
+            if ($cell) {
+                # Yes. Get this cell's role abbreviation and add it to the list of roles found
+                # in this row.
+                my $abbr = $roleList[$i];
+                push @rolesFound, $abbr;
+                # Create the machine role.
+                my $machineRoleID = "$machineID:$abbr";
+                $sap->InsertObject('IsMachineOf', from_link => $machineID, to_link => $machineRoleID);
+                $sap->InsertObject('MachineRole', id => $machineRoleID);
+                $sap->InsertObject('IsRoleOf', from_link => $roleHash{$abbr},
+                                   to_link => $machineRoleID);
+                # Connect the pegs in this cell to it.
+                for my $pegN (split m/\s*,\s*/, $cell) {
+                    $sap->InsertObject('Contains', from_link => $machineRoleID,
+                                       to_link => "fig|$genomeID.peg.$pegN");
                 }
             }
-            # Compute a role rule from this row's roles and associate it with this variant.
-            my $roleRule = join(" ", @rolesFound);
-            $varsAdded{$variantID}->{$roleRule} = 1;
         }
+        # Compute a role rule from this row's roles and associate it with this variant.
+        my $roleRule = join(" ", @rolesFound);
+        $varsAdded{$variantID}->{$roleRule} = 1;
     }
     # We've finished the spreadsheet. Now we go back and add the role rules to the variants.
     for my $variantID (keys %varsAdded) {

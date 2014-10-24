@@ -398,7 +398,8 @@ sub native_codon_usage
 
     my $mode_opts = { count_file => $counts_file,
                       exponent   => $mode_exponent,
-                      quiet      => 1
+                      quiet      => 1,
+                      trust_cnt  => 1
                     };
     my $gen_mode = gjocodonlib::modal_codon_usage( \@gen_counts, $mode_opts );
 

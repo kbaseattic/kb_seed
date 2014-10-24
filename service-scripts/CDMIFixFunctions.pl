@@ -61,30 +61,7 @@ There is one positional parameter-- the name of the input file.
 		    if (! $cdmi->Exists(Feature => $fid)) {
 		    	$stats->Add(featureNotFound => 1);
 		    } else {
-		        # Compute the new roles.
-        		my ($roles, $errors) = SeedUtils::roles_for_loading($function);
-		        # Disconnect the feature from its current roles.
-		        $cdmi->Disconnect('IsFunctionalIn', Feature => $fid);
-		        if (! defined $roles) {
-		            # Here the function does not appear to be a role.
-		            $stats->Add(roleRejected => 1);
-		        } else {
-		            # Here the function contained one or more roles. We will also count
-		            # the number of roles that were rejected for being too
-		            # long.
-		            $stats->Add(rolesTooLong => $errors);
-		            # Loop through the roles found.
-		            for my $role (@$roles) {
-		                # Insure this role is in the database.
-		                my $roleID = $loader->CheckRole($role);
-		                # Connect it to the feature.
-		                $cdmi->InsertObject('IsFunctionalIn', from_link => $roleID,
-		                        to_link => $fid);
-		                $stats->Add(connectRole => 1);
-		            }
-		        }
-		        # Update the feature with the new function.
-		        $cdmi->UpdateEntity('Feature', $fid, function => $function);
+		    	$loader->UpdateFunction($fid, $function);
 		    }
         }
         print "All done:\n" . $stats->Show();

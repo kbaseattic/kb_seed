@@ -255,7 +255,7 @@ if (! $source) {
 } else {
 	# Build our options hash.
 	my $options = { slow => $slow, noContigs => $noContigs, newOnly => $newOnly,
-					noProteins => \$noProteins };
+					noProteins => $noProteins };
     # Connect to the KBID server and create the loader utility object.
     my $id_server;
     if ($id_server_url eq 'none') {
