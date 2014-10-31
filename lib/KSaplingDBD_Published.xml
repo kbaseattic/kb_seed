@@ -2266,7 +2266,7 @@
 		<Notes>A series refers to a group of samples for expression data.</Notes>
 		<Asides>This often times will map to a GEO Series aka GSE#.</Asides>
 		<Fields>
-			<Field name="title" type="long-string">
+			<Field name="title" type="text">
 				<Notes>free text - title of the series</Notes>
 			</Field>
 			<Field name="summary" type="text">
@@ -3876,14 +3876,6 @@
 	  <Notes>text of the alias for the feature.</Notes>
 	</Field>
       </Fields>
-      <Indexes>
-      	<Index>
-      		<Notes>This index support searching by alias name.</Notes>
-      		<IndexFields>
-      			<IndexField name="alias" />
-      		</IndexFields>
-      	</Index>
-      </Indexes>
     </Relationship>
     <Relationship name="HasMember" from="Family" to="Feature"
       arity="MM" converse="IsMemberOf">

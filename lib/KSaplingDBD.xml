@@ -826,6 +826,11 @@
           <Notes>identifier assigned to this genome by the original
           source</Notes>
         </Field>
+         <Field name="ncbi-scientific-name" type="string">
+	  <Notes>NCBI scientific name this genome is associated with.  
+	  If an exact match is not found it may contain a higher level match, typically 
+	  Genus or Species level.</Notes>
+	</Field>
       </Fields>
       <FulltextIndexes>
         <FulltextIndex type="field" name="scientific-name"
@@ -833,6 +838,8 @@
         <FulltextIndex type="field" name="domain" />
         <FulltextIndex type="field" name="md5" in_result="1" />
         <FulltextIndex type="field" name="source-id"
+          in_result="1" />
+        <FulltextIndex type="field" name="ncbi-scientific-name"
           in_result="1" />
       </FulltextIndexes>
       <Indexes>
@@ -856,6 +863,13 @@
           database.</Notes>
           <IndexFields>
             <IndexField name="source-id" order="ascending" />
+          </IndexFields>
+        </Index>
+        <Index>
+          <Notes>This index allows the applications to find all
+          genome sequences in lexical order by NCBI scientific name.</Notes>
+          <IndexFields>
+            <IndexField name="ncbi-scientific-name" order="ascending" />
           </IndexFields>
         </Index>
       </Indexes>
