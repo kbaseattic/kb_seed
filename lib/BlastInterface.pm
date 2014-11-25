@@ -196,11 +196,25 @@ sub blast
     {
         warn "BlastInterface::blast: invalid blast program '$blast_prog'.\n";
     }
-    elsif ( ! ( $queryF = &get_query( $query, $tempD, $parms ) ) ) 
+    elsif ( $blast_prog ne 'psiblast'
+         && ! ( $queryF = &get_query( $query, $tempD, $parms ) )
+       # && ! ( print STDERR Dumper($queryF = &get_query( $query, $tempD, $parms )) )
+          ) 
     {
         warn "BlastInterface::get_query: failed to get query sequence data.\n";
     }
-    elsif ( ! ( $dbF = &get_db( $$dbR, $blast_prog, $tempD, $parms ) ) )
+    elsif ( $blast_prog eq 'psiblast'
+         && $query
+         && ! ( ( $queryF, $parms ) = &psiblast_in_msa( $query, $parms ) )[0]
+       # && ! ( print STDERR Dumper(( $queryF, $parms ) = &psiblast_in_msa( $query, $parms )) )[0]
+          )
+    {
+        warn "BlastInterface::psiblast_in_msa: failed to get query msa data.\n";
+    }
+    elsif (
+            ! ( $dbF = &get_db( $$dbR, $blast_prog, $tempD, $parms ) )
+       #    ! ( print STDERR Dumper($dbF = &get_db( $$dbR, $blast_prog, $tempD, $parms )) )
+          )
     {
         warn "BlastInterface::get_db: failed to get database sequence data.\n";
     }
@@ -213,7 +227,7 @@ sub blast
     if (! $save_temp)
     {
         delete $parms->{tmp_dir};
-        system( "rm", "-r", $tempD );
+        system( "rm", "-fr", $tempD );
     }
 
     return wantarray ? @$user_output : $user_output;
@@ -247,46 +261,8 @@ sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 #    outPSSM  =>  $file   #  output PSSM filename or handle (D = STDOUT)
 #    title    =>  $title  #  title of the PSSM (D = "untitled_$i")
 #
-#  Sequence filtering options:
-#
-#    keep    => \@ids           #  ids of sequences to keep in the MSA, regardless
-#                               #      of similarity filtering.
-#    max_sim =>  $fract         #  maximum identity of sequences in profile; i.e., build
-#                               #      the PSSM from a representative set (D = no_limit).
-#    min_sim =>  $min_sim_spec  #  exclude sequences with less than the specified identity 
-#                               #     to all specified sequences (D = no_limit).
-#
-#  where the minimum similarity specification is one of:
-#
-#    $min_sim_spec = [ $min_ident,  @ref_ids ]
-#    $min_sim_spec = [ $min_ident, \@ref_ids ]
-#
-#
-#  Master sequence options:
-#
-#    ignore_msa_master =>  $bool   #  do not include the master sequence in the PSSM (D = 0)
-#    ignoreMaster      =>  $bool   #  do not include the master sequence in the PSSM (D = 0)
-#    msa_master_id     =>  $id     #  ID of the sequence to use as a master
-#    msa_master_idx    =>  $int    #  1-based index of the sequence to use as a master (D = 1)
-#    pseudo_master     =>  $bool   #  add a master sequence covering all columns in the MSA (D = 0)
-#    pseudoMaster      =>  $bool   #  add a master sequence covering all columns in the MSA (D = 0)
-#
-#  Master sequence notes:
-#
-#    A psiblast PSSM is a query for a database search. The search output
-#    alignments are shown against the "msa_master" sequence, which defaults
-#    to the first sequence in the alignment supplied. The PSSM only includes
-#    alignment columns that are in the master sequence, so the reported
-#    match statistics (E-value, identity, positives, and gaps) and the
-#    alignment are all evaluated relative to the master sequence. For this
-#    reason, we provide a 'pseudo_master' option that adds a master sequence
-#    that is the plurality residue type in every column of the alignment.
-#    Thus, PSSM and the output alignments will reflect all columns in the
-#    original alignment, but the query sequence shown is unlikely to
-#    correspond to any of the input sequences. If this option is chosen,
-#    ignore_msa_master is set to true, so that the consensus is not included
-#    in the calculation of the PSSM. Any msa_master_id or msa_master_idx option
-#    value will be ignored.
+#  In addition, alignment_to_pssm takes all of the options of psiblast_in_msa
+#  (see below)
 #
 #-------------------------------------------------------------------------------
 
@@ -299,130 +275,15 @@ sub alignment_to_pssm
     my ( $align, $opts ) = @_;
     $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
 
-    my $ignore_master  = $opts->{ ignore_msa_master } || $opts->{ ignoreMaster };
-    my $pseudo_master  = $opts->{ pseudo_master }     || $opts->{ pseudoMaster };
-    my $msa_master_id  = $opts->{ msa_master_id };
-    my $msa_master_idx = $opts->{ msa_master_idx }    || 0;
-    my $max_sim        = $opts->{ max_sim };
-    my $min_opt        = $opts->{ min_sim };
-
-    my ( $min_sim, @ref_ids );
-    if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
-    {
-        ( $min_sim, @ref_ids ) = @$min_opt;
-        @ref_ids = @{$ref_ids[0]} if ( ( @ref_ids == 1 ) && ( ref( $ref_ids[0] ) eq 'ARRAY' ) )
-    }
-
-    my $fh;
-    my $write_file;
-    my ( $alignF, $subjectF, $pssm0F );
-
-    my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
-
-    if ( $is_array || $msa_master_id || $max_sim || $min_sim || $pseudo_master )
-    {
-        my @align;
-
-        if ( $is_array )
-        {
-            @align = @$align;
-            $write_file = 1;
-        }
-        elsif ( $align && ! ref( $align ) && -s $align )
-        {
-            @align = gjoseqlib::read_fasta( $align );
-            $alignF = $align;
-        }
-        elsif ( $align && ref( $align ) eq 'GLOB' )
-        {
-            @align = gjoseqlib::read_fasta( $align );
-            $write_file = 1;
-        }
-
-        @align
-            or warn "BlastInterface::alignment_to_pssm: No alignment supplied."
-                and return undef;
-
-        $msa_master_id ||= $align[ $msa_master_idx - 1 ]->[0] if $msa_master_idx;
-        
-        my @keep = ();
-        push @keep, $msa_master_id if $msa_master_id;
-
-        my $keep = $opts->{ keep };
-        if ( $keep )
-        {
-            push @keep, ( ref( $keep ) eq 'ARRAY' ? @$keep : $keep );
-        }
-
-        my $n_seq = @align;
-        if ( $max_sim )
-        {
-            my %rep_opts = ( max_sim => $max_sim );
-
-            $rep_opts{ keep }    = \@keep   if @keep;
-            $rep_opts{ min_sim } = $min_sim if $min_sim;
-
-            @align = gjoalignment::representative_alignment( \@align, \%rep_opts );
-        }
-        elsif ( $min_sim )
-        {
-            my %keep = map { $_ => 1 } @keep;
-            foreach ( gjoalignment::filter_by_similarity( \@align, $min_sim, @ref_ids ) )
-            {
-                $keep{ $_->[0] } = 1;
-            }
-            @align = grep { $keep{ $_->[0] } } @align;
-            @align = gjoseqlib::pack_alignment( \@align ) if @align < $n_seq;
-        }
-
-        $write_file ||= ( @align < $n_seq );
-        
-        if ( $pseudo_master )
-        {
-            my $master = gjoalignment::consensus_sequence( \@align );
-            unshift @align, [ 'consensus', '', $master ];
-            $write_file = 1;
-            $msa_master_id = 'consensus';
-            $msa_master_idx = 1;
-            $ignore_master = 1;
-        }
-
-        if ( $msa_master_id && ! $msa_master_idx )
-        {
-            for (my $i = 0; $i < @align; $i++)
-            {
-                next unless $msa_master_id eq $_->[0];
-                $msa_master_idx = $i + 1;
-                last;
-            }
-            $msa_master_idx
-                or warn "BlastInterface::alignment_to_pssm: msa_master_id '$msa_master_id' not found in alignment.";
-        }
-
-        # In psiblast 2.2.29+ command flags -ignore_master and
-        # -msa_master_idx are imcompatible, so we move the master
-        # sequence to be sequence 1 (the default master sequence).
-        if ( $ignore_master && $msa_master_idx > 1 )
-        {
-            my $master = splice( @align, $msa_master_idx-1, 1 );
-            unshift @align, $master;
-            $msa_master_idx = 1; 
-        }
-
-        if ( $write_file )
-        {
-            ( $fh, $alignF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_align', 'fasta' );
-            gjoseqlib::write_fasta( $fh, \@align );
-            close( $fh );
-        } 
-    }
+    my ( $alignF, $opts2, $rm_alignF ) = psiblast_in_msa( $align, $opts );
 
     my $subject = [ 'subject', '', 'MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILS' ]; 
 
-    ( $fh, $subjectF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_subject', 'fasta' );
+    my ( $fh, $subjectF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_subject', 'fasta' );
     gjoseqlib::write_fasta( $fh, $subject );
     close( $fh );
 
+    my $pssm0F;
     ( $fh, $pssm0F ) = SeedAware::open_tmp_file( 'alignment_to_pssm', 'pssm0' );
     close( $fh );
     
@@ -434,8 +295,10 @@ sub alignment_to_pssm
                  -subject  => $subjectF,
                  -out_pssm => $pssm0F
                );
-    push @args, "-ignore_msa_master"  if $ignore_master;
-    push @args, ( -msa_master_idx => $msa_master_idx ) if $msa_master_idx > 1;
+
+    my $msa_master_idx = $opts2->{ msa_master_idx };
+    push @args, -msa_master_idx    => $msa_master_idx  if $msa_master_idx > 1;
+    push @args, -ignore_msa_master => ()               if $opts2->{ ignore_master };
 
     my $rc = SeedAware::system_with_redirect( $prog, @args, { stdout => '/dev/null', stderr => '/dev/null' } );
     if ( $rc != 0 )
@@ -445,8 +308,10 @@ sub alignment_to_pssm
         return undef;
     }
 
-    unlink $alignF if $write_file;
+    unlink $alignF if $rm_alignF;
     unlink $subjectF;
+
+    #  Edit the raw PSSM file:
 
     my $title = $opts->{ title } || ( 'untitled_' . ++$n_pssm );
 
@@ -473,7 +338,226 @@ sub alignment_to_pssm
 
     unlink $pssm0F;
 
-    return $close ? $pssmF : 1;
+    $close ? $pssmF : 1;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Fix a multiple sequence alignment to be appropriate for a psiblast
+#  -in_msa file.
+#
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa(  $align_file, \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \@alignment,  \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \*ALIGN_FH,   \%opts )
+#
+#  The scalar context form below should generally not be used because the output
+#  options hash supplied in list context many include important modifications
+#  to those supplied by the user.
+#
+#        $msa_name                    = psiblast_in_msa(  $align_file, \%opts )
+#        $msa_name                    = psiblast_in_msa( \@alignment,  \%opts )
+#        $msa_name                    = psiblast_in_msa( \*ALIGN_FH,   \%opts )
+#
+#  The first argument supplies the MSA to be fixed. It can be a list of
+#  sequence triples, a file name, or an open file handle. Note that the
+#  output options might be modified relative to that input (it is a copy;
+#  the user-supplied options hash will not be modified). The value of
+#  $rm_msa will be 1 if the msa is written to a new (temporary) file.
+#
+#  General options:
+#
+#    tmp_dir => $dir            #  directory for output file
+#
+#  Sequence filtering options:
+#
+#    keep    => \@ids           #  ids of sequences to keep in the MSA, regardless
+#                               #      of similarity filtering.
+#    max_sim =>  $fract         #  maximum identity of sequences in profile; i.e., build
+#                               #      the PSSM from a representative set (D = no_limit).
+#                               #      This can take a significant amount of time.
+#    min_sim =>  $min_sim_spec  #  exclude sequences with less than the specified identity 
+#                               #      to all specified sequences (D = no_limit).
+#
+#  The minimum similarity specification is one of:
+#
+#    $min_sim_spec = [ $min_ident,  @ref_ids ]
+#    $min_sim_spec = [ $min_ident, \@ref_ids ]
+#
+#
+#  Master sequence options:
+#
+#    ignore_msa_master => $bool   #  do not include the master sequence in the PSSM (D = 0)
+#    ignoreMaster      => $bool   #  do not include the master sequence in the PSSM (D = 0)
+#    msa_master_id     => $id     #  ID of the sequence to use as a master (D is first in align)
+#    msa_master_idx    => $int    #  1-based index of the sequence to use as a master (D = 1)
+#    pseudo_master     => $bool   #  add a master sequence covering all columns in the MSA (D = 0)
+#    pseudoMaster      => $bool   #  add a master sequence covering all columns in the MSA (D = 0)
+#
+#  Master sequence notes:
+#
+#    A psiblast PSSM is a query for a database search. The search output
+#    alignments are shown against the "msa_master" sequence, which defaults
+#    to the first sequence in the alignment supplied. The PSSM only includes
+#    alignment columns that are in the master sequence, so the reported
+#    match statistics (E-value, identity, positives, and gaps) and the
+#    alignment are all evaluated relative to the master sequence. For this
+#    reason, we provide a 'pseudo_master' option that adds a master sequence
+#    that is the plurality residue type in every column of the alignment.
+#    Thus, PSSM and the output alignments will reflect all columns in the
+#    original alignment, but the query sequence shown is unlikely to
+#    correspond to any of the input sequences. If this option is chosen,
+#    ignore_msa_master is set to true, so that the consensus is not included
+#    in the calculation of the PSSM. Any msa_master_id or msa_master_idx option
+#    value will be ignored.
+#
+#-------------------------------------------------------------------------------
+sub psiblast_in_msa
+{
+    my ( $align, $opts ) = @_;
+    $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
+
+    my $ignore_master  = $opts->{ ignore_msa_master } || $opts->{ ignoreMaster };
+    my $pseudo_master  = $opts->{ pseudo_master }     || $opts->{ pseudoMaster };
+    my $msa_master_id  = $opts->{ msa_master_id };
+    my $msa_master_idx = $opts->{ msa_master_idx }    || 0;
+    my $max_sim        = $opts->{ max_sim };
+    my $min_opt        = $opts->{ min_sim };
+
+    my %strip = map { $_ => 1 } qw( ignore_msa_master ignoreMaster
+                                    pseudo_master pseudoMaster
+                                    msa_master_id msa_master_idx
+                                    max_sim
+                                    min_sim
+                                  );
+
+    my $opts2 = { map { ! $strip{$_} ? ( $_ => $opts->{$_} ) : () } keys %$opts };
+
+    my ( $min_sim, @ref_ids );
+    if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
+    {
+        ( $min_sim, @ref_ids ) = @$min_opt;
+        @ref_ids = @{$ref_ids[0]} if ( ( @ref_ids == 1 ) && ( ref( $ref_ids[0] ) eq 'ARRAY' ) )
+    }
+
+    my $alignF;
+    my $write_file;
+
+    my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
+    my $is_glob  = $align && ref( $align ) eq 'GLOB';
+
+    if ( $is_array || $is_glob
+                   || $msa_master_id
+                   || $max_sim
+                   || $min_sim
+                   || $pseudo_master
+                   || ( $msa_master_idx > 1 && $ignore_master )
+       )
+    {
+        my @align;
+
+        if ( $is_array )
+        {
+            @align = @$align;
+            $write_file = 1;
+        }
+        elsif ( $is_glob )
+        {
+            @align = gjoseqlib::read_fasta( $align );
+            $write_file = 1;
+        }
+        elsif ( $align && ! ref( $align ) && -s $align )
+        {
+            @align  = gjoseqlib::read_fasta( $align );
+            $alignF = $align;
+        }
+
+        @align
+            or warn "BlastInterface::psiblast_in_msa: No alignment supplied."
+                and return undef;
+
+        $msa_master_id ||= $align[ $msa_master_idx - 1 ]->[0] if $msa_master_idx;
+
+        my @keep = ();
+        push @keep, $msa_master_id if $msa_master_id;
+
+        my $keep = $opts->{ keep };
+        if ( $keep )
+        {
+            push @keep, ( ref( $keep ) eq 'ARRAY' ? @$keep : $keep );
+        }
+
+        my $n_seq = @align;
+        if ( $max_sim )
+        {
+            my %rep_opts = ( max_sim => $max_sim );
+
+            $rep_opts{ keep }    = \@keep    if @keep;
+            $rep_opts{ min_sim } =  $min_sim if $min_sim;
+
+            @align = gjoalignment::representative_alignment( \@align, \%rep_opts );
+        }
+        elsif ( $min_sim )
+        {
+            my %keep = map { $_ => 1 } @keep;
+            foreach ( gjoalignment::filter_by_similarity( \@align, $min_sim, @ref_ids ) )
+            {
+                $keep{ $_->[0] } = 1;
+            }
+            @align = grep { $keep{ $_->[0] } } @align;
+            @align = gjoseqlib::pack_alignment( \@align ) if @align < $n_seq;
+        }
+
+        $write_file ||= ( @align < $n_seq );
+
+        if ( $pseudo_master )
+        {
+            my $master = gjoalignment::consensus_sequence( \@align );
+            unshift @align, [ 'consensus', '', $master ];
+            $write_file     = 1;
+            $msa_master_id  = 'consensus';
+            $msa_master_idx = 1;
+            $ignore_master  = 1;
+        }
+
+        if ( $msa_master_id && ! $msa_master_idx )
+        {
+            for ( my $i = 0; $i < @align; $i++ )
+            {
+                next unless $msa_master_id eq $align[$i]->[0];
+                $msa_master_idx = $i + 1;
+                last;
+            }
+            $msa_master_idx
+                or warn "BlastInterface::psiblast_in_msa: msa_master_id '$msa_master_id' not found in alignment.";
+        }
+
+        #  In psiblast 2.2.29+ command flags -ignore_master and
+        #  -msa_master_idx are imcompatible, so we move the master
+        #  sequence to be sequence 1 (the default master sequence).
+
+        if ( $ignore_master && $msa_master_idx > 1 )
+        {
+            my $master = splice( @align, $msa_master_idx-1, 1 );
+            unshift @align, $master;
+            $msa_master_idx = 1; 
+            $write_file     = 1;
+        }
+
+        if ( $write_file )
+        {
+            my $fh;
+            my @dir = $opts->{ tmp_dir } ? ( $opts->{ tmp_dir } ) : ();
+            ( $fh, $alignF ) = SeedAware::open_tmp_file( 'psiblast_in_msa', 'fasta', @dir );
+            gjoseqlib::write_fasta( $fh, \@align );
+            close( $fh );
+        } 
+
+        $opts2->{ in_msa }            = $alignF          if $alignF;
+        $opts2->{ ignore_msa_master } = 1                if $ignore_master;
+        $opts2->{ msa_master_idx }    = $msa_master_idx  if $msa_master_idx > 1;
+    }
+
+    wantarray ? ( $alignF, $opts2, $write_file ) : $alignF;
 }
 
 
@@ -694,7 +778,7 @@ sub psi_tblastn
     my $rm_db  = ! ( $aa_db && -f $aa_db );
     if ( defined $aa_db && -f $aa_db && -s $aa_db )
     {
-        #  The tranaslated sequence database exists
+        #  The translated sequence database exists
     }
     elsif ( defined $nt_db )
     {
@@ -809,7 +893,7 @@ sub adjust_hsp
 
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#  Do a six frame translation for use by psi_tblastn.  This modifications of
+#  Do a six frame translation for use by psi_tblastn.  These modifications of
 #  the identifiers and definitions are essential to the interpretation of
 #  the blast results.  The program 'translate_fasta_6' produces the same
 #  output format, and is much faster.
@@ -817,8 +901,8 @@ sub adjust_hsp
 #   @translations = six_translations( $nucleotide_entry )
 #
 #  The ids are modified by adding ".frame" (+1, +2, +3, -1, -2, -3).
-#  The definition is mofidified by adding " begin-end/of_length".
-#  NCBI frame numbers reverse strand translation frames from the end of the
+#  The definition is modified by adding " begin-end/of_length".
+#  NCBI reverse strand translation frames count from the end of the
 #  sequence (i.e., the beginning of the complement of the strand).
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub six_translations
@@ -839,7 +923,10 @@ sub six_translations
     my ( $fr, $b, $e );
 
     map { ( $fr, $b, $e ) = @$_;
-          [ "$id.$fr", "$def $b-$e/$l", gjoseqlib::translate_seq( gjoseqlib::DNA_subseq( \$seq, $b, $e ) ) ]
+          [ "$id.$fr",
+            "$def $b-$e/$l",
+            gjoseqlib::translate_seq( gjoseqlib::DNA_subseq( \$seq, $b, $e ) )
+          ]
         } @intervals;
 }
 
@@ -877,7 +964,7 @@ sub get_query
     my( $query, $tempD, $parms ) = @_;
 #   returns query-file
 
-    return &valid_fasta( $query, "$tempD/query" );
+    &valid_fasta( $query, "$tempD/query" );
 }
 
 
@@ -925,6 +1012,8 @@ sub get_db
 #
 #  If supplied with a filename, return that. Otherwise determine the nature of
 #  the data, write it to $tmp_file, and return that name.
+#
+#  In psiblast, query might be a pssm file, an alignment file, or an alignment.
 #-------------------------------------------------------------------------------
 sub valid_fasta
 {
@@ -952,12 +1041,20 @@ sub valid_fasta
         if ( $seq_src && ( ref($seq_src) eq 'ARRAY' ) )
         {
             #  An array of sequences?
-            if ( @$seq_src && $seq_src->[0] && (ref($seq_src->[0]) eq 'ARRAY') )
+            if ( @$seq_src
+               && $seq_src->[0]
+               && (ref($seq_src->[0]) eq 'ARRAY')
+               )
             {
                 $data = $seq_src;
             }
+
             #  A single sequence triple?
-            elsif (@$seq_src == 3)
+            elsif ( @$seq_src == 3          # three elements
+                  && $seq_src->[0]          # first element defined
+                  && ! ref($seq_src->[0])   # first element not a reference
+                  && $seq_src->[2]          # third element defined
+                  )
             {
                 $data = [$seq_src];  # Nesting is unnecessary, but is consistent
             }
@@ -979,7 +1076,7 @@ sub valid_fasta
         }
     }
 
-    return $out_file;
+    $out_file;
 }
 
 
@@ -1405,17 +1502,16 @@ sub form_blast_command
                 my @align = gjoseqlib::read_fasta( $alignF );
                 my @query = gjoseqlib::read_fasta( $queryF ) if -s $queryF;
 
-                my $index    = 1;
                 my $masterID = $queryID;
                 $masterID  ||= $query[0]->[0] if @query && @query == 1;
                 $masterID  ||= representative_for_profile( \@align )->[0];
 
-                while ( $_ = shift @align )
+                for ( $queryIndex = 0; $queryIndex < @align; $queryIndex++ )
                 {
-                    last if $_->[0] eq $masterID;
-                    $index++;
+                    last if $align[$queryIndex]->[0] eq $masterID;
                 }
-                $queryIndex = $index > @align ? 1 : $index;
+
+                $queryIndex = 1 if $queryIndex >= @align;
             }
         }
 

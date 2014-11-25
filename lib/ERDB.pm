@@ -3902,19 +3902,10 @@ sub CreateTable {
     my ($self, $relationName, $indexFlag, $estimatedRows) = @_;
     # Get the database handle.
     my $dbh = $self->{_dbh};
-    # Get the relation data and determine whether or not the relation is primary.
-    my $relationData = $self->FindRelation($relationName);
+    # Determine whether or not the relation is primary.
     my $rootFlag = $self->_IsPrimary($relationName);
     # Create a list of the field data.
-    my @fieldList;
-    for my $fieldData (@{$relationData->{Fields}}) {
-        # Assemble the field name and type.
-        my $fieldString = $self->_FieldString($fieldData);
-        # Push the result into the field list.
-        push @fieldList, $fieldString;
-    }
-    # Convert the field list into a comma-delimited string.
-    my $fieldThing = join(', ', @fieldList);
+    my $fieldThing = $self->ComputeFieldString($relationName);
     # Insure the table is not already there.
     $dbh->drop_table(tbl => $self->{_quote} . $relationName . $self->{_quote});
     Trace("Table $relationName dropped.") if T(2);
@@ -3934,6 +3925,45 @@ sub CreateTable {
     if ($indexFlag) {
         $self->CreateIndex($relationName);
     }
+}
+
+=head3 ComputeFieldString
+
+	my $fieldString = $erdb->ComputeFieldString($relationName);
+	
+Return the comma-delimited field definition string for a relation. This can be plugged directly into an SQL
+C<CREATE> statement.
+
+=over 4
+
+=item relationName
+
+Name of the relation whose field definition string is desired.
+
+=item RETURN
+
+Returns a string listing SQL field definitions, in the proper order, separated by commas.
+
+=back
+
+=cut
+
+sub ComputeFieldString {
+	# Get the parameters.
+	my ($self, $relationName) = @_;
+    # Get the relation data.
+    my $relationData = $self->FindRelation($relationName);
+    # Create a list of the field data.
+    my @fieldList;
+    for my $fieldData (@{$relationData->{Fields}}) {
+        # Assemble the field name and type.
+        my $fieldString = $self->_FieldString($fieldData);
+        # Push the result into the field list.
+        push @fieldList, $fieldString;
+    }
+    # Convert the field list into a comma-delimited string.
+    my $retVal = join(', ', @fieldList);
+    return $retVal;
 }
 
 =head3 VerifyFields

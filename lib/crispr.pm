@@ -40,7 +40,7 @@ our @EXPORT = qw( find_crisprs );
 #  @crisprs = ( [ $loc, $consensus, \@repeats, \@spacers ], ...)
 #  @repeats = ( [ $loc, $repseq ], ... )
 #  @spacers = ( [ $loc, $spcseq ], ... )
-#  $loc     = [ $contig, $beg, $dir, $len ]
+#  $loc     = [ [ $contig, $beg, $dir, $len ], ... ]
 #
 #===============================================================================
 sub find_crisprs
@@ -93,6 +93,9 @@ sub find_crisprs
 
             my $len     = length( $rest );
             my $period  = int( $len / @parts + 0.5 );
+
+            #  @locs are offsets to starts of repeats in the sequence string
+
             my $n       = $n1;
             my @locs    = map { $n += length($_) } ( '', @parts );
 
@@ -107,6 +110,8 @@ sub find_crisprs
             my $max_shift = $maxreplen - $minreplen + 4;
             for ( my $delta = -$max_shift; $delta <= $max_shift; $delta++ )
             {
+                # Working from the second repeat helps if first repeat is truncated
+
                 my $p = $locs[1] + $delta;
                 my $r = substr( $seq, $p, $minreplen );
 
@@ -121,10 +126,7 @@ sub find_crisprs
             }
 
             @locs = @$best_locs;
-            if ( @locs < $minrep )
-            {
-                next;
-            }
+            next if ( @locs < $minrep );
 
             print STDERR "  $rept (requires $min_nid / $minreplen):\n",
                          ( map { sprintf "%12d  %s\n", $_, substr( $seq, $_, $minreplen ) } @locs ),
@@ -140,13 +142,12 @@ sub find_crisprs
                 push @data, [ $i, consensus_at_offset( \$seq, \@locs, $i ) ];
             }
 
-            # print STDERR Dumper( @data );
-
-            my $max_chg = int( 0.1 * ( @locs + 5 ) );
+            my $max_chg = int( 0.25 * @locs + 0.5 );
             my @runs;
             my $run = [];
             foreach ( @data )
             {
+                #  Too much variation? This cannot be in the consensus.
                 if    ( $_->[2] <= $max_chg ) { push @$run, $_ }
                 elsif ( @$run )               { push @runs, $run; $run = [] }
                 next;
@@ -188,8 +189,10 @@ sub find_crisprs
 
             my $beg = $locs[ 0];
             my $end = $locs[-1] + $replen - 1;
+            $beg = 0 if $beg < 0;
+            $end = length($seq) - 1 if $end >= length($seq);
             my $len = $end - $beg + 1;
-            my $loc = [ [ $id, $beg, '+', $len ] ];
+            my $loc = [ [ $id, $beg+1, '+', $len ] ];
 
             #  Split into repeats and spacers:
 
@@ -200,25 +203,53 @@ sub find_crisprs
                 # Repeat element:
 
                 my $rbeg = $locs[$i];
-                my $rloc = [ [ $id, $rbeg, '+', $replen ] ];
-                my $rseq = substr( $seq, $rbeg, $replen );
+                my $rend = $rbeg + $replen - 1;
+                $rbeg = 0 if $rbeg < 0;
+                $rend = length($seq) - 1 if $rend >= length($seq);
+                my $rlen = $rend - $rbeg + 1;
+                my $rloc = [ [ $id, $rbeg+1, '+', $rlen ] ];
+                my $rseq = substr( $seq, $rbeg, $rlen );
                 push @reps, [ $rloc, $rseq ];
 
                 # Spacer element:
 
                 if ( $locs[$i+1] )
                 {
-                    my $sbeg = $rbeg + $replen;
+                    my $sbeg = $rend + 1;
                     my $slen = $locs[$i+1] - $sbeg;
-                    my $sloc = [ [ $id, $sbeg, '+', $slen ] ];
+                    my $sloc = [ [ $id, $sbeg+1, '+', $slen ] ];
                     push @spcs, [ $sloc, substr( $seq, $sbeg, $slen ) ];
                 }
             }
 
-            #  Save location, repeat consensus, repeats and spacers:
-            #  $crispr = [ $loc, $repseq, \@repeats, \@spacers ];
+            #  The spacers are still coming through with repeated sequences.
+            #  For the time being, let's do a clean up based on kmer counts.
 
-            push @crisprs, [ $loc, $repseq, \@reps, \@spcs ];
+            my %kmers;
+            my $klen = 6;
+            my $nmax = 0.7 * @spcs;
+            foreach my $sp ( map { $_->[1] } @spcs )
+            {
+                my %k = map { $_ => 1 }                              # hash
+                        map { m/(.{$klen})/g }                       # kmers
+                        map { substr( $sp, $_ ) } ( 0 .. $klen-1 );  # frames
+                foreach ( keys %k ) { $kmers{$_}++ }
+            }
+            my ( $maxcnt ) = sort { $b <=> $a } values %kmers;
+
+            if ( $maxcnt <= $nmax )
+            {
+                #  Save location, repeat consensus, repeats and spacers:
+                #  $crispr = [ $loc, $repseq, \@repeats, \@spacers ];
+                push @crisprs, [ $loc, $repseq, \@reps, \@spcs ];
+            }
+            elsif ( $debug )
+            {
+                print STDERR "=========================================================\n";
+                print STDERR "Repeats in the spacers:\n";
+                print STDERR map { "    $_->[1]\n" } @spcs;
+                print STDERR "=========================================================\n\n";
+            }
 
             #  Move past this repeat array:
 

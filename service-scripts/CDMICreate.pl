@@ -154,6 +154,7 @@ if (! $cdmi) {
             $stats->Add(relationCreated => 1);
         } elsif ($changed{$relationName}) {
             print "$relationName needs to be recreated.\n";
+            print "Field string: " . $cdmi->ComputeFieldString($relationName) . "\n";
         }
     }
     # Tell the user we're done.

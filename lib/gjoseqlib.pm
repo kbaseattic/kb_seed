@@ -1973,7 +1973,7 @@ sub translate_codon
 
     #  Attempt to recover from mixed-case codons:
 
-    $codon = ( $codon =~ /[a-z]/ ) ? lc $codon : uc $codon;
+    $codon = ( $codon =~ /^.[a-z]/ ) ? lc $codon : uc $codon;
     if ( $aa = $genetic_code{ $codon } ) { return $aa }
 
     #  The code defined above catches simple N, R and Y ambiguities in the
@@ -1981,12 +1981,12 @@ sub translate_codon
     #  be unambiguously translated by converting the last position to N and
     #  seeing if this is in the code table:
 
-    my $N = ( $codon =~ /[a-z]/ ) ? 'n' : 'N';
+    my $N = ( $codon =~ /^.[a-z]/ ) ? 'n' : 'N';
     if ( $aa = $genetic_code{ substr($codon,0,2) . $N } ) { return $aa }
 
     #  Test that codon is valid for an unambiguous aa:
 
-    my $X = ( $codon =~ /[a-z]/ ) ? 'x' : 'X';
+    my $X = ( $codon =~ /^.[a-z]/ ) ? 'x' : 'X';
     if ( $codon !~ m/^[ACGTMY][ACGT][ACGTKMRSWYBDHVN]$/i
       && $codon !~ m/^YT[AGR]$/i     #  Leu YTR
       && $codon !~ m/^MG[AGR]$/i     #  Arg MGR

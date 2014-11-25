@@ -21,6 +21,7 @@ package tree_utilities;
 
 use set_utilities;
 use Carp;
+use Data::Dumper;
 
 require Exporter;
 @ISA = (Exporter);
@@ -37,6 +38,7 @@ require Exporter;
 	     is_desc_of
 	     is_leaf
 	     label_all_nodes
+             remove_added_labels
 	     label_of
 	     label_to_file
 	     label_to_node
@@ -62,6 +64,7 @@ require Exporter;
 	     parent_of
 	     parent_of_node
 	     parse_newick_tree
+             parsimonious_label
 	     prefix_of
 	     print_tree
 	     printable_to_label
@@ -69,8 +72,10 @@ require Exporter;
 	     read_ncbi_tree
 	     representative_by_size
 	     root_tree
+             root_at_midpoint
 	     root_tree_at_node
 	     root_tree_between_nodes
+             shifts
 	     simple_move_to_middle
 	     size_tree
 	     split_tree
@@ -97,6 +102,8 @@ require Exporter;
 #
 #  IndexSet is [NodeToPrefix,NodeToLabel,LabelToNode]  3 associative arrays
 #
+### NOTE: I believe that both $tabP and $tabsP are used to point
+###       at the IndexSet, and that is confusing.
 
 sub ancestors_of {
     my($node,$tabP) = @_;
@@ -773,6 +780,49 @@ sub inverted {
 	$newT          = [$par->[0],$brlen,$desc,$new_attr];
     }
     return $newT;
+}
+
+sub most_distant {
+    my($tree) = @_;
+
+    my($lab,$dist,$ptrs) = @$tree;
+    if (@$ptrs < 2)
+    {
+	return [$dist,$tree];
+    }
+    else
+    {
+	my $sofar;
+	my $i;
+	for ($i=1; ($i < @$ptrs); $i++)
+	{
+	    my $tuple = &most_distant($ptrs->[$i]);
+	    if (($i == 1) || ($sofar->[0] < $tuple->[0]))
+	    {
+		$sofar = $tuple;
+	    }
+	}
+	return [$sofar->[0]+$dist,$sofar->[1]];
+    }
+}
+
+sub root_at_midpoint {
+# $rooted = &root_at_midpoint($tree,$tabsP)
+    my($tree) = @_;
+
+    my $uprooted = &uproot($tree);
+    my $pointers = $uprooted->[2];
+    my(undef,$c1,$c2,$c3) = @$pointers;
+    if ((! $c1) || (! $c2) || (! $c3)) { print STDERR "failed to root_to_midpoint\n"; return $tree }
+    my $tuple1 = &most_distant($c1);
+    my $tuple2 = &most_distant($c2);
+    my $tuple3 = &most_distant($c3);
+    my @dist = sort { $a->[0] <=> $b->[0] } ($tuple1,$tuple2,$tuple3);
+    # @dist = ([ln1,nd1],[ln2,nd2],[ln3,nd3])
+    my $nd2 = $dist[1]->[1];
+    my $nd3 = $dist[2]->[1];
+    my $tabsP = &tree_index_tables($tree);
+    return &root_tree_between_nodes($nd2,$nd3,0.5,$tabsP);
 }
 
 sub root_tree {
@@ -2301,6 +2351,24 @@ sub unlabel_internal_nodes {
     }
 }
 
+sub remove_added_labels {
+    my($treeP) = @_;
+
+    my($children,$x);
+    $children = &node_pointers($treeP);
+    if (@$children > 1)
+    {
+	if ($treeP->[0] && ($treeP->[0] =~ /^n\d+$/))
+	{
+	    $treeP->[0] = '';
+	}
+	for ($x=1; $x <= $#{$children}; $x++)
+	{
+	    &remove_added_labels($children->[$x]);
+	}
+    }
+}
+
 sub label_all_nodesR {
     my($treeP,$n) = @_;
 
@@ -2665,6 +2733,145 @@ sub relabel_nodes {
     {
 	&relabel_nodes($ptrs->[$i],$relabel);
     }
+}
+#
+# "shifts" takes in two arguments:
+#
+#     a rooted tree and
+#
+#     a pointer to a hash that maps nodes into sets of values
+#
+#  That is, the second argument is a list of values that the 
+#  node may have.  
+#
+#  The routine returns a pointer to a list of node labels.  Each
+#  of these labels represents a node in which the parent list
+#  of possible values is disjoint from the set of values associated
+#  with the node.  That is, it is a pointer to a list of node labels
+#  for nodes that have shifted value from their parent nodes.  Only
+#  shifts from one unambigous value to another are returned.
+#
+#  This routine will try to refine estimates for the nodes using
+#  parsimony before checking for shifts.
+#
+sub shifts {
+    my($tree,$occH) = @_;
+
+    my $shifts = [];
+    &parsimonious_label($tree,$occH);
+    &shiftsR($tree,$occH,$shifts);
+    return [sort @$shifts];
+}
+
+sub shiftsR {
+    my($tree,$occH,$shifts) = @_;
+
+    my($labC,undef,$ptrs) = @$tree;
+    if ($ptrs->[0])    ## if we have a parent
+    {
+	my $labP = $ptrs->[0]->[0];
+	my $vC   = $occH->{$labC};
+	my $vP   = $occH->{$labP};
+	if ($vC && $vP && (@$vC == 1) && (@$vP == 1) && ($vP->[0] ne $vC->[0]))
+	{
+	    push(@$shifts,$labC);
+	}
+    }
+
+    my $i;
+    for ($i=1; ($i < @$ptrs); $i++)
+    {
+	my $child = $ptrs->[$i];
+	&shiftsR($child,$occH,$shifts)
+    }
+}
+#
+# parsimonious_label takes in two arguments: a tree and a hash mapping
+# nodes in the tree to pointers to lists of possible values.  The most common
+# error in invoking it is to map the leaves to scalars, rather than pointers
+# to lists that contain just one value.
+#
+
+sub parsimonious_label {
+    my($tree,$occH) = @_;
+
+    &pass1($tree,$occH);
+    &pass2($tree,$occH);
+}
+
+sub pass1 {
+    my($node,$occH) = @_;
+
+    if (! $node->[2]) { confess($node); }
+    if (@{$node->[2]} > 1)  # if not child
+    {
+	my $i;
+	my @current_values;
+	for ($i=1; ($i < @{$node->[2]}); $i++)
+	{
+	    &pass1($node->[2]->[$i],$occH);
+	    push(@current_values,$occH->{$node->[2]->[$i]->[0]});
+	}
+	$occH->{$node->[0]} = &iu(\@current_values);
+    }
+}
+
+sub pass2 {
+    my($node,$occH) = @_;
+
+    if (@{$node->[2]} > 1)  # if not child
+    {
+	my $i;
+	for ($i=1; ($i < @{$node->[2]}); $i++)
+	{
+	    my $overlap  = &i([$occH->{$node->[0]},$occH->{$node->[2]->[$i]->[0]}]);
+	    if (@$overlap > 0)
+	    {
+		$occH->{$node->[2]->[$i]->[0]} = $overlap;
+	    }
+	    &pass2($node->[2]->[$i],$occH);
+	}
+    }
+}
+sub iu {
+    my($values) = @_;
+
+    my $x = &i($values);
+    if (@$x > 0)
+    {
+	return $x;
+    }
+    return &u($values);
+}
+
+sub i {
+    my($values) = @_;
+    my %counts;
+#    print &Dumper($values);
+    foreach my $v (@$values)
+    {
+	if (! ref($v)) { confess('BAD') }
+	foreach my $x (@$v)
+	{
+	    $counts{$x}++;
+	}
+    }
+    my @tmp = sort grep { $counts{$_} == @$values } keys(%counts);
+    return \@tmp;
+}
+	    
+sub u {
+    my($values) = @_;
+
+    my %counts;
+    foreach my $v (@$values)
+    {
+	foreach my $x (@$v)
+	{
+	    $counts{$x}++;
+	}
+    }
+    return [sort keys(%counts)];
 }
 
 1;

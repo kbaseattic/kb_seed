@@ -49,6 +49,11 @@ If specified, the functions will be updated. Otherwise, the changes will simply 
 If specified, all of the SEED genomes in the CDMI will be checked; otherwise, only
 the genomes listed in the command-line will be checked.
 
+=item verbose
+
+If specified, the functional assignment changes will be listed. Otherwise, the statistics
+will be shown, but not the detailed changes.
+
 =back
 
 The positional parameters are the kBase IDs of the genomes to check.
@@ -64,10 +69,11 @@ The positional parameters are the kBase IDs of the genomes to check.
     $| = 1; # Prevent buffering on STDOUT.
     # The command-line options will be stored in here.
     my $orgDir = $FIG_Config::organisms;
-	my ($repair, $all);    
+	my ($repair, $all, $verbose);    
     # Connect to the target database.
     print "Connecting to database.\n";
-    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(repair => \$repair, all => \$all, "orgDir=s" => \$orgDir);
+    my $cdmi = Bio::KBase::CDMI::CDMI->new_for_script(repair => \$repair, all => \$all, "orgDir=s" => \$orgDir,
+    		verbose => \$verbose);
     if (! $cdmi) {
         print "usage: CDMICheckFunctions [options] genome1 genome2 ...\n";
     } else {
@@ -143,18 +149,23 @@ The positional parameters are the kBase IDs of the genomes to check.
        				}
        			}
        			# Loop through the SEED functions, comparing.
+       			my ($funs, $updates, $blanks) = (0, 0, 0);
        			for my $fid (keys %seedFuns) {
+       				$funs++;
        				if ($seedFuns{$fid} ne $kbFuns{$fid}) {
        					# Here we need an update.
        					my $idThing = "$fid ($kbidMap{$fid})";
        					my $spacer = " " x length($idThing);
-       					print "Update required for $idThing: $seedFuns{$fid}\n";
+       					if ($verbose) {
+       						print "Update required for $idThing: $seedFuns{$fid}\n";
+       					}
        					if (! $kbFuns{$fid}) {
        						$stats->Add(oldFunctionBlank => 1);
-       					} else {
+       						$blanks++;
+       					} elsif ($verbose) {
        						print "Old function is $spacer    : $kbFuns{$fid}\n";
        					}
-       					print "\n";
+       					$updates++;
        					if ($repair) {
        						$loader->UpdateFunction($fid, $seedFuns{$fid});
        						$stats->Add(updatePerformed => 1);
@@ -163,6 +174,7 @@ The positional parameters are the kBase IDs of the genomes to check.
        					}
        				}
        			}
+       			print "$funs functions examined, $blanks blanks fixed, $updates changes.\n";
        		}
        	}
         print "All done:\n" . $stats->Show();
