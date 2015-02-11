@@ -32,7 +32,7 @@ use File::Temp qw/ tempfile tempdir /;
 use File::Path qw(rmtree);
 use Data::Dumper;
 use Carp;
-
+use IPC::Run;
 use gjoseqlib;
 
 sub find_rnas
@@ -96,26 +96,34 @@ sub find_rnas
     my $tbl2 = "$tmp_dir/tbl2";
     
     my $opt_rna_types = $params->{-rnas} ? "-rnas=$params->{-rnas}" : "";
-    my $cmd = "$rna_tool $opt_rna_types --contigs=$tmp_contigs_filename --orgid=1 --domain=$domain --genus=$genus --species=$species";
-    warn "Run: $cmd\n" if $ENV{DEBUG}
+    my @cmd = ($rna_tool, $opt_rna_types, "--contigs=$tmp_contigs_filename", "--orgid=1",
+	       "--domain=$domain", "--genus=$genus", "--species=$species");
+    warn "Run: @cmd\n" if $ENV{DEBUG}
 ;
-    
     my $hostname = `hostname`;
     chomp $hostname;
     my $event = {
 	tool_name => $rna_tool,
 	execute_time => scalar gettimeofday,
-	parameters => [ split(/\s+/, $cmd) ],
+	parameters => \@cmd,
 	hostname => $hostname,
     };
     
     #
     # Need to clear the PERL5LIB from the environment since tool is configured to use its own.
     #
-    my $res = system("cd $tmp_dir; env PERL5LIB= $cmd > $tbl 2> $logfile");
-    if ($res != 0) {
+    my $ok = IPC::Run::run(\@cmd,
+		  '>', $tbl,
+		  '2>', $logfile,
+		  init => sub {
+		      chdir($tmp_dir);
+		      delete $ENV{PERL5LIB};
+		  });
+    # my $res = system("cd $tmp_dir; env PERL5LIB= $cmd > $tbl 2> $logfile");
+    if (!$ok)
+    {
 #	die "cmd failed with rc=$res: $cmd";
-	die "cmd failed with rc=$res: cd $tmp_dir; env PERL5LIB= $cmd > $tbl 2> $logfile";
+	die "cmd failed with rc=$?: @cmd\n";
     }
     
     my ($fh_tbl, $fh_tbl2);
