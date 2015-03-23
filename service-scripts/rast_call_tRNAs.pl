@@ -31,7 +31,7 @@ Find instances of tRNAs in a genome-type object.
 
 Example:
 
-    rast_call_tRNAs < input_genome > output_genome_with_selenoproteins_called
+    rast_call_tRNAs < input_genome > output_genome_with_tRNAs_called
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -131,9 +131,9 @@ my ($genus, $species) = (($genomeTO->{scientific_name} =~ m/^(\S+)\s+(\S+)/o)
 			 : qw(Unknown sp.)
 			 );
 
-my $domain = (($genomeTO->{domain} =~ m/^([ABE])/o)
-	      ? $1
-	      : die(qq(Invalid domain: \"$genomeTO->{domain}\"))
+my $domain = (($genomeTO->{domain} =~ m/^([ABEV])/io)
+	      ? uc($1)
+	      : (warn(qq(Unrecognized domain: \"$genomeTO->{domain}\")) && q(U))
 	      );
 
 my $contigs = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{contigs} } ];

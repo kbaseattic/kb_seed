@@ -23,7 +23,6 @@ package ERDBPDocPage;
     use Tracer;
     use ERDB;
     use CGI;
-    use FIGRules;
     use ERDBExtras;
 
 =head1 ERDB Pseudo-Documentation Page

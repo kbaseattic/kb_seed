@@ -23,7 +23,6 @@ package ERDBTypeImage;
     use Tracer;
     use ERDB;
     use GD;
-    use FIGRules;
     use MIME::Base64;
     use ERDBExtras;
     use base qw(ERDBType);
@@ -53,6 +52,33 @@ sub new {
     bless $retVal, $class;
     return $retVal;
 }
+
+=head3 NewSessionID
+
+    my $id = ERDBTypeImage::NewSessionID();
+
+Generate a new session ID for the current user.
+
+=cut
+
+sub NewSessionID {
+    # Declare the return variable.
+    my $retVal;
+    # Get a digest encoder.
+    Trace("Retrieving digest encoder.") if T(3);
+    my $md5 = Digest::MD5->new();
+    # Add the PID, the IP, and the time stamp. Note that the time stamp is
+    # actually two numbers, and we get them both because we're in list
+    # context.
+    Trace("Assembling pieces.") if T(3);
+    $md5->add($$, $ENV{REMOTE_ADDR}, $ENV{REMOTE_PORT}, gettimeofday());
+    # Hash up all this identifying data.
+    Trace("Producing result.") if T(3);
+    $retVal = $md5->hexdigest();
+    # Return the result.
+    return $retVal;
+}
+
 
 =head2 Virtual Methods
 
@@ -310,8 +336,8 @@ sub html {
     my ($self, $value) = @_;
     # The incoming value here is a GD graphic image. We need to store it
     # to a temporary file.
-    my $sessionID = FIGRules::NewSessionID();
-    my $fileName = FIGRules::NewSessionID() . "image$$.png";
+    my $sessionID = NewSessionID();
+    my $fileName = $sessionID . "image$$.png";
     my $oh = Open(undef, ">$ERDBExtras::temp/$fileName");
     print $oh $value->png();
     close $oh;

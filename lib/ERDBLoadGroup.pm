@@ -407,7 +407,7 @@ sub Track {
     # Do we need to output a progress message?
     if ($period && T(3) && ($newValue % $period == 0)) {
         # Yes.
-        MemTrace("$newValue $statName processed by $self->{label} for $self->{group} group.");
+        Trace("$newValue $statName processed by $self->{label} for $self->{group} group.");
     }
 }
 

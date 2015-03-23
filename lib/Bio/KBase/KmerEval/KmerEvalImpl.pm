@@ -69,24 +69,24 @@ length is an int
 frames is a reference to a list where each element is a frame
 frame is a reference to a list containing 3 items:
 	0: a strand
-	1: an int
+	1: (offset_of_frame) an int
 	2: a calls
 strand is an int
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -113,24 +113,24 @@ length is an int
 frames is a reference to a list where each element is a frame
 frame is a reference to a list containing 3 items:
 	0: a strand
-	1: an int
+	1: (offset_of_frame) an int
 	2: a calls
 strand is an int
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -204,19 +204,19 @@ comment is a string
 sequence is a string
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -238,19 +238,19 @@ comment is a string
 sequence is a string
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -309,10 +309,10 @@ sub call_prot_with_kmers
 <pre>
 $seq_set is a seq_set
 $return is a reference to a list containing 4 items:
-	0: an int
+	0: (estimate) an int
 	1: a comment
-	2: a genome_tuples
-	3: a seq_set
+	2: (placed) a genome_tuples
+	3: (unplaced) a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -324,12 +324,12 @@ sequence is a string
 genome_tuples is a reference to a list where each element is a genome_tuple
 genome_tuple is a reference to a list containing 4 items:
 	0: a genus_species
-	1: an int
-	2: a string
+	1: (genetic_code) an int
+	2: (estimated_taxonomy) a string
 	3: a seq_set
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -339,10 +339,10 @@ genus_species is a reference to a list containing 2 items:
 
 $seq_set is a seq_set
 $return is a reference to a list containing 4 items:
-	0: an int
+	0: (estimate) an int
 	1: a comment
-	2: a genome_tuples
-	3: a seq_set
+	2: (placed) a genome_tuples
+	3: (unplaced) a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -354,12 +354,12 @@ sequence is a string
 genome_tuples is a reference to a list where each element is a genome_tuple
 genome_tuple is a reference to a list containing 4 items:
 	0: a genus_species
-	1: an int
-	2: a string
+	1: (genetic_code) an int
+	2: (estimated_taxonomy) a string
 	3: a seq_set
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -727,8 +727,8 @@ a reference to a list where each element is a seq_triple
 
 <pre>
 a reference to a list containing 2 items:
-0: a string
-1: a string
+0: (genus) a string
+1: (species) a string
 
 </pre>
 
@@ -737,8 +737,8 @@ a reference to a list containing 2 items:
 =begin text
 
 a reference to a list containing 2 items:
-0: a string
-1: a string
+0: (genus) a string
+1: (species) a string
 
 
 =end text
@@ -760,8 +760,8 @@ a reference to a list containing 2 items:
 <pre>
 a reference to a list containing 4 items:
 0: a genus_species
-1: an int
-2: a string
+1: (genetic_code) an int
+2: (estimated_taxonomy) a string
 3: a seq_set
 
 </pre>
@@ -772,8 +772,8 @@ a reference to a list containing 4 items:
 
 a reference to a list containing 4 items:
 0: a genus_species
-1: an int
-2: a string
+1: (genetic_code) an int
+2: (estimated_taxonomy) a string
 3: a seq_set
 
 
@@ -847,7 +847,7 @@ a reference to a list where each element is a genus_species
 
 <pre>
 a reference to a list containing 2 items:
-0: an int
+0: (count) an int
 1: an otu_set
 
 </pre>
@@ -857,7 +857,7 @@ a reference to a list containing 2 items:
 =begin text
 
 a reference to a list containing 2 items:
-0: an int
+0: (count) an int
 1: an otu_set
 
 
@@ -905,9 +905,9 @@ a reference to a list where each element is an otu_set_counts
 
 <pre>
 a reference to a list containing 4 items:
-0: an int
-1: an int
-2: an int
+0: (start_of_first_hit) an int
+1: (end_of_last_hit) an int
+2: (number_hits) an int
 3: a function
 
 </pre>
@@ -917,9 +917,9 @@ a reference to a list containing 4 items:
 =begin text
 
 a reference to a list containing 4 items:
-0: an int
-1: an int
-2: an int
+0: (start_of_first_hit) an int
+1: (end_of_last_hit) an int
+2: (number_hits) an int
 3: a function
 
 
@@ -968,7 +968,7 @@ a reference to a list where each element is a call
 <pre>
 a reference to a list containing 3 items:
 0: a strand
-1: an int
+1: (offset_of_frame) an int
 2: a calls
 
 </pre>
@@ -979,7 +979,7 @@ a reference to a list containing 3 items:
 
 a reference to a list containing 3 items:
 0: a strand
-1: an int
+1: (offset_of_frame) an int
 2: a calls
 
 

@@ -3609,6 +3609,241 @@ sub _get_relationship
     return $out;
 }    
 
+sub _query_relationship
+{
+    my($self, $ctx, $relationship, $table, $is_converse, $ids, $user_qry, $from_fields, $rel_fields, $to_fields) = @_;
+
+    my($from_tbl, $to_tbl) = @{$relationship_entities->{$relationship}};
+    if (!$from_tbl)
+    {
+	die "Unknown relationship $relationship";
+    }
+
+    my %link_name_map;
+    my($from_link, $to_link);
+
+    my $valid_from_fields = $entity_field_defs->{$from_tbl};
+    my $valid_rel_fields = $relationship_field_defs->{$table};
+    my $valid_to_fields = $entity_field_defs->{$to_tbl};
+
+    if ($is_converse)
+    {
+	($from_link, $to_link) = qw(to_link from_link);
+	%link_name_map = ( from_link => 'to_link', to_link => 'from_link');
+    }
+    else
+    {
+	($from_link, $to_link) = qw(from_link to_link);
+	%link_name_map = ( from_link => 'from_link', to_link => 'to_link');
+    }
+    for my $f (@$rel_fields)
+    {
+	if (!exists $link_name_map{$f})
+	{
+	    $link_name_map{$f} = $f;
+	}
+    }
+
+    my $cdmi = $self->{db};
+    my $q = $cdmi->{_dbh}->quote;
+
+    my($from_sfields, $from_qfields, $from_relfields) = $self->_validate_fields_for_entity($from_tbl, $from_fields, 0);
+    my($to_sfields, $to_qfields, $to_relfields) = $self->_validate_fields_for_entity($to_tbl, $to_fields, 0);
+
+    my @trans_rel_fields = map { $link_name_map{$_} } @$rel_fields;
+    my($rel_sfields, $rel_qfields) = $self->_validate_fields_for_relationship($relationship, \@trans_rel_fields, $from_link);
+    
+#    my $filter = "$from_link IN (" . join(", ", map { '?' } @$ids) . ")";
+    #IN violates the typespec since it requires an array as the $value rather than a string
+    my %valid_ops = map { $_ => 1 } ('IS NULL', 'IS NOT NULL', 'LIKE', '<', '>', '=', '>=', '<='); # 'IN');
+    my @bad_q;
+    my $need_from;
+    my $need_to;
+    my(@filter, @filter_params);
+    for my $q (@$user_qry)
+    {
+        my($field, $op, $value) = @$q;
+	
+	my $field_tbl = 'r';
+	my $field_name = $field;
+	my $valid_hash = $valid_rel_fields;
+	if ($field =~ /^to\.(.*)/)
+	{
+	    $need_to++;
+	    $field_tbl = 't';
+	    $field_name = $1;
+	    $valid_hash = $valid_to_fields;
+	}
+	elsif ($field =~ /^from\.(.*)/)
+	{
+	    $need_from++;
+	    $field_tbl = 'f';
+	    $field_name = $1;
+	    $valid_hash = $valid_from_fields;
+	}
+	elsif ($field =~ /^rel\.(.*)/)
+	{
+	    $field_tbl = 'r';
+	    $field_name = $1;
+	    $valid_hash = $valid_rel_fields;
+	}
+	
+	if (defined(my $l = $link_name_map{$field_name}))
+	{
+	    $field_name = $l;
+	}
+
+	$field =~ s/-/_/g;
+        if (!$valid_hash->{$field_name})
+        {
+            push(@bad_q, "Field $field_name does not exist in $field_tbl");
+            next;
+        }
+        if (!$valid_ops{uc($op)})
+        {
+            push(@bad_q, "Operator $op is not allowed");
+               next;
+        }
+        if ($op eq 'IS NOT NULL' or $op eq 'IS NULL')
+        {
+            push(@filter, "$field_tbl.field_name $op");
+        } else {
+            push(@filter, "$field_tbl.$field_name $op ?");
+            push(@filter_params, $value);
+        }
+    } 
+    if (@$ids)
+    {
+	push(@filter, "$from_link IN (" . join(", ", map { '?' } @$ids) . ")");
+	push(@filter_params, @$ids);
+    }
+
+    if (@bad_q)
+    {
+        die "Errors found in query:\n" . join("\n", @bad_q);
+    }
+
+    my $from = "$q$table$q r ";
+    if (@$from_qfields || $need_from)
+    {
+	$from .= "JOIN $q$from_tbl$q f ON f.id = r.$from_link ";
+    }
+    if (@$to_qfields || $need_to)
+    {
+	$from .= "JOIN $q$to_tbl$q t ON t.id = r.$to_link ";
+    }
+
+    my $qstr = join(", ",
+		    (map { "f.$_" } @$from_qfields),
+		    (map { "t.$_" }  @$to_qfields),
+		    (map { "r.$_" } @$rel_qfields));
+
+    my $filter = join(" AND ", map { "(" . $_ . ")" } @filter);
+    my $qry = "SELECT $qstr FROM $from WHERE $filter";
+
+    my $attrs = {};
+    my $dbk = $cdmi->{_dbh};
+    if ($dbk->dbms eq 'mysql')
+    {
+	$attrs->{mysql_use_result} = 1;
+    }
+
+    my $sth = $dbk->{_dbh}->prepare($qry, $attrs);
+    
+    # print STDERR "$qry\n";
+    $sth->execute(@filter_params);
+    my $res = $sth->fetchall_arrayref();
+
+    my $out = [];
+
+    my(%from_keys_for_rel, %to_keys_for_rel);
+    for my $ent (@$res)
+    {
+	my($fout, $rout, $tout) = ({}, {}, {});
+	for my $fld (@$from_sfields)
+	{
+	    my $v = shift @$ent;
+	    $fout->{$fld} = $v;
+	}
+	for my $fld (@$to_sfields)
+	{
+	    my $v = shift @$ent;
+	    $tout->{$fld} = $v;
+	}
+	for my $fld (@$rel_sfields)
+	{
+	    my $v = shift @$ent;
+	    $rout->{$link_name_map{$fld}} = $v;
+	}
+	my $row = [$fout, $rout, $tout];
+
+	if (@$from_relfields)
+	{
+	    push(@{$from_keys_for_rel{$fout->{id}}}, $row);
+	}
+
+	if (@$to_relfields)
+	{
+	    push(@{$to_keys_for_rel{$tout->{id}}}, $row);
+	}
+
+	push(@$out, $row);
+    }
+
+    if (@$from_relfields)
+    {
+	my %ids = keys %from_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$from_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$from_keys_for_rel{$id}})
+		{
+		    push(@{$row->[0]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+    if (@$to_relfields)
+    {
+	my %ids = keys %to_keys_for_rel;
+	my @ids = keys %ids;
+
+	my $filter = "id IN (" . join(", ", map { '?' } @ids) . ")";
+
+	for my $ent (@$to_relfields)
+	{
+	    my($field, $rel) = @$ent;
+	    
+	    my $sth = $dbk->{_dbh}->prepare(qq(SELECT id, $field FROM $rel WHERE $filter));
+	    $sth->execute(@ids);
+	    while (my $row = $sth->fetchrow_arrayref())
+	    {
+		my($id, $val) = @$row;
+
+		for my $row (@{$to_keys_for_rel{$id}})
+		{
+		    push(@{$row->[2]->{$field}}, $val);
+		}
+	    }
+	}
+    }
+
+
+    return $out;
+}    
+
 sub _all_entities
 {
     my($self, $ctx, $tbl, $start, $count, $fields) = @_;

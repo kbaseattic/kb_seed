@@ -38,7 +38,7 @@ same name. When a new custom type is created, it should be put in this list.
 our $customERDBtypes        = [qw(ERDBTypeDNA ERDBTypeLink ERDBTypeImage
                                ERDBTypeLongString ERDBTypeSemiBoolean
                                ERDBTypeRectangle ERDBTypeCountVector
-                               ERDBTypeProteinData)];
+                               ERDBTypeProteinData ERDBTypeShortString)];
 
 =head3 sort_options
 

@@ -6,6 +6,17 @@ use Data::Dumper;
 use URI;
 use Bio::KBase::Exceptions;
 
+our %have_impl;
+eval {
+    require Bio::KBase::KmerEval::KmerEvalImpl;
+    $have_impl{'KmerEval'} = 1;
+};
+if ($@)
+{
+    warn "Error loading impl: $@\n";
+}
+
+
 # Client version should match Impl version
 # This is a Semantic Version number,
 # http://semver.org
@@ -19,16 +30,33 @@ Bio::KBase::KmerEval::Client
 
 
 
+
+
 =cut
 
 sub new
 {
-    my($class, $url) = @_;
+    my($class, $url, @args) = @_;
+
+    my $local_impl = {};
+    if ($url eq 'local' || $ENV{KB_CLIENT_LOCAL} || $ENV{'KB_CLIENT_LOCAL_KmerEval'})
+    {
+	$have_impl{'KmerEval'} or die "Error: Local implementation requested for service, but the implementation module did not load properly\n";
+	my $impl = Bio::KBase::KmerEval::KmerEvalImpl->new();
+	$local_impl->{'KmerEval'} = $impl;
+    }
+    if (!defined($url))
+    {
+	$url = 'http://ash.mcs.anl.gov:5060/services/kmer_eval';
+    }
 
     my $self = {
 	client => Bio::KBase::KmerEval::Client::RpcClient->new,
 	url => $url,
+	local_impl => $local_impl,
     };
+
+
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
     $ua->timeout($timeout);
@@ -70,24 +98,24 @@ length is an int
 frames is a reference to a list where each element is a frame
 frame is a reference to a list containing 3 items:
 	0: a strand
-	1: an int
+	1: (offset_of_frame) an int
 	2: a calls
 strand is an int
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -114,24 +142,24 @@ length is an int
 frames is a reference to a list where each element is a frame
 frame is a reference to a list containing 3 items:
 	0: a strand
-	1: an int
+	1: (offset_of_frame) an int
 	2: a calls
 strand is an int
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -147,6 +175,8 @@ genus_species is a reference to a list containing 2 items:
 sub call_dna_with_kmers
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -165,24 +195,37 @@ sub call_dna_with_kmers
 	}
     }
 
-    my $result = $self->{client}->call($self->{url}, {
-	method => "KmerEval.call_dna_with_kmers",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'call_dna_with_kmers',
-					      );
+    #
+    # See if we have a local implementation objct for this call.
+    #
+    if (ref(my $impl = $self->{local_impl}->{'KmerEval'}))
+    {
+	my @result = $impl->call_dna_with_kmers(@args);
+	
+	return wantarray ? @result : $result[0];
+    }
+    else
+    {
+	my $result = $self->{client}->call($self->{url}, {
+	    method => "KmerEval.call_dna_with_kmers",
+	    params => \@args,
+	});
+
+	if ($result) {
+	    if ($result->is_error) {
+		Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+						       code => $result->content->{code},
+						       method_name => 'call_dna_with_kmers',
+						      );
+	    } else {
+    		return wantarray ? @{$result->result} : $result->result->[0];
+	   }
 	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method call_dna_with_kmers",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'call_dna_with_kmers',
 				       );
+        }
     }
 }
 
@@ -213,19 +256,19 @@ comment is a string
 sequence is a string
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -247,19 +290,19 @@ comment is a string
 sequence is a string
 calls is a reference to a list where each element is a call
 call is a reference to a list containing 4 items:
-	0: an int
-	1: an int
-	2: an int
+	0: (start_of_first_hit) an int
+	1: (end_of_last_hit) an int
+	2: (number_hits) an int
 	3: a function
 function is a string
 otu_data is a reference to a list where each element is an otu_set_counts
 otu_set_counts is a reference to a list containing 2 items:
-	0: an int
+	0: (count) an int
 	1: an otu_set
 otu_set is a reference to a list where each element is a genus_species
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -275,6 +318,8 @@ genus_species is a reference to a list containing 2 items:
 sub call_prot_with_kmers
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -293,24 +338,37 @@ sub call_prot_with_kmers
 	}
     }
 
-    my $result = $self->{client}->call($self->{url}, {
-	method => "KmerEval.call_prot_with_kmers",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'call_prot_with_kmers',
-					      );
+    #
+    # See if we have a local implementation objct for this call.
+    #
+    if (ref(my $impl = $self->{local_impl}->{'KmerEval'}))
+    {
+	my @result = $impl->call_prot_with_kmers(@args);
+	
+	return wantarray ? @result : $result[0];
+    }
+    else
+    {
+	my $result = $self->{client}->call($self->{url}, {
+	    method => "KmerEval.call_prot_with_kmers",
+	    params => \@args,
+	});
+
+	if ($result) {
+	    if ($result->is_error) {
+		Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+						       code => $result->content->{code},
+						       method_name => 'call_prot_with_kmers',
+						      );
+	    } else {
+    		return wantarray ? @{$result->result} : $result->result->[0];
+	   }
 	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method call_prot_with_kmers",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'call_prot_with_kmers',
 				       );
+        }
     }
 }
 
@@ -329,10 +387,10 @@ sub call_prot_with_kmers
 <pre>
 $seq_set is a seq_set
 $return is a reference to a list containing 4 items:
-	0: an int
+	0: (estimate) an int
 	1: a comment
-	2: a genome_tuples
-	3: a seq_set
+	2: (placed) a genome_tuples
+	3: (unplaced) a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -344,12 +402,12 @@ sequence is a string
 genome_tuples is a reference to a list where each element is a genome_tuple
 genome_tuple is a reference to a list containing 4 items:
 	0: a genus_species
-	1: an int
-	2: a string
+	1: (genetic_code) an int
+	2: (estimated_taxonomy) a string
 	3: a seq_set
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 </pre>
 
@@ -359,10 +417,10 @@ genus_species is a reference to a list containing 2 items:
 
 $seq_set is a seq_set
 $return is a reference to a list containing 4 items:
-	0: an int
+	0: (estimate) an int
 	1: a comment
-	2: a genome_tuples
-	3: a seq_set
+	2: (placed) a genome_tuples
+	3: (unplaced) a seq_set
 seq_set is a reference to a list where each element is a seq_triple
 seq_triple is a reference to a list containing 3 items:
 	0: an id
@@ -374,12 +432,12 @@ sequence is a string
 genome_tuples is a reference to a list where each element is a genome_tuple
 genome_tuple is a reference to a list containing 4 items:
 	0: a genus_species
-	1: an int
-	2: a string
+	1: (genetic_code) an int
+	2: (estimated_taxonomy) a string
 	3: a seq_set
 genus_species is a reference to a list containing 2 items:
-	0: a string
-	1: a string
+	0: (genus) a string
+	1: (species) a string
 
 
 =end text
@@ -395,6 +453,8 @@ genus_species is a reference to a list containing 2 items:
 sub check_contig_set
 {
     my($self, @args) = @_;
+
+# Authentication: none
 
     if ((my $n = @args) != 1)
     {
@@ -413,27 +473,39 @@ sub check_contig_set
 	}
     }
 
-    my $result = $self->{client}->call($self->{url}, {
-	method => "KmerEval.check_contig_set",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'check_contig_set',
-					      );
+    #
+    # See if we have a local implementation objct for this call.
+    #
+    if (ref(my $impl = $self->{local_impl}->{'KmerEval'}))
+    {
+	my @result = $impl->check_contig_set(@args);
+	
+	return wantarray ? @result : $result[0];
+    }
+    else
+    {
+	my $result = $self->{client}->call($self->{url}, {
+	    method => "KmerEval.check_contig_set",
+	    params => \@args,
+	});
+
+	if ($result) {
+	    if ($result->is_error) {
+		Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+						       code => $result->content->{code},
+						       method_name => 'check_contig_set',
+						      );
+	    } else {
+    		return wantarray ? @{$result->result} : $result->result->[0];
+	   }
 	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method check_contig_set",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'check_contig_set',
 				       );
+        }
     }
 }
-
 
 
 
@@ -774,8 +846,8 @@ a reference to a list where each element is a seq_triple
 
 <pre>
 a reference to a list containing 2 items:
-0: a string
-1: a string
+0: (genus) a string
+1: (species) a string
 
 </pre>
 
@@ -784,8 +856,8 @@ a reference to a list containing 2 items:
 =begin text
 
 a reference to a list containing 2 items:
-0: a string
-1: a string
+0: (genus) a string
+1: (species) a string
 
 
 =end text
@@ -807,8 +879,8 @@ a reference to a list containing 2 items:
 <pre>
 a reference to a list containing 4 items:
 0: a genus_species
-1: an int
-2: a string
+1: (genetic_code) an int
+2: (estimated_taxonomy) a string
 3: a seq_set
 
 </pre>
@@ -819,8 +891,8 @@ a reference to a list containing 4 items:
 
 a reference to a list containing 4 items:
 0: a genus_species
-1: an int
-2: a string
+1: (genetic_code) an int
+2: (estimated_taxonomy) a string
 3: a seq_set
 
 
@@ -894,7 +966,7 @@ a reference to a list where each element is a genus_species
 
 <pre>
 a reference to a list containing 2 items:
-0: an int
+0: (count) an int
 1: an otu_set
 
 </pre>
@@ -904,7 +976,7 @@ a reference to a list containing 2 items:
 =begin text
 
 a reference to a list containing 2 items:
-0: an int
+0: (count) an int
 1: an otu_set
 
 
@@ -952,9 +1024,9 @@ a reference to a list where each element is an otu_set_counts
 
 <pre>
 a reference to a list containing 4 items:
-0: an int
-1: an int
-2: an int
+0: (start_of_first_hit) an int
+1: (end_of_last_hit) an int
+2: (number_hits) an int
 3: a function
 
 </pre>
@@ -964,9 +1036,9 @@ a reference to a list containing 4 items:
 =begin text
 
 a reference to a list containing 4 items:
-0: an int
-1: an int
-2: an int
+0: (start_of_first_hit) an int
+1: (end_of_last_hit) an int
+2: (number_hits) an int
 3: a function
 
 
@@ -1015,7 +1087,7 @@ a reference to a list where each element is a call
 <pre>
 a reference to a list containing 3 items:
 0: a strand
-1: an int
+1: (offset_of_frame) an int
 2: a calls
 
 </pre>
@@ -1026,7 +1098,7 @@ a reference to a list containing 3 items:
 
 a reference to a list containing 3 items:
 0: a strand
-1: an int
+1: (offset_of_frame) an int
 2: a calls
 
 
@@ -1098,7 +1170,6 @@ a reference to a list containing 3 items:
 
 =cut
 
-
 package Bio::KBase::KmerEval::Client::RpcClient;
 use base 'JSON::RPC::Client';
 
@@ -1140,5 +1211,38 @@ sub call {
         return;
     }
 }
+
+
+sub _post {
+    my ($self, $uri, $obj) = @_;
+    my $json = $self->json;
+
+    $obj->{version} ||= $self->{version} || '1.1';
+
+    if ($obj->{version} eq '1.0') {
+        delete $obj->{version};
+        if (exists $obj->{id}) {
+            $self->id($obj->{id}) if ($obj->{id}); # if undef, it is notification.
+        }
+        else {
+            $obj->{id} = $self->id || ($self->id('JSON::RPC::Client'));
+        }
+    }
+    else {
+        $obj->{id} = $self->id if (defined $self->id);
+    }
+
+    my $content = $json->encode($obj);
+
+    $self->ua->post(
+        $uri,
+        Content_Type   => $self->{content_type},
+        Content        => $content,
+        Accept         => 'application/json',
+	($self->{token} ? (Authorization => $self->{token}) : ()),
+    );
+}
+
+
 
 1;

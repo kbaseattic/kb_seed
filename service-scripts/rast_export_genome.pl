@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
+use File::Copy;
 use SeedUtils;
 use gjoseqlib;
 
@@ -19,14 +20,11 @@ use Bio::Location::Split;
 use Bio::Location::Simple;
 use Bio::SeqFeature::Generic;
 use Bio::SeqFeature::Annotated;
-use Getopt::Long;
+use Getopt::Long::Descriptive;
+use Spreadsheet::Write;
+use File::Temp;
 
-my $help;
-my $input_file;
-my $output_file;
 my $temp_dir;
-my $id_prefix;
-my $id_server;
 my @feature_type;
 
 #
@@ -36,25 +34,31 @@ my @feature_type;
 
 my @formats = ([genbank => "Genbank format"],
 	       [genbank_merged => "Genbank format as single merged locus, suitable for Artemis"],
+	       [spreadsheet_txt => "Spreadsheet (tab-separated text format)"],
+	       [spreadsheet_xls => "Spreadsheet (Excel XLS format)"],
 	       [feature_data => "Tabular form of feature data"],
 	       [protein_fasta => "Protein translations in fasta format"],
 	       [contig_fasta => "Contig DNA in fasta format"],
 	       [feature_dna => "Feature DNA sequences in fasta format"],
+	       [seed_dir => "SEED directory"],
 	       [gff => "GFF format"],
 	       [embl => "EMBL format"]);
 
-my $rc = GetOptions('help'        => \$help,
-		    'input=s'     => \$input_file,
-		    'output=s'    => \$output_file,
-		    'feature-type=s' => \@feature_type,
-		    );
+my($opt, $usage) = describe_options("%c %o format",
+				    ["feature-type=s@", 'Select a feature type to dump'],
+				    ["input|i=s", "Input file"],
+				    ["output|o=s", "Output file"],
+				    ["help|h", "Show this help message"],
+				    [],
+				    ["Supported formats:\n"],
+				    map { [ "$_->[0]  : $_->[1]" ] } @formats,
+				   );
 
-if (!$rc || $help || @ARGV != 1) {
-    die "Bad ARGV";
-}
+print($usage->text), exit if $opt->help;
+print($usage->text), exit 1 if @ARGV != 1;
 
 my $feature_type_ok;
-if (@feature_type)
+if (ref($opt->feature_type))
 {
     my $feature_type = { map { $_ => 1 } @feature_type };
     $feature_type_ok = sub {
@@ -75,13 +79,13 @@ if (lc($format) eq 'gff')
 }
 
 my $in_fh;
-if ($input_file) {
-    open($in_fh, "<", $input_file) or die "Cannot open $input_file: $!";
+if ($opt->input) {
+    open($in_fh, "<", $opt->input) or die "Cannot open " . $opt->input . ": $!";
 } else { $in_fh = \*STDIN; }
 
 my $out_fh;
-if ($output_file) {
-    open($out_fh, ">", $output_file) or die "Cannot open $output_file: $!";
+if ($opt->output) {
+    open($out_fh, ">", $opt->output) or die "Cannot open " . $opt->output . ": $!";
 } else { $out_fh = \*STDOUT; }
 
 my $json = JSON::XS->new;
@@ -123,6 +127,16 @@ elsif ($format eq 'contig_fasta')
 elsif ($format eq 'feature_data')
 {
     export_feature_data($genomeTO, $out_fh);
+    exit;
+}
+elsif ($format =~ /spreadsheet_(xls|txt)/)
+{
+    export_spreadsheet($genomeTO, $1, $out_fh);
+    exit;
+}
+elsif ($format eq 'seed_dir')
+{
+    export_seed_dir($genomeTO, $out_fh);
     exit;
 }
 elsif ($format eq 'feature_dna')
@@ -537,5 +551,100 @@ sub export_feature_data
 	my $aliases = ref($feature->{aliases}) ? join(",",@{$feature->{aliases}}) : "";
 
 	print $out_fh join("\t", $fid,$loc,$type,$func,$aliases,$md5), "\n";
+    }
+}
+
+sub export_seed_dir
+{
+    my($genomeTO, $out_fh) = @_;
+
+    my $td = File::Temp::tempdir(CLEANUP => 1);
+    my $dir = "$td/$genomeTO->{id}";
+    mkdir($dir) or die "Cannot mkdir $dir: $@";
+    $genomeTO->write_seed_dir($dir);
+
+    my $fh;
+    open($fh, "cd $td; tar czf - '$genomeTO->{id}' |") or die "cannot open tar: $!";
+    copy($fh, $out_fh);
+    close($fh);
+}
+
+sub export_spreadsheet
+{
+    my($genomeTO, $suffix, $out_fh) = @_;
+    
+    my $features = $genomeTO->{features};
+
+    my @cols = qw(contig_id feature_id type location start stop strand
+		  function aliases figfam evidence_codes nucleotide_sequence aa_sequence);
+
+    my $tmp;
+    my $ss;
+    
+    if ($suffix eq 'xls')
+    {	
+	$tmp = File::Temp->new(SUFFIX => ".$suffix");
+	close($tmp);
+	
+	$ss = Spreadsheet::Write->new(file => "$tmp",
+				      format => 'xls',
+				      sheet => "Features in $genomeTO->{scientific_name}",
+				      styles  => {
+					  header => { font_weight => 'bold' },
+				      });
+
+	$ss->addrow(map { { content => $_, style => 'header' } } @cols);
+    }
+    else
+    {
+	print $out_fh join("\t", @cols), "\n";
+    }
+
+    foreach my $feature (@$features)
+    {
+	next unless &$feature_type_ok($feature);
+	my %dat;
+
+	my $fid = $feature->{id};
+
+	$dat{feature_id} = $fid;
+
+	my($contig, $min, $max, $dir) = SeedUtils::boundaries_of(map { my($c,$s,$d,$l) = @$_; "${c}_$s$d$l" } @{$feature->{location}});
+	if (!$contig)
+	{
+	    die Dumper($feature);
+	}
+	$dat{contig_id} = $contig;
+	($dat{start}, $dat{stop}) = ($dir eq '+') ? ($min, $max) : ($max, $min);
+	$dat{strand} = $dir;
+	
+	$dat{location} = join(",",map { my($contig,$beg,$strand,$len) = @$_; 
+				 "$contig\_$beg$strand$len" 
+			       } @{$feature->{location}});
+
+	$dat{type} = $feature->{type};
+	$dat{function} = $feature->{function};
+
+	$dat{aa_sequence} = $feature->{protein_translation} ? $feature->{protein_translation} : '';
+	$dat{nucleotide_sequence} = $genomeTO->get_feature_dna($fid);
+
+	$dat{evidence_codes} = '';
+	$dat{figfam} = '';
+	$dat{aliases} = ref($feature->{aliases}) ? join(",",@{$feature->{aliases}}) : "";
+
+	if ($ss)
+	{
+	    $ss->addrow(@dat{@cols});
+	}
+	else
+	{
+	    print $out_fh join("\t", @dat{@cols}), "\n";
+	}
+    }
+
+    if ($ss)
+    {
+	undef $ss;
+	copy("$tmp", $out_fh);
     }
 }

@@ -554,9 +554,9 @@ Sort order of the field-- C<ascending> or C<descending>.
 
 =back
 
-The B<FromIndex>, and B<ToIndex> tags have no attributes. The B<Index> tag can
-have a B<unique> attribute. If specified, the index will be generated as a
-unique index.
+The B<FromIndex>, B<ToIndex> and B<Index> tags can have a B<unique> attribute. 
+If specified, the index will be generated as a unique index. The B<ToIndex>
+for a one-to-many relationship is always unique.
 
 =head3 Regions
 
@@ -3357,6 +3357,11 @@ be analyzed and compacted at the end.
 If TRUE, then when an error occurs, the process will be killed; otherwise, the
 process will stay alive, but a message will be put into the statistics object.
 
+=item dup
+
+If C<ignore>, duplicate rows will be ignored. If C<replace>, duplicate rows will 
+replace previous instances. If omitted, duplicate rows will cause an error.
+
 =back
 
 =cut
@@ -3406,7 +3411,8 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode}, 'local' => 'LOCAL' );
+                               style => $options{mode}, 'local' => 'LOCAL', 
+                               dup => $options{dup} );
     };
     if (!defined $rv) {
         $retVal->AddMessage($@) if ($@);
@@ -4808,10 +4814,20 @@ Hash of insert options. The current list of options is
 
 =over 8
 
-=item ignore
+=item ignore (deprecated)
 
 If TRUE, then duplicate-record errors will be suppressed. If the record already exists, the insert
 will not take place.
+
+=item dup
+
+If specified, then duplicate-record errors will be suppressed. If C<ignore> is specified, duplicate
+records will be discarded. If C<replace> is specified, duplicate records will replace the previous
+version.
+
+=item encoded
+
+If TRUE, the fields are presumed to be already encoded for loading.
 
 =back
 
@@ -4838,7 +4854,7 @@ sub InsertObject {
     # Parse the field hash. We need to strip off the table names and
     # convert underscores in field names to hyphens. We will also
     # encode the values.
-    my %fixedHash = $self->_SingleTableHash($fieldHash, $newObjectType);
+    my %fixedHash = $self->_SingleTableHash($fieldHash, $newObjectType, $options->{encoded});
     # Get the relation descriptor.
     my $relationData = $self->FindRelation($newObjectType);
     # We'll need a list of the fields being inserted, a list of the corresponding
@@ -4846,6 +4862,8 @@ sub InsertObject {
     my @fieldNameList = ();
     my @valueList = ();
     my @missing = ();
+    # Get the quote character.
+    my $q = $self->{_quote};
     # Loop through the fields in the relation.
     for my $fieldDescriptor (@{$relationData->{Fields}}) {
         # Get the field name and save it. Note we need to fix it up so the hyphens
@@ -4863,7 +4881,7 @@ sub InsertObject {
             } else {
                 # Normal case. Stash it in both lists.
                 push @valueList, $fixedHash{$fieldName};
-                push @fieldNameList, $fixedName;
+                push @fieldNameList, "$q$fixedName$q";
                 Trace("Value for $fixedName is \"$fixedHash{$fieldName}\".") if T(SQL => 4);
             }
         } else {
@@ -4872,7 +4890,7 @@ sub InsertObject {
             if (defined $default) {
                 # Yes, we have a default. Push it into the two lists.
                 push @valueList, $default;
-                push @fieldNameList, $fixedName;
+                push @fieldNameList, "$q$fixedName$q";
                 Trace("Default value for $fixedName is \"$default\".") if T(SQL => 4);
             } else {
                 # No, this field is officially missing.
@@ -4886,11 +4904,17 @@ sub InsertObject {
             join(' ', @missing)) if T(1);
     } else {
         # Build the INSERT statement.
-        my $optional = "";
+        my $command = "INSERT";
         if ($options->{ignore}) {
-        	$optional = "IGNORE";
+        	$command = "INSERT IGNORE";       	
+        } elsif ($options->{dup}) {
+        	if ($options->{dup} eq 'ignore') {
+        		$command = "INSERT IGNORE";
+        	} elsif ($options->{dup} eq 'replace') {
+        		$command = "REPLACE";
+        	}
         }
-        my $statement = "INSERT $optional INTO $self->{_quote}$newObjectType$self->{_quote} (" . join (', ', @fieldNameList) .
+        my $statement = "$command INTO $q$newObjectType$q (" . join (', ', @fieldNameList) .
             ") VALUES (";
         # Create a marker list of the proper size and put it in the statement.
         my @markers = ();
@@ -6132,7 +6156,7 @@ sub _Default {
 
 =head3 _SingleTableHash
 
-    my %fixedHash = $self->_SingleTableHash($fieldHash, $objectName);
+    my %fixedHash = $self->_SingleTableHash($fieldHash, $objectName, $unchanged);
 
 Convert a hash of field names in L</Standard Field Name Format> to field values
 into a hash of simple field names to encoded values. This is a common
@@ -6150,6 +6174,10 @@ L</Standard Field Name Format>.
 The default object name to be used when no object name is specified for
 the field.
 
+=item unchanged
+
+If TRUE, the field values will not be encoded for storage. (It is presumed they already are.) The default is FALSE.
+
 =item RETURN
 
 Returns a hash of simple field names to encoded values for those fields.
@@ -6160,13 +6188,17 @@ Returns a hash of simple field names to encoded values for those fields.
 
 sub _SingleTableHash {
     # Get the parameters.
-    my ($self, $fieldHash, $objectName) = @_;
+    my ($self, $fieldHash, $objectName, $unchanged) = @_;
     # Declare the return variable.
     my %retVal;
     # Loop through the fields.
     for my $key (keys %$fieldHash) {
         my $fieldData = $self->_FindField($key, $objectName);
-        $retVal{$fieldData->{name}} = encode($fieldData->{type}, $fieldHash->{$key});
+        my $value = $fieldHash->{$key};
+        if (! $unchanged) {
+        	$value = encode($fieldData->{type}, $value);
+        }
+        $retVal{$fieldData->{name}} = $value;
     }
     # Return the result.
     return %retVal;
@@ -7205,8 +7237,10 @@ sub _CreateRelationshipIndex {
     # PERL, if the index descriptor does not exist, it will be created
     # automatically so we can add the field to it.
     unshift @{$newIndex->{IndexFields}}, $firstField;
-    # If this is a one-to-many relationship, the "To" index is unique.
-    if ($relationshipStructure->{arity} eq "1M" && $indexKey eq "To") {
+    # If this is a one-to-many relationship, the "To" index is unique. The index
+    # can also be forced unique by the user.
+    if ($relationshipStructure->{arity} eq "1M" && $indexKey eq "To" ||
+    	$relationshipStructure->{unique}) {
         $newIndex->{unique} = 1;
     }
     # Add the index to the relation.

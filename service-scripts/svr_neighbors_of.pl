@@ -1,6 +1,9 @@
+########################################################################
 use strict;
 use Data::Dumper;
 use Carp;
+$| = 1;
+
 
 #
 # This is a SAS Component
@@ -78,8 +81,11 @@ my @pegs = map { $_->[$column-1] } @lines;
 my $neighbors = &get_neighbors(\@pegs,$N);
 foreach $_ (@lines)
 {
-    my $neigh = join(",",@{$neighbors->{$_->[$column-1]}});
-    print join("\t",(@$_,$neigh)),"\n";
+    if ($column && $_->[$column-1] && $neighbors->{$_->[$column-1]})
+    {
+	my $neigh = join(",",@{$neighbors->{$_->[$column-1]}});
+	print join("\t",(@$_,$neigh)),"\n";
+    }
 }
 
 sub get_neighbors {

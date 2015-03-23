@@ -36,7 +36,10 @@ our @EXPORT = qw( find_nucleotide_homologs );
 #
 #  Options:
 #
-#      blastall    =>  $blastall_path
+#      blastall    =>  $blastall_path        # Use specified blastall program
+#      blastall    =>  $bool                 # Use default blastall program
+#      blastn      =>  $blastm_path          # Use specified blastn program
+#      blastn      =>  $bool                 # Use default blastn program (D)
 #      coverage    =>  $min_coverage         # D = 0.70
 #      descript    =>  $description          # D = ''
 #      description =>  $description          # D = ''
@@ -73,7 +76,8 @@ sub find_nucleotide_homologs
        or print STDERR "find_nucleotide_homologs called with bad \\%options\n"
           and return [];
 
-    my $blastall  = $options->{ blastall }   ||= SeedAware::executable_for( 'blastall' );
+    my $blastall  = $options->{ blastall };
+    my $blastn    = $options->{ blastn };
     my $min_cover = $options->{ coverage }   ||=    0.70;  # Minimum fraction of reference covered
        $debug     = $options->{ debug } if exists $options->{ debug };
     my $max_exp   = $options->{ expect }     ||=    0.01;  # Maximum e-value for blast
@@ -92,6 +96,24 @@ sub find_nucleotide_homologs
     my $verbose   = $options->{ verbose }    ||=    0;
 
     my ( $tmp_dir, $save_tmp ) = SeedAware::temporary_directory( $options );
+
+    #  Find the blast program. Note the blastn is now the default given observations
+    #  that blastall seems to return corrupt output for some large query files,
+    #  which puts the reading of output out of sync with the contigs.
+
+    if ( $blastn || ( ! $blastall ) )
+    {
+        $blastn = SeedAware::executable_for( 'blastn' ) unless -x $blastn;
+    }
+    if ( ! ( -x $blastn ) )
+    {
+        $blastall = SeedAware::executable_for( 'blastall' ) unless -x $blastall;
+        if ( ! ( -x $blastall ) )
+        {
+            print STDERR "find_nucleotide_homologs() failed to find a blast program.\n";
+            return wantarray ? () : [];
+        }
+    }
 
     #  Build the blast database of reference sequences:
     #
@@ -156,18 +178,31 @@ sub find_nucleotide_homologs
         $qfile = $contigs;
     }
 
-    my @cmd = ( $blastall,
-                -p => 'blastn',
-                -d => $db,
-                -i => $qfile,
-                -r =>  1,
-                -q => -1,
-                -F => 'f',
-                -e => $max_exp,
-                -v =>  5,
-                -b =>  5,
-                -a =>  2
-              );
+    my @cmd = $blastn ? ( $blastn,
+                          -db               => $db,
+                          -query            => $qfile,
+                          -reward           =>  1,
+                          -penalty          => -1,
+                          -gapopen          =>  2,   # These are required
+                          -gapextend        =>  1,   # These are required
+                          -dust             => 'no',
+                          -evalue           => $max_exp,
+                          -num_descriptions =>  5,
+                          -num_alignments   =>  5,
+                          -num_threads      =>  2
+                        )
+                      : ( $blastall,
+                          -p => 'blastn',
+                          -d => $db,
+                          -i => $qfile,
+                          -r =>  1,
+                          -q => -1,
+                          -F => 'f',
+                          -e => $max_exp,
+                          -v =>  5,
+                          -b =>  5,
+                          -a =>  2
+                        );
 
     my $redirect = { stderr => '/dev/null' };
     my $blastFH = SeedAware::read_from_pipe_with_redirect( @cmd, $redirect )
@@ -181,7 +216,13 @@ sub find_nucleotide_homologs
 
     while ( $contig = next_contig( $contigs, $n++ ) )
     {
-        my $query_results = next_blast_query( $blastFH ) or next;
+        my $query_results = next_blast_query( $blastFH );
+        # if ( $contig->[0] eq 'AACY01526565' or $contig->[0] eq 'AACY01526566' )
+        # {
+        #     print STDERR Dumper( $contig, $query_results )
+        # }
+        $query_results or next;
+
         my ( $qid, $qdef, $qlen, $q_matches ) = @$query_results;
 
         #  Check the framing between contigs and blast queries:

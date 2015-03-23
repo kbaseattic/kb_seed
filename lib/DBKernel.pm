@@ -1074,6 +1074,11 @@ works. C<LOW_PRIORITY> causes the load to wait until the table is no longer
 being accessed, and C<CONCURRENT> attempts to allow other users to read the
 table while the load is in progress.
 
+=item dup (optional)
+
+If C<ignore>, duplicate rows are discarded automatically; if C<replace>, duplicate rows
+replace the previous instance. If omitted, duplicate rows cause an error. 
+
 =item RETURN
 
 Returns the number of rows loaded. If no rows were loaded, will return a true 0, that is,
@@ -1102,9 +1107,6 @@ sub load_table {
     }
     if ($file) {
         if ($dbms eq "mysql") {
-            # We need to determine whether or not we have to use a special line
-            # terminator string.
-            #my $lineEnd = ($FIG_Config::arch eq "win" ? "\\r\\n" : "\\n");
             Trace("Loading $tbl into MySQL using file $file and style $style.") if T(2);
             # Fix the file name for windows.
             $file =~ tr/\\/\//;
@@ -1112,8 +1114,13 @@ sub load_table {
             if ($self->{_host} ne "localhost" && ! $local) {
                 $local = "LOCAL";
             }
-	    my $sql = "LOAD DATA $style $local INFILE '$file' INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
-	    Trace("SQL command: $sql") if T(SQL => 2);
+            # Decide whether we are ignoring duplicates.
+            my $ignore_mode = "";
+            if ($arg{dup}) {
+            	$ignore_mode = uc $arg{dup};
+            }
+	    	my $sql = "LOAD DATA $style $local INFILE '$file' $ignore_mode INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
+	    	Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         } elsif ($dbms eq "Pg") {
             Trace("Loading $tbl into PostGres using file $file.") if T(2);

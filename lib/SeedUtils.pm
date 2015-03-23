@@ -1461,7 +1461,7 @@ sub roles_of_function {
     # Remove any comment.
     my $commentFree = ($assignment =~ /(.+?)\s*[#!]/ ? $1 : $assignment);
     # Split out the roles.
-    my @retVal = split /\s+[\/@]\s+|\s*;\s+/, $commentFree;
+    my @retVal = grep { $_ } split /\s+[\/@]\s+|\s*;\s+/, $commentFree;
     # Return the result.
     return @retVal;
 }

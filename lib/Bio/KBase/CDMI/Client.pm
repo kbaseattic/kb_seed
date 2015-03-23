@@ -109,7 +109,7 @@ sub new
     
     if (!defined($url))
     {
-	$url = 'https://kbase.us/services/cdmi_api';
+	$url = 'http://140.221.84.182:7032';
     }
 
     my $self = {
@@ -5909,7 +5909,7 @@ sub aliases_to_fids_by_source
 
 <pre>
 $aliases is an aliases
-$return is a reference to a hash where the key is a string and the value is a fid
+$return is a reference to a hash where the key is a string and the value is a reference to a list where each element is a fid
 aliases is a reference to a list where each element is an alias
 alias is a string
 fid is a string
@@ -5921,7 +5921,7 @@ fid is a string
 =begin text
 
 $aliases is an aliases
-$return is a reference to a hash where the key is a string and the value is a fid
+$return is a reference to a hash where the key is a string and the value is a reference to a list where each element is a fid
 aliases is a reference to a list where each element is an alias
 alias is a string
 fid is a string

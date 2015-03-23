@@ -1,9 +1,14 @@
 #!/bin/sh
 
-dbd=/home/parrello/CdmiData/Published/KSaplingDBD.xml
+#dbd=/home/parrello/CdmiData/Published/KSaplingDBD.xml
+#dbd=/home/olson/KSaplingDBD.xml.ForSAC
+dbd=KSaplingDBD.xml
 
-bin=/home/olson/kb_test/bin
+#bin=/home/olson/kb_test/bin
 bin=/vol/kbase/deployment/bin
+
+#url=https://kbase.us/services/cdmi_api
+url=http://140.221.84.182:7032
 
 $bin/compile_dbd_to_typespec CDMI_API CDMI_EntityAPI $dbd CDMI-EntityAPI.spec  \
 	Bio/KBase/CDMI/CDMI_EntityAPIImpl.pm er_scripts
@@ -15,5 +20,5 @@ $bin/compile_typespec \
 	-client Bio::KBase::CDMI::Client \
 	-js CDMI \
 	-py CDMI \
-	-url http://bio-data-1.mcs.anl.gov/services/cdmi_api \
+	-url $url \
 	CDMI-API.spec CDMI-EntityAPI.spec .

@@ -17,38 +17,35 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
-package ERDBTypeHashString;
+
+package ERDBTypeShortString;
 
     use strict;
     use Tracer;
     use ERDB;
     use base qw(ERDBType);
 
-=head1 ERDB Hash String Type Definition
+=head1 ERDB Short String Type Definition
 
 =head2 Introduction
 
-This object represents the data type for keys that are hash codes produced from
-computable strings. Such codes are almost guaranteed to be unique, and are
-considerably shorter than the data from which they are digested. It is not,
-however, possible to reverse the encoding.
-
-There is no encoding or decoding done for this type. Instead, its use serves as
-notice that the real identifier must be computed by feeding something through
-L<ERDB/DigestKey>.
+This object represents the data type for short strings of 32 characters or less
+with no odd control characters needing translation. Such strings are very limited,
+but more of them can be crowded into an index and they do not require encoding or
+decoding.
 
 =head3 new
 
-    my $et = ERDBTypeHashString->new();
+    my $et = ERDBTypeShortString->new();
 
-Construct a new ERDBTypeHashString descriptor.
+Construct a new ERDBTypeShortString descriptor.
 
 =cut
 
 sub new {
     # Get the parameters.
     my ($class) = @_;
-    # Create the ERDBTypeHashString object.
+    # Create the ERDBTypeShortString object.
     my $retVal = { };
     # Bless and return it.
     bless $retVal, $class;
@@ -67,7 +64,7 @@ database. This value is used to compute the expected size of a database table.
 =cut
 
 sub averageLength {
-    return 22;
+    return 24;
 }
 
 =head3 prettySortValue
@@ -112,8 +109,10 @@ sub validate {
     my ($self, $value) = @_;
     # Assume it's valid until we prove otherwise.
     my $retVal = "";
-    if (length($value) != 22) {
-        $retVal = "Invalid hash string field.";
+    if (length($value) > 32) {
+        $retVal = "Invalid short string field.";
+    } elsif ($value =~ /[\%\\\x00-\x1F\x80-\xFF]/) {
+        $retVal = "Invalid character in short-string field.";
     }
     # Return the determination.
     return $retVal;
@@ -203,7 +202,7 @@ an SQL table.
 =cut
 
 sub sqlType {
-    return "CHAR(22)";
+    return "VARCHAR(32)";
 }
 
 =head3 indexMod
@@ -244,7 +243,7 @@ format, though HTML will also work.
 =cut
 
 sub documentation() {
-    return 'A Base64 Digest MD5 code.';
+    return 'A short string of 32 or fewer chaaracters.';
 }
 
 =head3 name
@@ -256,7 +255,7 @@ Return the name of this type, as it will appear in the XML database definition.
 =cut
 
 sub name() {
-    return "hash-string";
+    return "short-string";
 }
 
 =head3 default
@@ -271,7 +270,7 @@ an error will be thrown during the load.
 =cut
 
 sub default {
-    return '                      ';
+    return '';
 }
 
 =head3 align

@@ -94,7 +94,7 @@ sub Get
 
     $req_buf = $req->content;
     print $req_buf;
-    my $n = $socket->syswrite($req_buf, length($req_buf));
+    $n = $socket->syswrite($req_buf, length($req_buf));
     print "Wrote $n\n";
     die $! unless defined($n);
     die "short write" unless $n == length($req_buf);

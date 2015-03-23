@@ -7,6 +7,7 @@ package RASTserver;
 use LWP::UserAgent;
 #use LWP::Debug qw(+trace +debug +conns);
 use Data::Dumper;
+#use YAML::Any qw(Load Dump);
 use YAML;
 use File::Basename;
 use ClientThing;
@@ -66,7 +67,8 @@ sub new
 	password => $password,
     };
     $self->{ua}->timeout(20 * 60);
-
+    $self->{ua}->env_proxy;
+    
     return bless $self, $class;
 }
 
@@ -257,7 +259,7 @@ sub retrieve_RAST_job
     };
     
     my $form = [function  => 'retrieve_RAST_job',
-		args => YAML::Dump($params),
+		args => Dump($params),
 		username => $self->{username},
 		password => $self->{password},
 		];
@@ -355,7 +357,7 @@ sub run_query
 {
     my($self, $function, @args ) = @_;
     my $form = [function  => $function,
-		args => YAML::Dump(@args),
+		args => Dump(@args),
 		username => $self->{username},
 		password => $self->{password},
 		];
@@ -464,7 +466,7 @@ sub copy_to_RAST_dir
 	$params->{-chunkNum} = $chunk_num;
 	
 	my $form = [function  => 'copy_to_RAST_dir',
-		    args => YAML::Dump($params),
+		    args => Dump($params),
 		    username => $self->{username},
 		    password => $self->{password},
 		    file => $buf,
@@ -503,7 +505,7 @@ sub copy_to_RAST_dir
     $params->{-totalSize} = $size;
     
     my $form = [function  => 'copy_to_RAST_dir',
-		args => YAML::Dump($params),
+		args => Dump($params),
 		username => $self->{username},
 		password => $self->{password},
 		];

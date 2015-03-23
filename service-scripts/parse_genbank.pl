@@ -186,26 +186,31 @@ while (defined($record = <$input_fh>)) {
 	if ($record =~ /\n {0,4}ORGANISM\s+(\S[^\n]+(\n\s{10,14}\S[^\n]+)*)/os) {
 	    my $block = $1;
 	    my @lines = split(/\n/,$block);
+#	    print STDERR Dumper($block, \@lines);
 	    
 	    my @genome = ();
 	    my @full_tax = ();
-	    for ($i=0; ($i < @lines) && ($lines[$i] !~ /;/); $i++) {
+	    for ($i=0; ($i < $#lines) && ($lines[$i] !~ /;/); $i++) {
 		push(@genome,$lines[$i]);
 	    }
+#	    print STDERR "i=$i\n";
 	    
 	    while ($i < @lines) {
 		push(@full_tax,$lines[$i]);
 		++$i;
 	    }
+#	    print STDERR Dumper(\@genome, @full_tax);
 	    
-	    $genome = join(qq( ),map { $_ =~ s/^\s*(\S.*\S).*$/$1/; $1 } @genome);
-	    $taxonomy    = join(qq( ),map { $_ =~ s/^\s*(\S.*\S).*$/$1/; $1 } @full_tax);
+	    $genome   = join(qq( ), map { $_ =~ s/^\s*(\S.*\S).*$/$1/; $1 } @genome);
+	    $taxonomy = join(qq( ), map { $_ =~ s/^\s*(\S.*\S).*$/$1/; $1 } @full_tax);
 	    
 	    $taxonomy =~ s/\n\s+//og;
 	    $taxonomy =~ s/ {2,}/ /og;
 	    $taxonomy =~ s/\.$//o;
-	    $taxonomy = $taxonomy . qq(; $genome);
-
+	    $taxonomy = $taxonomy . qq(; $genome\.);
+	    $taxonomy =~ s/\.\.$/./o;
+#	    print STDERR "$genome\n$taxonomy\n";
+	    
 	    if (! $written_genome) {
 		if ($force_bioname) { $genome = $force_bioname; }
 		print GENOME qq($genome\n);

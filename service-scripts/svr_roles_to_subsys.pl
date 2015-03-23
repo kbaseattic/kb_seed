@@ -100,7 +100,9 @@ while (my @tuples = ScriptThing::GetBatch(\*STDIN, undef, $column)) {
     my $subHash = $sapServer->classification_of(-ids => \@subs);
     # Put them in the classification hash.
     for my $sub (@subs) {
-        $subClasses{$sub} = join(", ", @{$subHash->{$sub}});
+	# RAE: originally we joined these with a ', ', but that is often part of the
+	# classification, and makes it impossible to know where one begins and one ends
+        $subClasses{$sub} = join(" :: ", @{$subHash->{$sub}});
     }
     # Output the results for these roles.
     for my $tuple (@tuples) {
