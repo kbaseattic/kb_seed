@@ -586,9 +586,11 @@ sub export_spreadsheet
 	$tmp = File::Temp->new(SUFFIX => ".$suffix");
 	close($tmp);
 	
+	my $sheetname = substr("Features in $genomeTO->{scientific_name}", 0, 31);
+
 	$ss = Spreadsheet::Write->new(file => "$tmp",
 				      format => 'xls',
-				      sheet => "Features in $genomeTO->{scientific_name}",
+				      sheet => $sheetname,
 				      styles  => {
 					  header => { font_weight => 'bold' },
 				      });

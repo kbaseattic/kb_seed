@@ -2375,8 +2375,48 @@ sub map_to_families
 	}
 	$func->($cur, \@set);
     }
-	 
 }
 
+use JSON::XS;
+
+sub write_encoded_object
+{
+    my ( $obj, $oh ) = @_;
+
+# If the user passes in a file, we open it here. Because it is opened in a local                                       
+# variable, it will be closed automatically when we go out of scope. An open handle                                    
+# passed in, however, will not be closed.                                                                              
+    my $handle;
+    if ( !ref $oh )
+    {
+        open( $handle, ">$oh" ) || die "Could not open output file $oh: $!";
+    }
+    else
+    {
+        $handle = $oh;
+    }
+
+    my $json = JSON::XS->new;
+    $json->pretty(1);
+    print $handle $json->encode($obj);
+}
+
+sub read_encoded_object
+{   
+    my ($encoded_file) = @_;
+
+    open( OBJ, "<$encoded_file" )
+	|| die "encoded_file $encoded_file could not be opened: $!";
+
+    my $obj;
+    my $json = JSON::XS->new;
+    {
+        local $/;
+        undef $/;
+        my $obj_txt = <OBJ>;
+        $obj = $json->decode($obj_txt);
+    }
+    return $obj;
+}
 
 1;
