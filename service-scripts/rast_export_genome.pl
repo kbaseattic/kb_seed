@@ -48,6 +48,7 @@ my($opt, $usage) = describe_options("%c %o format",
 				    ["feature-type=s@", 'Select a feature type to dump'],
 				    ["input|i=s", "Input file"],
 				    ["output|o=s", "Output file"],
+				    ["with-headings", "For downloads with optional headings (feature_data) include headings"],
 				    ["help|h", "Show this help message"],
 				    [],
 				    ["Supported formats:\n"],
@@ -126,7 +127,7 @@ elsif ($format eq 'contig_fasta')
 }
 elsif ($format eq 'feature_data')
 {
-    export_feature_data($genomeTO, $out_fh);
+    export_feature_data($genomeTO, $opt->with_headings, $out_fh);
     exit;
 }
 elsif ($format =~ /spreadsheet_(xls|txt)/)
@@ -504,7 +505,9 @@ sub export_protein_fasta
 	my $peg = $f->{id};
 	if ($f->{protein_translation})
 	{
-	    print_alignment_as_fasta($out_fh, [$peg, $f->{function}, $f->{protein_translation}]);
+	    print_alignment_as_fasta($out_fh, [$peg,
+					       "$f->{function} [$genomeTO->{scientific_name} | $genomeTO->{id}]",
+					       $f->{protein_translation}]);
 	}
     }
 }
@@ -517,7 +520,9 @@ sub export_feature_dna
     {
 	next unless &$feature_type_ok($f);
 	my $id = $f->{id};
-	print_alignment_as_fasta($out_fh, [$id, $f->{function}, $genomeTO->get_feature_dna($id)]);
+	print_alignment_as_fasta($out_fh, [$id,
+					   "$f->{function} [$genomeTO->{scientific_name} | $genomeTO->{id}]",
+					   $genomeTO->get_feature_dna($id)]);
     }
 }
 
@@ -534,8 +539,13 @@ sub export_contig_fasta
 
 sub export_feature_data
 {
-    my($genomeTO, $out_fh) = @_;
-    
+    my($genomeTO, $with_headings, $out_fh) = @_;
+
+    if ($with_headings)
+    {
+	print $out_fh join("\t", qw(feature_id location type function aliases protein_md5)), "\n";
+    }
+
     my $features = $genomeTO->{features};
     foreach my $feature (@$features)
     {
