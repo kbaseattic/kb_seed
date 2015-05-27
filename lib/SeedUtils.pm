@@ -2,7 +2,7 @@
 # This is a SAS component.
 
 ########################################################################
-# Copyright (c) 2003-2011 University of Chicago and Fellowship
+# Copyright (c) 2003-2015 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -19,9 +19,12 @@
 ########################################################################
 
 package SeedUtils;
+
 use Carp;
 use Fcntl;
 use Data::Dumper;
+use JSON::XS;
+
 
 #
 # In case we are running in a SEED, pull in the FIG_Config
@@ -29,7 +32,7 @@ use Data::Dumper;
 BEGIN
 {
     eval {
-	require FIG_Config;
+        require FIG_Config;
     };
 }
 
@@ -40,7 +43,7 @@ BEGIN
                      rev_comp genome_of min max sims verify_dir between translate
                      standard_genetic_code parse_location roles_of_function
                      strip_ec location_string location_cmp strand_of by_fig_id
-		     verify_db bbh_data id_url validate_fasta_file);
+                     verify_db bbh_data id_url validate_fasta_file);
 
 =head1 SEED Utility Methods
 
@@ -48,6 +51,19 @@ BEGIN
 
 This is a simple utility package that performs functions useful for
 bioinformatics, but that do not require access to the databases.
+
+=head2 Location Strings
+
+Several methods deal with gene locations. Location information from the Sapling
+server is expressed as I<location strings>. A location string consists of a
+contig ID (which includes the genome ID), an underscore, a starting location, a
+strand indicator (C<+> or C<->), and a length. The first location on the contig
+is C<1>.
+
+For example, C<100226.1:NC_003888_3766170+612> indicates contig C<NC_003888> in
+genome C<100226.1> (I<Streptomyces coelicolor A3(2)>) beginning at location
+3766170 and proceeding forward on the plus strand for 612 bases.
+
 
 =head2 Public Methods
 
@@ -75,9 +91,9 @@ length.
 
 sub abbrev {
     my($genome_name) = @_;
-    my %exclude = map { $_ => 1 } 
+    my %exclude = map { $_ => 1 }
                   qw( candidatus subspecies subsp strain str bv pv sp );
-    my ($p1,$p2,@rest) = grep { ! $exclude{lc $_} } 
+    my ($p1,$p2,@rest) = grep { ! $exclude{lc $_} }
                          map { $_ =~ s/\W//g; $_ }
                          split(/\s/,$genome_name);
     my $p3 = join("",@rest);
@@ -86,53 +102,53 @@ sub abbrev {
 
     if (! $p2)
     {
-	if (length($p1) > $lbl_ln) { $p1 = substr($p1,0,$lbl_ln) }
-	return $p1;
+        if (length($p1) > $lbl_ln) { $p1 = substr($p1,0,$lbl_ln) }
+        return $p1;
     }
     elsif (! $p3)
     {
-	my $l1 = length($p1);
-	my $l2 = length($p2);
-	my $ln1 = $l1;
-	my $ln2 = $l2;
+        my $l1 = length($p1);
+        my $l2 = length($p2);
+        my $ln1 = $l1;
+        my $ln2 = $l2;
 
-	if (($l1 + $l2 + 1) > $lbl_ln)
-	{
-	    $ln1 = $lbl_ln - ($l2+1);
-	    $ln1 = &min($l1,&max($ln1,3));
-	    $ln2 = $lbl_ln - ($ln1+1);
-	    $p1 = substr($p1,0,$ln1);
-	    $p2 = substr($p2,0,$ln2);
-	}
-	my $sep = ($l1 == $ln1) ? '_' : '.';
-	return $p1 . $sep . $p2;
+        if (($l1 + $l2 + 1) > $lbl_ln)
+        {
+            $ln1 = $lbl_ln - ($l2+1);
+            $ln1 = &min($l1,&max($ln1,3));
+            $ln2 = $lbl_ln - ($ln1+1);
+            $p1 = substr($p1,0,$ln1);
+            $p2 = substr($p2,0,$ln2);
+        }
+        my $sep = ($l1 == $ln1) ? '_' : '.';
+        return $p1 . $sep . $p2;
     }
     else
     {
-	my $l1  = length($p1);
-	my $l2  = length($p2);
-	my $l3  = length($p3);
-	my $l23 = $l2+$l3+1;
-	my $ln1 = $l1;
-	my $ln2 = $l2;
-	my $ln3 = $l3;
-	
-	if (($l1 + $l2 + $l3 + 2) > $lbl_ln)
-	{
-	    $ln1 = $lbl_ln - ($l23 + 1);
-	    $ln1 = &min($l1,&max($ln1,3));
-	    my $rest = $lbl_ln - ($ln1+1);
-	    $ln2 = $rest - ($ln3+1);
-	    $ln2 = &min($l2,&max($ln2,3));
-	    $ln3 = $lbl_ln - ($ln1+$ln2+2);
+        my $l1  = length($p1);
+        my $l2  = length($p2);
+        my $l3  = length($p3);
+        my $l23 = $l2+$l3+1;
+        my $ln1 = $l1;
+        my $ln2 = $l2;
+        my $ln3 = $l3;
 
-	    $p1 = substr($p1,0,$ln1);
-	    $p2 = substr($p2,0,$ln2);
-	    $p3 = substr($p3,0,$ln3);
-	}
-	my $sep1 = ($l1 == $ln1) ? '_' : '.';
-	my $sep2 = ($l2 == $ln2) ? '_' : '.';
-	return $p1 . $sep1 . $p2 . $sep2 . $p3;
+        if (($l1 + $l2 + $l3 + 2) > $lbl_ln)
+        {
+            $ln1 = $lbl_ln - ($l23 + 1);
+            $ln1 = &min($l1,&max($ln1,3));
+            my $rest = $lbl_ln - ($ln1+1);
+            $ln2 = $rest - ($ln3+1);
+            $ln2 = &min($l2,&max($ln2,3));
+            $ln3 = $lbl_ln - ($ln1+$ln2+2);
+
+            $p1 = substr($p1,0,$ln1);
+            $p2 = substr($p2,0,$ln2);
+            $p3 = substr($p3,0,$ln3);
+        }
+        my $sep1 = ($l1 == $ln1) ? '_' : '.';
+        my $sep2 = ($l2 == $ln2) ? '_' : '.';
+        return $p1 . $sep1 . $p2 . $sep2 . $p3;
     }
 }
 
@@ -164,14 +180,14 @@ sub abbrev_set {
     my $hash = {};
     foreach my $name (@$genome_names)
     {
-	next if ($hash->{$name});
-	my $abbrev = &abbrev($name);
-	while ($seen{$abbrev})
-	{
-	    $abbrev = &next_try($abbrev);
-	}
-	$hash->{$name} = $abbrev;
-	$seen{$abbrev} = 1;
+        next if ($hash->{$name});
+        my $abbrev = &abbrev($name);
+        while ($seen{$abbrev})
+        {
+            $abbrev = &next_try($abbrev);
+        }
+        $hash->{$name} = $abbrev;
+        $seen{$abbrev} = 1;
     }
     return $hash;
 }
@@ -185,7 +201,7 @@ sub next_try {
     my $ln = length($abbrev) + length($ext) + 1;
     if ($ln > 10)
     {
-	$abbrev = substr($abbrev,0,(10 - (length($ext)+1)));
+        $abbrev = substr($abbrev,0,(10 - (length($ext)+1)));
     }
     return "$abbrev.$ext";
 }
@@ -281,7 +297,6 @@ then the return is TRUE if I<$x> >= I$<$y> >= I<$z>.
 
 #: Return Type $;
 sub between {
-    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
     my($x,$y,$z) = @_;
 
     if ($x < $z) {
@@ -401,7 +416,7 @@ sub boundaries_of {
 
     my $singleLoc = SeedUtils::boundary_loc($locations);
 
-Return a single location string (see L<SAP/Location Strings>) that covers
+Return a single location string (see L</Location Strings>) that covers
 the incoming list of locations. NOTE that if the locations listed span
 more than one contig, this method may return an unexpected result.
 
@@ -592,7 +607,7 @@ C<\*STDOUT> is assumed.
 =cut
 
 sub display_id_and_seq {
-    
+
     my( $id, $seqP, $fh ) = @_;
 
     if (! defined($fh) )  { $fh = \*STDOUT; }
@@ -646,7 +661,7 @@ sub display_seq {
 }
 
 =head3 extract_seq
-    
+
  $seq = &SeedUtils::extract_seq($contigs,$loc)
 
 This is just a little utility routine that I have found convenient.  It assumes that
@@ -731,25 +746,17 @@ sub extract_seq {
 
 =head3 file_read
 
-    my $text = $fig->file_read($fileName);
+    my $text = SeedUtils::file_read($fileName);
 
 or
 
-    my @lines = $fig->file_read($fileName);
-
-or
-
-    my $text = FIG::file_read($fileName);
-
-or
-
-    my @lines = FIG::file_read($fileName);
+    my @lines = SeedUtils::file_read($fileName);
 
 Read an entire file into memory. In a scalar context, the file is returned
 as a single text string with line delimiters included. In a list context, the
 file is returned as a list of lines, each line terminated by a line
 delimiter. (For a method that automatically strips the line delimiters,
-use C<Tracer::GetFile>.)
+use C<StringUtils::GetFile>.)
 
 =over 4
 
@@ -770,7 +777,6 @@ a string containing all the lines of the file with delimiters included.
 #: Return Type @;
 sub file_read {
 
-    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
     my($fileName) = @_;
     return file_head($fileName, '*');
 
@@ -779,19 +785,12 @@ sub file_read {
 
 =head3 file_head
 
-    my $text = $fig->file_head($fileName, $count);
+
+    my $text = SeedUtils::file_head($fileName, $count);
 
 or
 
-    my @lines = $fig->file_head($fileName, $count);
-
-or
-
-    my $text = FIG::file_head($fileName, $count);
-
-or
-
-    my @lines = FIG::file_head($fileName, $count);
+    my @lines = SeedUtils::file_head($fileName, $count);
 
 Read a portion of a file into memory. In a scalar context, the file portion is
 returned as a single text string with line delimiters included. In a list
@@ -854,9 +853,7 @@ sub file_head {
 
 =head3 flatten_dumper
 
-    FIG::flatten_dumper( $perl_ref_or_object_1, ... );
-
-    $fig->flatten_dumper( $perl_ref_or_object_1, ... );
+    SeedUtils::flatten_dumper( $perl_ref_or_object_1, ... );
 
 Takes a list of perl references or objects, and "flattens" their Data::Dumper() output
 so that it can be printed on a single line.
@@ -864,18 +861,17 @@ so that it can be printed on a single line.
 =cut
 
 sub flatten_dumper {
-    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
     my @x = @_;
     my $x;
 
     foreach $x (@x)
     {
-	$x = Dumper($x);
+        $x = Dumper($x);
 
-	$x =~ s/\$VAR\d+\s+\=\s+//o;
-	$x =~ s/\n//gso;
-	$x =~ s/\s+/ /go;
-	$x =~ s/\'//go;
+        $x =~ s/\$VAR\d+\s+\=\s+//o;
+        $x =~ s/\n//gso;
+        $x =~ s/\s+/ /go;
+        $x =~ s/\'//go;
 #       $x =~ s/^[^\(\[\{]+//o;
 #       $x =~ s/[^\)\]\}]+$//o;
     }
@@ -1037,7 +1033,7 @@ sub id_url {
 
     my $cmp = location_cmp($loc1, $loc2);
 
-Compare two location strings (see L<SAP/Location Strings>).
+Compare two location strings (see L</Location Strings>).
 
 The ordering principle for locations is that they are sorted first by contig ID, then by
 leftmost position, in reverse order by length, and then by direction. The effect is that
@@ -1120,7 +1116,7 @@ Ending offset of the location.
 
 =item RETURN
 
-Returns a location string (see L<SAP/Location String>) for the specified
+Returns a location string (see L</Location Strings>) for the specified
 location.
 
 =back
@@ -1279,7 +1275,7 @@ sub parse_fasta_record {
     my ($contig, $begin, $end, $strand) = parse_location($locString);
 
 Return the contigID, start offset, and end offset for a specified
-location string (see L<SAP/Location Strings>).
+location string (see L</Location Strings>).
 
 =over 4
 
@@ -1318,10 +1314,10 @@ sub parse_location {
     }
     elsif ($locString =~ /^(.*)_(\d+)_(\d+)$/)
     {
-	$contig = $1;
-	$begin = $2;
-	$end = $3;
-	$strand = $begin < $end ? "+" : "-";
+        $contig = $1;
+        $begin = $2;
+        $end = $3;
+        $strand = $begin < $end ? "+" : "-";
     }
 
     # Return the results.
@@ -1392,6 +1388,8 @@ Split a functional assignment into roles. If the functional assignment
 seems suspicious, it will be flagged as invalid. A count will be returned
 of the number of roles that are rejected because they are too long.
 
+This method should not be used for Shrub functions.
+
 =over 4
 
 =item function
@@ -1441,6 +1439,8 @@ Return a list of the functional roles in the specified assignment string.
 A single assignment may contain multiple roles as well as comments; this
 method separates them out.
 
+This method should not be used for Shrub functions.
+
 =over 4
 
 =item assignment
@@ -1469,7 +1469,7 @@ sub roles_of_function {
 =head3 sims
 
     my @sims = sims($id, $maxN, $maxP, 'fig');
-    
+
 or
 
     my @sims = sims($id, $maxN, $maxP, 'all);
@@ -1658,15 +1658,15 @@ sub genetic_code {
     my $code = &standard_genetic_code();
 
     if    (($ncbi_genetic_code_num ==  1) ||
-	   ($ncbi_genetic_code_num == 11)
-	   ) {
-	#...Do nothing
+           ($ncbi_genetic_code_num == 11)
+           ) {
+        #...Do nothing
     }
     elsif ($ncbi_genetic_code_num ==  4) {
-	$code->{TGA} = 'W';
+        $code->{TGA} = 'W';
     }
     else {
-	die "Sorry, only genetic codes 1, 4, and 11 are currently supported";
+        die "Sorry, only genetic codes 1, 4, and 11 are currently supported";
     }
 
     return $code;
@@ -1868,7 +1868,7 @@ sub translate {
     my( $i,$j,$ln );
     my( $x,$y );
     my( $prot );
-    
+
     if (! defined($code)) {
         $code = &standard_genetic_code;
     }
@@ -1960,7 +1960,7 @@ sub verify_dir {
 =head3 validate_fasta_file
 
     $sequence_type = validate_fasta_file($in_file, $out_file)
-    
+
 Ensure the given file is in valid fasta format. If $out_file
 is given, write the data to $out_file as a normalized fasta file
 (with cleaned up line endings, upper case data).
@@ -1976,79 +1976,79 @@ sub validate_fasta_file
     my($file, $norm) = @_;
 
     my($input_fh, $clean_fh);
-    
+
     if ($file =~ /\.gz$/)
     {
-	open($input_fh, "-|", "gunzip", "-c", $file) or die "cannot unzip $file: $!";
+        open($input_fh, "-|", "gunzip", "-c", $file) or die "cannot unzip $file: $!";
     }
     else
     {
-	open($input_fh, "<", $file) or die "cannot open $file: $!";
+        open($input_fh, "<", $file) or die "cannot open $file: $!";
     }
 
     if ($norm)
     {
-	open($clean_fh, ">", $norm) or die "cannot write normalized file $norm: $!";
+        open($clean_fh, ">", $norm) or die "cannot write normalized file $norm: $!";
     }
 
     my $state = 'expect_header';
     my $cur_id;
     my $dna_chars;
     my $prot_chars;
-    
+
     while (<$input_fh>)
     {
-	chomp;
-	
-	if ($state eq 'expect_header')
-	{
-	    if (/^>(\S+)/)
-	    {
-		$cur_id = $1;
-		$state = 'expect_data';
-		print $clean_fh ">$cur_id\n" if $clean_fh;
-		next;
-	    }
-	    else
-	    {
-		die "Invalid fasta: Expected header at line $.\n";
-	    }
-	}
-	elsif ($state eq 'expect_data')
-	{
-	    if (/^>(\S+)/)
-	    {
-		$cur_id = $1;
-		$state = 'expect_data';
-		print $clean_fh ">$cur_id\n" if $clean_fh;
-		next;
-	    }
-	    elsif (/^([acgtumrwsykbdhvn]*)\s*$/i)
-	    {
-		print $clean_fh uc($1) . "\n" if $clean_fh;
-		$dna_chars += length($1);
-		next;
-	    }
-	    elsif (/^([*abcdefghijklmnopqrstuvwxyz]*)\s*$/i)
-	    {
-		print $clean_fh uc($1) . "\n" if $clean_fh;
-		$prot_chars += length($1);
-		next;
-	    }
-	    else
-	    {
-		my $str = $_;
-		if (length($_) > 100)
-		{
-		    $str = substr($_, 0, 50) . " [...] " . substr($_, -50);
-		}
-		die "Invalid fasta: Bad data at line $.\n$str\n";
-	    }
-	}
-	else
-	{
-	    die "Internal error: invalid state $state\n";
-	}
+        chomp;
+
+        if ($state eq 'expect_header')
+        {
+            if (/^>(\S+)/)
+            {
+                $cur_id = $1;
+                $state = 'expect_data';
+                print $clean_fh ">$cur_id\n" if $clean_fh;
+                next;
+            }
+            else
+            {
+                die "Invalid fasta: Expected header at line $.\n";
+            }
+        }
+        elsif ($state eq 'expect_data')
+        {
+            if (/^>(\S+)/)
+            {
+                $cur_id = $1;
+                $state = 'expect_data';
+                print $clean_fh ">$cur_id\n" if $clean_fh;
+                next;
+            }
+            elsif (/^([acgtumrwsykbdhvn]*)\s*$/i)
+            {
+                print $clean_fh uc($1) . "\n" if $clean_fh;
+                $dna_chars += length($1);
+                next;
+            }
+            elsif (/^([*abcdefghijklmnopqrstuvwxyz]*)\s*$/i)
+            {
+                print $clean_fh uc($1) . "\n" if $clean_fh;
+                $prot_chars += length($1);
+                next;
+            }
+            else
+            {
+                my $str = $_;
+                if (length($_) > 100)
+                {
+                    $str = substr($_, 0, 50) . " [...] " . substr($_, -50);
+                }
+                die "Invalid fasta: Bad data at line $.\n$str\n";
+            }
+        }
+        else
+        {
+            die "Internal error: invalid state $state\n";
+        }
     }
     close($input_fh);
     close($clean_fh) if $clean_fh;
@@ -2058,6 +2058,15 @@ sub validate_fasta_file
     return $what;
 }
 
+
+=head3 strip_func
+
+    my $stripped = SeedUtils::strip_func($func);
+
+Remove the comment and the FIGfam identifier from a function.
+
+=cut
+
 sub strip_func {
         my($func) = @_;
 
@@ -2066,20 +2075,40 @@ sub strip_func {
         return($func);
 }
 
+=head3 strip_func_comment
+
+    my ($stripped, $comment) = strip_func_comment($func);
+
+or
+
+    my $stripped = strip_func_comment($func);
+
+Split the comment from a function.
+
+=cut
+
 sub strip_func_comment {
     my($func) = @_;
 
     if (wantarray)
     {
-	my($just_func, $comment) = $func =~ /(.*?)(\s*\#.*)?$/;
-        return($just_func, $comment);						  
+        my($just_func, $comment) = $func =~ /(.*?)(\s*\#.*)?$/;
+        return($just_func, $comment);
     }
     else
     {
-	$func =~ s/\s*\#.*$//;
-	return $func;
+        $func =~ s/\s*\#.*$//;
+        return $func;
     }
 }
+
+=head3 verify_db
+
+    verify_db($db, $type);
+
+Insure we have a blast database for the specified FASTA.
+
+=cut
 
 sub verify_db {
     my($db,$type) = @_;
@@ -2092,38 +2121,38 @@ sub verify_db {
     my $path = '';
     if ($FIG_Config::blastbin ne '' && -d $FIG_Config::blastbin)
     {
-	$path = "$FIG_Config::blastbin/";
+        $path = "$FIG_Config::blastbin/";
     }
     elsif ($FIG_Config::ext_bin ne '' && -d $FIG_Config::ext_bin)
     {
-	$path = "$FIG_Config::ext_bin/";
+        $path = "$FIG_Config::ext_bin/";
     }
-    
+
 
     my @cmd;
     if ($type =~ /^p/i)
     {
         unless ( ((-s "$db.psq") && (-M "$db.psq" <= -M $db)) ||
                  ((-s "$db.00.psq") && (-M "$db.00.psq" <= -M $db)) )
-	{
-	    @cmd = ("${path}formatdb", "-p", "T", "-i", $db);
-	}
+        {
+            @cmd = ("${path}formatdb", "-p", "T", "-i", $db);
+        }
     }
     else
     {
         unless ( ((-s "$db.nsq") && (-M "$db.nsq" <= -M $db)) ||
                  ((-s "$db.00.nsq") && (-M "$db.00.nsq" <= -M $db)) )
-	{
-	    @cmd = ("${path}formatdb", "-p", "F", "-i", $db);
-	}
+        {
+            @cmd = ("${path}formatdb", "-p", "F", "-i", $db);
+        }
     }
     if (@cmd)
     {
-	my $rc = system(@cmd);
-	if ($rc != 0)
-	{
-	    warn "SeedUtils::verify_db: formatdb failed with rc=$rc: @cmd\n";
-	}
+        my $rc = system(@cmd);
+        if ($rc != 0)
+        {
+            warn "SeedUtils::verify_db: formatdb failed with rc=$rc: @cmd\n";
+        }
     }
 }
 
@@ -2139,22 +2168,22 @@ sub create_berk_table
     local $DB_File::DB_BTREE->{flags};
     if ($opts{-multiple_values})
     {
-	$DB_File::DB_BTREE->{flags} = &DB_File::R_DUP;
+        $DB_File::DB_BTREE->{flags} = &DB_File::R_DUP;
     }
-    
+
     my $ifh;
 
     if ($opts{-sort})
     {
-	my $sk = join(" ", map { "-k " . ($_ + 1) } @$key_columns);
-	my $cmd = "sort $sk $input_file";
-	print "Run $cmd\n";
-	
-	open($ifh, "$cmd |") or die "Cannot open sort $sk $input_file for reading: $!";
+        my $sk = join(" ", map { "-k " . ($_ + 1) } @$key_columns);
+        my $cmd = "sort $sk $input_file";
+        print "Run $cmd\n";
+
+        open($ifh, "$cmd |") or die "Cannot open sort $sk $input_file for reading: $!";
     }
     else
     {
-	open($ifh, "<", $input_file) or die "Cannot open $input_file for reading: $!";
+        open($ifh, "<", $input_file) or die "Cannot open $input_file for reading: $!";
     }
 
     my $hash = {};
@@ -2163,12 +2192,12 @@ sub create_berk_table
 
     while (<$ifh>)
     {
-	chomp;
-	my @a = split(/\t/);
-	my $k = join($;, @a[@$key_columns]);
-	my $v = join($;, @a[@$value_columns]);
+        chomp;
+        my @a = split(/\t/);
+        my $k = join($;, @a[@$key_columns]);
+        my $v = join($;, @a[@$value_columns]);
 
-	$hash->{$k} = $v;
+        $hash->{$k} = $v;
     }
     close($ifh);
     undef $hash;
@@ -2181,13 +2210,13 @@ sub open_berk_table
 
     if (! -f $table)
     {
-	warn "Cannot read table file $table\n";
-	return undef;
+        warn "Cannot read table file $table\n";
+        return undef;
     }
 
     if ( ! eval { require BerkTable; } )
     {
-	warn "Failed in require BerkTable.\n";
+        warn "Failed in require BerkTable.\n";
         return undef;
     }
 
@@ -2195,6 +2224,15 @@ sub open_berk_table
     tie %$h, 'BerkTable', $table, %opts;
     return $h;
 }
+
+
+=head3 compare_region_color
+
+    my ($r,$g,$b) = compare_region_color($n);
+
+Return the nth color for compare region displays.
+
+=cut
 
 our $AllColors;
 
@@ -2350,72 +2388,151 @@ sub map_to_families
 
     if (ref($fam2c))
     {
-	$fh = $fam2c;
+        $fh = $fam2c;
     }
     else
     {
-	if (!open($fh, "<", $fam2c))
-	{
-	    die "Cannot open $fam2c: $!";
-	}
+        if (!open($fh, "<", $fam2c))
+        {
+            die "Cannot open $fam2c: $!";
+        }
     }
     local $_ = <$fh>;
     chomp;
     my($fam, $peg) = split(/\t/);
     while (defined($fam))
     {
-	my $cur = $fam;
-	my @set;
-	while (defined($fam) && $fam eq $cur)
-	{
-	    push(@set, $peg);
-	    $_ = <$fh>;
-	    chomp;
-	    ($fam, $peg) = split(/\t/);
-	}
-	$func->($cur, \@set);
+        my $cur = $fam;
+        my @set;
+        while (defined($fam) && $fam eq $cur)
+        {
+            push(@set, $peg);
+            $_ = <$fh>;
+            chomp;
+            ($fam, $peg) = split(/\t/);
+        }
+        $func->($cur, \@set);
     }
 }
 
-use JSON::XS;
+
+=head3 write_encoded_object
+
+  write_encoded_object( $json,  $filename   [, \%options] )
+  write_encoded_object( $json, \*FILEHANDLE [, \%options] )
+  write_encoded_object( $json, \$string     [, \%options] )
+  write_encoded_object( $json               [, \%options] )    # D = \*STDOUT
+
+Write a PERL object to an output file in json format.
+
+Options:
+
+     condensed => $bool   #  If true, do not invoke 'pretty'
+     pretty    => $bool   #  If explicitly false, do not invoke 'pretty'
+
+=cut
 
 sub write_encoded_object
 {
+    my $opts = ( @_ > 1 && ref( $_[-1]) eq 'HASH' ) ? pop( @_ ) : {};
+
     my ( $obj, $oh ) = @_;
 
-# If the user passes in a file, we open it here. Because it is opened in a local                                       
-# variable, it will be closed automatically when we go out of scope. An open handle                                    
-# passed in, however, will not be closed.                                                                              
+    $obj && ( ref( $obj ) eq 'HASH' )
+        or print STDERR "write_encoded_object() called without object.\n"
+            and return undef;
+
+    #  If the user passes in a file, we open it here. Because it is opened in a
+    #  local variable, it will be closed automatically when we go out of scope.
+    #  An open handle passed in, however, will not be closed.
+
     my $handle;
-    if ( !ref $oh )
-    {
-        open( $handle, ">$oh" ) || die "Could not open output file $oh: $!";
-    }
-    else
+    my $suffix = "\n";       # This is a newline at end of file if not 'pretty'
+
+    if ( $oh && ( ref( $oh ) eq 'GLOB' ) )
     {
         $handle = $oh;
     }
+    elsif ( $oh && (! ref $oh) )
+    {
+        open( $handle, ">", $oh )
+            || die "Could not open output file $oh: $!";
+    }
+    elsif ( $oh && ( ref( $oh ) eq 'SCALAR' ) )
+    {
+        open( $handle, ">", $oh )
+            || die "Could not open output file $oh: $!";
+        $suffix = "";                      # No newline when writing to string
+    }
+    elsif ( ! defined $oh || $oh eq '' )
+    {
+        $handle = \*STDOUT;
+    }
+    else
+    {
+        print STDERR "write_encoded_object() called with invalid output definition.\n"
+            and return undef;
+    }
 
-    my $json = JSON::XS->new;
-    $json->pretty(1);
-    print $handle $json->encode($obj);
+    #  Set up a JSON encoder with the properties that we want:
+
+    my $pretty = $opts->{condensed}                                 ? 0
+               : ( exists( $opts->{pretty} ) && ! $opts->{pretty} ) ? 0
+               :                                                      1;
+
+    my $json = JSON::XS->new->ascii->pretty( $pretty );
+
+    #  Once we are this far, let print supply the return value
+
+    print $handle $json->encode($obj), ( $pretty ? () : $suffix );
 }
 
-sub read_encoded_object
-{   
-    my ($encoded_file) = @_;
 
-    open( OBJ, "<$encoded_file" )
-	|| die "encoded_file $encoded_file could not be opened: $!";
+=head3 read_encoded_object
+
+
+  $object = read_encoded_object(  $filename )
+  $object = read_encoded_object( \*FILEHANDLE )
+  $object = read_encoded_object( \$string )
+  $object = read_encoded_object( )                # D = \*STDIN
+
+Read a JSON object from a file.
+
+=cut
+
+sub read_encoded_object
+{
+    my ( $encoded_file ) = @_;
+
+    my $handle;
+    if ( ref $encoded_file eq 'GLOB' )
+    {
+        $handle = $encoded_file;
+    }
+    elsif ( $encoded_file && ( ( ! ref $encoded_file ) || ( ref( $encoded_file ) eq 'SCALAR' ) ) )
+    {
+        open( $handle, "<", $encoded_file )
+            || die "Could not open input file $encoded_file: $!";
+    }
+    elsif ( ! defined $encoded_file || $encoded_file eq '' )
+    {
+        $handle = \*STDOUT;
+    }
+    else
+    {
+        print STDERR "read_encoded_object() called with invalid input file definition.\n"
+            and return undef;
+    }
 
     my $obj;
-    my $json = JSON::XS->new;
+    my $json = JSON::XS->new->utf8(0);
     {
         local $/;
         undef $/;
-        my $obj_txt = <OBJ>;
-        $obj = $json->decode($obj_txt);
+        my $obj_txt = <$handle>;
+        $obj = $json->decode($obj_txt) if $obj_txt;
     }
+
     return $obj;
 }
 

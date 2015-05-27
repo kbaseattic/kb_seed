@@ -54,7 +54,7 @@ my $sz = &make_final($dataD,
 		     $distinct_signatures,
 		     $distinct_functions,
 		     $seqs_with_func);
-open(SZ,">$dataD/size") || die "could not write size = $sz";
+open(SZ,">$dataD/size") || die "could not write size = $sz: $!";
 print SZ "$sz\n";
 close(SZ);
 
@@ -97,7 +97,7 @@ sub build_otu_index {
 	    }
 	}
     }
-    open(WTS,">$dataD/otu.occurrences") || "could not open $dataD/otu.occurrences";
+    open(WTS,">$dataD/otu.occurrences") || die "could not open $dataD/otu.occurrences: $!";
     my $nxt = 0;
     foreach my $gs_or_prop (sort keys(%counts))
     {
@@ -113,7 +113,7 @@ sub build_otu_index {
 sub build_function_index {
     my($dataD,$use_pub_seed,$rast_dirs) = @_;
 
-    open(FI,">$dataD/function.index") || die "could not open $dataD/function.index";
+    open(FI,">$dataD/function.index") || die "could not open $dataD/function.index :$!";
     if (-s "$dataD/genomes")
     {
 	my $cmd;
@@ -130,14 +130,18 @@ sub build_function_index {
 	    $cmd = "cut -f2 $dataD/genomes | genomes_to_fids | grep peg | fids_to_functions | cut -f2,3";
 	}
 	open(ASSIGNMENTS,"$cmd |")
-	    || die "cannot access assignments";
+	    || die "cannot access assignments: $!";
 
 	my %funcs;
 	while (defined($_ = <ASSIGNMENTS>))
 	{
 	    if ($_ =~ /^\S+\t(\S.*\S+)/)
 	    {
-		my $stripped = &SeedUtils::strip_func_comment($1);
+		my $stripped = $1;
+		if (!$ENV{KM_BUILD_NO_STRIP})
+		{
+		    $stripped = &SeedUtils::strip_func_comment($stripped);
+		}
 		$funcs{$stripped}++;
 	    }
 	}
@@ -214,7 +218,7 @@ sub build_reduced_kmers {
 #   First, we build a file containing [kmer,fI,oI,off-set,sequence-ID]
 #   sorted by kmer
 ###
-    open(RAW,"| sort -T . -S 1G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers";
+    open(RAW,"| sort -T . -S 40G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
     my $seqID=0;
     my @genomes = map { chomp; $_ } ($properties ? `cut -f2 $dataD/properties` : `cut -f2 $dataD/genomes`);
     foreach my $g (sort @genomes)
@@ -268,8 +272,8 @@ sub build_reduced_kmers {
 
 ### Now, we reduce sets of adjacent lines with the same kmer to a single line (or none)
 ###
-    open(RAW,"<$dataD/sorted.kmers") || die "could not open sorted.kmers";
-    open(REDUCED,">$dataD/reduced.kmers") || die "could not open reduced kmers";
+    open(RAW,"<$dataD/sorted.kmers") || die "could not open sorted.kmers: $!";
+    open(REDUCED,">$dataD/reduced.kmers") || die "could not open reduced kmers: $!";
     my $last = <RAW>;
 
     while ($last && ($last =~ /^(\S+)/))
@@ -392,8 +396,8 @@ sub make_final {
 
     my $num_seqs_with_a_signature = keys(%$seqs_with_a_signature);
     my $num_distinct_functions = keys(%$distinct_functions);
-    open(IN,"<$dataD/reduced.kmers") || die "could not open final.kmers";
-    open(OUT,">$dataD/final.kmers") || die "could not open $dataD/final.signatures";
+    open(IN,"<$dataD/reduced.kmers") || die "could not open final.kmers: $!";
+    open(OUT,">$dataD/final.kmers") || die "could not open $dataD/final.signatures: $!";
     while (defined($_ = <IN>))
     {
 	chop;

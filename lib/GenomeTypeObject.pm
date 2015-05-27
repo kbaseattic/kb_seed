@@ -32,7 +32,7 @@ GenomeTypeObject - a helper class for manipulating GenomeAnnotation service geno
   $obj = GenomeTypeObject->new()
 
   $obj = GenomeTypeObject->initialize($raw_genome_object)
- 
+
 =head1 DESCRIPTION
 
 The C<GenomeTypeObject> class wraps a number of common operations to be performed
@@ -98,10 +98,10 @@ sub new
     my($class) = @_;
 
     my $self = {
-	contigs => [],
-	features => [],
-	close_genomes => [],
-	analysis_events => []
+        contigs => [],
+        features => [],
+        close_genomes => [],
+        analysis_events => []
     };
     bless $self, $class;
 
@@ -126,6 +126,20 @@ sub create_from_file
     return bless $self, $class;
 }
 
+=head2 $obj->destroy_to_file($filename)
+
+Write the given object in JSON form to the specified file.
+The object will be rendered unusuable.
+
+=cut
+
+sub destroy_to_file {
+    my ($self, $fileName) = @_;
+    $self->prepare_for_return;
+
+    SeedUtils::write_encoded_object($self, $fileName);
+}
+
 =head2 $obj->set_metadata({ ... });
 
 Set the metadata fields on this genome object based on a metadata
@@ -144,7 +158,7 @@ object as defined in the GenomeAnnotation typespec:
  } genome_metadata
 
 =cut
-    
+
 sub set_metadata
 {
     my($self, $meta) = @_;
@@ -152,10 +166,10 @@ sub set_metadata
     my @keys = qw(id scientific_name domain genetic_code source source_id taxonomy ncbi_taxonomy_id);
     for my $k (@keys)
     {
-	if (exists($meta->{$k}))
-	{
-	    $self->{$k} = $meta->{$k};
-	}
+        if (exists($meta->{$k}))
+        {
+            $self->{$k} = $meta->{$k};
+        }
     }
     return $self;
 }
@@ -199,19 +213,19 @@ sub prepare_for_return
     #
     if (ref($self) && ref($self) ne 'HASH')
     {
-	if ($have_unbless)
-	{
-	    unbless $self;
-	    return $self;
-	}
-	else
-	{
-	    return { %$self };
-	}
+        if ($have_unbless)
+        {
+            unbless $self;
+            return $self;
+        }
+        else
+        {
+            return { %$self };
+        }
     }
     else
     {
-	return $self;
+        return $self;
     }
 }
 
@@ -237,7 +251,7 @@ sub update_indexes
     $self->{_feature_index} = $feature_index;
     for my $feature ($self->features)
     {
-	$feature_index->{$feature->{id}} = $feature;
+        $feature_index->{$feature->{id}} = $feature;
     }
 
     #
@@ -247,7 +261,7 @@ sub update_indexes
     $self->{_contig_index} = $contig_index;
     for my $contig ($self->contigs)
     {
-	$contig_index->{$contig->{id}} = $contig;
+        $contig_index->{$contig->{id}} = $contig;
     }
 
     #
@@ -257,7 +271,7 @@ sub update_indexes
     $self->{_event_index} = $event_index;
     for my $e (@{$self->{analysis_events}})
     {
-	$event_index->{$e->{id}} = $e;
+        $event_index->{$e->{id}} = $e;
     }
     return $self;
 }
@@ -306,30 +320,30 @@ sub add_features_from_list
     my($self, $features) = @_;
 
     my $event = {
-	tool_name => "add_features_from_list",
-	execution_time => scalar gettimeofday,
-	parameters => [],
-	hostname => $self->hostname,
+        tool_name => "add_features_from_list",
+        execution_time => scalar gettimeofday,
+        parameters => [],
+        hostname => $self->hostname,
     };
     my $event_id = $self->add_analysis_event($event);
 
     my $map = {};
-    
+
     for my $f (@$features)
     {
-	my($id, $loc_str, $type, $func, $aliases_str) = @$f;
+        my($id, $loc_str, $type, $func, $aliases_str) = @$f;
 
-	my @aliases = split(/,/, $aliases_str);
-	my @locs = map { my $l = BasicLocation->new($_);
-		         [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
-	my $new_id = $self->add_feature({
-	    -type => $type,
-	    -location => \@locs,
-	    -function => $func,
-	    -aliases => \@aliases,
-	    -analysis_event_d => $event_id,
-	});
-	$map->{$id} = $new_id;
+        my @aliases = split(/,/, $aliases_str);
+        my @locs = map { my $l = BasicLocation->new($_);
+                         [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
+        my $new_id = $self->add_feature({
+            -type => $type,
+            -location => \@locs,
+            -function => $func,
+            -aliases => \@aliases,
+            -analysis_event_id => $event_id,
+        });
+        $map->{$id} = $new_id;
     }
     return $map;
 }
@@ -347,13 +361,15 @@ Identifier for this feature. If not provided, a new identifier will be
 created based on the genome id, the type of the feature and the current largest identifier for
 that feature type.
 
+=back
+
 =cut
 
 sub add_feature {
     my ($self, $parms) = @_;
     my $genomeTO = $self;
     print STDERR (Dumper($parms), qq(\n\n)) if $ENV{DEBUG};
-    
+
     my $id = $parms->{-id};
     my $id_client   = $parms->{-id_client};
     my $id_prefix   = $parms->{-id_prefix};
@@ -369,39 +385,50 @@ sub add_feature {
 
     if (!defined($id))
     {
-	if (!defined($id_prefix))
+        if (!defined($id_prefix))
+        {
+            $id_prefix = $self->{id};
+        }
+        if (!defined($id_client))
+        {
+            $id_client = $self->{_id_client};
+        }
+
+	# 
+	# If our id prefix is a bare \d+\.\d+ genome ID, prefix the
+	# id prefix with fig| to create SEED style identifiers.
+	#
+
+	if ($id_prefix =~ /^\d+\.\d+$/)
 	{
-	    $id_prefix = $self->{id};
+	    $id_prefix = "fig|" . $id_prefix;
 	}
-	if (!defined($id_client))
-	{
-	    $id_client = $self->{_id_client};
-	}
-	my $typed_prefix = "$id_prefix.$type";
-	my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
-	# print STDERR Dumper($typed_prefix, $next_num);
 	
-	if (defined($next_num)) {
-	    print STDERR "Allocated id for typed-prefix \'$typed_prefix\' starting from $next_num\n" if $ENV{DEGUG};
-	}
-	else {
-	    die "Could not get a new ID with typed-prefix \"$typed_prefix\"" unless $next_num;
-	}
-	$id = join(".", $typed_prefix, $next_num);
-    }    
-    
+        my $typed_prefix = "$id_prefix.$type";
+        my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
+        # print STDERR Dumper($typed_prefix, $next_num);
+
+        if (defined($next_num)) {
+            print STDERR "Allocated id for typed-prefix \'$typed_prefix\' starting from $next_num\n" if $ENV{DEGUG};
+        }
+        else {
+            die "Could not get a new ID with typed-prefix \"$typed_prefix\"" unless $next_num;
+        }
+        $id = join(".", $typed_prefix, $next_num);
+    }
+
     if (not defined $genomeTO->{features}) {
-	$genomeTO->{features} = [];
+        $genomeTO->{features} = [];
     }
     my $features  = $genomeTO->{features};
-    
+
     my $feature =  { id   => $id,
-		     type => $type,
-		     location => $location,
-		     annotations => [[ $annotation, 
-				       $annotator,
-				       time(),
-				       ]],
+                     type => $type,
+                     location => $location,
+                     annotations => [[ $annotation,
+                                       $annotator,
+                                       time(),
+                                       ]],
     };
 
     $feature->{quality} = $quality if $quality;
@@ -409,21 +436,27 @@ sub add_feature {
     $feature->{aliases} = $aliases if $aliases;
 
     if ($function) {
-	$feature->{function} = $function;
-	push @ { $feature->{annotations} }, [ "Set function to $function",
-					      $annotator,
-					      time(),
-	                                      ];
+        $feature->{function} = $function;
+        push @ { $feature->{annotations} }, [ "Set function to $function",
+                                              $annotator,
+                                              time(),
+                                              ];
     }
-    
+
     if ($translation) {
-	$feature->{protein_translation} = $translation;
+        $feature->{protein_translation} = $translation;
     }
-    
+
     push @$features, $feature;
-    
+
     return $feature;
 }
+
+=head2 $obj->write_protein_translations_to_file($filename)
+
+Write the protein translations to a FASTA file.
+
+=cut
 
 sub write_protein_translations_to_file
 {
@@ -434,11 +467,31 @@ sub write_protein_translations_to_file
 
     for my $feature (@{$self->{features}})
     {
-	my $trans = $feature->{protein_translation};
-	if ($trans)
-	{
-	    write_fasta($fh, [$feature->{id}, undef, $trans]);
-	}
+        my $trans = $feature->{protein_translation};
+        if ($trans)
+        {
+            write_fasta($fh, [$feature->{id}, undef, $trans]);
+        }
+    }
+    close($fh);
+}
+
+=head2 $obj->write_contigs_to_file($filename)
+
+Write the contigs to a FASTA file.
+
+=cut
+
+sub write_contigs_to_file
+{
+    my ($self, $filename) = @_;
+
+    my $fh;
+    open($fh, ">", $filename) or die "Cannot write $filename: $!";
+
+    for my $ctg (@{$self->{contigs}})
+    {
+        write_fasta($fh, [$ctg->{id}, undef, $ctg->{dna}]);
     }
     close($fh);
 }
@@ -454,11 +507,11 @@ sub write_feature_locations_to_file
 
     for my $feature (@{$self->{features}})
     {
-	next if (@feature_types && !$feature_types{$feature->{type}});
+        next if (@feature_types && !$feature_types{$feature->{type}});
 
-	my $loc = $feature->{location};
-	my $loc_str = join(",", map { my $b = BasicLocation->new(@$_); $b->String() } @$loc);
-	print $fh "$feature->{id}\t$loc_str\n";
+        my $loc = $feature->{location};
+        my $loc_str = join(",", map { my $b = BasicLocation->new(@$_); $b->String() } @$loc);
+        print $fh "$feature->{id}\t$loc_str\n";
     }
     close($fh);
 }
@@ -476,23 +529,23 @@ sub extract_protein_sequences_to_temp_file
 
     for my $feature (@{$self->{features}})
     {
-	my $trans = $feature->{protein_translation};
-	if (ref($filter))
-	{
-	    if ($filter->($feature))
-	    {
-		print STDERR "keeping $feature->{id} $feature->{function}\n";
-	    }
-	    else
-	    {
-		print STDERR "skippinging $feature->{id} $feature->{function}\n";
-		next;
-	    }
-	}
-	if ($trans)
-	{
-	    write_fasta($fh, [$feature->{id}, undef, $trans]);
-	}
+        my $trans = $feature->{protein_translation};
+        if (ref($filter))
+        {
+            if ($filter->($feature))
+            {
+                print STDERR "keeping $feature->{id} $feature->{function}\n";
+            }
+            else
+            {
+                print STDERR "skippinging $feature->{id} $feature->{function}\n";
+                next;
+            }
+        }
+        if ($trans)
+        {
+            write_fasta($fh, [$feature->{id}, undef, $trans]);
+        }
     }
     close($fh);
     return $fn;
@@ -506,7 +559,7 @@ sub extract_contig_sequences_to_temp_file
 
     for my $ctg (@{$self->{contigs}})
     {
-	write_fasta($fh, [$ctg->{id}, undef, $ctg->{dna}]);
+        write_fasta($fh, [$ctg->{id}, undef, $ctg->{dna}]);
     }
     close($fh);
     return $fn;
@@ -521,12 +574,12 @@ sub compute_contigs_gc
     my $at = 0;
     for my $ctg (@{$self->{contigs}})
     {
-	my $this_gc = ($ctg->{dna} =~ tr/gcGC//);
-	my $this_at = ($ctg->{dna} =~ tr/atAT//);
-	my $div = $this_gc + $this_at;
-	$gc{$ctg->{id}} = 100 * $this_gc / $div if $div;
-	$gc += $this_gc;
-	$at += $this_at;
+        my $this_gc = ($ctg->{dna} =~ tr/gcGC//);
+        my $this_at = ($ctg->{dna} =~ tr/atAT//);
+        my $div = $this_gc + $this_at;
+        $gc{$ctg->{id}} = 100 * $this_gc / $div if $div;
+        $gc += $this_gc;
+        $at += $this_at;
     }
 
     my $div = $gc + $at;
@@ -551,7 +604,7 @@ sub write_seed_dir
     open(my $ctg_fh, ">", "$dir/contigs") or die "Cannot create $dir/contigs: $!";
     for my $contig (@{$self->{contigs}})
     {
-	write_fasta($ctg_fh, [$contig->{id}, undef, $contig->{dna}]);
+        write_fasta($ctg_fh, [$contig->{id}, undef, $contig->{dna}]);
     }
     close($ctg_fh);
 
@@ -559,11 +612,11 @@ sub write_seed_dir
     # Some individual file metadata.
     #
     my $write_md = sub { my($name, $value) = @_;
-			 my $fh;
-			 open($fh, ">", "$dir/$name") or die "Cannot open $dir/$name: $!";
-			 print $fh "$value\n";
-			 close($fh);
-		    };
+                         my $fh;
+                         open($fh, ">", "$dir/$name") or die "Cannot open $dir/$name: $!";
+                         print $fh "$value\n";
+                         close($fh);
+                    };
     $write_md->("GENETIC_CODE", $self->{genetic_code});
     $write_md->("GENOME", $self->{scientific_name});
     $write_md->("TAXONOMY", $self->{taxonomy}) if $self->{taxonomy};
@@ -574,8 +627,8 @@ sub write_seed_dir
     my %typemap;
     if ($options->{map_CDS_to_peg})
     {
-	delete $types{CDS};
-	$types{peg} = 1;
+        delete $types{CDS};
+        $types{peg} = 1;
     }
     my @types = keys %types;
     $typemap{$_} = $_ foreach @types;
@@ -589,36 +642,36 @@ sub write_seed_dir
     my $close = $self->{close_genomes};
     if (ref($close) && @$close)
     {
-	open(my $close_fh, ">", "$dir/closest.genomes") or die "cannot open $dir/closest.genomes: $!";
-	for my $c (@$close)
-	{
-	    print $close_fh join("\t", $c->{genome_id}, $c->{closeness_measure}, $c->{genome_name}), "\n";
-	}
-	close($close_fh);
+        open(my $close_fh, ">", "$dir/closest.genomes") or die "cannot open $dir/closest.genomes: $!";
+        for my $c (@$close)
+        {
+            print $close_fh join("\t", $c->{genome_id}, $c->{closeness_measure}, $c->{genome_name}), "\n";
+        }
+        close($close_fh);
     }
 
     my $fn_file = $options->{assigned_functions_file};
     $fn_file = "assigned_functions" if !$fn_file;
-			      
+
     open(my $func_fh, ">", "$dir/$fn_file") or die "Cannot create $dir/fn_file: $!";
     open(my $anno_fh, ">", "$dir/annotations") or die "Cannot create $dir/annotations: $!";
 
     mkdir("$dir/Features");
-    
+
     my(%tbl_fh, %fasta_fh);
-	
+
     for my $type (@types)
     {
-	my $tdir = "$dir/Features/$type";
-	-d $tdir or mkdir($tdir) or die "Cannot mkdir $tdir: $!";
-	
-	my $fh;
-	open($fh, ">", "$tdir/tbl") or die "Cannot create $dir/tbl:$ !";
-	$tbl_fh{$type} = $fh;
+        my $tdir = "$dir/Features/$type";
+        -d $tdir or mkdir($tdir) or die "Cannot mkdir $tdir: $!";
 
-	my $fafh;
-	open($fafh, ">", "$tdir/fasta") or die "Cannot create $dir/fasta:$ !";
-	$fasta_fh{$type} = $fafh;
+        my $fh;
+        open($fh, ">", "$tdir/tbl") or die "Cannot create $dir/tbl:$ !";
+        $tbl_fh{$type} = $fh;
+
+        my $fafh;
+        open($fafh, ">", "$tdir/fasta") or die "Cannot create $dir/fasta:$ !";
+        $fasta_fh{$type} = $fafh;
     }
 
     #     "location" : [
@@ -629,63 +682,63 @@ sub write_seed_dir
     #           3216
     #        ]
     #     ],
-    
+
     for my $feature (@$features)
     {
-	my $fid = $feature->{id};
-	my $type = $feature->{type};
-	my @aliases;
-	
-	if ($options->{correct_fig_id} && $fid =~ /^\d+\.\d+\.$type/)
-	{
-	    $fid = "fig|$fid";
-	}
-	if ($type eq 'CDS' && $options->{map_CDS_to_peg})
-	{
-	    $type = 'peg';
-	    $fid =~ s/\.CDS\./.peg./;
-	}
-	my $function = $feature->{function} || "hypothetical protein";
-	print $func_fh "$fid\t$function\n";
+        my $fid = $feature->{id};
+        my $type = $feature->{type};
+        my @aliases;
 
-	my $loc = $feature->{location};
-	
-	my @bloc;
-	for my $loc_part (@$loc)
-	{
-	    my($ctg, $start, $strand, $len) = @$loc_part;
-	    my $bl = BasicLocation->new($ctg, $start, $strand, $len);
-	    push(@bloc, $bl);
-	}
-	my $sloc = join(",", map { $_->SeedString() } @bloc);
+        if ($options->{correct_fig_id} && $fid =~ /^\d+\.\d+\.$type/)
+        {
+            $fid = "fig|$fid";
+        }
+        if ($type eq 'CDS' && $options->{map_CDS_to_peg})
+        {
+            $type = 'peg';
+            $fid =~ s/\.CDS\./.peg./;
+        }
+        my $function = $feature->{function} || "hypothetical protein";
+        print $func_fh "$fid\t$function\n";
 
-	print { $tbl_fh{$type} } join("\t", $fid, $sloc, @aliases), "\n";
+        my $loc = $feature->{location};
 
-	if ($feature->{protein_translation})
-	{
-	    write_fasta($fasta_fh{$type}, [$fid, undef, $feature->{protein_translation}]);
-	}
-	else
-	{
-	    write_fasta($fasta_fh{$type}, [$fid, undef, $self->get_feature_dna($feature->{id})]);
-	}
+        my @bloc;
+        for my $loc_part (@$loc)
+        {
+            my($ctg, $start, $strand, $len) = @$loc_part;
+            my $bl = BasicLocation->new($ctg, $start, $strand, $len);
+            push(@bloc, $bl);
+        }
+        my $sloc = join(",", map { $_->SeedString() } @bloc);
 
-	# typedef tuple<string comment, string annotator, int annotation_time, analysis_event_id> annotation;
-	
-	for my $anno (@{$feature->{annotations}})
-	{
-	    my($txt, $annotator, $time, $event_id) = @$anno;
-	    print $anno_fh join("\n", $fid, $time, $annotator, $txt);
-	    print $anno_fh "\n" if substr($txt, -1) ne "\n";
-	    print $anno_fh "//\n";
-	}
-	    
+        print { $tbl_fh{$type} } join("\t", $fid, $sloc, @aliases), "\n";
+
+        if ($feature->{protein_translation})
+        {
+            write_fasta($fasta_fh{$type}, [$fid, undef, $feature->{protein_translation}]);
+        }
+        else
+        {
+            write_fasta($fasta_fh{$type}, [$fid, undef, $self->get_feature_dna($feature->{id})]);
+        }
+
+        # typedef tuple<string comment, string annotator, int annotation_time, analysis_event_id> annotation;
+
+        for my $anno (@{$feature->{annotations}})
+        {
+            my($txt, $annotator, $time, $event_id) = @$anno;
+            print $anno_fh join("\n", $fid, $time, $annotator, $txt);
+            print $anno_fh "\n" if substr($txt, -1) ne "\n";
+            print $anno_fh "//\n";
+        }
+
     }
 
     for my $type (@types)
     {
-	$fasta_fh{$type}->close();
-	$tbl_fh{$type}->close();
+        $fasta_fh{$type}->close();
+        $tbl_fh{$type}->close();
     }
     close($anno_fh);
     close($func_fh);
@@ -697,7 +750,7 @@ sub add_analysis_event
 
     if (ref($event) ne 'HASH')
     {
-	die "GenomeTypeObject::add_analysis_event: event must be a hash reference";
+        die "GenomeTypeObject::add_analysis_event: event must be a hash reference";
     }
 
     my $uuid_str = create_uuid();
@@ -716,7 +769,7 @@ sub update_function
 
     my $annotation = ["Function updated to $function", $user, scalar gettimeofday, $event_id];
     # print STDERR Dumper($fid, $feature, $annotation);
-    
+
     push(@{$feature->{annotations}}, $annotation);
     $feature->{function} = $function;
 }
@@ -743,24 +796,24 @@ sub get_feature_dna
 
     if (!ref($feature))
     {
-	$feature = $self->find_feature($feature);
+        $feature = $self->find_feature($feature);
     }
 
     foreach my $loc (@{$feature->{location}})
     {
-	my($contig, $beg, $strand, $len) = @$loc;
+        my($contig, $beg, $strand, $len) = @$loc;
 
-	my $cobj = $self->find_contig($contig);
-	
-	if ($strand eq '+' || $len == 1)
-	{
-	    
-	    push(@seq, substr($cobj->{dna}, $beg - 1, $len));
-	}
-	else
-	{
-	    push(@seq, &SeedUtils::reverse_comp(substr($cobj->{dna}, $beg - $len, $len)));
-	}
+        my $cobj = $self->find_contig($contig);
+
+        if ($strand eq '+' || $len == 1)
+        {
+
+            push(@seq, substr($cobj->{dna}, $beg - 1, $len));
+        }
+        else
+        {
+            push(@seq, &SeedUtils::reverse_comp(substr($cobj->{dna}, $beg - $len, $len)));
+        }
     }
     return join("", @seq);
 
@@ -770,27 +823,27 @@ sub create_uuid
 {
     if ($have_UUID)
     {
-	my($uuid, $uuid_str);
-	UUID::generate($uuid);
-	UUID::unparse($uuid, $uuid_str);
-	return $uuid_str;
+        my($uuid, $uuid_str);
+        UUID::generate($uuid);
+        UUID::unparse($uuid, $uuid_str);
+        return $uuid_str;
     }
     elsif ($have_Data_UUID)
     {
-	return Data::UUID->new->create_str();
+        return Data::UUID->new->create_str();
     }
     else
     {
-	die "No UUID generator found";
+        die "No UUID generator found";
     }
 }
 
 sub seed_location_to_location_list
 {
     my($loc_str) = @_;
-    
+
     my @locs = map { my $l = BasicLocation->new($_);
-		     [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
+                     [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
     return wantarray ? @locs : \@locs;
 }
 
@@ -798,7 +851,7 @@ sub seed_location_to_location_list
 # Renumber the features such that they are in order along the contigs.
 #
 # We use the order of the contigs in the contigs to set the overall ordering.
-# 
+#
 sub renumber_features
 {
     my($self, $user, $event_id) = @_;
@@ -807,16 +860,16 @@ sub renumber_features
     my $i = 0;
     for my $c (@{$self->{contigs}})
     {
-	$contig_order{$c->{id}} = $i++;
+        $contig_order{$c->{id}} = $i++;
     }
 
 
     my @f = sort {
-	my($ac, $apos) = sort_position($a);
-	my($bc, $bpos) = sort_position($b);
-	($a->{type} cmp $b->{type}) or
-	($contig_order{$ac} <=> $contig_order{$bc}) or
-	$apos <=> $bpos } @{$self->{features}};
+        my($ac, $apos) = sort_position($a);
+        my($bc, $bpos) = sort_position($b);
+        ($a->{type} cmp $b->{type}) or
+        ($contig_order{$ac} <=> $contig_order{$bc}) or
+        $apos <=> $bpos } @{$self->{features}};
 
     my $nf = [];
 
@@ -824,35 +877,35 @@ sub renumber_features
     my $last_type = '';
     for my $f (@f)
     {
-	my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_; 
-				 "$contig\_$beg$strand$len" 
-			       } @{$f->{location}});
+        my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_;
+                                 "$contig\_$beg$strand$len"
+                               } @{$f->{location}});
 
-	my($c, $left) = sort_position($f);
+        my($c, $left) = sort_position($f);
 
-	if ($f->{type} ne $last_type)
-	{
-	    $id = 1;
-	    $last_type = $f->{type};
-	}
-	if ($f->{id} =~ /(.*\.)(\d+)$/)
-	{
-	    my $new_id = $1 . $id++;
+        if ($f->{type} ne $last_type)
+        {
+            $id = 1;
+            $last_type = $f->{type};
+        }
+        if ($f->{id} =~ /(.*\.)(\d+)$/)
+        {
+            my $new_id = $1 . $id++;
 
-	    my $annotation = ["Feature renumbered from $f->{id} to $new_id", $user, scalar gettimeofday, $event_id];
-	    push(@{$f->{annotations}}, $annotation);
-	    
-	    $f->{id} = $new_id;
-	}
-	else
-	{
-	    warn "Cannot renumber feature with id $f->{id}\n";
-	}
+            my $annotation = ["Feature renumbered from $f->{id} to $new_id", $user, scalar gettimeofday, $event_id];
+            push(@{$f->{annotations}}, $annotation);
 
-	push(@$nf, $f);
-	
-	# print join("\t", $f->{id}, $c, $left, $loc), "\n";
-	
+            $f->{id} = $new_id;
+        }
+        else
+        {
+            warn "Cannot renumber feature with id $f->{id}\n";
+        }
+
+        push(@$nf, $f);
+
+        # print join("\t", $f->{id}, $c, $left, $loc), "\n";
+
     }
     $self->{features} = $nf;
 }
@@ -868,18 +921,18 @@ sub sort_position
 
     for my $l (@{$f->{location}})
     {
-	my($c, $beg, $str, $len) = @$l;
-	$contig = $c;
-	my $left;
-	if ($str eq '+')
-	{
-	    $left = $beg;
-	}
-	else
-	{
-	    $left = $beg - $len + 1;
-	}
-	$min = $min < $left ? $min : $left;
+        my($c, $beg, $str, $len) = @$l;
+        $contig = $c;
+        my $left;
+        if ($str eq '+')
+        {
+            $left = $beg;
+        }
+        else
+        {
+            $left = $beg - $len + 1;
+        }
+        $min = $min < $left ? $min : $left;
     }
     return ($contig, $min);
 }
@@ -895,12 +948,12 @@ sub get_creation_info
     my $anno_tool;
     for my $anno (@{$feature->{annotations}})
     {
-	my($str, $tool, $date, $eid) = @$anno;
-	if ($str =~ /Function updated/ && defined($eid) && $eid)
-	{
-	    $anno_id = $eid;
-	    $anno_tool = $tool;
-	}
+        my($str, $tool, $date, $eid) = @$anno;
+        if ($str =~ /Function updated/ && defined($eid) && $eid)
+        {
+            $anno_id = $eid;
+            $anno_tool = $tool;
+        }
     }
     my $aevent = $self->{_event_index}->{$anno_id} if $anno_id;
     return($cevent, $aevent, $anno_tool);

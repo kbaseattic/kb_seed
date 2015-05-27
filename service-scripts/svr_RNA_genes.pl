@@ -38,23 +38,25 @@ Options:
     -b         #  Add a blank line between genomes (D = no blank)
     -c         #  Parameters are contig file names (D = genome ids from STDIN)
     -d domains #  One or more of the letters A, B and/or E, run together
-    -e dist    #  Maximum nucleotides at end to extrapolate a match (D = 20)
+    -e dist    #  Maximum number of unmatched nucleotides at end of a match
+               #      to extrapolate the end points (D = 20)
     -f         #  Fasta output format
     -g         #  Parameters are genome ids. No ids gives all complete genomes.
     -j nt      #  Just show the first and last nt nucleotides (D = full seq)
     -l locform #  Location format: SEED (D) or Sapling
     -m module  #  Perl module with reference sequences for the RNA type
+               #      (D = RNA_reps_SSU_rRNA; excludes -r)
     -p         #  Include partial Sapling genomes
     -q         #  Provide four more output fields with quality control info:
                #      uncovered reference nt at 5' end
                #      distance from 5' end to contig end
                #      uncovered reference nt at 3' end
                #      distance from 3' end to contig end
-    -r reffile #  File of reference sequences for the RNA type
-    -s         #  Do not show sequence
-    -t 'tag'   #  A short tage to identify the nature of the feature; allows
+    -r reffile #  File of reference sequences for the RNA type (excludes -m)
+    -s         #  Do not show sequence (excludes -j)
+    -t 'tag'   #  A short tag to identify the nature of the feature; allows
                #      mixing of different types; empty string supresses the
-               #      field (D = '')
+               #      field (D = '', but modules may include a tag)
     -u url     #  url of the desired sapling server
     -v         #  Send some progress information to STDERR
 

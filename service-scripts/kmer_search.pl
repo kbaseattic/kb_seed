@@ -1,3 +1,4 @@
+
 # This is a SAS component.
 
 ########################################################################
@@ -107,34 +108,83 @@ you will probably wish to vote and pick the most likely.
 use strict;
 use Data::Dumper;
 use SeedUtils;
-use Getopt::Long;
+use Getopt::Long::Descriptive;
 
-my $usage = "usage: kmer_search -d DataDir [-a] [-m MinHits] [-g MaxGap] [-p] [-r RastDirs] [-z]\n";
+my $usage = "usage: kmer_search -d DataDir [-a] [-m MinHits] [-g MaxGap] [-p] [-r RastDirs] [-z] [-s server-host:server-port]\n";
+
+my($opt, $usage) = describe_options("%c %o < input",
+				    ["data-dir|d=s" => "kmer data directory"],
+				    ["url|u=s" => "kmer server URL"],
+				    ["max-gap|g=i" => "maximium gap size", { default => 200 }],
+				    ["min-hits|m=i" => "minimum hit count", { default => 5 }],
+				    ["pubseed|p" => "use PubSEED"],
+				    ["rast-dirs|r=s" => "RAST directories to use for input"],
+				    ["a" => "input is amino acid sequences"],
+				    ["z" => "compute Z-scores"],
+				    ["help|h" => "Show this help message"],
+				    [],
+				    ["The --data-dir and --server parameters are mutually exclusive; exactly one must be provided"]);
+
+print($usage->text), exit if $opt->help;
+print($usage->text), exit 1 if (@ARGV != 0);
+
+my $server_url;
 my $dataD;
-my $aa = 0;
-my $min_hits = 5;
-my $max_gap  = 200;
-my $use_pub_seed = 0;
-my $rast_dirs;
-my $zscores = 0;
-my $rc  = GetOptions('d=s' => \$dataD,
-		     'g=i' => \$max_gap,
-                     'm=i' => \$min_hits, 
-		     'p'   => \$use_pub_seed,
-		     'r=s' => \$rast_dirs,
-                     'a'   => \$aa,
-                     'z'   => \$zscores);
+my $aa = $opt->a;
+my $min_hits = $opt->min_hits;
+my $max_gap  = $opt->max_gap;
+my $use_pub_seed = $opt->pubseed;
+my $rast_dirs = $opt->rast_dirs;
+my $zscores = $opt->z;
+my $search_type;		# "genome" or "properties"
 
-if ((! $rc) || (! $dataD))
-{ 
-    print STDERR $usage; exit ;
+my $kmer_guts;
+my @kmer_guts_params = ("-m", $min_hits, "-g", $max_gap);
+
+$dataD = $opt->data_dir;
+
+if (!$dataD)
+{
+    die "The data directory parameter must be provided\n";
 }
-if ((! -s "$dataD/genomes") && (! -s "$dataD/properties"))
+    
+if (! -d $dataD)
+{
+    die "Data dir $dataD does not exist\n";
+}
+
+if (-s "$dataD/genomes")
+{
+    $search_type = 'genomes';
+}
+elsif (-s "$dataD/properties")
+{
+    $search_type = 'properties';
+}
+else
 {
     die "you need to give a genomes or properties file in $dataD\n$usage";
 }
 
-if (! -s "$dataD/final.kmers")
+if ($opt->url)
+{
+    $server_url = $opt->url;
+
+    if ($search_type ne 'genomes')
+    {
+	die "Server-based search only works for data directory containing genomes (not properties)";
+    }
+
+    push(@kmer_guts_params, "--url", $server_url);
+    $kmer_guts = "kmer_guts_net";
+}
+else
+{
+    push(@kmer_guts_params, "-D", $dataD);
+    $kmer_guts = "kmer_guts";
+}
+
+if ($dataD && ! -s "$dataD/final.kmers")
 {
     my $which_seed;
     if ($use_pub_seed)
@@ -152,49 +202,76 @@ if (! -s "$dataD/final.kmers")
     &SeedUtils::run("km_build_Data -d $dataD -k 8 $which_seed");
 }
 
-my $primes = [3769,6337,12791,24571,51043,101533,206933,400187,
-              821999,2000003,4000037,8000009,16000057,32000011,
-	      64000031,128000003,248000009,508000037,1073741824,
-	      1400303159,2147483648,1190492993,3559786523,6461346257];
-open(SZ,"<$dataD/size") || die "could not open $dataD/size";
-my $sz = <SZ>;
-chomp $sz;
-my $i;
-# print STDERR "required sz = $sz\n";
-for ($i=0; ($i < @$primes) && ($primes->[$i] < (3 * $sz)); $i++) {}
-if ($i == @$primes) { die "$sz is too large - adjust the '$primes' above" }
-my $hash_size = $primes->[$i];
-# print STDERR "hash_size=$hash_size\n";
+#
+# We only need to set a hash size if we are writing the map.
+#
+# The size file is written by km_build_Data.
+#
 
-my $write_mem = '';
-if (! -s "$dataD/kmer.table.mem_map")
+if ($dataD && ! -s "$dataD/kmer.table.mem_map")
 {
-    $write_mem = "-w ";
+
+    my $primes = [3769,6337,12791,24571,51043,101533,206933,400187,
+		  821999,2000003,4000037,8000009,16000057,32000011,
+		  64000031,128000003,248000009,508000037,1073741824,
+		  1400303159,2147483648,1190492993,3559786523,6461346257];
+    open(SZ,"<$dataD/size") || die "could not open $dataD/size";
+    my $sz = <SZ>;
+    chomp $sz;
+    my $i;
+    # print STDERR "required sz = $sz\n";
+    for ($i=0; ($i < @$primes) && ($primes->[$i] < (3 * $sz)); $i++) {}
+    if ($i == @$primes) { die "$sz is too large - adjust the '$primes' above" }
+    my $hash_size = $primes->[$i];
+    # print STDERR "hash_size=$hash_size\n";
+
+    push(@kmer_guts_params, "-w", "-s", $hash_size);
 }
+
+push(@kmer_guts_params, "-a") if $aa;
+
 my $command;
 my $z = $zscores ? '-z' : '';
-if ((-s "$dataD/genomes") && (! $aa))
+if ($search_type eq 'genomes')
 {
-    $command = "kmer_guts -D $dataD $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -d $dataD $z";
+    if ($aa)
+    {
+	$command = "$kmer_guts @kmer_guts_params | km_process_hits_to_regions -a -d $dataD $z | km_pick_best_hit_in_peg";
+    }
+    else
+    {
+	$command = "$kmer_guts @kmer_guts_params | km_process_hits_to_regions -d $dataD $z";
+    }
 }
-elsif ((-s "$dataD/genomes") && $aa)
+elsif ($search_type eq 'properties')
 {
-    $command = "kmer_guts -D $dataD -a $write_mem -s $hash_size -m $min_hits -g $max_gap | km_process_hits_to_regions -a -d $dataD $z | km_pick_best_hit_in_peg";
+    if ($aa)
+    {
+	$command = "$kmer_guts @kmer_guts_params | kp_process_hits -d $dataD";
+    }
+    else
+    {
+	$command = "$kmer_guts @kmer_guts_params | kp_process_dna_hits -d $dataD";
+    }
 }
-elsif ((-s "$dataD/properties") && $aa)
+else
 {
-    $command = "kmer_guts -s $hash_size -D $dataD -a $write_mem -m $min_hits -g $max_gap | kp_process_hits -d $dataD";
+    die "Invalid search type 'search_type'\n";
 }
-elsif ((-s "$dataD/properties") && (! $aa))
-{
-    $command = "kmer_guts -s $hash_size -D $dataD $write_mem -m $min_hits -g $max_gap | kp_process_dna_hits -d $dataD";
-}
+
 # print STDERR $command,"\n";
-open(INPUT,'-') || die "could not transer STDIN";
-open(RUN,"| $command") || die "could not open $command";
-while (defined($_ = <INPUT>))
+#open(INPUT,'-') || die "could not transer STDIN";
+# open(RUN,"| $command") || die "could not open $command";
+# while (defined($_ = <INPUT>))
+# {
+#     print RUN $_;
+# }
+# close(INPUT);
+# close(RUN);
+
+my $rc = system($command);
+if ($rc != 0)
 {
-    print RUN $_;
+    print STDERR "Command failed with rc=$rc: $command\n";
+    exit $rc;
 }
-close(INPUT);
-close(RUN);

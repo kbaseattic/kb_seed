@@ -457,7 +457,7 @@ sub nbsc {
     my($sim) = @_;
 
     my $min_ln = &min( abs( $sim->e1 - $sim->b1 ), abs( $sim->e2 - $sim->b2 ) ) + 1;
-    
+
     return $min_ln > 1 ? sprintf("%4.2f",$sim->bit_score / $min_ln) : undef;
 }
 
@@ -539,4 +539,4 @@ sub usage {
 
 1;
 
-__DATA__
+

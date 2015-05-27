@@ -22,8 +22,6 @@
 package BasicLocation;
 
     use strict;
-    use FBasicLocation;
-    use BBasicLocation;
 
 =head1 Basic Location Object
 
@@ -51,7 +49,7 @@ Note that even though they are called "offsets", location indices are 1-based.
 Note also that the possibility of an underscore in the contig ID makes the parsing a little
 tricky.
 
-The Sprout uses a slightly different format designed to allow for the possibility of
+The databases use a slightly different format designed to allow for the possibility of
 zero-length regions. Instead of a starting and ending position, we specify the start position,
 the direction (C<+> or C<->), and the length. The Sprout versions of the two example locations
 above are C<RED_1+400> (corresponds to C<RED_1_400>), and C<NC_000913_500-100> (corresponds
@@ -62,47 +60,12 @@ and it is constantly necessary to ask if the location is forward or backward. Th
 object seeks to resolve these differences by providing a single interface that can be
 used regardless of the format or direction.
 
-It is frequently useful to keep additional data about a basic location while it is being passed
-around. The basic location object is a PERL hash, and this additional data is kept in the object
-by adding hash keys. The internal values used by the object have keys preceded by an
-underscore, so any keys not beginning with underscores are considered to be additional
-values. The additional values are called I<augments>.
-
-When a basic location is in its string form, the augments can be tacked on using parentheses
-enclosing a comma-delimited list of assignments. For example, say we want to describe
-the first 400 base pairs in the contig B<RED>, and include the fact that it is the second
-segment of feature B<fig|12345.1.peg.2>. We could use the key C<fid> for the feature ID and
-C<idx> for the segment index (0-based), in which case the location string would be
-
-    RED_1+400(fid=fig|12345.1.peg.2,idx=1)
-
-When this location string is converted to a location object in the variable C<$loc>, we
-would have
-
-    $loc->{fig} eq 'fig|12345.1.peg.2'
-    $loc->{idx} == 1
-
-Spaces can be added for readability. The above augmented location string can also be
-coded as
-
-    RED_1+400(fid = fig|12345.1.peg.2, idx = 1)
-
-A basic location is frequently part of a full location. Full locations are described by the
-B<FullLocation> object. A full location is a list of basic locations associated with a genome
-and a FIG-like object. If the parent full location is known, we can access the basic location's
-raw DNA. To construct a basic location that is part of a full location, we add the parent full
-location and the basic location's index to the constructor. In the constructor below,
-C<$parent> points to the parent full location.
-
-    my $secondLocation = BasicLocation->new("RED_450+100", $parent, 1);
-
-=cut
 
 =head2 Public Methods
 
 =head3 new
 
-    my $loc = BasicLocation->new($locString, $parentLocation, $idx);
+    my $loc = BasicLocation->new($locString);
 
 Construct a basic location from a location string. A location string has the form
 I<contigID>C<_>I<begin>I<dir>I<len> where I<begin> is the starting position,
@@ -112,30 +75,11 @@ location beginning at position 4000 of contig C<1999.1_NC123> and ending at
 position 4199. Similarly, C<1999.1_NC123_2000-400> describes a location in the
 same contig starting at position 2000 and ending at position 1601.
 
-Augments can be specified as part of the location string using parentheses and
-a comma-delimited list of assignments. For example, the following constructor
-creates a location augmented by a feature ID called C<fid> and an index value
-called C<idx>.
-
-    my $loc = BasicLocation->new("NC_000913_499_400(fid = fig|83333.1.peg.10, idx => 2)");
-
-All fields internal to the location object have names beginning with an
-underscore (C<_>), so as long as the value name begins with a letter,
-there should be no conflict.
-
 =over 4
 
 =item locString
 
 Location string, as described above.
-
-=item parentLocation (optional)
-
-Full location that this basic location is part of (if any).
-
-=item idx (optional)
-
-Index of this basic location in the parent full location.
 
 =back
 
@@ -155,7 +99,21 @@ ID of the new contig to be plugged in.
 
 =back
 
-    my $loc = BasicLocation->new($contigID, $beg, $dir, $len, $augments, $parentLocation, $idx);
+    my $loc = BasicLocation->new($tuple);
+
+Construct a location from a database location tuple. A database location specification
+consists of a contig ID, a leftmost location, a direction, and a length.
+
+=over 4
+
+=item tuple
+
+A 4-tuple consisting of (0) a contig ID, (1) the leftmost point of the location,
+(2) the direction (C<+> or C<->), and (3) the length.
+
+=back
+
+    my $loc = BasicLocation->new($contigID, $beg, $dir, $len);
 
 Construct a location from specific data elements, in particular the contig ID, the starting
 offset, the direction, and the length.
@@ -181,18 +139,6 @@ a length.
 Length of the location. If the direction is an underscore (C<_>), it will be the endpoint
 instead of the length.
 
-=item augments (optional)
-
-Reference to a hash containing any augment values for the location.
-
-=item parentLocation (optional)
-
-Full location that this basic location is part of (if any).
-
-=item idx (optional)
-
-Index of this basic location in the parent full location.
-
 =back
 
 =cut
@@ -200,43 +146,29 @@ Index of this basic location in the parent full location.
 sub new {
     # Get the parameters.
     my ($class, @p) = @_;
+    require BBasicLocation;
+    require FBasicLocation;
     # Declare the data variables.
-    my ($contigID, $beg, $dir, $len, $end, $parent, $idx, $augments, $augmentString);
+    my ($contigID, $beg, $dir, $len, $end);
     # Determine the signature type.
     if (@p >= 4) {
         # Here we have specific incoming data.
-        ($contigID, $beg, $dir, $len, $augments, $parent, $idx) = @p;
+        ($contigID, $beg, $dir, $len) = @p;
     } elsif (UNIVERSAL::isa($p[0],__PACKAGE__)) {
         # Here we have a source location and possibly a new contig ID.
         $contigID = (defined $p[1] ? $p[1] : $p[0]->{_contigID});
         ($beg, $dir, $len) = ($p[0]->{_beg}, $p[0]->{_dir}, $p[0]->{_len});
-        if (exists $p[0]->{_parent}) {
-            ($parent, $idx) = ($p[0]->{_parent}, $p[0]->{_idx});
-        }
-        # Get the augments (if any) from the source location. We want these
-        # copied to the new location.
-        $augments = { };
-        for my $key (keys %{$p[0]}) {
-            if (substr($key, 0, 1) ne '_') {
-                $augments->{$key} = $p[0]->{$key};
-            }
+    } elsif (ref $p[0] eq 'ARRAY') {
+        # Here we have a database location tuple.
+        ($contigID, $beg, $dir, $len) = @{$p[0]};
+        # Adjust the beginning if this is on the - strand.
+        if ($dir eq '-') {
+            $beg = $beg + $len - 1;
         }
     } else {
-        # Here we have a source string and possibly augments. We first parse
-        # the source string.
-        $p[0] =~ /^(.+)_(\d+)(\+|\-|_)(\d+)($|\(.*\)$)/;
-        ($contigID, $beg, $dir, $len, $augmentString) = ($1, $2, $3, $4, $5);
-        # Check for augments.
-        if ($augmentString) {
-            # Here we have an augment string. First, we strip the enclosing
-            # parentheses.
-            $augmentString = substr $augmentString, 1, length($augmentString) - 2;
-            # Now we parse out the assignments and put them in a hash.
-            my %augmentHash = map { split /\s*,\s*/, $_ } split /\s*=\s*/, $augmentString;
-            $augments = \%augmentHash;
-        }
-        # Pull in the parent location and index, if applicable.
-        ($parent, $idx) = ($p[1], $p[2]);
+        # Here we have a source string.
+        $p[0] =~ /^(.+)_(\d+)(\+|\-|_)(\d+)$/;
+        ($contigID, $beg, $dir, $len) = ($1, $2, $3, $4);
     }
     # Determine the format.
     if ($dir eq '_') {
@@ -255,14 +187,7 @@ sub new {
     }
     # Create the return structure.
     my $retVal = { _contigID => $contigID, _beg => $beg, _dir => $dir,
-                   _end => $end, _len => $len, _parent => $parent,
-                   _idx => $idx };
-    # Add the augments.
-    if ($augments) {
-        for my $key (keys %{$augments}) {
-            $retVal->{$key} = $augments->{$key};
-        }
-    }
+                   _end => $end, _len => $len };
     # Bless the location with the appropriate package name.
     if ($dir eq '+') {
         bless $retVal, "FBasicLocation";
@@ -428,38 +353,6 @@ sub SeedString {
     return $self->{_contigID} . "_" . $self->{_beg} . "_" . $self->{_end};
 }
 
-=head3 AugmentString
-
-    my $string = $loc->AugmentString;
-
-Return a Sprout-format string representation of this location with augment data
-included. The augment data will be appended as a comma-delimited list of assignments
-enclosed in parentheses, the exact format expected by the single-argument location object
-constructor L</new>.
-
-=cut
-
-sub AugmentString {
-    # Get this instance.
-    my ($self) = @_;
-    # Get the pure location string.
-    my $retVal = $self->String;
-    # Create the augment string. We build it from all the key-value pairs in the hash
-    # for which the key does not being with an underscore.
-    my @augmentStrings = ();
-    for my $key (sort keys %{$self}) {
-        if (substr($key,0,1) ne "_") {
-            push @augmentStrings, "$key = " . $self->{$key};
-        }
-    }
-    # If any augments were found, we concatenate them to the result string.
-    if (@augmentStrings > 0) {
-        $retVal .= "(" . join(", ", @augmentStrings) . ")";
-    }
-    # Return the result.
-    return $retVal;
-}
-
 =head3 IfValid
 
     my $distance = $loc->IfValid($distance);
@@ -586,35 +479,6 @@ sub Matches {
     }
     # Return the result.
     return $retVal;
-}
-
-=head3 Attach
-
-    my  = $loc->Attach($parent, $idx);
-
-Point this basic location to a parent full location. The basic location will B<not> be
-inserted into the full location's data structures.
-
-=over 4
-
-=item parent
-
-Parent full location to which this location should be attached.
-
-=item idx
-
-Index of this location in the full location.
-
-=back
-
-=cut
-
-sub Attach {
-    # Get the parameters.
-    my ($self, $parent, $idx) = @_;
-    # Save the parent location and index in our data structures.
-    $self->{_idx} = $idx;
-    $self->{_parent} = $parent;
 }
 
 =head3 FixContig
@@ -763,6 +627,269 @@ sub Merge {
     $self->Combine($other);
 }
 
+=head2 Virtual Methods
+
+=head3 Left
+
+    my $leftPoint = $loc->Left;
+
+Return the offset of the leftmost point of the location.
+
+=head3 Right
+
+    my $rightPoint = $loc->Right;
+
+Return the offset of the rightmost point of the location.
+
+=head3 Compare
+
+    my ($distance, $cmp) = $loc->Compare($point);
+
+Determine the relative location of the specified point on the contig. Returns a distance,
+which indicates the location relative to the leftmost point of the contig, and a comparison
+number, which is negative if the point is to the left of the location, zero if the point is
+inside the location, and positive if the point is to the right of the location.
+
+=head3 Split
+
+    my $newLocation = $loc->Split($offset);
+
+Split this location into two smaller ones at the specified offset from the left endpoint. The
+new location split off of it will be returned. If the offset is at either end of the location,
+no split will occur and an underfined value will be returned.
+
+=over 4
+
+=item offset
+
+Offset into the location from the left endpoint of the point at which it should be split.
+
+=item RETURN
+
+The new location split off of this one, or an undefined value if no split was necessary.
+
+=back
+
+=head3 Peel
+
+    my $peel = $loc->Peel($length);
+
+Peel a specified number of positions off the beginning of the location. Peeling splits
+a location at a specified offset from the beginning, while splitting takes it at a
+specified offset from the left point. If the specified length is equal to or longer
+than the location's length, an undefined value will be returned.
+
+=over 4
+
+=item length
+
+Number of positions to split from the location.
+
+=item RETURN
+
+Returns a new location formed by splitting positions off of the existing location, which is
+shortened accordingly. If the specified length is longer than the location's length, an
+undefined value is returned and the location is not modified.
+
+=back
+
+=head3 Reverse
+
+    $loc->Reverse;
+
+Change the polarity of the location. The location will have the same nucleotide range, but
+the direction will be changed.
+
+=head3 PointIndex
+
+    my $index = $loc->PointIndex($point);
+
+Return the index of the specified point in this location. The value returned is the distance
+from the beginning. If the specified point is not in the location, an undefined value is returned.
+
+=over 4
+
+=item point
+
+Offset into the contig of the point in question.
+
+=item RETURN
+
+Returns the distance of the point from the beginning of the location, or an undefined value if the
+point is outside the location.
+
+=back
+
+=head3 PointOffset
+
+    my $offset = $loc->PointOffset($index);
+
+Return the offset into the contig of the point at the specified position in the location. A position
+of 0 will return the beginning point, a position of 1 returns the point next to that, and a position
+1 less than the length will return the ending point.
+
+=over 4
+
+=item index
+
+Index into the location of the relevant point.
+
+=item RETURN
+
+Returns an offset into the contig of the specified point in the location.
+
+=back
+
+=head3 SetBegin
+
+    $loc->SetBegin($newBegin);
+
+Change the begin point of this location without changing the endpoint.
+
+=over 4
+
+=item newBegin
+
+Proposed new beginning point.
+
+=back
+
+=head3 SetEnd
+
+    $loc->SetEnd($newEnd);
+
+Change the endpoint of this location without changing the begin point.
+
+=over 4
+
+=item newEnd
+
+Proposed new ending point.
+
+=back
+
+=head3 Widen
+
+    my  = $loc->Widen($distance, $max);
+
+Add the specified distance to each end of the location, taking care not to
+extend past either end of the contig. The contig length must be provided
+to insure we don't fall off the far end; otherwise, only the leftward
+expansion is limited.
+
+=over 4
+
+=item distance
+
+Number of positions to add to both ends of the location.
+
+=item max (optional)
+
+Maximum possible value for the right end of the location.
+
+=back
+
+=head3 Upstream
+
+    my $newLoc = $loc->Upstream($distance, $max);
+
+Return a new location upstream of the given location, taking care not to
+extend past either end of the contig.
+
+=over 4
+
+=item distance
+
+Number of positions to add to the front (upstream) of the location.
+
+=item max (optional)
+
+Maximum possible value for the right end of the location.
+
+=item RETURN
+
+Returns a new location object whose last position is next to the first
+position of this location.
+
+=back
+
+=head3 Truncate
+
+    $loc->Truncate($len);
+
+Truncate the location to a new length. If the length is larger than the location length, then
+the location is not changed.
+
+=over 4
+
+=item len
+
+Proposed new length for the location.
+
+=back
+
+=head3 Adjacent
+
+    my $okFlag = $loc->Adjacent($other);
+
+Return TRUE if the other location is adjacent to this one, else FALSE. The other
+location must have the same direction and start immediately after this location's
+endpoint.
+
+=over 4
+
+=item other
+
+BasicLocation object for the other location.
+
+=item RETURN
+
+Returns TRUE if the other location is an extension of this one, else FALSE.
+
+=back
+
+=head3 Combine
+
+    $loc->Combine($other);
+
+Combine another location with this one. The result will contain all bases in both
+original locations. Both locations must have the same contig ID and direction.
+
+=over 4
+
+=item other
+
+Other location to combine with this one.
+
+=back
+
+=head3 NumDirection
+
+    my $multiplier = $loc->NumDirection();
+
+Return C<1> if this is a forward location, C<-1> if it is a backward location.
+
+=head3 Lengthen
+
+    my  = $loc->Lengthen($distance, $max);
+
+Add the specified distance to the end of the location, taking care not to
+extend past either end of the contig. The contig length must be provided
+to insure we don't fall off the far end; otherwise, only the leftward
+expansion is limited.
+
+=over 4
+
+=item distance
+
+Number of positions to add to the end of the location.
+
+=item max (optional)
+
+Maximum possible value for the right end of the location.
+
+=back
+
 =head3 ExtendUpstream
 
     $loc->ExtendUpstream($distance, $max);
@@ -830,7 +957,7 @@ location's end point, the returned value will be negative.
 
 =head3 Tail
 
-	$loc->Tail($len)
+    $loc->Tail($len)
 
 Reduce the length of the location to the specified amount at the end
 of the location's span.
@@ -860,5 +987,6 @@ sub min {
     my ($a, $b) = @_;
     return ($a < $b ? $a : $b);
 }
+
 
 1;

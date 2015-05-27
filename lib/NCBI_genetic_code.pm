@@ -4,7 +4,7 @@
 #
 
 #
-# Copyright (c) 2003-2007 University of Chicago and Fellowship
+# Copyright (c) 2003-2014 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -40,12 +40,13 @@ package NCBI_genetic_code;
 #   \%is_stop_codon = $NCBI_genetic_code::is_stop_codon{ $n };
 #   \%is_stop_codon =  NCBI_genetic_code::is_stop_codon( $n );
 #
-#  The only difference in behaviour is that the subroutine defaults to code
-#  number 1 when no parameter is supplied:
+#  The only difference in behaviour is that when no parameter is supplied the
+#  subroutine defaults to code number 11, but with only the three most common
+#  bacterial and archaeal initiator codons:
 #
-#   \%genetic_code_1 =  NCBI_genetic_code::genetic_code();
+#   \%genetic_code = NCBI_genetic_code::genetic_code();
 #
-#  All other invalid numbers return an undefined value.
+#  All other invalid code numbers return an undefined value.
 #
 
 use strict;
@@ -105,14 +106,22 @@ while ( <DATA> )
     }
 }
 
-sub genetic_code      { $genetic_code{ $_[0]      || '1' } }
-sub genetic_code_name { $genetic_code_name{ $_[0] || '1' } }
-sub is_start_codon    { $is_start_codon{ $_[0]    || '1' } }
-sub is_stop_codon     { $is_stop_codon{ $_[0]     || '1' } }
+sub genetic_code      { $genetic_code{ $_[0]      || '0' } }
+sub genetic_code_name { $genetic_code_name{ $_[0] || '0' } }
+sub is_start_codon    { $is_start_codon{ $_[0]    || '0' } }
+sub is_stop_codon     { $is_stop_codon{ $_[0]     || '0' } }
 
 1;
 
 __DATA__
+
+0. The Standard Code with the most common bacterial and archaeal initiators (transl_table=0)
+
+    AAs  = FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG
+  Starts = ---M-------------------------------M---------------M------------
+  Base1  = TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  Base2  = TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  Base3  = TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
 
 1. The Standard Code (transl_table=1)
 

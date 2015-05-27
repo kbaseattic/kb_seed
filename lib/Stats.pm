@@ -235,19 +235,22 @@ sub Show {
     my $map = $self->{Map};
     # Get the key list.
     my @keys = sort keys %{$map};
-    # Convert all the statistics to integers.
-    my %intMap;
-    for my $statKey (@keys) {
-        $intMap{$statKey} = sprintf("%d", $map->{$statKey});
-    }
-    # Compute the key size.
-    my $keySize = Max(map { length $_ } @keys) + 1;
-    my $statSize = Max(map { length "$intMap{$_}" } @keys) + 1;
-    # Loop through the statistics.
-    for my $statKey (@keys) {
-        # Add the statistic and its value.
-        $retVal .= Pad($statKey, $keySize) .
-                   Pad($intMap{$statKey}, $statSize, 'left') . "\n";
+    # Only proceed if there are any keys to display.
+    if (scalar @keys) {
+        # Convert all the statistics to integers.
+        my %intMap;
+        for my $statKey (@keys) {
+            $intMap{$statKey} = sprintf("%d", $map->{$statKey});
+        }
+        # Compute the key size.
+        my $keySize = Max(map { length $_ } @keys) + 1;
+        my $statSize = Max(map { length "$intMap{$_}" } @keys) + 1;
+        # Loop through the statistics.
+        for my $statKey (@keys) {
+            # Add the statistic and its value.
+            $retVal .= Pad($statKey, $keySize) .
+                       Pad($intMap{$statKey}, $statSize, 'left') . "\n";
+        }
     }
     # Display the messages.
     $retVal .= "\n" . $self->{Messages} . "\n";
@@ -323,7 +326,7 @@ Increment the specified statistic and return TRUE if the result is a
 multiple of the specified period. This is a helpful method for generating
 periodic trace messages. For example,
 
-    Trace($stats->Ask('frogs') . " frogs processed.") if $stats->Check(frogs => 100) && T(3);
+    print $stats->Ask('frogs') . " frogs processed.\n" if $stats->Check(frogs => 100) && T(3);
 
 will generate a trace message at level 3 for every 100 frogs processed.
 
@@ -425,7 +428,7 @@ sub Max {
 
 =head3 Pad
 
-    my $paddedString = Tracer::Pad($string, $len, $left, $padChar);
+    my $paddedString = Stats::Pad($string, $len, $left, $padChar);
 
 Pad a string to a specified length. The pad character will be a
 space, and the padding will be on the right side unless specified

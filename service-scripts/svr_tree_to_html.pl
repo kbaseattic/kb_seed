@@ -53,6 +53,7 @@ usage: svr_tree_to_html [options] < tree.newick > tree.html
                             (D = Woese' list of 69 common organisms)
        -t   title         - title for html page               
        -units label       - units label for scale bar; implies -bar
+       -va  fa1[,fa2,..]  - vector annotation files    
        -x   min_dx        - minimum horizontal space between consecutive nodes (D = 1)
        -y   dy            - vertical separation of consecutive tips (D = 1)
 
@@ -232,6 +233,7 @@ usage: svr_tree_to_html [options] < tree.newick > tree.html
                             (D = Woese' list of 69 common organisms)
        -t   title         - title for html page               
        -units label       - units label for scale bar; implies -bar
+       -va  fa1[,fa2,..]  - vector annotation files    
        -x   min_dx        - minimum horizontal space between consecutive nodes (D = 1)
        -y   dy            - vertical separation of consecutive tips (D = 1)
        -anno              - use the annotator's SEED for URLs
@@ -245,7 +247,7 @@ End_of_Usage
 
 my ($help, $url, $alias_file, $focus_file, $branch, $collapse_by, $show_file,
     $desc_file, $keep_file, $link_file, $text_link, $popup_file, $id_file, $title,
-    $min_dx, $dy, $ncolor, $color_by, $anno, $gray, $pseed, $ppseed, $raw,
+    $min_dx, $dy, $ncolor, $color_by, $anno, $gray, $pseed, $ppseed, $raw, $va_files,
     $scale_bar, $scale_lbl);
 
 GetOptions("h|help"         => \$help,
@@ -265,6 +267,7 @@ GetOptions("h|help"         => \$help,
            "s|show=s"       => \$show_file,
            "t|title=s"      => \$title,
            "units=s"        => \$scale_lbl,    # units label for scale bar
+           "va=s"           => \$va_files,
            "x|dx=i"         => \$min_dx,
            "y|dy=i"         => \$dy,
            "anno"           => \$anno,
@@ -274,6 +277,14 @@ GetOptions("h|help"         => \$help,
            "raw"            => \$raw);
 
 $help and die $usage;
+
+my @va;
+if ($va_files) {
+    for my $vaF (split(/,/, $va_files)) {
+        my $anno = ffxtree::read_vector_annotation($vaF);
+        push @va, $anno if $anno;
+    }
+}
 
 my $opts = {};
 
@@ -300,6 +311,7 @@ $opts->{anno}          = $anno;
 $opts->{raw}           = $raw;
 $opts->{scale_bar}     = $scale_bar if $scale_bar;
 $opts->{scale_lbl}     = $scale_lbl if defined $scale_lbl;
+$opts->{anno_vectors}  = \@va       if @va;
 
 $opts->{color_by}      ||= $raw ? 'none' : 'taxonomy';
 $opts->{collapse_by}   ||= $raw ? 'none' : 'genus';
