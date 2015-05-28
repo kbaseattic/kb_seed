@@ -155,6 +155,7 @@ object as defined in the GenomeAnnotation typespec:
   string source_id;
   int ncbi_taxonomy_id;
   string taxonomy;
+  string owner;
  } genome_metadata
 
 =cut
@@ -163,7 +164,7 @@ sub set_metadata
 {
     my($self, $meta) = @_;
 
-    my @keys = qw(id scientific_name domain genetic_code source source_id taxonomy ncbi_taxonomy_id);
+    my @keys = qw(id scientific_name domain genetic_code source source_id taxonomy ncbi_taxonomy_id owner);
     for my $k (@keys)
     {
         if (exists($meta->{$k}))
