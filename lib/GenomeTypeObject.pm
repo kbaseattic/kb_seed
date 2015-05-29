@@ -375,6 +375,7 @@ sub add_feature {
     my $id_client   = $parms->{-id_client};
     my $id_prefix   = $parms->{-id_prefix};
     my $type        = $parms->{-type}       or die "No feature-type -type";
+    my $id_type	    = $parms->{-id_type};
     my $location    = $parms->{-location}   or die "No feature location -location";
     my $function    = $parms->{-function};
     my $annotator   = $parms->{-annotator}  || q(Nobody);
@@ -404,8 +405,8 @@ sub add_feature {
 	{
 	    $id_prefix = "fig|" . $id_prefix;
 	}
-	
-        my $typed_prefix = "$id_prefix.$type";
+
+        my $typed_prefix = "$id_prefix." . (defined($id_type) ? $id_type : $type);
         my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
         # print STDERR Dumper($typed_prefix, $next_num);
 
