@@ -19,6 +19,7 @@ my $output_file;
 my $temp_dir;
 my $id_prefix;
 my $id_server;
+my $id_type = "CDS";
 
 use Getopt::Long;
 my $rc = GetOptions('help'        => \$help,
@@ -27,6 +28,7 @@ my $rc = GetOptions('help'        => \$help,
 		    'tmpdir=s'    => \$temp_dir,
 		    'id-prefix=s' => \$id_prefix,
 		    'id-server=s' => \$id_server,
+		    'id-type=s'   => \$id_type,
 		    );
 
 if (!$rc || $help || @ARGV != 0) {
@@ -84,7 +86,7 @@ $id_prefix = $genomeTO->{id} unless $id_prefix;
 
 my $count = @$result;
 my $type = 'CDS';
-my $typed_prefix = join(".", $id_prefix, $type);
+my $typed_prefix = join(".", $id_prefix, $id_type);
 my $cur_id_suffix = $id_client->allocate_id_range($typed_prefix, $count);
 
 foreach my $entry (@$result) {
