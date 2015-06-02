@@ -918,7 +918,7 @@ sub renumber_features
 sub sort_position
 {
     my($f) = @_;
-    my $min = 1e6;
+    my $min;
     my $contig;
 
     for my $l (@{$f->{location}})
@@ -934,7 +934,7 @@ sub sort_position
         {
             $left = $beg - $len + 1;
         }
-        $min = $min < $left ? $min : $left;
+        $min = (defined($min) && $min < $left) ? $min : $left;
     }
     return ($contig, $min);
 }
