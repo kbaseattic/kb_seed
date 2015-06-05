@@ -25,6 +25,7 @@ use SeedUtils;
 use strict;
 use DB_File;
 use File::Basename;
+use Digest::MD5;
 
 our $have_fig;
 eval {
@@ -1115,8 +1116,12 @@ sub patric_figfam_call
     while (my($peg, $com, $seq) = read_next_fasta_seq($fh))
     {
 	next unless $missing{$peg};
-	my $md5 = $fig->md5_of_peg($peg);
-	my $len = $fig->translation_length($peg);
+
+	my $md5 = Digest::MD5::md5_hex( uc $seq );
+	my $len = length($seq);
+
+	# my $md5 = $fig->md5_of_peg($peg);
+	# my $len = $fig->translation_length($peg);
 	my $fams = $md5_to_fam->{$md5};
 	if ($fams)
 	{
