@@ -152,6 +152,21 @@ sub abbrev {
     }
 }
 
+=head3 probably_active
+
+    my $activeFlag = SeedUtils::probably_active($vc);
+
+Return TRUE if the specified variant code is most likely for an active variant, else FALSE.
+
+=cut
+
+sub probably_active {
+    my($vc) = @_;
+
+    return $vc !~ /^(inactive|-1|\*-1|0|\*0)$/;
+}
+
+
 =head3 abbrev_set
 
     my $abbrevH = SeedUtils::abbrev_set($genome_names);
@@ -2101,6 +2116,31 @@ sub strip_func_comment {
         return $func;
     }
 }
+
+=head3 canonical_function
+
+    $clean_function = canonical_function($function);
+
+Functions with leading space, trailing space, tabs, etc. need to be cleaned.
+
+=cut
+
+#  Functions with leading space, trailing space, tabs, etc. need to be cleaned
+#
+#      $function = canonical_function( $function );
+#
+sub canonical_function
+{
+    return undef if ! defined $_[0];
+
+    local $_ = shift;
+    s/^\s+//;     # no leading space
+    s/\s+$//;     # no trailing space
+    s/\s+/ /sg;   # whitespace of any form becomes a single space character
+    s/\s;/;/g;    # no space before semicolon
+    $_;
+}
+
 
 =head3 verify_db
 

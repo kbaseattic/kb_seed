@@ -177,7 +177,7 @@ sub Process {
     my ($sap, $genome, $directory) = @_;
     # Clear the existing data for the specified genome.
     my $stats = ClearGenome($sap, $genome);
-    # Load the new expression data from the specified directory (if one is
+    # Load the new genome data from the specified directory (if one is
     # specified).
     if ($directory) {
         my $newStats = Load($sap, $genome, $directory);

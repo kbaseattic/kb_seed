@@ -35,22 +35,22 @@ package SeedURLs;
 #
 #  Names of the known SEEDs:
 #
-#     @names = SeedURLs::names( $all_flag );  # list 
+#     @names = SeedURLs::names( $all_flag );  # list
 #     $names = SeedURLs::names( $all_flag );  # text string, comma separated
 #
 #  URLs of the known SEEDs:
 #
-#     @urls = SeedURLs::urls( $all_flag );    # list 
+#     @urls = SeedURLs::urls( $all_flag );    # list
 #    \@urls = SeedURLs::urls( $all_flag );    # reference to a list
 #
-#     @name_and_url = SeedURLs::names_and_urls( $all_flag );  # list 
+#     @name_and_url = SeedURLs::names_and_urls( $all_flag );  # list
 #    \@name_and_url = SeedURLs::names_and_urls( $all_flag );  # reference to a list
 #
 #     where:  $name_and_url = [ $name, $url ]
 #
 #  URL of a known SEED referenced by name, or any SEED referenced by URL:
 #
-#     $url = SeedURLs::url( $name_or_url ); 
+#     $url = SeedURLs::url( $name_or_url );
 #
 #===============================================================================
 
@@ -87,7 +87,7 @@ our $all_names = join( ', ', @all_names );
 #-------------------------------------------------------------------------------
 #  Get a list of names of known SEEDs:
 #
-#   @names = SeedURLs::names( $all_flag );  # list 
+#   @names = SeedURLs::names( $all_flag );  # list
 #   $names = SeedURLs::names( $all_flag );  # text string, comma separated
 #
 #
@@ -96,7 +96,7 @@ our $all_names = join( ', ', @all_names );
 #   @urls  = SeedURLs::urls( $all_flag );   # list
 #  \@urls  = SeedURLs::urls( $all_flag );   # reference to list
 #
-#   @name_and_url = SeedURLs::names_and_urls( $all_flag );  # list 
+#   @name_and_url = SeedURLs::names_and_urls( $all_flag );  # list
 #  \@name_and_url = SeedURLs::names_and_urls( $all_flag );  # reference to a list
 #
 #     where:  $name_and_url = [ $name, $url ]
@@ -106,7 +106,7 @@ our $all_names = join( ', ', @all_names );
 #-------------------------------------------------------------------------------
 
 sub names
-{ 
+{
     wantarray ? $_[0] ? @all_names : $all_names
               : $_[0] ? @names     : $names;
 }
@@ -130,10 +130,11 @@ sub names_and_urls
 #  Return a URL for a supplied name or URL. In case of a URL, no checking
 #  is performed as this is intended to supply access to SEEDs that are not
 #  included in this module.
-# 
+#
 #   $url = SeedURLs::url( $name_or_url )
 #
 #-------------------------------------------------------------------------------
+
 sub url
 {
     my ( $name ) = @_;

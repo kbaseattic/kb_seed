@@ -4,6 +4,8 @@ use strict;
 use Data::Dumper;
 use SeedUtils;
 use Getopt::Long;
+use IPC::Run;
+use IO::Handle;
 
 my $usage = "usage: km_build_Data -d DataDir -k 8\n";
 my $dataD;
@@ -15,6 +17,8 @@ my $rc  = GetOptions('d=s' => \$dataD,
 		     'p'   => \$use_pub_seed,
 		     'r=s' => \$rast_dirs,
 		     'k=i' => \$k);
+
+my $min_reps_required = $ENV{KM_MIN_REPS_REQUIRED} || 5;
 
 # properties vs normal-search is determined by the presence of 
 # $dataD/genomes and $dataD/properties;
@@ -135,14 +139,13 @@ sub build_function_index {
 	my %funcs;
 	while (defined($_ = <ASSIGNMENTS>))
 	{
-	    if ($_ =~ /^\S+\t(\S.*\S+)/)
+	    chomp;
+	    my($fid, $func) = split(/\t/);
+	    my $gid = SeedUtils::genome_of($fid);
+	    if ($fid && $gid && $func)
 	    {
-		my $stripped = $1;
-		if (!$ENV{KM_BUILD_NO_STRIP})
-		{
-		    $stripped = &SeedUtils::strip_func_comment($stripped);
-		}
-		$funcs{$stripped}++;
+		my $stripped = km_strip_func_comment($func);
+		$funcs{$stripped}->{$gid}++;
 	    }
 	}
 	close(ASSIGNMENTS);
@@ -150,7 +153,10 @@ sub build_function_index {
 	my $nxt = 0;
 	foreach my $f (sort keys(%funcs))
 	{
-	    if ($funcs{$f} > 5) #  && ((! &SeedUtils::hypo($f)) || ($f =~ /FIG/)))
+#	    if ($funcs{$f} > 5) #  && ((! &SeedUtils::hypo($f)) || ($f =~ /FIG/)))
+
+	    my $gcount = keys %{$funcs{$f}};
+	    if ($gcount >= $min_reps_required || $f =~ /\#/)
 	    {
 		print FI "$nxt\t$f\n";
 		$nxt++;
@@ -181,6 +187,17 @@ sub build_function_index {
 	}
     }
     close(FI);
+}
+
+sub km_strip_func_comment
+{
+    my($func) = @_;
+    my $stripped = $func;
+    if (!$ENV{KM_BUILD_NO_STRIP})
+    {
+	$stripped = &SeedUtils::strip_func_comment($stripped);
+    }
+    return $stripped;
 }
 
 sub build_reduced_kmers {
@@ -218,9 +235,10 @@ sub build_reduced_kmers {
 #   First, we build a file containing [kmer,fI,oI,off-set,sequence-ID]
 #   sorted by kmer
 ###
-    open(RAW,"| sort -T . -S 40G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
+    open(RAW,"| sort -T . -S 80G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
     my $seqID=0;
     my @genomes = map { chomp; $_ } ($properties ? `cut -f2 $dataD/properties` : `cut -f2 $dataD/genomes`);
+
     foreach my $g (sort @genomes)
     {
 	my $cmd;
@@ -236,13 +254,16 @@ sub build_reduced_kmers {
 	{
 	    $cmd = "echo '$g' | genomes_to_fids | grep peg | fids_to_protein_sequences -fasta 0 | cut -f2,3";
 	}
-	    
-	foreach $_ (`$cmd`)
+
+	open(P, "$cmd |") or die "cannot open $cmd: $!";
+	while (<P>)
 	{
 	    if ($_ =~ /^(fig\|\d+\.\d+\.peg\.\d+)\t(\S.*\S)$/)
 	    {
 		chomp;
 		my $seq = $2;
+		my $lseq = length($seq);
+		$seq = uc($seq);
 		my $id = $1;
 		($id =~ /^fig\|(\d+\.\d+)/) || die "bad peg $_";
 		my $oI = $to_oI{$g_to_o->{$g}};
@@ -253,26 +274,28 @@ sub build_reduced_kmers {
 		    $seqs_with_func->{$fI}++;                                                                # NFj
 		    for (my $i=0; ($i < (length($seq) - $k)); $i++)
 		    {
-			my $kmer = uc substr($seq,$i,$k);
+			my $kmer = substr($seq,$i,$k);
 			if ($kmer !~ /[^ACDEFGHIKLMNPQRSTVWY]/)
 			{
 			    print RAW join("\t",($kmer,
 						 $fI,
 						 $oI,
-						 (length($seq)-$i),
-						 $seqID)),"\n";
+						 $lseq-$i,
+						 $seqID)) . "\n";
 			}
 		    }
 		    $seqID++;
 		}
 	    }
 	}
+	close(P);
     }
     close(RAW);
 
 ### Now, we reduce sets of adjacent lines with the same kmer to a single line (or none)
 ###
     open(RAW,"<$dataD/sorted.kmers") || die "could not open sorted.kmers: $!";
+    
     open(REDUCED,">$dataD/reduced.kmers") || die "could not open reduced kmers: $!";
     my $last = <RAW>;
 
@@ -280,10 +303,24 @@ sub build_reduced_kmers {
     {
 	my $curr = $1;
 	my @set;
-	while ($last && ($last =~ /^(\S+)\t(\S*)\t(\S*)\t(\S*)\t(\S+)$/) && ($1 eq $curr))
+	while ($last)
 	{
-	    push(@set,[$2,$3,$4,$5]);
-	    $last = <RAW>;
+	    if ($last =~ /^(\S+)\t(\S*)\t(\S*)\t(\S*)\t(\S+)$/)
+	    {
+		if ($1 eq $curr)
+		{
+		    push(@set,[$2,$3,$4,$5]);
+		    $last = <RAW>;
+		}
+		else
+		{
+		    last;
+		}
+	    }
+	    else
+	    {
+		die "Invalid line $. in merged data\n$last\n";
+	    }
 	}
 	&process_set($curr,\@set,\*REDUCED,$seqs_with_a_signature,$distinct_signatures,$distinct_functions);
     }
@@ -367,7 +404,7 @@ sub load_id_to_fI {
 	    {
 		my $peg = $1;
 		my $func_or_prop = $properties ? $genomes{$genome} : $2;
-		$func_or_prop    = &SeedUtils::strip_func_comment($func_or_prop);
+		$func_or_prop    = km_strip_func_comment($func_or_prop);
 		if (defined($to_fI->{$func_or_prop}))
 		{
 		    $id_to_fI->{$peg} = $to_fI->{$func_or_prop};

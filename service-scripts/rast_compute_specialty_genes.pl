@@ -214,7 +214,7 @@ for my $db (@db)
 	    die "Blast failed with $?: $@blastcmd\n";
 	}
     }
-    unlink($tmp);
+    unlink($tmp) or warn "Unlink $tmp failed: $!";
 }
 close($raw_blast_fh);
 
@@ -274,6 +274,10 @@ while( my $result = $in->next_result ) {
 	}  
     }
 }
+if (!$opt->report)
+{
+    unlink($raw_blast);
+}
 # print Dumper(\%val, \%id_to_md5);
 
 for my $db (@db)
@@ -289,7 +293,7 @@ for my $db (@db)
 	    {
 		# we computed this and had no hit
 		# print "Update $db $md5 no hi\n";
-		# $sth_miss->execute($md5, $db);
+		$sth_miss->execute($md5, $db);
 	    }
 	    else
 	    {
@@ -302,7 +306,7 @@ for my $db (@db)
 	    # print "Update $db $md5 @$ent\n";
 	    if ($sth)
 	    {
-		# $sth->execute(@$ent);
+		$sth->execute(@$ent);
 	    }
 	}
 	my(undef, undef, $sid, $qcov, $scov, $iden, $pvalue) = @$ent;

@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
 
-#!/usr/bin/perl -w
 #
 #	This is a SAS Component.
 #
@@ -264,11 +263,6 @@ sub AdjustStdin {
         open STDIN, "<$file" || die $!;
     }
 }
-
-
-
-
-
 
 
 1;

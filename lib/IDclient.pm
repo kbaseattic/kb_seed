@@ -25,48 +25,48 @@ use SeedUtils;
 
 sub new {
     my ($class, $source) = @_;
-    
+
     my $self = {};
     if (ref($source) eq q(HASH) || (ref($source) && UNIVERSAL::can($source, 'isa') && $source->isa('GenomeTypeObject'))) {
-	#...Hack to fake the service locally
-	$self->{_counters} = {};
-	
-	if (defined(my $features = $source->{features})) {
-	    foreach my $feature (@$features) {
-		if (my ($prefix, $num) = ($feature->{id} =~ m/^(\S+)\.(\d+)$/o)) {
-		    if (defined($self->{_counters}->{$prefix})) {
-			if ($num > $self->{_counters}->{$prefix}) {
-			    $self->{_counters}->{$prefix} = $num;
-			}
-		    }
-		    else {
-			$self->{_counters}->{$prefix} = 0;
-		    }
-		}
-		#
-		# If we can't parse, we'll just assume that
-		# we'll start with zero.
-		#
-		#else {
-		#    die "Could not parse ID for feature: \'$feature->{id}\'";
-		#}
-	    }
-	}
+        #...Hack to fake the service locally
+        $self->{_counters} = {};
+
+        if (defined(my $features = $source->{features})) {
+            foreach my $feature (@$features) {
+                if (my ($prefix, $num) = ($feature->{id} =~ m/^(\S+)\.(\d+)$/o)) {
+                    if (defined($self->{_counters}->{$prefix})) {
+                        if ($num > $self->{_counters}->{$prefix}) {
+                            $self->{_counters}->{$prefix} = $num;
+                        }
+                    }
+                    else {
+                        $self->{_counters}->{$prefix} = 0;
+                    }
+                }
+                #
+                # If we can't parse, we'll just assume that
+                # we'll start with zero.
+                #
+                #else {
+                #    die "Could not parse ID for feature: \'$feature->{id}\'";
+                #}
+            }
+        }
     }
-    
+
     return bless $self, $class;
 }
 
 sub allocate_id_range {
     my ($self, $id_prefix, $num_IDs) = @_;
-    
+
     if (not defined $self->{_counters}->{$id_prefix}) {
-	$self->{_counters}->{$id_prefix} = 0;
+        $self->{_counters}->{$id_prefix} = 0;
     }
-    
+
     my $next_num = ($self->{_counters}->{$id_prefix} + 1);
     $self->{_counters}->{$id_prefix} += $num_IDs;
-    
+
     return $next_num;
 }
 

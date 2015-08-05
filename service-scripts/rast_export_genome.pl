@@ -312,6 +312,9 @@ for my $f (@{$genomeTO->{features}})
 
 	$start += $offset;
 	$end += $offset;
+
+	($start, $end) = ($end, $start) if $strand eq '-';
+
 	my $sloc = new Bio::Location::Simple(-start => $start, -end => $end, -strand => $strand);
 	push(@loc_obj, $sloc);
 
@@ -319,7 +322,6 @@ for my $f (@{$genomeTO->{features}})
 	# Compute loc_info for GFF stuff.
 	#
 	my $frame = $start % 3;
-	($start, $end) = ($end, $start) if $strand eq '-';
 	push(@loc_info, [$ctg, $start, $end, (($len == 0) ? "." : $strand), $frame]);
     }
 

@@ -55,8 +55,8 @@ the C<prepare_for_return()> method which strips these indexes out of the data ob
 
 use strict;
 use warnings;
-use Data::Dumper;
 use SeedUtils;
+use SeedAware;
 use File::Temp;
 use File::Slurp;
 use JSON::XS;
@@ -65,6 +65,7 @@ use Time::HiRes 'gettimeofday';
 use IDclient;
 use BasicLocation;
 use IO::Handle;
+use Data::Dumper;
 
 our $have_unbless;
 eval {
@@ -93,21 +94,67 @@ Create a new empty genome object.
 
 =cut
 
+#
+#     my $gto = GenomeTypeObject->new()          #  An empty GenomeTypeObject 
+#     my $gto = GenomeTypeObject->new( \%opt )   #  An object filled from
+#                                                #     specified source
+#
+#   Options:
+#
+#       file  =>  $filename           #  Build from JSON text in file
+#       file  => \*FILEHANDLE         #  Build from JSON text in open file
+#       file  => \$string             #  Build from JSON text in string ref
+#       gid   =>  $SEED_genome_ID     #  Build from a SEED genome; one or more
+#                                     #    SEEDs can be specified by seed option
+#                                     #    (D = [core, pseed, pubseed])
+#       json  =>  $JSON_text_string   #  Build from a JSON text string
+#       json  => \@JSON_text_lines    #  Build from JSON text lines
+#       seed  =>  $SEED_name          #  SEED to use for genome ID
+#       seed  =>  $SEED_URL           #  SEED to use for genome ID
+#       seed  => \@SEED_names_URLs    #  Search multiple SEEDs, in order
+#       stdin =>  $bool               #  Build from JSON text on STDIN
+#                                     #     (same as file => \*STDIN)
+#
 sub new
 {
-    my($class) = @_;
+    my( $class, $opts ) = @_;
+    $opts ||= {};
 
-    my $self = {
-        contigs => [],
-        features => [],
-        close_genomes => [],
-        analysis_events => []
-    };
-    bless $self, $class;
+    my $self;
+    if ( $opts->{ file } )
+    {
+        $self = $class->create_from_file( $opts->{ file } );
+    }
+    elsif ( $opts->{ stdin } )
+    {
+        $self = $class->create_from_file( \*STDIN );
+    }
+    elsif ( $opts->{ json } )
+    {
+        $self = $class->create_from_json( $opts->{ json } );
+    }
+    elsif ( $opts->{ gid } )
+    {
+        my $seed = $opts->{ seed };
+        my @seeds = ! $seed               ? ()         # None specified
+                  : ref($seed) eq 'ARRAY' ? @$seed     # List specified
+                  :                         ( $seed ); # One specified
 
-    $self->setup_id_allocation();
+        $self = $class->fetch_from_seed( $opts->{ gid }, @seeds );
+    }
+    else
+    {
+        my $raw = { contigs         => [],
+                    features        => [],
+                    close_genomes   => [],
+                    analysis_events => []
+                  };
+        $self = $class->initialize_without_indexes( $raw );
+    }
+
     return $self;
 }
+
 
 =head2 $obj = GenomeTypeObject->create_from_file($filename)
 
@@ -118,27 +165,166 @@ The resulting object has not had the C<initialize> method invoked on it.
 
 =cut
 
+#
+#    $gto = GenomeTypeObject->create_from_file(  $filename )
+#    $gto = GenomeTypeObject->create_from_file( \*filehandle )
+#    $gto = GenomeTypeObject->create_from_file( \$string )
+#    $gto = GenomeTypeObject->create_from_file( )                # D = STDIN
+#
 sub create_from_file
 {
     my($class, $file) = @_;
-    my $txt = read_file($file);
-    my $self = decode_json($txt);
-    return bless $self, $class;
+
+    $class
+        or print STDERR "create_from_file() called without class.\n"
+            and return undef;
+ 
+    #  Read the data:
+
+    my $raw = SeedUtils::read_encoded_object( $file );
+
+    #  Return the blessed and initialized object:
+
+    $raw ? $class->initialize( $raw ) : undef;
 }
+
 
 =head2 $obj->destroy_to_file($filename)
 
 Write the given object in JSON form to the specified file.
-The object will be rendered unusuable.
+The object will be rendered unusable (i.e., unblessed)
 
 =cut
 
-sub destroy_to_file {
-    my ($self, $fileName) = @_;
-    $self->prepare_for_return;
+#
+#    GenomeTypeObject->destroy_to_file(  $filename   [, \%options] )
+#    GenomeTypeObject->destroy_to_file( \*filehandle [, \%options] )
+#    GenomeTypeObject->destroy_to_file( \$string     [, \%options] )
+#    GenomeTypeObject->destroy_to_file(              [  \%options] ) # D = STDOUT
+#
+#   Options:
+#
+#        condensed => $bool   #  If true, do not invoke 'pretty'
+#        pretty    => $bool   #  If explicitly false, do not invoke 'pretty'
+#
+sub destroy_to_file
+{
+    my $opts = ( @_ > 1 && ref( $_[-1]) eq 'HASH' ) ? pop( @_ ) : {};
 
-    SeedUtils::write_encoded_object($self, $fileName);
+    my ( $self, $fileName ) = @_;
+
+    #  Remove our local files (e.g., indices) and unbless the object.
+    #  When unbless exists, this works without the assignment, but without
+    #  unbless, a reference to a new (never blessed) hash is returned.
+
+    my $raw = $self->prepare_for_return;
+
+    #  Write it
+
+    SeedUtils::write_encoded_object( $raw, $fileName, $opts );
 }
+
+
+#
+#    $gto = GenomeTypeObject->create_from_json(  $textstr )
+#    $gto = GenomeTypeObject->create_from_json( \@textlines )
+#
+sub create_from_json
+{
+    my( $class, $text ) = @_;
+
+    $class
+        or print STDERR "create_from_json() called without class.\n"
+            and return undef;
+ 
+    #  Process the text:
+
+    $text = join( ' ', @$text ) if $text && ref($text) eq 'ARRAY';
+    $text && $text =~ /\S/
+        or print STDERR "create_from_json() called without text data.\n"
+            and return undef;
+
+
+    #  Create the perl structure:
+
+    my $raw = JSON::XS->new->utf8(0)->decode( $text );
+
+    #  Return the blessed and initialized object:
+
+    $raw ? $class->initialize( $raw ) : undef;
+}
+
+
+sub fetch_from_seed
+{
+    my ( $class, $gid, @seeds ) = @_;
+
+    eval { require LWP::Simple; }
+        or print STDERR "fetch_from_seed failed in 'require LWP::Simple'.\n"
+            and return undef;
+
+    my @where;
+
+    # Map SEED name(s) to URL(s):
+
+    #  This handles user-supplied SEED names and URLs
+    if ( @seeds && ( eval { require SeedURLs; } ) )
+    {
+        @where = map { SeedURLs::url( $_ ) } @seeds;
+    }
+
+    #  This handles just URLs
+    elsif ( @seeds )
+    {
+        my $error = 0;
+        foreach ( @seeds )
+        {
+            if ( m/^http/i )
+            {
+                push @where, $_;
+            }
+            else
+            {
+                print STDERR "fetch_from_seed(): Invalid SEED '$_'.\n";
+                print STDERR "Unable to process SEED names without SeedURLs.pm, use URLs instead.\n" unless $error++;
+            }
+        }
+    }
+
+    #  Default SEEDs to search
+    elsif ( eval { require SeedURLs; } )
+    {
+        @where = map { SeedURLs::url( $_ ) }
+                 qw( core pseed pubseed );
+    }
+    else
+    {
+        @where = qw( http://core.theseed.org/FIG
+                     http://pseed.theseed.org
+                     http://pubseed.theseed.org
+                   );
+    }
+
+    my $raw;
+
+    #  Work through SEEDs to find the genome
+    foreach my $where ( @where )
+    {
+        # Get the JSON text:
+
+        my $text = LWP::Simple::get( "$where/genome_object.cgi?genome=$gid" )
+            or next;
+
+        #  Create the perl structure:
+
+        $raw = JSON::XS->new->utf8(0)->decode( $text );
+
+        last if $raw;
+    }
+
+    $raw ? $class->initialize( $raw ) : undef;
+}
+
 
 =head2 $obj->set_metadata({ ... });
 
@@ -196,12 +382,14 @@ sub initialize_without_indexes
     return $self;
 }
 
+
 sub setup_id_allocation
 {
     my($self) = @_;
-    $self->{_id_client} = IDclient->new($self);
+    $self->{_id_client} ||= IDclient->new($self);
     return $self;
 }
+
 
 sub prepare_for_return
 {
@@ -230,15 +418,17 @@ sub prepare_for_return
     }
 }
 
+
 sub hostname
 {
     my($self) = @_;
 
     return $self->{hostname} if $self->{hostname};
-    $self->{hostname} = `hostname`;
+    $self->{hostname} = SeedAware::run_gathering_output( 'hostname' );
     chomp $self->{hostname};
     return $self->{hostname};
 }
+
 
 sub update_indexes
 {
@@ -247,47 +437,187 @@ sub update_indexes
     #
     # Create feature index.
     #
+    $self->update_feature_index();
 
-    my $feature_index = {};
-    $self->{_feature_index} = $feature_index;
+    #
+    # Create contig index.
+    #
+    $self->update_contig_index();
+
+    #
+    # Event index.
+    #
+    $self->update_event_index();
+
+    return $self;
+}
+
+
+sub update_feature_index
+{
+    my($self) = @_;
+
+    my $feature_index = $self->{_feature_index} = {};
     for my $feature ($self->features)
     {
         $feature_index->{$feature->{id}} = $feature;
     }
 
-    #
-    # Create contig index.
-    #
-    my $contig_index = {};
-    $self->{_contig_index} = $contig_index;
+    if ( keys %$feature_index != @{$self->features} )
+    {
+        my $nftr = $self->features;
+        my $nind = keys %$feature_index;
+        die "Number of features ($nftr) not equal to index size ($nind). Duplicate ids?";
+    }
+
+    return $feature_index;
+}
+
+
+sub update_contig_index
+{
+    my($self) = @_;
+
+    my $contig_index = $self->{_contig_index} = {};
     for my $contig ($self->contigs)
     {
         $contig_index->{$contig->{id}} = $contig;
     }
 
-    #
-    # Event index.
-    #
-    my $event_index = {};
-    $self->{_event_index} = $event_index;
-    for my $e (@{$self->{analysis_events}})
+    if ( keys %$contig_index != @{$self->contigs} )
+    {
+        my $ncnt = $self->contigs;
+        my $nind = keys %$contig_index;
+        die "Number of contigs ($ncnt) not equal to index size ($nind). Duplicate ids?";
+    }
+
+    return $contig_index;
+}
+
+
+sub update_event_index
+{
+    my($self) = @_;
+
+    my $event_index = $self->{_event_index} = {};
+    for my $e ( @{$self->{analysis_events}} )
     {
         $event_index->{$e->{id}} = $e;
     }
-    return $self;
+
+    if ( keys %$event_index != @{ $self->{analysis_events} } )
+    {
+        my $nevt = @{$self->{analysis_events}};
+        my $nind = keys %$event_index;
+        die "Number of analysis events ($nevt) not equal to index size ($nind). Duplicate ids?";
+    }
+
+    return $event_index;
 }
 
+
+#
+#      @features = $genomeTO->features
+#     \@features = $genomeTO->features   # ref is to original list
+#
 sub features
 {
     my($self) = @_;
-    return @{$self->{features}};
+    wantarray ? @{$self->{features}} : $self->{features};
 }
 
+
+#
+#  Return the number of features
+#
+sub n_features
+{
+    my $genomeTO = shift;
+    scalar @{ $genomeTO->{features} || [] };
+}
+
+
+#
+#  Get the ids of features of specified type(s)
+#
+#     @fids = $genomeTO->fids_of_type( @types );
+#    \@fids = $genomeTO->fids_of_type( @types );
+#
+sub fids_of_type
+{
+    my $genomeTO = shift;
+    my @fids;
+    if ( @_ )
+    {
+        my %keep = map { $_ => 1 } @_;
+        @fids = map { $keep{ $_->{type} } ? $_->{id} : () }
+                $genomeTO->features;
+    }
+
+    wantarray ? @fids : \@fids;
+}
+
+
+#
+#  Get lists of feature ids, keyed by feature type
+#
+#    \%fids_by_type = $genomeTO->fids_by_type();
+#
+sub fids_by_type
+{
+    my ( $genomeTO ) = @_;
+
+    my %by_type;
+    foreach ( $genomeTO->features )
+    {
+        push @{ $by_type{$_->{type}} }, $_->{id};
+    }
+
+    \%by_type;
+}
+
+
+#
+#      @contigs = $genomeTO->contigs
+#     \@contigs = $genomeTO->contigs   # ref is to original list
+#
 sub contigs
 {
     my($self) = @_;
-    return @{$self->{contigs}};
+    wantarray ? @{$self->{contigs}} : $self->{contigs};
 }
+
+
+#
+#  Return the number of contigs
+#
+sub n_contigs
+{
+    my $genomeTO = shift;
+    scalar @{ $genomeTO->{contigs} || [] };
+}
+
+
+#
+#      @analysis_events = $genomeTO->analysis_events
+#     \@analysis_events = $genomeTO->analysis_events   # ref is to original list
+#
+sub analysis_events
+{
+    my($self) = @_;
+    wantarray ? @{$self->{analysis_events}} : $self->{analysis_events};
+}
+
+
+#
+#  Return the number of analysis events
+#
+sub n_analysis_events
+{
+    my $genomeTO = shift;
+    scalar @{ $genomeTO->{analysis_events} || [] };
+}
+
 
 =head2 $obj->add_contigs($contigs)
 
@@ -299,7 +629,41 @@ objects, which we add to the genome object without further inspection.
 sub add_contigs
 {
     my($self, $contigs) = @_;
+    $contigs && ref($contigs) eq 'ARRAY'
+        or return 0;
+
     push(@{$self->{contigs}}, @$contigs);
+
+    my $status = 1;
+    my $index;
+    if ( $self->{_contig_index} )
+    {
+        $index = $self->{_contig_index};
+    }
+    else
+    {
+        $index = {};
+        for my $contig ($self->contigs)
+        {
+            $index->{$contig->{id}} = $contig;
+        }
+    }
+
+    foreach ( @$contigs )
+    {
+        my $id = $_->{id};
+        if ( $index->{ $id } )
+        {
+            $status = 0;
+            die( qq(Attempt to add duplicate contig id '$id'.) );
+        }
+        else
+        {
+            $index->{ $id } = $_;
+        }
+    }
+
+    return $status;
 }
 
 =head2 $obj->add_features_from_list($features)
@@ -318,7 +682,9 @@ Returns a hash mapping from the feature ID in the list to the allocated feature 
 
 sub add_features_from_list
 {
-    my($self, $features) = @_;
+    my($self, $features, $parms) = @_;
+
+    my %parms = $parms && ref($parms) eq 'HASH' ? %$parms : {};
 
     my $event = {
         tool_name => "add_features_from_list",
@@ -326,7 +692,9 @@ sub add_features_from_list
         parameters => [],
         hostname => $self->hostname,
     };
+
     my $event_id = $self->add_analysis_event($event);
+    $parms{ -analysis_event_id } = $event_id;
 
     my $map = {};
 
@@ -334,20 +702,24 @@ sub add_features_from_list
     {
         my($id, $loc_str, $type, $func, $aliases_str) = @$f;
 
-        my @aliases = split(/,/, $aliases_str);
+        my @aliases = grep { /\S/ }
+                      split(/,/, $aliases_str || '');
         my @locs = map { my $l = BasicLocation->new($_);
-                         [ $l->Contig, $l->Begin, $l->Dir, $l->Length ] } split(/,/, $loc_str);
-        my $new_id = $self->add_feature({
-            -type => $type,
-            -location => \@locs,
-            -function => $func,
-            -aliases => \@aliases,
-            -analysis_event_id => $event_id,
-        });
+                         [ $l->Contig, $l->Begin, $l->Dir, $l->Length ]
+                       }
+                   split(/,/, $loc_str);
+
+        $parms{ -type }     =  $type;
+        $parms{ -location } = \@locs;
+        $parms{ -function } =  $func;
+        $parms{ -aliases }  = \@aliases;
+
+        my $new_id = $self->add_feature( \%parms );
         $map->{$id} = $new_id;
     }
     return $map;
 }
+
 
 =head2 $obj->add_feature($params)
 
@@ -378,7 +750,7 @@ sub add_feature {
     my $id_type	    = $parms->{-id_type};
     my $location    = $parms->{-location}   or die "No feature location -location";
     my $function    = $parms->{-function};
-    my $annotator   = $parms->{-annotator}  || q(Nobody);
+    my $annotator   = $parms->{-annotator}  || q(Unknown);
     my $annotation  = $parms->{-annotation} || q(Add feature);
     my $translation = $parms->{-protein_translation};
     my $event_id    = $parms->{-analysis_event_id};
@@ -414,7 +786,7 @@ sub add_feature {
             print STDERR "Allocated id for typed-prefix \'$typed_prefix\' starting from $next_num\n" if $ENV{DEGUG};
         }
         else {
-            die "Could not get a new ID with typed-prefix \"$typed_prefix\"" unless $next_num;
+            die "Could not get a new ID with typed-prefix \"$typed_prefix\"";
         }
         $id = join(".", $typed_prefix, $next_num);
     }
@@ -437,7 +809,9 @@ sub add_feature {
     $feature->{feature_creation_event} = $event_id if $event_id;
     $feature->{aliases} = $aliases if $aliases;
 
-    if ($function) {
+    $function = SeedUtils::canonical_function( $function ) if defined $function;
+
+    if (defined $function && length $function) {
         $feature->{function} = $function;
         push @ { $feature->{annotations} }, [ "Set function to $function",
                                               $annotator,
@@ -451,8 +825,11 @@ sub add_feature {
 
     push @$features, $feature;
 
+    $genomeTO->{_feature_index}->{$id} = $feature  if $genomeTO->{_feature_index};
+
     return $feature;
 }
+
 
 =head2 $obj->write_protein_translations_to_file($filename)
 
@@ -509,7 +886,7 @@ sub write_feature_locations_to_file
 
     for my $feature (@{$self->{features}})
     {
-        next if (@feature_types && !$feature_types{$feature->{type}});
+        next if (@feature_types && ! $feature_types{$feature->{type}});
 
         my $loc = $feature->{location};
         my $loc_str = join(",", map { my $b = BasicLocation->new(@$_); $b->String() } @$loc);
@@ -746,6 +1123,7 @@ sub write_seed_dir
     close($func_fh);
 }
 
+
 sub add_analysis_event
 {
     my($self, $event) = @_;
@@ -759,46 +1137,159 @@ sub add_analysis_event
 
     $event->{id} = $uuid_str;
 
-    push(@{$self->{analysis_events}}, $event);
+    push @{$self->analysis_events}, $event;
+
+    if ( $self->{_event_index} )
+    {
+        $self->{_event_index}->{$uuid_str} = $event;
+    }
+
     return $uuid_str;
 }
 
+
+#
+#     $func = $genomeTO->update_function( $user, $fid,     $function, $event_id )
+#     $func = $genomeTO->update_function( $user, $feature, $function, $event_id )
+#
 sub update_function
 {
     my($self, $user, $fid, $function, $event_id) = @_;
 
-    my $feature = $self->find_feature($fid);
+    return undef unless $user && $fid && defined($function);
 
-    my $annotation = ["Function updated to $function", $user, scalar gettimeofday, $event_id];
-    # print STDERR Dumper($fid, $feature, $annotation);
+    $function = SeedUtils::canonical_function( $function );
 
-    push(@{$feature->{annotations}}, $annotation);
+    my $feature = ref($fid) eq 'HASH' ? $fid : $self->find_feature($fid)
+        or return undef;
+
+    $self->add_annotation( $feature,
+                           "Function updated to $function",
+                           $user,
+                           $event_id
+                         );
+
     $feature->{function} = $function;
 }
+
+
+#
+#     $genomeTO->propose_function( $user, $fid,     $function, $score_0_to_1, $event_id )
+#     $genomeTO->propose_function( $user, $feature, $function, $score_0_to_1, $event_id )
+#         # recorded as annotation: "Proposed function: $function [score=$score]"
+#
+
+sub propose_function
+{
+    my( $self, $user, $fid, $function, $score, $event_id ) = @_;
+
+    return undef unless $user && $fid && defined($function) && $score;
+
+    $function = SeedUtils::canonical_function( $function );
+    return undef unless length( $function );
+
+    $self->add_annotation( $fid,
+                           "Proposed function: $function [score=$score]",
+                           $user,
+                           $event_id
+                         );
+}
+
+#
+#     $genomeTO->add_annotation( $fid, $annotation, $user )
+#     $genomeTO->add_annotation( $fid, $annotation, $user, $event_id )
+#
+sub add_annotation
+{
+    my( $self, $fid, $text, $user, $event_id ) = @_;
+
+    return undef unless $fid && defined($text) && $text =~ /\S/ && $user;
+
+    my $feature = ref($fid) eq 'HASH' ? $fid : $self->find_feature($fid)
+        or return undef;
+
+    # No leading or trailing whitespace:
+
+    $text =~ s/^\s+//;
+    $text =~ s/\s+$//;
+    length $text or return undef;
+
+    my $annotation = [ $text, $user, scalar gettimeofday, $event_id ];
+
+    push @{$feature->{annotations}}, $annotation;
+
+    $text;
+}
+
 
 sub find_feature
 {
     my($self, $fid) = @_;
+    defined( $fid ) or return undef;
 
-    return $self->{_feature_index}->{$fid};
+    #  Get the index, or build it:
+
+    my $index = $self->{_feature_index} || $self->update_feature_index;
+
+    #  Return feature, or if index is the wrong size, rebuild and try again.
+    #  Note that two features with the same id will really mess this up,
+    #  but it will mess up many other things, too.
+
+    return $index->{$fid}
+        || ( keys %$index != @{$self->{features}} && $self->update_feature_index->{$fid} )
+        || undef;
 }
+
 
 sub find_contig
 {
     my($self, $contig) = @_;
+    defined( $contig ) or return undef;
 
-    return $self->{_contig_index}->{$contig};
+    #  Get the index, or build it:
+
+    my $index = $self->{_contig_index} || $self->update_contig_index;
+
+    #  Return contig, or if index is the wrong size, rebuild and try again.
+    #  Note that two contigs with the same id will really mess this up,
+    #  but it will mess up many other things, too.
+
+    return $index->{$contig}
+        || ( keys %$index != $self->n_contigs && $self->update_contig_index->{$contig} )
+        || undef;;
 }
+
+
+sub find_analysis_event
+{
+    my($self, $event_id) = @_;
+    defined( $event_id ) or return undef;
+
+    #  Get the index, or build it:
+
+    my $index = $self->{_analysis_index} || $self->update_event_index;
+
+    #  Return event, or if index is the wrong size, rebuild and try again.
+    #  Note that two events with the same id will really mess this up,
+    #  but it will mess up many other things, too.
+
+    return $index->{$event_id}
+        || ( keys %$index != $self->n_analysis_events && $self->update_event_index->{$event_id} )
+        || undef;;
+}
+
 
 sub get_feature_dna
 {
     my($self, $feature) = @_;
+    defined( $feature ) or return undef;
 
     my @seq;
 
     if (!ref($feature))
     {
-        $feature = $self->find_feature($feature);
+        $feature = $self->find_feature($feature)
+            or return undef;
     }
 
     foreach my $loc (@{$feature->{location}})
@@ -820,6 +1311,7 @@ sub get_feature_dna
     return join("", @seq);
 
 }
+
 
 sub create_uuid
 {
@@ -939,6 +1431,68 @@ sub sort_position
     return ($contig, $min);
 }
 
+
+#
+#  Sort features my midpoint:
+#
+#    @sorted = sort_features_by_midpoint( @features )
+#
+sub sort_features_by_midpoint
+{
+    return map  { $_->[0] }
+           sort { lc $a->[1] cmp lc $b->[1]    # contig (lowercase)
+               ||    $a->[1] cmp    $b->[1]    # contig
+               ||    $a->[2] <=>    $b->[2]    # midpoint (left to right)
+               ||    $a->[3] cmp    $b->[3]    # direction
+               ||    $b->[4] <=>    $a->[4]    # length (long to short)
+                }
+           map  { [ $_, mid_point( $_ ) ] }
+           @_;
+}
+
+#
+# compute the [ contig, midpoint, direction, length ] for a feature.
+#
+sub mid_point
+{
+    my( $f ) = @_;
+
+    my ( $contig, $min, $max, $dir );
+
+    for my $l (@{$f->{location}})
+    {
+        my( $c, $beg, $str, $len ) = @$l;
+        $len ||= 1;
+
+        if    ( ! defined $contig ) { $contig = $c }
+        elsif ( $contig ne $c )     { next }
+
+        if    ( ! defined $dir )    { $dir = $str }
+        elsif ( $dir ne $str )      { next }
+
+        if ($str eq '+')
+        {
+            if    ( ! defined $min ) { $min = $beg }
+            elsif ( $beg < $min )    { last }
+
+            my $right = $beg + $len - 1;
+            if ( ! defined $max || $right >= $max ) { $max = $right }
+        }
+        else
+        {
+            if    ( ! defined $max ) { $max = $beg }
+            elsif ( $beg > $max )    { last }
+
+            my $left = $beg - $len + 1;
+            if ( ! defined $min || $left <= $min ) { $min = $left }
+        }
+    }
+
+    my @cont_mid_dir_len = ( $contig, 0.5 * ($min+$max), $dir, $max-$min+1 );
+
+    wantarray ? @cont_mid_dir_len : \@cont_mid_dir_len;
+}
+
 sub get_creation_info
 {
     my($self, $feature) = @_;
@@ -960,5 +1514,190 @@ sub get_creation_info
     my $aevent = $self->{_event_index}->{$anno_id} if $anno_id;
     return($cevent, $aevent, $anno_tool);
 }
+
+#
+#  Feature data access:
+#
+#  Existing:
+#
+#     $genomeTO->update_function( $user, $fid, $function, $event_id )
+#
+#     # hash keyed by type, with lists of feature ids of that type
+#    \%fids_by_type = $genomeTO->fids_by_type()
+#
+#     @fids = $genomeTO->fids_of_type( @types )
+#    \@fids = $genomeTO->fids_of_type( @types )
+#
+#     $done = $genomeTO->delete_feature( $fid )
+#
+#     $type = $genomeTO->feature_type( $fid )
+#
+#     $loc  = $genomeTO->feature_location( $fid )
+#
+#     $func = $genomeTO->feature_function( $fid )
+#
+#     @anno = $genomeTO->feature_annotations( $fid )
+#    \@anno = $genomeTO->feature_annotations( $fid )
+#
+#    \%qual = $genomeTO->feature_quality_data( $fid )
+#
+
+
+sub delete_feature
+{
+    my ( $genomeTO, $fid ) = @_;
+    $genomeTO && $fid
+        or return undef;
+
+    my $ind = 0;
+    foreach my $ftr ( $genomeTO->features )
+    {
+        last if ( $ftr->{id} eq $fid );
+        $ind++;
+    }
+
+    my $done = ( $ind < $genomeTO->n_features ) ? 1 : 0;
+    if ( $done )
+    {
+        splice @{$genomeTO->features}, $ind, 1;
+        my $feature_index = $genomeTO->{_feature_index};
+        delete $feature_index->{ $fid } if $feature_index;
+    }
+
+    return $done;
+}
+
+
+sub feature_type
+{
+    my $ftr;
+    if ( ref($_[0]) eq 'GenomeTypeObject' )
+    {
+        my ( $genomeTO, $fid ) = @_;
+        $ftr = $genomeTO->find_feature($fid);
+    }
+    elsif ( ref($_[0]) eq 'HASH' )
+    {
+        $ftr = shift;
+    }
+
+    $ftr ? $ftr->{type} : undef;
+}
+        
+
+sub feature_location
+{
+    my $ftr;
+    if ( ref($_[0]) eq 'GenomeTypeObject' )
+    {
+        my ( $genomeTO, $fid ) = @_;
+        $ftr = $genomeTO->find_feature($fid);
+    }
+    elsif ( ref($_[0]) eq 'HASH' )
+    {
+        $ftr = shift;
+    }
+
+    $ftr ? $ftr->{location} : undef;
+}
+        
+
+sub feature_function
+{
+    my $ftr;
+    if ( ref($_[0]) eq 'GenomeTypeObject' )
+    {
+        my ( $genomeTO, $fid ) = @_;
+        $ftr = $genomeTO->find_feature($fid);
+    }
+    elsif ( ref($_[0]) eq 'HASH' )
+    {
+        $ftr = shift;
+    }
+
+    $ftr ? $ftr->{function} : undef;
+}
+       
+
+#
+#     @anno = $genomeTO->feature_annotations( $fid )
+#    \@anno = $genomeTO->feature_annotations( $fid )
+#
+sub feature_annotations
+{
+    my $ftr;
+    if ( ref($_[0]) eq 'GenomeTypeObject' )
+    {
+        my ( $genomeTO, $fid ) = @_;
+        $ftr = $genomeTO->find_feature($fid);
+    }
+    elsif ( ref($_[0]) eq 'HASH' )
+    {
+        $ftr = shift;
+    }
+
+    my $anno = $ftr ? $ftr->{annotations} : [];
+
+    wantarray ? @$anno : $anno;
+}
+       
+
+#
+#     @func_scr_user_date_tool = $genomeTO->feature_proposed_functions( $fid )
+#    \@func_scr_user_date_tool = $genomeTO->feature_proposed_functions( $fid )
+#     @func_scr_user_date_tool = $genomeTO->feature_proposed_functions( $feature )
+#    \@func_scr_user_date_tool = $genomeTO->feature_proposed_functions( $feature )
+#
+#     $annotation = [ $text, $user, scalar gettimeofday, $event_id ]
+#
+sub proposed_functions
+{
+    my $genomeTO = shift;
+    my @prop = map { $_->[4] = ( $genomeTO->find_analysis_event($_->[4]) || {} )->{tool};
+                     $_;
+                   }
+               map { $_->[0] =~ /^Proposed function: (.+) \[score=(\S+)\]$/
+                     ? [ $1, $2, @$_[1,2,3] ]
+                     : ()
+                   }
+               $genomeTO->feature_annotations( @_ );
+
+    wantarray ? @prop : \@prop;
+}
+
+
+#
+#  Feature quality data:
+#
+#    {
+#      existence_confidence =>  $P_value,  # absolute probability estimate
+#      existence_priority   =>  $float,    # priority in overlap removal
+#      frameshifted         =>  $bool,
+#      genemark_score       =>  $float,
+#      hit_count            =>  $float,    # kmer hits (for priority)
+#      overlap_rules        => \@rules,    # overlap resolution
+#      pyrrolysylprotein    =>  $bool,     # raises priority
+#      selenoprotein        =>  $bool,     # raises priority
+#      truncated_begin      =>  $bool,
+#      truncated_end        =>  $bool,
+#      weighted_hit_count   =>  $float     # weighted kmers
+#   }
+
+sub feature_quality_data
+{
+    my $ftr;
+    if ( ref($_[0]) eq 'GenomeTypeObject' )
+    {
+        my ( $genomeTO, $fid ) = @_;
+        $ftr = $genomeTO->find_feature($fid);
+    }
+    elsif ( ref($_[0]) eq 'HASH' )
+    {
+        $ftr = shift;
+    }
+
+    $ftr ? $ftr->{quality} : {};
+}
+        
 
 1;
