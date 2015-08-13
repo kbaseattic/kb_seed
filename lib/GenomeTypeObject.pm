@@ -632,23 +632,9 @@ sub add_contigs
     $contigs && ref($contigs) eq 'ARRAY'
         or return 0;
 
-    push(@{$self->{contigs}}, @$contigs);
+    my $index = $self->{_contig_index} || $self->update_contig_index();
 
     my $status = 1;
-    my $index;
-    if ( $self->{_contig_index} )
-    {
-        $index = $self->{_contig_index};
-    }
-    else
-    {
-        $index = {};
-        for my $contig ($self->contigs)
-        {
-            $index->{$contig->{id}} = $contig;
-        }
-    }
-
     foreach ( @$contigs )
     {
         my $id = $_->{id};
@@ -659,6 +645,7 @@ sub add_contigs
         }
         else
         {
+            push( @{$self->{contigs}}, $_ );
             $index->{ $id } = $_;
         }
     }

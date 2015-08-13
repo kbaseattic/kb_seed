@@ -315,7 +315,7 @@ sub ProcessContig {
     for my $chunk (@$dnaChunks) {
         $self->AddChunk($chunk);
     }
-    my $retVal = CloseContig();
+    my $retVal = $self->CloseContig();
 
     # Return it to the caller.
     return $retVal;
