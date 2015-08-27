@@ -152,6 +152,37 @@ sub abbrev {
     }
 }
 
+=head3 fields_of
+
+    my @fields = SeedUtils::fields_of($ih);
+
+Extract the fields from a tab-delimited input line. The input line is read from an open file handle.
+
+=over 4
+
+=item ih
+
+Open input file handle.
+
+=item RETURN
+
+Returns a list consisting of the tab-delimited fields found in the record read, or an empty list if we are at end-of-file.
+
+=back
+
+=cut
+
+sub fields_of {
+    my ($ih) = @_;
+    my @retVal;
+    if (! eof $ih) {
+        my $line = <$ih>;
+        chomp $line;
+        @retVal = split /\t/, $line;
+    }
+    return @retVal;
+}
+
 =head3 probably_active
 
     my $activeFlag = SeedUtils::probably_active($vc);
@@ -2556,7 +2587,7 @@ sub read_encoded_object
     }
     elsif ( ! defined $encoded_file || $encoded_file eq '' )
     {
-        $handle = \*STDOUT;
+        $handle = \*STDIN;
     }
     else
     {
@@ -2574,6 +2605,43 @@ sub read_encoded_object
     }
 
     return $obj;
+}
+
+=head3 read_ids
+
+    my @ids = SeedUtils::read_ids($fileName);
+
+Read a list of IDs from a tab-delimited file. The IDs are taken from the first column of each record.
+
+=over 4
+
+=item fileName
+
+Name of the file from which to read the IDs.
+
+=item RETURN
+
+Returns a list of the IDs read.
+
+=back
+
+=cut
+
+sub read_ids {
+    my ($fileName) = @_;
+    # Open the file.
+    open(my $ih, "<", $fileName) || die "Could not open $fileName: $!";
+    # This will contain the return list.
+    my @retVal;
+    # Loop through it.
+    while (! eof $ih) {
+        my $line = <$ih>;
+        chomp $line;
+        my ($id) = split /\t/, $line;
+        push @retVal, $id;
+    }
+    # Return the list of IDs.
+    return @retVal;
 }
 
 1;

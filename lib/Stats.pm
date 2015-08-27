@@ -359,6 +359,24 @@ sub Check {
     return $retVal;
 }
 
+=head3 Clear
+
+    $stats->Clear();
+
+Reset all the statistics to zero.
+
+=cut
+
+sub Clear {
+    # Get the parameters.
+    my ($self) = @_;
+    # Run through the map, clearing values.
+    my $map = $self->{Map};
+    for my $key (keys %$map) {
+        $map->{$key} = 0;
+    }
+}
+
 =head3 Progress
 
     my $percent = $stats->Progress($counter => $total);

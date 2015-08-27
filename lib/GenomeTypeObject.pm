@@ -56,7 +56,7 @@ the C<prepare_for_return()> method which strips these indexes out of the data ob
 use strict;
 use warnings;
 use SeedUtils;
-use SeedAware;
+require SeedAware;
 use File::Temp;
 use File::Slurp;
 use JSON::XS;
@@ -95,7 +95,7 @@ Create a new empty genome object.
 =cut
 
 #
-#     my $gto = GenomeTypeObject->new()          #  An empty GenomeTypeObject 
+#     my $gto = GenomeTypeObject->new()          #  An empty GenomeTypeObject
 #     my $gto = GenomeTypeObject->new( \%opt )   #  An object filled from
 #                                                #     specified source
 #
@@ -178,7 +178,7 @@ sub create_from_file
     $class
         or print STDERR "create_from_file() called without class.\n"
             and return undef;
- 
+
     #  Read the data:
 
     my $raw = SeedUtils::read_encoded_object( $file );
@@ -236,7 +236,7 @@ sub create_from_json
     $class
         or print STDERR "create_from_json() called without class.\n"
             and return undef;
- 
+
     #  Process the text:
 
     $text = join( ' ', @$text ) if $text && ref($text) eq 'ARRAY';
@@ -755,15 +755,15 @@ sub add_feature {
             $id_client = $self->{_id_client};
         }
 
-	# 
-	# If our id prefix is a bare \d+\.\d+ genome ID, prefix the
-	# id prefix with fig| to create SEED style identifiers.
-	#
+        #
+        # If our id prefix is a bare \d+\.\d+ genome ID, prefix the
+        # id prefix with fig| to create SEED style identifiers.
+        #
 
-	if ($id_prefix =~ /^\d+\.\d+$/)
-	{
-	    $id_prefix = "fig|" . $id_prefix;
-	}
+        if ($id_prefix =~ /^\d+\.\d+$/)
+        {
+            $id_prefix = "fig|" . $id_prefix;
+        }
 
         my $typed_prefix = "$id_prefix." . (defined($id_type) ? $id_type : $type);
         my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
@@ -1570,7 +1570,7 @@ sub feature_type
 
     $ftr ? $ftr->{type} : undef;
 }
-        
+
 
 sub feature_location
 {
@@ -1587,7 +1587,7 @@ sub feature_location
 
     $ftr ? $ftr->{location} : undef;
 }
-        
+
 
 sub feature_function
 {
@@ -1604,7 +1604,7 @@ sub feature_function
 
     $ftr ? $ftr->{function} : undef;
 }
-       
+
 
 #
 #     @anno = $genomeTO->feature_annotations( $fid )
@@ -1627,7 +1627,7 @@ sub feature_annotations
 
     wantarray ? @$anno : $anno;
 }
-       
+
 
 #
 #     @func_scr_user_date_tool = $genomeTO->feature_proposed_functions( $fid )
@@ -1685,6 +1685,6 @@ sub feature_quality_data
 
     $ftr ? $ftr->{quality} : {};
 }
-        
+
 
 1;

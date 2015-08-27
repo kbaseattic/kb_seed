@@ -49,13 +49,7 @@ if ($output_file) {
 
 my $json = JSON::XS->new;
 
-my $genomeTO;
-{
-    local $/;
-    undef $/;
-    my $genomeTO_txt = <$in_fh>;
-    $genomeTO = $json->decode($genomeTO_txt);
-}
+my $genomeTO = GenomeTypeObject->create_from_file($in_fh);
 
 if ($genomeTO->{domain} !~ m/^([ABV])/o) {
     die "Invalid domain: \"$genomeTO->{domain}\"";
@@ -181,7 +175,5 @@ while (<O>)
     }
 }
 
-$json->pretty(1);
-GenomeTypeObject::prepare_for_return($genomeTO);
-print $out_fh $json->encode($genomeTO);
+$genomeTO->destroy_to_file($out_fh);
 close($out_fh);
