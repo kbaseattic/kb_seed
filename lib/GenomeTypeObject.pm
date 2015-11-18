@@ -423,10 +423,10 @@ sub hostname
 {
     my($self) = @_;
 
-    return $self->{hostname} if $self->{hostname};
-    $self->{hostname} = SeedAware::run_gathering_output( 'hostname' );
-    chomp $self->{hostname};
-    return $self->{hostname};
+    return $self->{_hostname} if $self->{_hostname};
+    $self->{_hostname} = SeedAware::run_gathering_output( 'hostname' );
+    chomp $self->{_hostname};
+    return $self->{_hostname};
 }
 
 
@@ -465,9 +465,22 @@ sub update_feature_index
 
     if ( keys %$feature_index != @{$self->features} )
     {
-        my $nftr = $self->features;
+        my $nftr = @{$self->features};
         my $nind = keys %$feature_index;
-        die "Number of features ($nftr) not equal to index size ($nind). Duplicate ids?";
+
+	my %seen;
+	$seen{$_->{id}}++ foreach @{$self->features};
+	my @dups = grep { $seen{$_} > 1 } keys %seen;
+	my $n = 10;
+	my $extra;
+	if (@dups > $n)
+	{
+	    $#dups = $n-1;
+	    $extra = "...";
+	}
+	my $ndups = @dups;
+
+        die "Number of features ($nftr) not equal to index size ($nind). $ndups duplicate ids: \n@dups$extra";
     }
 
     return $feature_index;
@@ -725,96 +738,169 @@ that feature type.
 
 =cut
 
-sub add_feature {
+#
+#  Required parameters:
+#
+#   -type                    =>  $ftr_type
+#   -location                => \@contig_beg_dir_len
+#
+#  Optional user-supplied parameters:
+#
+#   -function                =>  $function
+#   -annotator               =>  $annotator       #  D = 'Unknown'
+#   -annotation              =>  $annotation      #  D = 'Add feature'
+#   -annotations             => \@annotations
+#   -protein_translation     =>  $sequence
+#   -aliases                 => \@aliases
+#   -alias_pairs             => \@db_id_pairs
+#   -quality_measure         => \%quality_measure
+#   -family_assignments      => \@fam_assigns
+#   -similarity_associations => \@sim_assns
+#   -proposed_functions      => \@prop_funcs
+#   -analysis_event_id       =>  $event_id
+#   -genbank_type            =>  $gb_type
+#   -genbank_feature         =>  [ $gb_type, $gb_location, \%qualifiers ]
+#
+#  Special parameters generally left to default:
+#
+#   -id                      =>  $ftr_id
+#   -id_client               =>  $id_client_object
+#   -id_prefix               =>  $id_prefix       
+#   -id_type                 =>  $type            #  D = $ftr_type
+#
+sub add_feature
+{
     my ($self, $parms) = @_;
     my $genomeTO = $self;
     print STDERR (Dumper($parms), qq(\n\n)) if $ENV{DEBUG};
 
+    #  Check for fatal erros:
+
+    my $type         = $parms->{-type}      or die "No feature-type -type";
+    my $location     = $parms->{-location}  or die "No feature location -location";
+
+    #  Build a feature id if one is not supplied:
+
     my $id = $parms->{-id};
-    my $id_client   = $parms->{-id_client};
-    my $id_prefix   = $parms->{-id_prefix};
-    my $type        = $parms->{-type}       or die "No feature-type -type";
-    my $id_type	    = $parms->{-id_type};
-    my $location    = $parms->{-location}   or die "No feature location -location";
-    my $function    = $parms->{-function};
-    my $annotator   = $parms->{-annotator}  || q(Unknown);
-    my $annotation  = $parms->{-annotation} || q(Add feature);
-    my $translation = $parms->{-protein_translation};
-    my $event_id    = $parms->{-analysis_event_id};
-    my $quality     = $parms->{-quality_measure};
-    my $aliases     = $parms->{-aliases};
+    $id = new_feature_id( $self, $parms )  if ! defined($id);
 
-    if (!defined($id))
+    my $function     = $parms->{-function};
+    my $function_id  = $parms->{-function_id};
+    my $annotator    = $parms->{-annotator} || q(Unknown);
+    my $annotation   = $parms->{-annotation};
+    my $annotations  = $parms->{-annotations};
+    my $translation  = $parms->{-protein_translation};
+    my $aliases      = $parms->{-aliases};
+    my $alias_pairs  = $parms->{-alias_pairs};
+    my $quality      = $parms->{-quality_measure};
+    my $fam_assigns  = $parms->{-family_assignments};
+    my $sim_assns    = $parms->{-similarity_associations};
+    my $prop_funcs   = $parms->{-proposed_functions};
+    my $event_id     = $parms->{-analysis_event_id} || '';
+    my $genbank_type = $parms->{-genbank_type};
+    my $genbank_ftr  = $parms->{-genbank_feature};
+
+    #  Process the annotations, and convert to [ $what, $whom, $when, $event ] tuples:
+
+    my $time = gettimeofday();
+    my @annotations = ();
+    push @annotations,  $annotation   if defined $annotation;
+    push @annotations, @$annotations  if ref( $annotations ) eq 'ARRAY';
+    @annotations = grep { defined && /\S/ } @annotations;
+    @annotations = q(Add feature)  if ! @annotations;
+
+    @annotations = map { [ $_, $annotator, $time, $event_id ] } @annotations;
+
+    my $feature = { id          =>  $id,
+                    type        =>  $type,
+                    location    =>  $location,
+                    annotations => \@annotations
+                  };
+
+    if (defined $function && $function =~ /\S/)
     {
-        if (!defined($id_prefix))
-        {
-            $id_prefix = $self->{id};
-        }
-        if (!defined($id_client))
-        {
-            $id_client = $self->{_id_client};
-        }
-
-        #
-        # If our id prefix is a bare \d+\.\d+ genome ID, prefix the
-        # id prefix with fig| to create SEED style identifiers.
-        #
-
-        if ($id_prefix =~ /^\d+\.\d+$/)
-        {
-            $id_prefix = "fig|" . $id_prefix;
-        }
-
-        my $typed_prefix = "$id_prefix." . (defined($id_type) ? $id_type : $type);
-        my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
-        # print STDERR Dumper($typed_prefix, $next_num);
-
-        if (defined($next_num)) {
-            print STDERR "Allocated id for typed-prefix \'$typed_prefix\' starting from $next_num\n" if $ENV{DEGUG};
-        }
-        else {
-            die "Could not get a new ID with typed-prefix \"$typed_prefix\"";
-        }
-        $id = join(".", $typed_prefix, $next_num);
-    }
-
-    if (not defined $genomeTO->{features}) {
-        $genomeTO->{features} = [];
-    }
-    my $features  = $genomeTO->{features};
-
-    my $feature =  { id   => $id,
-                     type => $type,
-                     location => $location,
-                     annotations => [[ $annotation,
-                                       $annotator,
-                                       time(),
-                                       ]],
-    };
-
-    $feature->{quality} = $quality if $quality;
-    $feature->{feature_creation_event} = $event_id if $event_id;
-    $feature->{aliases} = $aliases if $aliases;
-
-    $function = SeedUtils::canonical_function( $function ) if defined $function;
-
-    if (defined $function && length $function) {
+        $function = SeedUtils::canonical_function( $function );
         $feature->{function} = $function;
-        push @ { $feature->{annotations} }, [ "Set function to $function",
-                                              $annotator,
-                                              time(),
-                                              ];
+        push @annotations, [ "Set function to $function",
+                              $annotator,
+                              $time,
+                              $event_id
+                           ];
     }
 
-    if ($translation) {
-        $feature->{protein_translation} = $translation;
-    }
+    $feature->{function_id}             = $function_id  if $function_id;
+    $feature->{aliases}                 = $aliases      if ref( $aliases ) eq 'ARRAY';
+    $feature->{alias_pairs}             = $alias_pairs  if ref( $alias_pairs ) eq 'ARRAY';
+    $feature->{protein_translation}     = $translation  if $translation;
+    $feature->{quality}                 = $quality      if ref( $quality ) eq 'HASH';
+    $feature->{family_assignments}      = $fam_assigns  if ref( $fam_assigns ) eq 'ARRAY';
+    $feature->{similarity_associations} = $sim_assns    if ref( $sim_assns ) eq 'ARRAY';
+    $feature->{feature_creation_event}  = $event_id     if $event_id;
 
+    #  We are done creating the feature.
+    #  Ensure that there is a features list in the genomeTO and add this one:
+
+    my $features = $genomeTO->{features} ||= [];
     push @$features, $feature;
 
     $genomeTO->{_feature_index}->{$id} = $feature  if $genomeTO->{_feature_index};
 
     return $feature;
+}
+
+
+#
+#  add_feature() is a very clunky interface given that one is required to
+#  build a complete pseudofeature with keys that are similar to, but
+#  distinct from, those in the GenomeTO.  This extra layer, and not being able
+#  to refer to the GenomeTO spec to get the correct keys, is a nightmare, and
+#  error prone.  The only function that really needs to be compartmentalized
+#  is the id generation, so I am breaking it out here.  Also, all the defaults
+#  except for the type are in the GenomeTO, so just passing the type seems
+#  reasonable.
+#
+#      $id = $gto->new_feature_id( $type )
+#      $id = $gto->new_feature_id( $type, \%opts )
+#      $id = $gto->new_feature_id(        \%opts )
+#
+sub new_feature_id
+{
+    my $self  = shift;
+    my $type  = $_[0] && ! ref( $_[0] ) ? shift : undef;
+    my $parms = shift || {};
+
+    print STDERR (Dumper($parms), qq(\n\n)) if $ENV{DEBUG};
+
+    my $id = $parms->{-id};
+    return $id if defined( $id );
+
+    #  Build a feature id if one was not supplied:
+
+    $type       ||= $parms->{-type}      or die "No feature-type supplied to new_feature_id()";
+    my $id_client = $parms->{-id_client};
+    my $id_prefix = $parms->{-id_prefix};
+    my $id_type	  = $parms->{-id_type};
+
+    $id_client = $self->{_id_client} if ! defined( $id_client );
+    $id_type   = $type               if ! defined( $id_type );
+    $id_prefix = $self->{id}         if ! defined( $id_prefix );
+
+
+    #  If our id prefix is a bare \d+\.\d+ genome ID, prefix the
+    #  id prefix with fig| to create SEED style identifiers.
+
+    $id_prefix =~ s/^(\d+\.\d+)$/fig|$1/;
+
+    my $typed_prefix = "$id_prefix.$id_type";
+    my $next_num     = $id_client->allocate_id_range($typed_prefix, 1);
+    if ( ! defined($next_num) )
+    {
+        die "Could not get a new ID with typed-prefix \"$typed_prefix\"";
+    }
+    # print STDERR Dumper($typed_prefix, $next_num);
+    print STDERR "Allocated id for typed-prefix \'$typed_prefix\' starting from $next_num\n" if $ENV{DEGUG};
+
+    return "$typed_prefix.$next_num";
 }
 
 
@@ -1328,14 +1414,9 @@ sub seed_location_to_location_list
     return wantarray ? @locs : \@locs;
 }
 
-#
-# Renumber the features such that they are in order along the contigs.
-#
-# We use the order of the contigs in the contigs to set the overall ordering.
-#
-sub renumber_features
+sub sorted_features
 {
-    my($self, $user, $event_id) = @_;
+    my($self) = @_;
 
     my %contig_order;
     my $i = 0;
@@ -1346,32 +1427,52 @@ sub renumber_features
 
 
     my @f = sort {
-        my($ac, $apos) = sort_position($a);
-        my($bc, $bpos) = sort_position($b);
-        ($a->{type} cmp $b->{type}) or
-        ($contig_order{$ac} <=> $contig_order{$bc}) or
-        $apos <=> $bpos } @{$self->{features}};
+        my($ac, $apos, $atype) = sort_position($a);
+        my($bc, $bpos, $btype) = sort_position($b);
+	($contig_order{$ac} <=> $contig_order{$bc}) or
+	    $apos <=> $bpos or
+		($atype cmp $btype) 
+		} @{$self->{features}};
+    return wantarray ? @f : \@f;
+}
 
+
+#
+# Renumber the features such that they are in order along the contigs.
+#
+# We use the order of the contigs in the contigs to set the overall ordering.
+#
+sub renumber_features
+{
+    my($self, $user, $event_id) = @_;
+
+    my @f = $self->sorted_features();
     my $nf = [];
 
-    my $id = 1;
-    my $last_type = '';
+    my %next_id;
+
     for my $f (@f)
     {
         my $loc = join(",",map { my($contig,$beg,$strand,$len) = @$_;
                                  "$contig\_$beg$strand$len"
                                } @{$f->{location}});
 
-        my($c, $left) = sort_position($f);
+        my($c, $left, $type) = sort_position($f);
 
-        if ($f->{type} ne $last_type)
-        {
-            $id = 1;
-            $last_type = $f->{type};
-        }
+	my $id;
+	if (exists $next_id{$type})
+	{
+	    $id = $next_id{$type}++;
+	}
+	else
+	{
+	    $id = 1;
+	    $next_id{$type} = 2;
+	}
+	    
         if ($f->{id} =~ /(.*\.)(\d+)$/)
         {
-            my $new_id = $1 . $id++;
+            my $new_id = $1 . $id;
 
             my $annotation = ["Feature renumbered from $f->{id} to $new_id", $user, scalar gettimeofday, $event_id];
             push(@{$f->{annotations}}, $annotation);
@@ -1415,7 +1516,8 @@ sub sort_position
         }
         $min = (defined($min) && $min < $left) ? $min : $left;
     }
-    return ($contig, $min);
+    my ($type) = $f->{id} =~ /\.([^.]+)\.\d+$/;
+    return ($contig, $min, $type || $f->{type});
 }
 
 
@@ -1478,6 +1580,46 @@ sub mid_point
     my @cont_mid_dir_len = ( $contig, 0.5 * ($min+$max), $dir, $max-$min+1 );
 
     wantarray ? @cont_mid_dir_len : \@cont_mid_dir_len;
+}
+
+sub bounds
+{
+    my( $f ) = @_;
+
+    my ( $contig, $min, $max, $dir );
+
+    for my $l (@{$f->{location}})
+    {
+        my( $c, $beg, $str, $len ) = @$l;
+        $len ||= 1;
+
+        if    ( ! defined $contig ) { $contig = $c }
+        elsif ( $contig ne $c )     { next }
+
+        if    ( ! defined $dir )    { $dir = $str }
+        elsif ( $dir ne $str )      { next }
+
+        if ($str eq '+')
+        {
+            if    ( ! defined $min ) { $min = $beg }
+            elsif ( $beg < $min )    { last }
+
+            my $right = $beg + $len - 1;
+            if ( ! defined $max || $right >= $max ) { $max = $right }
+        }
+        else
+        {
+            if    ( ! defined $max ) { $max = $beg }
+            elsif ( $beg > $max )    { last }
+
+            my $left = $beg - $len + 1;
+            if ( ! defined $min || $left <= $min ) { $min = $left }
+        }
+    }
+
+    my @bounds = ( $contig, $min, $max, $dir, $max-$min+1 );
+
+    wantarray ? @bounds : \@bounds;
 }
 
 sub get_creation_info
@@ -1686,5 +1828,15 @@ sub feature_quality_data
     $ftr ? $ftr->{quality} : {};
 }
 
+sub flattened_feature_aliases
+{
+    my($self, $feature) = @_;
+    my @aliases = ref($feature->{aliases}) ? @{$feature->{aliases}} : ();
+    if (ref($feature->{alias_pairs}))
+    {
+	push(@aliases, map { join(":", @$_) } @{$feature->{alias_pairs}});
+    }
+    return @aliases;
+}
 
 1;

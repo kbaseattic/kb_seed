@@ -40,16 +40,16 @@ sub new {
                         }
                     }
                     else {
-                        $self->{_counters}->{$prefix} = 0;
+                        $self->{_counters}->{$prefix} = $num;
                     }
                 }
                 #
                 # If we can't parse, we'll just assume that
                 # we'll start with zero.
                 #
-                #else {
-                #    die "Could not parse ID for feature: \'$feature->{id}\'";
-                #}
+                # else {
+                #    warn "Could not parse ID for feature: \'$feature->{id}\'";
+                # }
             }
         }
     }

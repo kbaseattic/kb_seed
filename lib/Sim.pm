@@ -151,15 +151,18 @@ Returns a similarity object that allows the values to be accessed by name.
 
 sub new_from_hsp {
     my $class = shift;
-
+    my ($hsp, $tool);
+    if (ref $_[0] eq 'ARRAY' || ref $_[0] eq 'Hsp') {
+        ($hsp, $tool) = @_;
+    } else {
+        ($hsp, $tool) = (\@_, 'blast');
+    }
     my ( $qid, undef, $qlen, $sid, undef, $slen, $scr, $e_val, undef, undef,
          $n_mat, $n_id, undef, $n_gap, undef, $q1, $q2, undef, $s1, $s2, undef
-       ) = ( $_[0] && ( ref( $_[0] ) eq 'ARRAY' ) ) ? @{$_[0]} : @_;
+       ) = @$hsp;
 
     my $ident = sprintf( '%.1f', 100 * ($n_id || 0) / ($n_mat || 1) );
     my $n_mis = $n_mat ? ( $n_mat - $n_id - $n_gap ) : 0;
-    my $tool  = ( $_[0] && ( ref( $_[0] ) eq 'ARRAY' ) && $_[1] ) ? $_[1] : 'blast';
-
     Sim->new( $qid, $sid, $ident, $n_mat, $n_mis, $n_gap, $q1, $q2, $s1, $s2,
               $e_val, $scr, $qlen, $slen, $tool );
 }

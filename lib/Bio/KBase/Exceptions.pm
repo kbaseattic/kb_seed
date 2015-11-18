@@ -25,6 +25,12 @@ use Exception::Class
 	 isa => 'Bio::KBase::Exceptions::KBaseException',
      },
 
+     Bio::KBase::Exceptions::ClientServerIncompatible => {
+     description => "Client and Server libraries are incompatible with eachother",
+     fields => ['server_version', 'client_version'],
+	 isa => 'Bio::KBase::Exceptions::KBaseException',
+     }
+
     );
 
 Bio::KBase::Exceptions::KBaseException->Trace(1);
@@ -38,13 +44,12 @@ sub full_message
     return $self->message . "\nHTTP status: " . $self->status_line . "\nFunction invoked: " . $self->method_name;
 }
 
-package Bio::KBase::Exceptions::JSONRPC;
+package Bio::KBase::Exceptions::ClientServerIncompatible;
 use strict;
 
 sub full_message
 {
-    my($self) = @_;
-    return sprintf("JSONRPC error:\n%s\nJSONRPC error code: %s\nJSONRPC error data:%s\n", $self->message, $self->code, $self->data);
+    my ($self) = @_;
+    return $self->message . "\nClient version: " . $self->client_version . "\nServer version: " . $self->server_version;
 }
-
 1;

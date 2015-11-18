@@ -311,7 +311,7 @@ sub overlap_rules
     my $rules  = {};
     foreach ( @$rules0 )
     {
-        if    ( s/^+// ) { $rules->{ $_ }->{ default => { allow => 1 } } }
+        if    ( s/^\+// ) { $rules->{ $_ }->{ default => { allow => 1 } } }
         elsif ( s/^-// ) { $rules->{ $_ }->{ default => { same => [ 0, 0.0, 0.0, 0, 0, 1 ],
                                                           conv => [ 0, 0.0, 0.0, 0, 0, 1 ],
                                                           div  => [ 0, 0.0, 0.0, 0, 0, 1 ]
@@ -335,7 +335,7 @@ sub overlap_rules
     if ( lc $type eq 'rna' )
     {
         $type = ( $func =~ /^tRNA/i ) ? 'tRNA'
-              : ( $func =~ /rRNA/i )  ? 'rRNA'
+              : ( $func =~ /rRNA|ribosomal RNA/i )  ? 'rRNA'
               :                         $type;
     }
 

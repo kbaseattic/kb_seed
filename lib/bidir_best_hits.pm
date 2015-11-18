@@ -77,8 +77,10 @@ sub bbh
     if ( ref( $seq1 ) eq 'ARRAY' )
     {
         @$seq1 or return ([], [], []);
-        $file1 = SeedAware::new_file_name( "$tmp/bbh_tmp1", 'faa' );
-        print_alignment_as_fasta( "$file1", $seq1 );
+        my $fh1;
+        ( $fh1, $file1 ) = SeedAware::open_tmp_file( 'bbh_tmp1', 'faa', $tmp );
+        gjoseqlib::write_fasta( $fh1, $seq1 );
+        close( $fh1 );
         $save1 = 0;
     }
     elsif ( ! -f $file1 )
@@ -97,8 +99,10 @@ sub bbh
     if ( ref( $seq2 ) eq 'ARRAY' )
     {
         @$seq2 or return ([], [], []);
-        $file2 = SeedAware::new_file_name( "$tmp/bbh_tmp2", 'faa' );
-        print_alignment_as_fasta( $file2, $seq2 );
+        my $fh2;
+        ( $fh2, $file2 ) = SeedAware::open_tmp_file( 'bbh_tmp2', 'faa', $tmp );
+        gjoseqlib::write_fasta( $fh2, $seq2 );
+        close( $fh2 );
         $save2 = 0;
     }
     elsif ( ! -f $file2 )
@@ -129,8 +133,10 @@ sub bbh
         my $n_seq1s = @seq1s;
         print STDERR "Using $n_seq1s of $n_seq1 sequences in $file1.\n" if $verbose;
 
-        $file1s = SeedAware::new_file_name( "$tmp/bbh_tmp1s", 'faa' );
-        print_alignment_as_fasta( $file1s, \@seq1s );
+        my $fh1s;
+        ( $fh1s, $file1s ) = SeedAware::open_tmp_file( 'bbh_tmp1s', 'faa', $tmp );
+        gjoseqlib::write_fasta( $fh1s, \@seq1s );
+        close( $fh1s );
     }
 
     print STDERR "Blasting $file1 against $file2 ...\n" if $verbose;
@@ -154,8 +160,10 @@ sub bbh
             my $n_seq2s = @seq2s;
             print STDERR "Using $n_seq2s of $n_seq2 sequences in $file2.\n" if $verbose;
 
-            $file2s = SeedAware::new_file_name( "$tmp/bbh_tmp2s", 'faa' );
-            print_alignment_as_fasta( $file2s, \@seq2s );
+            my $fh2s;
+            ( $fh2s, $file2s ) = SeedAware::open_tmp_file( 'bbh_tmp2s', 'faa', $tmp );
+            gjoseqlib::write_fasta( $fh2s, \@seq2s );
+            close( $fh2s );
         }
 
         print STDERR "Blasting $file2 against $file1 ...\n" if $verbose;
@@ -313,23 +321,25 @@ sub best_merged_blast_hit
     my $max_e_val     = $opts{ evalue }   || $opts{ maxevalue } || 1e-5;
     my $program       = $opts{ program }  || 'blastp';
     my $blast_options = $opts{ options }  || '';
+    my $n_thread      = $opts{ n_thread } || 4;
 
     if ( $blast_options )
     {
         $blast_options = ' ' . $blast_options;
-        $blast_options =~ s/ -b *[^ ]+//g;     # No changing result count
-        $blast_options =~ s/ -d *[^ ]+//g;     # No changing the database
-        $blast_options =~ s/ -e *[^ ]+//g;     # No separate e-value
-        $blast_options =~ s/ -F *[^ ]*//g;     # No filtering
-        $blast_options =~ s/ -i *[^ ]+//g;     # No changing the input
-        $blast_options =~ s/ -m *[^ ]+//g;     # No reformatting output
-        $blast_options =~ s/ -L *[^ ]+//g;     # No location
-        $blast_options =~ s/ -o *[^ ]+//g;     # No redirecting output
-        $blast_options =~ s/ -O *[^ ]+//g;     # No redirecting output
-        $blast_options =~ s/ -p *[^ ]+//g;     # No changing the program
-        $blast_options =~ s/ -R *[^ ]+//g;     # No PSI blast
-        $blast_options =~ s/ -T *[^ ]+//g;     # No reformatting output
-        $blast_options =~ s/ -v *[^ ]+//g;     # No changing result count
+        $blast_options =~ s/ +-a *(\d+)// and $n_thread = $1;
+        $blast_options =~ s/ +-b *[^ ]+//g;     # No changing result count
+        $blast_options =~ s/ +-d *[^ ]+//g;     # No changing the database
+        $blast_options =~ s/ +-e *[^ ]+//g;     # No separate e-value
+        $blast_options =~ s/ +-F *[^ ]*//g;     # No filtering
+        $blast_options =~ s/ +-i *[^ ]+//g;     # No changing the input
+        $blast_options =~ s/ +-m *[^ ]+//g;     # No reformatting output
+        $blast_options =~ s/ +-L *[^ ]+//g;     # No location
+        $blast_options =~ s/ +-o *[^ ]+//g;     # No redirecting output
+        $blast_options =~ s/ +-O *[^ ]+//g;     # No redirecting output
+        $blast_options =~ s/ +-p *[^ ]+//g;     # No changing the program
+        $blast_options =~ s/ +-R *[^ ]+//g;     # No PSI blast
+        $blast_options =~ s/ +-T *[^ ]+//g;     # No reformatting output
+        $blast_options =~ s/ +-v *[^ ]+//g;     # No changing result count
         $blast_options =~ s/^ +//;
     }
 
@@ -397,14 +407,16 @@ sub best_merged_blast_hit
 
     my @blast_opts = $blast_options? split /\s+/, $blast_options : ();
     my @blast_command = ( $blastall,
-                          '-p', $program,
-                          '-i', $file1p,
-                          '-d', $file2,
-                          '-e', $max_e_val,
-                          '-b', 5,
-                          '-v', 5,
-                          '-F', 'f',
-                          @blast_opts );
+                          '-p' => $program,
+                          '-i' => $file1p,
+                          '-d' => $file2,
+                          '-e' => $max_e_val,
+                          '-b' => 5,
+                          '-v' => 5,
+                          '-F' => 'f',
+                          '-a' => $n_thread,
+                          @blast_opts
+                        );
 
     my $redirect = { stderr => '/dev/null' };
     my $blast = SeedAware::read_from_pipe_with_redirect( @blast_command, $redirect );

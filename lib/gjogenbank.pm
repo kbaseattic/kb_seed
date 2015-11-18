@@ -13,6 +13,8 @@ package gjogenbank;
 #     \@entries = parse_genbank( \*FH )
 #      @entries = parse_genbank(  $file )
 #     \@entries = parse_genbank(  $file )
+#      @entries = parse_genbank( \$text )
+#     \@entries = parse_genbank( \$text )
 #
 #  One entry per call:
 #
@@ -63,22 +65,79 @@ package gjogenbank;
 #                   }
 #
 #
+#-------------------------------------------------------------------------------
 #  Access functions to parts of structure:
 #
 #     @types = feature_types( $entry );
 #    \@types = feature_types( $entry );
+#
+#  Features of a type:
 #
 #     @ftrs = features_of_type( $entry,  @types );
 #    \@ftrs = features_of_type( $entry,  @types );
 #     @ftrs = features_of_type( $entry, \@types );
 #    \@ftrs = features_of_type( $entry, \@types );
 #
+#     WARNING: The returned features DO NOT include their respective types, so
+#              this function is only useful for features of a single type.
+#
+#-------------------------------------------------------------------------------
 #  Sequence of a feature, optionally including information on partial ends.
+#  Use this form for the reasons noted below.
+#
+#     $seq                           = ftr_seq( $ftr,  $dna   )
+#     $seq                           = ftr_seq( $ftr, \$dna   )
+#     $seq                           = ftr_seq( $ftr,  $entry )
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr,  $dna   )  # boolean of > or < in location
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr, \$dna   )
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr,  $entry )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Deprecated method to get the sequence of a feature, optionally including
+#  information on partial ends.  This interface reverses the feature and the
+#  sequence args relative to all other feature access functions.  Yuk.
 #
 #     $seq                           = ftr_dna(  $dna, $ftr )
 #     $seq                           = ftr_dna( \$dna, $ftr )
-#   ( $seq, $partial_5, $partial_3 ) = ftr_dna(  $dna, $ftr )  # boolean of > or < in location
+#   ( $seq, $partial_5, $partial_3 ) = ftr_dna(  $dna, $ftr )
 #   ( $seq, $partial_5, $partial_3 ) = ftr_dna( \$dna, $ftr )
+#
+#-------------------------------------------------------------------------------
+#  Feature ids in order of preference.  For non-CDS features on many genomes,
+#  locus_tag is the most consistently present.  For proteins, protein_id is
+#  is usually the accession number for the corresponding protein database entry.
+#
+#   $id  = ftr_id( $ftr,  @types )  #  The first id drawn from an ordered list
+#   $id  = ftr_id( $ftr, \@types )  #      of type preferences, each defined by
+#                                   #    1. a feature qualifier name,
+#                                   #    2. "gi", or
+#                                   #    3. "xref:$db", where $db is a database id
+#                                   #  It is up to the user to handle multiword ids.
+#
+#  Predefined lists:
+#
+#   $id  = ftr_id( $ftr )           #  protein_id, locus_tag, gene or gi
+#   $id  = ftr_locus_tag( $ftr )    #  locus_tag, protein_id, gene or gi
+#   $id  = ftr_old_tag( $ftr )      #  old_locus_tag, locus_tag, protein_id, gene or gi
+#   $id  = ftr_gene_or_id( $ftr )   #  gene, locus_tag, protein_id or gi
+#   $id  = ftr_gi_or_id( $ftr )     #  gi, protein_id, locus_tag or gene
+#
+#  Get the feature id of a specific type, or return undef:
+#
+#   $gi  = ftr_gi( $ftr )           #  gi number or undef
+#   $id  = ftr_xref( $ftr, $type )  #  db cross reference of $type
+#   @ids = ftr_xref( $ftr, $type )  #  db cross references of $type
+#
+#  Feature ids in old interface:
+#
+#   $id  = CDS_id( $ftr )           #  protein_id, locus_tag, gene or gi
+#   $id  = CDS_locus_tag( $ftr )    #  locus_tag, protein_id, gene or gi
+#   $id  = CDS_gi_or_id( $ftr )     #  gi, protein_id, locus_tag or gene
+#   $gi  = CDS_gi( $ftr )           #  gi number or undef
+#
+#-------------------------------------------------------------------------------
+#  Feature location (as GenBank format location string; see conversion
+#  conversion functions below).
 #
 #    $ftr_location = location( $ftr )      #  Returns empty string on failure.
 #
@@ -91,11 +150,7 @@ package gjogenbank;
 #
 #     $gene              = gene( $ftr )
 #     @gene_and_synonyms = gene( $ftr )
-#
-#     $id = CDS_id( $ftr )         #  Prefer protein_id as id:
-#     $id = CDS_gi_or_id( $ftr )   #  Prefer gi number as id:
-#     $gi = CDS_gi( $ftr )         #  gi number or nothing:
-#
+
 #     $product = product( $ftr )
 #
 #     @EC_number = EC_number( $ftr )
@@ -191,18 +246,24 @@ my %qualifier_order;
                   
                            rpt_type
                            rpt_family
+                           rpt_unit_range
+                           rpt_unit_seq
                   
                            operon
                            gene
                            gene_synonym
                            allele
                            locus_tag
+                           old_locus_tag
                            codon_start
                            transl_table
                   
                            anticodon
                            product
                            function
+                           GO_component
+                           GO_function
+                           GO_process
                            EC_number
                            protein_id
                            locus_peptide
@@ -233,37 +294,63 @@ my %valueless_qual = map { $_ => 1 }
                          trans_splicing
                       );
 
+#  Qualifiers whose values are not wrapped in quotation marks:
+
+my %unquoted_qual  = map { $_ => 1 }
+                     qw( anticodon
+                         citation
+                         codon_start
+                         compare
+                         direction
+                         estimated_length
+                         mod_base
+                         number
+                         rpt_type
+                         rpt_unit_range
+                         tag_peptide
+                         transl_except
+                         transl_table
+                      );
+
+
+my %genbank_streams;   # used by parse_next_genbank() to track open streams
 
 #===============================================================================
+#  Read GenBank entries from one or more files and/or strings.
 #
-#    @entries = parse_genbank( )           #  \*STDIN
-#   \@entries = parse_genbank( )           #  \*STDIN
-#    @entries = parse_genbank( \*FH )
-#   \@entries = parse_genbank( \*FH )
-#    @entries = parse_genbank(  $file )
-#   \@entries = parse_genbank(  $file )
+#    @entries = parse_genbank( )                 #  \*STDIN
+#   \@entries = parse_genbank( )                 #  \*STDIN
+#    @entries = parse_genbank( \*FH, ... )       #  open file
+#   \@entries = parse_genbank( \*FH, ... )       #  open file
+#    @entries = parse_genbank(  $gb_file, ... )  #  file name
+#   \@entries = parse_genbank(  $gb_file, ... )  #  file name
+#    @entries = parse_genbank( \$gb_text, ... )  #  reference to data string
+#   \@entries = parse_genbank( \$gb_text, ... )  #  reference to data string
 #
 #===============================================================================
-my %genbank_streams;
 
 sub parse_genbank
 {
-    my $file = shift;
-
-    my ( $fh, $close ) = &input_filehandle( $file );
-    $fh or return wantarray ? () : [];
-
     my @entries;
-    while ( my $entry = parse_one_genbank_entry( $fh ) ) { push @entries, $entry }
-
-    close $fh if $close;
+    my $first = 1;
+    while ( @_ || $first )
+    {
+        my $file = shift;
+        my ( $fh, $close ) = &input_filehandle( $file );
+        if ( $fh )
+        {
+            while ( my $entry = parse_one_genbank_entry( $fh ) ) { push @entries, $entry }
+            close $fh if $close;
+        }
+        $first = 0;
+    }
 
     wantarray ? @entries : \@entries;
 }
 
 
 #-------------------------------------------------------------------------------
-#  Read and parse a GenBank file, on entry at a time.  Successive calls with
+#  Read and parse a GenBank file, one entry at a time.  Successive calls with
 #  same parameter will return successive entries.  Calls to different files
 #  can be interlaced.
 #
@@ -290,8 +377,9 @@ sub parse_next_genbank
 
     if ( ! $entry ) { close $fh if $close; delete $genbank_streams{ $file || '' }; }
 
-    return $entry;
+    $entry;
 }
+
 
 #-------------------------------------------------------------------------------
 #  If it should be necessary to close a stream openned by parse_next_genbank()
@@ -364,6 +452,12 @@ sub parse_one_genbank_entry
         {
             $state = 2;
             if ( defined( $_ = <$fh> ) ) { chomp } else { $state = -1 }
+        }
+
+        elsif ( /^CONTIG / )
+        {
+            $state = 3;
+            last;
         }
 
         elsif ( /^ORIGIN / )
@@ -450,10 +544,9 @@ sub parse_one_genbank_entry
 
             else
             {
-                my $imax = @value - 2;
-                if ( $imax > 0 )
+                if ( @value > 1 )
                 {
-                    foreach ( @value[ 0 .. $imax ] ) { $_ .= ' ' if ! /-$/ }
+                    foreach ( @value[ 0 .. @value-2 ] ) { $_ .= ' ' if ! /-$/ }
                 }
                 my $value = join( '', @value );
 
@@ -463,10 +556,9 @@ sub parse_one_genbank_entry
                 }
                 elsif ( $tag eq 'VERSION' )
                 {
-                    if ( $value =~ / +GI:(\d+)/ )
+                    if ( $value =~ s/ +GI:(\d+)// )
                     {
                         $entry{ gi } = $1;
-                        $value =~ s/ +GI:\d+//;
                     }
                     $entry{ VERSION } = [ split / +/, $value ];
                 }
@@ -580,6 +672,8 @@ sub parse_one_genbank_entry
 
     while ( $state == 3 )
     {
+        #  Introducer to sequence data
+
         if ( /^ORIGIN/ )
         {
             $entry{ ORIGIN } = $1 if /^ORIGIN \s+(\S.*\S)\s*$/;
@@ -623,15 +717,34 @@ sub parse_one_genbank_entry
                 push @{ $entry{ COMMENT } }, @value;
             }
 
+            elsif ( $tag eq 'CONTIG' )
+            {
+                #  The value of CONTIG is a location string and is merged
+                #  without spaces.
+                $entry{ CONTIG } = join( '', @value );
+            }
+
             else
             {
-                my $imax = @value - 2;
-                if ( $imax > 0 )
+                if ( @value > 1 )
                 {
-                    foreach ( @value[ 0 .. $imax ] ) { $_ .= ' ' if ! /-$/ }
+                    foreach ( @value[ 0 .. @value-2 ] ) { $_ .= ' ' if ! /-$/ }
                 }
                 $entry{ $tag } = join( '', @value );
             }
+        }
+
+        #  End of entry without sequence data.  These can be replaced by
+        #  WGS and WGS_SCAFLD, or CONTIG or possibly something else.
+
+        elsif ( $_ eq '//' )
+        {
+            #  We could fetch and assemble the data
+            if ( 0 and $entry{ CONTIG } and eval { require NCBI_sequence } )
+            {
+                $entry{ SEQUENCE } = NCBI_sequence::contig( $entry{CONTIG} );
+            }
+            $state = 0;
         }
 
         else  # This is really a format error, but let's skip it.
@@ -849,7 +962,20 @@ sub end_coordinates
 #-------------------------------------------------------------------------------
 #  Sequence of a feature.  In list context, include information on partial ends.
 #  Can get extract the data from a DNA string, reference to a string, or from
-#  the SEQUENCE in an entry.
+#  the SEQUENCE in an entry.  However, this does not handle locations that
+#  specify contigs.  Also, this adjusts CDS features to the first nucleotide
+#  of the first complete codon, which is not really what we should be doing.
+#
+#     $seq                           = ftr_seq( $ftr,  $dna   )
+#     $seq                           = ftr_seq( $ftr, \$dna   )
+#     $seq                           = ftr_seq( $ftr,  $entry )
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr,  $dna   )  # boolean of > or < in location
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr, \$dna   )
+#   ( $seq, $partial_5, $partial_3 ) = ftr_seq( $ftr,  $entry )
+#
+#  Handles both [ $location, \%quals ] and [ $type, $location, \%quals ]
+#
+#  Deprecated interface because args are reversed relative to other methods:
 #
 #     $seq                           = ftr_dna(  $dna,   $ftr )
 #     $seq                           = ftr_dna( \$dna,   $ftr )
@@ -858,12 +984,15 @@ sub end_coordinates
 #   ( $seq, $partial_5, $partial_3 ) = ftr_dna( \$dna,   $ftr )
 #   ( $seq, $partial_5, $partial_3 ) = ftr_dna(  $entry, $ftr )
 #
-#  Handles both [ $location, \%quals ] and [ $type, $location, \%quals ]
+
+sub ftr_dna { ftr_seq( @_[1,0] ) }
+
 #-------------------------------------------------------------------------------
-sub ftr_dna
+
+sub ftr_seq
 {
-    my ( $dna, $ftr ) = @_;
-    return undef if ! ( $dna && $ftr );
+    my ( $ftr, $dna ) = @_;
+    return undef if ! ( $ftr && $dna );
 
     my $dnaR =   ref $dna eq 'SCALAR'                     ?  $dna
              :   ref $dna eq 'HASH' && $dna->{ SEQUENCE } ? \$dna->{ SEQUENCE }
@@ -871,9 +1000,8 @@ sub ftr_dna
              :                                               undef;
     return undef if ! $dnaR;
 
-    my $have_lib = 0;
-    eval { require gjoseqlib; $have_lib = 1; };
-    return undef if ! $have_lib;
+    eval { require gjoseqlib; }
+        or return undef;
 
     my $loc = &location( $ftr );
     $loc or return undef;
@@ -882,6 +1010,10 @@ sub ftr_dna
     my $complement = ( $loc =~ s/^complement\((.*)\)$/$1/ );
     $loc =~ s/^join\((.*)\)$/$1/;
     my @spans = split /,/, $loc;
+    #  For each substring, see if it needs to be complemented.  This does
+    #  not occur unless pieces are drawn from multiple contigs, which we
+    #  are not dealing with here anyway.
+    my @cspan = map { s/^complement\((.+)\)$/$1/ } @spans;
     if ( grep { ! /^<?\d+\.\.>?\d+$/ } @spans )
     {
         print STDERR "*** Feature location parse error: $loc0\n";
@@ -892,11 +1024,19 @@ sub ftr_dna
     my $partial_3 = $spans[-1] =~ s/\.\.>/../;
     ( $partial_5, $partial_3 ) = ( $partial_3, $partial_5 ) if $complement;
 
-    my $seq = join( '', map { extract_span( $dnaR, $_ ) } @spans );
+    my @parts;
+    for ( my $i = 0; $i < @spans; $i++ )
+    {
+        $parts[$i] = $cspan[$i] ? gjoseqlib::complement_DNA_seq( extract_span( $dnaR, $spans[$i] ) )
+                                :                                extract_span( $dnaR, $spans[$i] );
+    }
+    my $seq = join( '', @parts );
     $seq = gjoseqlib::complement_DNA_seq( $seq ) if $complement;
 
     #  Sequences that run off the end can start at other than the first
     #  nucleotide of a codon.
+    #  This should not really be done here, even though it makes life easier
+    #  for the calling program. -- GJO, 2015-08-27
 
     my $qual = &qualifiers( $ftr );
     my $codon_start = $qual->{ codon_start } ? $qual->{ codon_start }->[0] : 1;
@@ -991,9 +1131,10 @@ sub qualifiers
 
 
 #-------------------------------------------------------------------------------
+#  Feature gene:
 #
-#   $gene              = gene( $ftr )
-#   @gene_and_synonyms = gene( $ftr )
+#   $gene          = gene( $ftr )
+#   @gene_and_syns = gene( $ftr )
 #
 #-------------------------------------------------------------------------------
 sub gene
@@ -1010,30 +1151,101 @@ sub gene
 
 
 #-------------------------------------------------------------------------------
-#  Prefer protein_id as id:
+#  Feature ids in order of preference.  For non-CDS features on many genomes,
+#  locus_tag is the most consistently present.  For proteins, protein_id is
+#  
 #
-#   $id = CDS_id( $ftr )
+#   $id  = ftr_id( $ftr,  @types )  #  the first id drawn from an ordered list
+#   $id  = ftr_id( $ftr, \@types )  #      of type preferences, each defined by
+#                                   #    1. a feature qualifier name,
+#                                   #    2. "gi", or
+#                                   #    3. "xref:$db", where $db is a database id
+#                                   #  It is up to the user to handle multiword ids.
+#
+#  Predefined lists:
+#
+#   $id  = ftr_id( $ftr )           #  protein_id, locus_tag, gene or gi
+#   $id  = ftr_locus_tag( $ftr )    #  locus_tag, protein_id, gene or gi
+#   $id  = ftr_old_tag( $ftr )      #  old_locus_tag, locus_tag, protein_id, gene or gi
+#   $id  = ftr_gene_or_id( $ftr )   #  gene, locus_tag, protein_id or gi
+#   $id  = ftr_gi_or_id( $ftr )     #  gi, protein_id, locus_tag or gene
+#
+#  Specific feature ids or undef:
+#
+#   $gi  = ftr_gi( $ftr )           #  gi number or undef
+#   $id  = ftr_xref( $ftr, $type )  #  db cross reference of $type
+#   @ids = ftr_xref( $ftr, $type )  #  db cross references of $type
+#
+#  Feature ids in old interface:
+#
+#   $id  = CDS_id( $ftr )           #  protein_id, locus_tag, gene or gi
+#   $id  = CDS_locus_tag( $ftr )    #  locus_tag, protein_id, gene or gi
+#   $id  = CDS_gi_or_id( $ftr )     #  gi, protein_id, locus_tag or gene
+#   $gi  = CDS_gi( $ftr )           #  gi number or undef
 #
 #-------------------------------------------------------------------------------
+sub ftr_id
+{
+    my $ftr  = shift;
+    my $qual = &qualifiers( $ftr );
+
+    my @types = grep { $_ } ref( $_[0] ) eq 'ARRAY' ? @$_ : @_;
+    @types = qw( protein_id locus_tag gene gi )  if ! @types;
+
+    my $id;
+    foreach ( @types )
+    {
+        if    ( /^gi$/i       ) { $id = ftr_gi( $ftr ) }
+        elsif ( /^xref:(.+)$/ ) { $id = ftr_xref( $ftr, $1 ) }
+        else                    { $id = ( $qual->{$_} || [] )->[0] }
+        last if $id;
+    }
+
+    $id;
+}
+
+
+sub ftr_locus_tag  { ftr_id( $_[0], qw( locus_tag protein_id gene gi ) ) }
+sub ftr_old_tag    { ftr_id( $_[0], qw( old_locus_tag locus_tag protein_id gene gi ) ) }
+sub ftr_gene_or_id { ftr_id( $_[0], qw( gene locus_tag protein_id gi ) ) }
+sub ftr_gi_or_id   { ftr_id( $_[0], qw( gi locus_tag protein_id gene ) ) }
+
+
+sub ftr_gi
+{
+    my $qual = &qualifiers( @_ );
+
+    my ( $id ) = map { m/^GI:(.+)$/i ? $1 : () } @{ $qual->{db_xref} || [] };
+
+    $id;
+}
+
+
+sub ftr_xref
+{
+    my ( $ftr, $type ) = @_;
+    my $qual = &qualifiers( $ftr );
+
+    my @ids = map { m/^\Q$type\E:(.+)$/i ? $1 : () } @{ $qual->{db_xref} || [] };
+
+    wantarray ? @ids : $ids[0];
+}
+
+
 sub CDS_id
 {
     my $qual = &qualifiers( @_ );
     my $id;
 
     ( $id ) =                                 @{ $qual->{ protein_id } } if          $qual->{ protein_id };
-    ( $id ) = map { m/^GI:(.+)$/i ? $1 : () } @{ $qual->{ db_xref } }    if ! $id && $qual->{ db_xref };
     ( $id ) =                                 @{ $qual->{ locus_tag } }  if ! $id && $qual->{ locus_tag };
+    ( $id ) =                                 @{ $qual->{ gene } }       if ! $id && $qual->{ gene };
+    ( $id ) = map { m/^GI:(.+)$/i ? $1 : () } @{ $qual->{ db_xref } }    if ! $id && $qual->{ db_xref };
 
     $id;
 }
 
 
-#-------------------------------------------------------------------------------
-#  Prefer gi number as id:
-#
-#   $id = CDS_gi_or_id( $ftr )
-#
-#-------------------------------------------------------------------------------
 sub CDS_gi_or_id
 {
     my $qual = &qualifiers( @_ );
@@ -1042,17 +1254,26 @@ sub CDS_gi_or_id
     ( $id ) = map { m/^GI:(.+)$/i ? $1 : () } @{ $qual->{ db_xref } }    if          $qual->{ db_xref };
     ( $id ) =                                 @{ $qual->{ protein_id } } if ! $id && $qual->{ protein_id };
     ( $id ) =                                 @{ $qual->{ locus_tag } }  if ! $id && $qual->{ locus_tag };
+    ( $id ) =                                 @{ $qual->{ gene } }       if ! $id && $qual->{ gene };
 
     $id;
 }
 
 
-#-------------------------------------------------------------------------------
-#  gi number or nothing:
-#
-#   $gi = CDS_gi( $ftr )
-#
-#-------------------------------------------------------------------------------
+sub CDS_locus_tag
+{
+    my $qual = &qualifiers( @_ );
+    my $id;
+
+    ( $id ) =                                 @{ $qual->{ locus_tag } }  if          $qual->{ locus_tag };
+    ( $id ) =                                 @{ $qual->{ protein_id } } if ! $id && $qual->{ protein_id };
+    ( $id ) =                                 @{ $qual->{ gene } }       if ! $id && $qual->{ gene };
+    ( $id ) = map { m/^GI:(.+)$/i ? $1 : () } @{ $qual->{ db_xref } }    if ! $id && $qual->{ db_xref };
+
+    $id;
+}
+
+
 sub CDS_gi
 {
     my $qual = &qualifiers( @_ );
@@ -1064,6 +1285,7 @@ sub CDS_gi
 
 
 #-------------------------------------------------------------------------------
+#  Feature product:
 #
 #   $product = product( $ftr )
 #
@@ -1116,9 +1338,8 @@ sub CDS_translation
 
     return undef if ! $dna;
 
-    my $have_lib = 0;
-    eval { require gjoseqlib; $have_lib = 1; };
-    return undef if ! $have_lib;
+    eval { require gjoseqlib; }
+        or return undef;
 
     my $CDS_dna = ftr_dna( $dna, $ftr ) or return undef;
     my $pep = gjoseqlib::translate_seq( $CDS_dna, ! partial_5_prime( $ftr ) );
@@ -1193,6 +1414,7 @@ sub genbank_loc_2_string
 #   (accession:)?<?\d+^>?\d+                   # site between residues
 #   (accession:)?\d+                           # single residue
 #   (accession:)?complement\(element\)
+#                gap\(\w+\)
 #   (accession:)?join\(element,element,...\)
 #   (accession:)?order\(element,element,...\)
 #
@@ -1565,7 +1787,7 @@ sub cbdl_part_2_genbank
 #     mol_type   =>   Mol_type
 #
 #  The record types marked with a * are required.
-#  At least of of the types marked with a + must also be present.
+#  At least one of the types marked with a + must also be present.
 #
 #  Feature records are merged by type.  Slash is removed from qualifier name.
 #  Surrounding quotation marks are stripped from qualifier values.
@@ -2010,16 +2232,22 @@ sub qualifier_priority { $qualifier_order{ lc $_[0] } || 999999 }
 sub add_feature_qualifier
 {
     my ( $key, $value ) = @_;
+    $key or return;
+    $value = '' if ! defined $value;
 
     my $qualif;
-    if ( ! defined $value || $value eq '' )
+    if ( $valueless_qual{$key} )
     { 
         $qualif = "/$key";
     }
+    elsif ( $unquoted_qual{$key} )
+    {
+        $qualif = "/key=$value";
+    }
     else
     {
-        if ( $value !~ /^\d+$/ ) { $value =~ s/"/""/g; $value = qq("$value"); }
-        $qualif = "/$key=$value";
+        $value =~ s/"/""/g;
+        $qualif = qq(/$key="$value");
     }
 
     formline( <<'End_of_continuation', $qualif ) if defined $qualif && length $qualif;
@@ -2105,6 +2333,7 @@ sub write_end_of_entry
 #
 #     filehandle is passed through
 #     string is taken as file name to be opened
+#     scalar reference is taken as data string to be opened
 #     undef or "" defaults to STDIN
 #
 #      \*FH           = input_filehandle( $file );
@@ -2131,11 +2360,11 @@ sub input_filehandle
 
     #  File name
 
-    if ( ! ref( $file ) )
+    if ( ! ref( $file ) || ref( $file ) eq 'SCALAR' )
     {
-        -f $file or die "Could not find input file '$file'.\n";
+        ref( $file ) or -f $file or die "Could not find input file '$file'.\n";
         my $fh;
-        open( $fh, "<$file" ) || die "Could not open '$file' for input.\n";
+        open( $fh, "<", $file ) || die "Could not open '$file' for input.\n";
         return wantarray ? ( $fh, 1 ) : $fh;
     }
 
@@ -2148,6 +2377,7 @@ sub input_filehandle
 #
 #     filehandle is passed through
 #     string is taken as file name to be opened
+#     scalar reference is taken as data string to be opened
 #     undef or "" defaults to STDOUT
 #
 #      \*FH           = output_filehandle( $file );
@@ -2174,10 +2404,10 @@ sub output_filehandle
 
     #  File name
 
-    if ( ! ref( $file ) )
+    if ( ! ref( $file ) || ref( $file ) eq 'SCALAR' )
     {
         my $fh;
-        open( $fh, ">$file" ) || die "Could not open '$file' for output.\n";
+        open( $fh, ">", $file ) || die "Could not open '$file' for output.\n";
         return wantarray ? ( $fh, 1 ) : $fh;
     }
 

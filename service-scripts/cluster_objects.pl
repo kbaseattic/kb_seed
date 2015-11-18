@@ -34,7 +34,7 @@ my %in_cluster;
 my $nxt = 1;
 while (defined($_ = <STDIN>))
 {
-    if ($_ =~ /^(\S[^\t]*\S?)\t(\S?[^\t]*\S)/)
+    if (($_ =~ /^(\S[^\t]*\S?)\t(\S?[^\t]*\S)/) && ($1 ne $2))
     {
 	my $obj1 = $1;
 	my $obj2 = $2;
