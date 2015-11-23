@@ -3,10 +3,10 @@
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
-# 
+#
 # The SEED Toolkit is free software. You can redistribute
 # it and/or modify it under the terms of the SEED Toolkit
-# Public License. 
+# Public License.
 #
 # You should have received a copy of the SEED Toolkit Public License
 # along with this program; if not write to the University of Chicago
@@ -31,7 +31,7 @@ use gjoparseblast;
 #-------------------------------------------------------------------------------
 #  This is a general interface to NCBI blastall.  It supports blastp,
 #  blastn, blastx, and tblastn. The psiblast and rpsblast programs
-#  from the blast+ package are also supported. 
+#  from the blast+ package are also supported.
 #
 #      @matches = blast( $query, $db, $blast_prog, \%options )
 #     \@matches = blast( $query, $db, $blast_prog, \%options )
@@ -167,7 +167,7 @@ use gjoparseblast;
 sub blast
 {
     my( $query, $db, $blast_prog, $parms ) = @_;
- 
+
     #  Life is easier without tests against undef
 
     $query      = ''      if ! defined $query;
@@ -199,7 +199,7 @@ sub blast
     elsif ( $blast_prog ne 'psiblast'
          && ! ( $queryF = &get_query( $query, $tempD, $parms ) )
        # && ! ( print STDERR Dumper($queryF = &get_query( $query, $tempD, $parms )) )
-          ) 
+          )
     {
         warn "BlastInterface::get_query: failed to get query sequence data.\n";
     }
@@ -277,7 +277,7 @@ sub alignment_to_pssm
 
     my ( $alignF, $opts2, $rm_alignF ) = psiblast_in_msa( $align, $opts );
 
-    my $subject = [ 'subject', '', 'MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILS' ]; 
+    my $subject = [ 'subject', '', 'MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILS' ];
 
     my ( $fh, $subjectF ) = SeedAware::open_tmp_file( 'alignment_to_pssm_subject', 'fasta' );
     gjoseqlib::write_fasta( $fh, $subject );
@@ -286,7 +286,7 @@ sub alignment_to_pssm
     my $pssm0F;
     ( $fh, $pssm0F ) = SeedAware::open_tmp_file( 'alignment_to_pssm', 'pssm0' );
     close( $fh );
-    
+
     my $prog = SeedAware::executable_for( 'psiblast' )
         or warn "BlastInterface::alignment_to_pssm: psiblast program not found.\n"
             and return undef;
@@ -319,7 +319,7 @@ sub alignment_to_pssm
     my $pssmF = $opts->{ outPSSM } || $opts->{ out_pssm };
 
     ( $fh, $close ) = output_file_handle( $pssmF );
-    
+
     my $skip;
     open( PSSM0, "<", $pssm0F ) or die "Could not open $pssm0F";
     while ( <PSSM0> )
@@ -328,7 +328,7 @@ sub alignment_to_pssm
             print $fh "      descr {\n";
             print $fh "        title \"$title\"\n";
             print $fh "      },\n";
-        }            
+        }
         $skip = 1 if /intermediateData \{/;
         $skip = 0 if /finalData \{/;
         print $fh $_ unless $skip;
@@ -375,7 +375,7 @@ sub alignment_to_pssm
 #    max_sim =>  $fract         #  maximum identity of sequences in profile; i.e., build
 #                               #      the PSSM from a representative set (D = no_limit).
 #                               #      This can take a significant amount of time.
-#    min_sim =>  $min_sim_spec  #  exclude sequences with less than the specified identity 
+#    min_sim =>  $min_sim_spec  #  exclude sequences with less than the specified identity
 #                               #      to all specified sequences (D = no_limit).
 #
 #  The minimum similarity specification is one of:
@@ -442,10 +442,11 @@ sub psiblast_in_msa
     my $alignF;
     my $write_file;
 
+    my $is_file  = $align && ! ref( $align ) && -s $align;
     my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
     my $is_glob  = $align && ref( $align ) eq 'GLOB';
 
-    if ( $is_array || $is_glob
+    if ( $is_array || $is_glob || $is_file
                    || $msa_master_id
                    || $max_sim
                    || $min_sim
@@ -465,12 +466,16 @@ sub psiblast_in_msa
             @align = gjoseqlib::read_fasta( $align );
             $write_file = 1;
         }
-        elsif ( $align && ! ref( $align ) && -s $align )
+        elsif ( $is_file )
         {
             @align  = gjoseqlib::read_fasta( $align );
             $alignF = $align;
         }
-
+	else {
+	    warn "BlastInterface::psiblast_in_msa: Unsupported data-type for alignment";
+	    return undef;
+	}
+	
         @align
             or warn "BlastInterface::psiblast_in_msa: No alignment supplied."
                 and return undef;
@@ -539,7 +544,7 @@ sub psiblast_in_msa
         {
             my $master = splice( @align, $msa_master_idx-1, 1 );
             unshift @align, $master;
-            $msa_master_idx = 1; 
+            $msa_master_idx = 1;
             $write_file     = 1;
         }
 
@@ -550,7 +555,7 @@ sub psiblast_in_msa
             ( $fh, $alignF ) = SeedAware::open_tmp_file( 'psiblast_in_msa', 'fasta', @dir );
             gjoseqlib::write_fasta( $fh, \@align );
             close( $fh );
-        } 
+        }
 
         $opts2->{ in_msa }            = $alignF          if $alignF;
         $opts2->{ ignore_msa_master } = 1                if $ignore_master;
@@ -566,7 +571,7 @@ sub psiblast_in_msa
 #
 #      $db_file = build_rps_db( \@aligns, \%options )
 #
-#  The first argument supplies the list of alignments and/or alignment files. 
+#  The first argument supplies the list of alignments and/or alignment files.
 #
 #  Three forms of alignments are supported:
 #
@@ -574,9 +579,9 @@ sub psiblast_in_msa
 #       [ [ 'alignment-id', 'optional title', 'align1.fa' ], ... ];
 #       [ 'align1.pssm', ... ];
 #
-# 
+#
 #  Options:
-# 
+#
 #      title => DB title
 #
 #-------------------------------------------------------------------------------
@@ -584,7 +589,7 @@ sub psiblast_in_msa
 sub build_rps_db
 {
     my ( $aligns, $db, $opts ) = @_;
-    
+
     return '' unless $aligns && ref( $aligns ) eq 'ARRAY' && @$aligns;
     return '' unless defined( $db ) && ! ref( $db ) && $db ne '';
     $opts = {} unless $opts && ref( $opts ) eq 'HASH';
@@ -595,7 +600,7 @@ sub build_rps_db
     {
         my $pssm = verify_pssm( $_ , \%title_to_pssm, $opts )
             or next;
-        
+
         push @pssms, $pssm;
     }
     @pssms
@@ -627,7 +632,7 @@ sub build_rps_db
         warn "BlastInterface::build_rps_db: $prog_name program not found.\n";
         return '';
     }
-    
+
     my $rc = SeedAware::system_with_redirect( $prog, @args );
     if ( $rc != 0 )
     {
@@ -635,7 +640,7 @@ sub build_rps_db
         warn "BlastInterface::build_rps_db: $prog_name failed with rc = $rc: $cmd\n";
         return '';
     }
-    
+
     return $db;
 }
 
@@ -660,7 +665,7 @@ sub verify_pssm
     if ( ! ref( $align ) )
     {
         $title = pssm_title( $align );
-        
+
         if ( ! ( defined $title && length( $title ) ) )
         {
             $align ||= 'undefined';
@@ -686,7 +691,7 @@ sub verify_pssm
            )
         {
             my ( $fh, $path_name ) = SeedAware::open_tmp_file( "verify_pssm", "pssm" );
-            
+
             my %parms = %$opts;
             $parms{ title } = $title;
             $parms{ out_pssm } = $fh;
@@ -695,15 +700,15 @@ sub verify_pssm
 
             $pssm = $path_name;
         }
-        else 
+        else
         {
             warn "BlastInterface::verify_pssm: invalid alignment definition data"
                 and return undef;
         }
-    
+
     }
     else
-    {    
+    {
         warn "BlastInterface::verify_pssm: invalid alignment structure"
             and return undef;
     }
@@ -940,7 +945,7 @@ sub six_translations
 #  There might be more.
 #-------------------------------------------------------------------------------
 sub is_stdin
-{ 
+{
     return ( ! defined $_[0] )
         || ( $_[0] eq '' )
         || ( $_[0] eq \*STDIN )   # Stringifies to GLOB(0x....)
@@ -1238,7 +1243,7 @@ sub verify_db
 #      }
 #
 #  We need to be stringent. The database must be named db, in a directory
-#  tmp_blast_db_..., and which contains only files db and db\..+ . 
+#  tmp_blast_db_..., and which contains only files db and db\..+ .
 #-------------------------------------------------------------------------------
 sub remove_blast_db_dir
 {
@@ -1369,7 +1374,7 @@ sub form_blast_command
                 || $blast_prog eq 'rpsblast';
 
     my $blastplus = ! $try_plus ? ''
-                  : $blast_prog eq 'rpsblast' ? SeedAware::executable_for( 'rpsblast+' ) 
+                  : $blast_prog eq 'rpsblast' ? SeedAware::executable_for( 'rpsblast+' )
                                               : SeedAware::executable_for( $blast_prog );
 
     $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast+' if $blast_prog eq 'rpsblast';
@@ -1496,7 +1501,7 @@ sub form_blast_command
             $alignF   = valid_fasta( $inMSA, $parms->{ tmp_dir }.'/inMSA' ) if defined $inMSA;
             $alignF ||= $queryF if ! defined $inPSSM ;
 
-            # queryIndex is 1-based 
+            # queryIndex is 1-based
             if ( ! $queryIndex && ! defined $inPSSM )
             {
                 my @align = gjoseqlib::read_fasta( $alignF );
@@ -2066,6 +2071,6 @@ sub html_esc { local $_ = shift || ''; s/\&/&amp;/g; s/>/&gt;/g; s/</&lt;/g; $_ 
 
 sub max   { $_[0] >= $_[1] ? $_[0] : $_[1] }
 
-sub max_n { my $max = shift; foreach ( @_ ) { $max = $_ if $_ > $max }; $max } 
+sub max_n { my $max = shift; foreach ( @_ ) { $max = $_ if $_ > $max }; $max }
 
 1;

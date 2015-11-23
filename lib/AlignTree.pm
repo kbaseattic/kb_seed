@@ -20,7 +20,7 @@ package AlignTree;
 
 use strict;
 
-use Carp;     
+use Carp;
 use Data::Dumper;
 
 use SeedAware;
@@ -67,7 +67,7 @@ sub align_sequences {
     } else {
         ($seqs, $opts) = @_;
     }
-    
+
     $opts->{version} or $seqs && ref $seqs eq 'ARRAY' && @$seqs
         or die "align_sequences called with invalid sequences.\n";
 
@@ -75,7 +75,7 @@ sub align_sequences {
 
     $opts->{tool}  ||= 'mafft';
     $opts->{reorder} = 1 if $opts->{tool} =~ /mafft/i;
-        
+
     if    ($opts->{tool} =~ /muscle/i)  { $program = \&gjoalignment::align_with_muscle  }
     elsif ($opts->{tool} =~ /mafft/i)   { $program = \&gjoalignment::align_with_mafft   }
     elsif ($opts->{tool} =~ /clustal/i) { $program = \&gjoalignment::align_with_clustal }
@@ -127,9 +127,9 @@ sub align_sequences {
 #
 #   @trimmed_ali = trim_ali_to_conserved_domains( \@ali, \%opts )
 #  \@trimmed_ali = trim_ali_to_conserved_domains( \@ali, \%opts )
-#  
+#
 #  Options
-#   
+#
 #     win_size        => size    # size of sliding window used in scoring domain conservation
 #     domain_conserv  => thresh  # min mean domain conservation (D = 0.3)
 #     residue_conserv => thresh  # min residule conservation for trimmed end sites (D = 0.1)
@@ -192,7 +192,9 @@ sub trim_ali_to_conserved_domains {
         last if $conserv->[$ee] < $residue * $frac * $frac;
     }
 
-    my @ali2 = map { [@$_[0,1], substr($_->[2], $b, $e-$b+1)] } @$ali;
+    # my @ali2 = map { [@$_[0,1], substr($_->[2], $b, $e-$b+1)] } @$ali;
+    my @ali2 = map { my $keep = substr($_->[2], $b, $e-$b+1);
+                     $keep =~ /\w/ ? [@$_[0,1], $keep] : () } @$ali;
 
     wantarray ? @ali2 : \@ali2;
 }
@@ -215,10 +217,10 @@ sub trim_ali_to_conserved_domains {
 #  substitution matrix. A mean vector is then calculated for the site
 #  and the final score is the average euclidean distance to the mean
 #  vector.
-# 
+#
 #  It is unclear how the original method converts a distance to a
 #  similarity score. Here we use the following simple conversion:
-#   
+#
 #    sim = min( 0, (1 - distance/MAX_DISTANCE) )
 #
 #  where MAX_DISTANCE is hardcoded to 10.
@@ -280,11 +282,11 @@ sub residue_conserv_scores {
 #-------------------------------------------------------------------------------
 #   @conserved_regions = conserved_regions_in_ali( \@align, \%opts)
 #  \@conserved_regions = conserved_regions_in_ali( \@align, \%opts)
-# 
+#
 #  Options:
 #
 #     conserv    => HASH      # precomputed conservation data
-#     sort       => BOOL      # return regions sort by conservation 
+#     sort       => BOOL      # return regions sort by conservation
 #     thresh     => conserve  # threshold for average site convervation score (D = 0.6)
 #     win_min    => size      # minimum window size (D = 4)
 #     win_max    => size      # maximum window size (D = 10)
@@ -299,7 +301,7 @@ sub conserved_regions_in_ali {
     my $thresh  = $opts->{thresh}  || 0.6;
     my $conserv = $opts->{conserv} || AlignTree::residue_conserv_scores($ali);
     my $sort    = $opts->{sort};
-    
+
     my @cands;
     my %cov;
     my @sum;
@@ -347,7 +349,7 @@ sub conserved_regions_in_ali {
 #     fract_cov     => fract   #  fraction of sequences to be covered in initial trimming of ends (D: 0.75)
 #     fract_ends    => fract   #  minimum fraction of ends to be considered significant for uncov cutoff (D = 0.1)
 #     keep_def      => bool    #  do not append trimming coordinates to description fields in seqs
-#     log_dir       => dir     #  directory for log files 
+#     log_dir       => dir     #  directory for log files
 #     log_prefix    => string  #  prefix for log file names
 #     max_reps_sim  => thresh  #  threshold used to collapse seqs into representatives (D = 0.9)
 #     single_round  => bool    #  if set to false, additional rounds of psiblast are attempted to incorporate seqs with multiple hsps.
@@ -395,7 +397,7 @@ sub trim_alignment {
         my %full = map { $_->[0] => $_->[2] } @$ali;
         for (@$trim0) {
             my $s0 = $full{$_->[0]};  $s0 =~ tr/A-Za-z//cd;    #  remove gaps
-            my $s  = $_->[2];         $s  =~ tr/A-Za-z//cd;   
+            my $s  = $_->[2];         $s  =~ tr/A-Za-z//cd;
 
             my $l = length($s0);
             my $b = index(lc $s0, lc $s) + 1;
@@ -403,7 +405,7 @@ sub trim_alignment {
             $_->[1] .= " ($b-$e/$l)" if $b > 1 || $e < $l;
         }
     }
-    
+
     return wantarray ? @$trim0 : $trim0 if $skip_psiblast;
 
     SeedUtils::verify_dir($log_dir);
@@ -415,7 +417,7 @@ sub trim_alignment {
     my $profile            = align_sequences($reps, $align_opts);
     my $blast              = gjoalignandtree::blastpgp($db, $profile, {stderr => $log_stderr});
     my ($trimmed, $report) = process_psiblast_v2($blast, $opts);
-    
+
     my $report_string      = join("\n", map { join "\t", @$_ } values %$report) . "\n";
 
     print_string($log_report, $report_string) if $keep_log;
@@ -432,11 +434,11 @@ sub trim_alignment {
         my $blast       = gjoalignandtree::blastpgp($db, \@to_trim, {stderr => $log_stderr});
         my ($trm, $rpt) = process_psiblast_v2($blast, $opts);
         my @new_hits    = grep { $report->{$_->[0]} =~ /multiple hsps/ } @$trm;
-        @to_trim        = grep { $rpt->{$_->[0]}    =~ /multiple hsps/ } @$trm; 
+        @to_trim        = grep { $rpt->{$_->[0]}    =~ /multiple hsps/ } @$trm;
 
         push @$trimmed, $_ for @new_hits;
     }
-    
+
     $new_ali = align_sequences($trimmed, $align_opts);
     wantarray ? @$new_ali : $new_ali;
 }
@@ -520,7 +522,7 @@ sub psiblast_search {
 
     my ($hits, $report, $history) = $inc ? incremental_psiblast_search($db, $profile, $opts)
                                          : gjoalignandtree::extract_with_psiblast($db, $profile, $opts);
-    
+
     wantarray ? ($hits, $report, $history) : $hits;
 }
 
@@ -544,7 +546,7 @@ sub db_name_to_file {
 #
 #  Incremental psiblast search from a small set of initial sequences,
 #  which may be unaligned.
-#  
+#
 #    \@seq                        = incremental_psiblast_search( $db, $profile, \%opts )
 #  ( \@seq, \%report, \@history ) = incremental_psiblast_search( $db, $profile, \%opts )
 #
@@ -556,15 +558,15 @@ sub db_name_to_file {
 #     stop_round        => $n        # stop after a specified number of psiblast rounds (D = unlimited)
 #     use_reps          => bool      # always collapse profile seqs into representatives before submitting to psiblast
 #
-#  Other options only affect the final round of psiblast. 
+#  Other options only affect the final round of psiblast.
 #
 #  Report records are documented in psiblast_search().
 #
 #  History consists a list 4-tuples, corresponding to search status
 #  at each psiblast round:
-#    
+#
 #     [ profile_length, num_starting_seqs, num_trimmed_reps, num_psiblast_hits ]
-#  
+#
 #  The psiblast hits at the end of each round are aligned, trimmed,
 #  and sorted.  The top hits are then selected to form the set of
 #  profile sequences for the next round.  The algorithm tries to
@@ -604,18 +606,18 @@ sub incremental_psiblast_search {
 
     # in case profile seqs are unaligned
     my @lens = sort { $a <=> $b } map { length $_->[2] } @$profile;
-    if ($lens[0] != $lens[-1]) {  
+    if ($lens[0] != $lens[-1]) {
         my $reps  = $use_reps && @prof >= $min_reps_seqs ? representative_sequences::rep_seq_2(\@prof, {max_sim => $max_reps_sim}) : [@prof];
         my $ali   = align_sequences($reps, $opts2);
         my $trim  = trim_alignment($ali, $opts4);
         my $redo  = (@$trim / @$ali) < $initial_set_keep;
-        $trim     = trim_alignment($ali, { skip_psiblast => 1 }) if $redo;            
+        $trim     = trim_alignment($ali, { skip_psiblast => 1 }) if $redo;
         @prof     = @$trim;
 
         my $record = [ length $ali->[0]->[2], scalar @$profile, scalar @$trim ];
         push @history, $record;
         print STDERR join("\t", @$record). "\n";
-    } 
+    }
 
     $max_query_nseq = min($max_query_nseq, $opts->{nresult}) if $opts->{nresult} > 0;
     my @seqs = @$profile;
@@ -635,7 +637,7 @@ sub incremental_psiblast_search {
             my $uncov_q = $uncov_q1 + $uncov_q2;
             my $uncov_s = $uncov_s1 + $uncov_s2;
             $score{$_}  = $frac_id * $frac_id_weight + $frac_pos * $frac_pos_weight
-                          - $uncov_q * $uncov_penalty_q - $uncov_s * $uncov_penalty_s; 
+                          - $uncov_q * $uncov_penalty_q - $uncov_s * $uncov_penalty_s;
         }
         my @keep;
         for (sort { $score{$b} <=> $score{$a} } keys %score) {
@@ -662,7 +664,7 @@ sub incremental_psiblast_search {
         @prof = @$trim;
     }
 
-    my ($hits, $report) = gjoalignandtree::extract_with_psiblast($db, \@prof, $opts); 
+    my ($hits, $report) = gjoalignandtree::extract_with_psiblast($db, \@prof, $opts);
     my $record = [ length $prof[0]->[2], scalar @seqs, scalar @prof, scalar @$hits ];
     push @history, $record;
     print STDERR join("\t", @$record). "\n";
@@ -710,7 +712,7 @@ sub blast {
         die "blastpgp requires database.";
     }
     verify_db( $dbfile, 'P' );  # protein
-    
+
 
     my ( $qfile, $rm_query );
     if ( defined $query && ref $query )
@@ -753,12 +755,12 @@ sub blast {
                 '-F' => 'F'
               );
     push @cmd, ( '-a' => $n_cpu ) if $n_cpu;
-    
+
     my $blastfh = SeedAware::read_from_pipe_with_redirect( @cmd, { stderr => $stderr } )
            or print STDERR "Failed to open: '" . join( ' ', @cmd ), "'.\n"
               and return undef;
 
-    my $out = gjoparseblast::blast_hsp_list( $blastfh, 1 );  
+    my $out = gjoparseblast::blast_hsp_list( $blastfh, 1 );
     close $blastfh;
 
     if ( $rm_db )
@@ -789,7 +791,7 @@ sub blast {
 #
 #  Incremental psiblast search from a small set of initial sequences,
 #  which may be unaligned.
-#  
+#
 #    \@seq                        = incremental_psiblast_search( $db, $profile, \%opts )
 #  ( \@seq, \%report, \@history ) = incremental_psiblast_search( $db, $profile, \%opts )
 #
@@ -800,15 +802,15 @@ sub blast {
 #     stop_round        => $n        # stop after a specified number of psiblast rounds (D = unlimited)
 #     use_reps          => bool      # always collapse profile seqs into representatives before submitting to psiblast
 #
-#  Other options only affect the final round of psiblast. 
+#  Other options only affect the final round of psiblast.
 #
 #  Report records are documented in psiblast_search().
 #
 #  History consists a list 4-tuples, corresponding to search status
 #  at each psiblast round:
-#    
+#
 #     [ profile_length, num_starting_seqs, num_trimmed_reps, num_psiblast_hits ]
-#  
+#
 #  The psiblast hits at the end of each round are aligned, trimmed,
 #  and sorted.  The top hits are then selected to form the set of
 #  profile sequences for the next round.  The algorithm tries to
@@ -842,7 +844,7 @@ sub incremental_psiblast_search_0 {
 
     # in case profile seqs are unaligned
     my @lens = sort { $a <=> $b } map { length $_->[2] } @$profile;
-    if ($lens[0] != $lens[-1]) {  
+    if ($lens[0] != $lens[-1]) {
         my $reps  = $use_reps && @prof >= $min_reps_seqs ? representative_sequences::rep_seq_2(\@prof, {max_sim => $max_reps_sim}) : [@prof];
         my $opts2 = @$reps < $max_nseq_clustal ? { tool => 'clustal' } : { tool => 'mafft' };
         my $ali   = align_sequences($reps, $opts2);
@@ -854,7 +856,7 @@ sub incremental_psiblast_search_0 {
         my $record = [ length $ali->[0]->[2], scalar @$profile, scalar @$trim ];
         push @history, $record;
         print STDERR join("\t", @$record). "\n";
-    } 
+    }
 
     my $opts3 = { e_value => 0.01, max_q_uncov => 1000, nresult => 1000, stderr => '/dev/null' };
 
@@ -871,7 +873,7 @@ sub incremental_psiblast_search_0 {
             my ($scr, $exp, $status, $frac_id, $frac_pos, $uncov_q1, $uncov_q2) = @{$report->{$_}}[1, 2, 4, 5, 6, 7, 8];
             next unless $status =~ /included/i;
             my $uncov = $uncov_q1 + $uncov_q2;
-            $score{$_} = $frac_id * $frac_id_weight + $frac_pos * $frac_pos_weight - $uncov * $uncov_penalty; 
+            $score{$_} = $frac_id * $frac_id_weight + $frac_pos * $frac_pos_weight - $uncov * $uncov_penalty;
         }
         my @keep;
         for (sort { $score{$b} <=> $score{$a} } keys %score) {
@@ -936,7 +938,7 @@ sub process_psiblast_v2 {
 
     my( $qid, $qdef, $qlen, $qhits ) = @{ $blast->[0] };
 
-    my $keep_def      = $opts->{ keep_def }      || $opts->{ keep_seq_def } ? 1 : 0;  
+    my $keep_def      = $opts->{ keep_def }      || $opts->{ keep_seq_def } ? 1 : 0;
     my $fract_ends    = $opts->{ fract_ends }    || $opts->{ fraction_ends } || 0.1;               # fraction of sequences ending in window
     my $max_q_uncov_c = $opts->{ max_q_uncov_c } || $opts->{ max_q_uncov }   || min(20, $qlen/3);
     my $max_q_uncov_n = $opts->{ max_q_uncov_n } || $opts->{ max_q_uncov }   || min(20, $qlen/3);
@@ -973,20 +975,20 @@ sub process_psiblast_v2 {
 
             my $uncov1 = $q1 <= $q1_cut ? 0 : $q1 - $q1_cut;
             my $uncov2 = $q2 >= $q2_cut ? 0 : $q2_cut - $q2;
-      
+
             if    ( $q1-1     > $max_q_uncov_n ) { $status = 'missing start' }
             elsif ( $qlen-$q2 > $max_q_uncov_c ) { $status = 'missing end' }
             elsif ( $nid  / $nmat < $min_ident ) { $status = 'low identity' }
             elsif ( $npos / $nmat < $min_pos )   { $status = 'low positives' }
             else {
                 my ($t1, $t2, $s1t, $s2t);
-                
+
                 ($sseq, $t1) = trim_5( $q1_cut - $q1, $qseq, $sseq );
                 ($sseq, $t2) = trim_3( $q2 - $q2_cut, $qseq, $sseq );
 
                 $s1t = $s1 + $t1;
                 $s2t = $s2 - $t2;
-                    
+
                 $sseq =~ s/-+//g;
 
                 if ( length $sseq < $min_q_cov )   {
@@ -1050,7 +1052,7 @@ sub one_real_hsp {
 #-------------------------------------------------------------------------------
 #
 #  Calculate the best cutoff from an array of uncov numbers:
-#     
+#
 #    1. Sort the uncov numbers
 #    2. Use a sliding window to count the instances of uncovs in a specified range
 #    3. Look for the first significant peak of uncovs from the highest uncov
@@ -1093,18 +1095,18 @@ sub calc_uncov_cut {
     }
     if ($max_cnt >= $min_count) {
         return ($i_of_max_cnt > $winsize) ? $i_of_max_cnt - $winsize : 0;
-    }    
+    }
 
-    return calc_uncov_cut($uncovs, $thresh, max($winsize+1, int($winsize*1.43))); 
+    return calc_uncov_cut($uncovs, $thresh, max($winsize+1, int($winsize*1.43)));
 }
 
 sub print_string {
-    my ( $fh, $close, $unused ) = gjoseqlib::output_filehandle( shift ); 
+    my ( $fh, $close, $unused ) = gjoseqlib::output_filehandle( shift );
     ( unshift @_, $unused ) if $unused;                       # modeled after gjoseqlib::print_alignment_as_fasta
 
     my $str = shift;
     return unless $str;
-    
+
     print $fh $str;
     close $fh if $close;
 }
@@ -1120,7 +1122,7 @@ sub print_string {
 #
 #  Options:
 #
-#     bootstrap  => n                     # bootstrap samples (D = 0) 
+#     bootstrap  => n                     # bootstrap samples (D = 0)
 #     tool       => program               # fasttree (d), phyml, raxml
 #
 #     params     => parameter string for tree tool
@@ -1129,12 +1131,12 @@ sub print_string {
 #     search     => topolog_search_method # NNI (d), SPR
 #     model      => substitution_model    # nt: HKY85, JC69, K80, F81, F84, TN93
 #                                         # aa: LG, JTT, WAG, MtREV, Dayhoff, DCMut
-#     rate       => rate_distribution     # Gamma (d), Uniform 
+#     rate       => rate_distribution     # Gamma (d), Uniform
 #     nclasses   => num_subst_categories  # 4 (d)
 #     optimize   => all (d, topology && brlen && parameters), eval (optimize model parameters only)
 #     input      => input tree            # tree file name
-#     nproc      => number of processors to use for bootstrap 
-#     
+#     nproc      => number of processors to use for bootstrap
+#
 #     Option default values depend the tool used. See details in:
 #       ffxtree:: tree_with_fasttree, tree_with_phyml, tree_with_raxml
 #
@@ -1142,7 +1144,7 @@ sub print_string {
 
 sub make_tree {
     my ($ali, $opts) = ffxtree::process_input_args_w_ali(@_);
-    
+
     return unless @$ali >= 3;
 
     my $program;
@@ -1164,7 +1166,7 @@ sub make_tree {
     } else {
         ($tree, $stats) = $program->($ali, $opts);
     }
-    
+
     if ($nb > 0) {
         my @samples = map { my $a = gjoalignment::bootstrap_sample($ali); $a } 1..$nb;
         my @trees;
@@ -1203,7 +1205,7 @@ sub pfam_scan {
     gjoseqlib::print_alignment_as_fasta($tmpin, $seqs);
 
     my @lines   = SeedAware::run_gathering_output($scan, '-fasta', $tmpin, '-dir', $pfamdir, '-cpu', $ncpu);
-    
+
     my %pfam;
     for (@lines) {
         next if /^#/ || /^\s/;
@@ -1222,7 +1224,7 @@ sub print_pfam {
     my ($pfam) = @_;
 
     # print STDERR '$pfam = '. Dumper($pfam);
-    
+
     my @lines = map { $_->[0] ."\t". join(" ", @{$_->[1]} ) } @$pfam;
 
     print join("\n", @lines). "\n";
@@ -1235,12 +1237,12 @@ sub print_pfam {
 #   @signatures = signature_columns_in_ali( \@align, \%opts )
 #  \@signatures = signature_columns_in_ali( \@align, \@g1, \@g2, \%opts )
 #  \@signatures = signature_columns_in_ali( \@align, \%opts )
-# 
+#
 #  Options:
 #
-#    nogap   => BOOL      # return regions sort by conservation 
+#    nogap   => BOOL      # return regions sort by conservation
 #    thresh  => disc      # threshold discrimimitive value for calling signatures (D = 0.75)
-#    g1      => \@group1  # group 1 seq IDs 
+#    g1      => \@group1  # group 1 seq IDs
 #    g2      => \@group2  # group 2 seq IDs
 #    use_gid => BOOL      # seq IDs supplied in SEED genome ID format
 #                          gids associated with multiple seqs will be removed
@@ -1249,7 +1251,7 @@ sub print_pfam {
 
 sub signature_columns_in_ali {
     my ($ali, $opts) = ffxtree::process_input_args_w_ali(@_);
-    
+
     my ($g1, $g2);
     shift @_;
     for (@_) {
@@ -1262,7 +1264,7 @@ sub signature_columns_in_ali {
     my $nogap   = $opts->{nogap};
     my $thresh  = $opts->{thresh} || 0.75;
     my $use_gid = $opts->{use_gid};
-    
+
     my (@ids1, @ids2);
     my (%gid_cnt, %sid_hash);
     if ($use_gid) {
@@ -1275,12 +1277,12 @@ sub signature_columns_in_ali {
         }
         # print STDERR '\%gid_cnt = '. Dumper(\%gid_cnt);
         # print STDERR '\%sid_hsh = '. Dumper(\%sid_hash);
-        
+
         @ids1 = map { $gid_cnt{$_} == 1 ? $sid_hash{$_} : () } @$g1;
         @ids2 = map { $gid_cnt{$_} == 1 ? $sid_hash{$_} : () } @$g2;
         # print STDERR '\@ids1 = '. Dumper(\@ids1);
         # print STDERR '\@ids2 = '. Dumper(\@ids2);
-        
+
     } else {
         @ids1 = @$g1;
         @ids2 = @$g2;
@@ -1304,33 +1306,33 @@ sub signature_columns_in_ali {
 #-------------------------------------------------------------------------------
 #
 # This code arose when Ross asked Sergei Kovbassa to consider the following problem:
-# 
+#
 #      1.  You have an alignment.  Suppose that it is an rRNA alignment (which it was).
-# 
+#
 #      2.  You have a tree.  A subtree contains a set of genomes (which correspond
 #          to rows in the alignment) which we call the "in group".
-# 
+#
 #      3.  The genomes that occur around the nested "in group" we call the "out group".
-# 
+#
 #      4.  The question then becomes "Which columns in the alignment best distinguish
 #          the "in group" from the "out group".
-# 
+#
 # Sergei answered this question in a publication "Sugnature Analysis of Images of a Nucleotide
 # Sequence (I)" published in Pattern Recognition and Image Analysis, vol 5, no 2, 1995, pp 294-298.
-# 
+#
 # The alignment contains characters in any of several alphabets. If we are discussing
-# nucleotides, then one could think of each character as a 4-tuple: 
-# 
+# nucleotides, then one could think of each character as a 4-tuple:
+#
 # 	     (probability of A,
 # 	      probability of C,
 # 	      probability of G,
 # 	      probability of T)
-# 
+#
 # Thus, a character S (meaning C or G) would be (0,0.5,0.5,0) and an indel would be
 # (0,0,0,0).  The variable $xin is a vector which is the sum of the probability vectors
 # for the characters in the column from the "in group".  Similarly, the variable $xout
-# is the sum of the probability vectors for the "out group". 
-# 
+# is the sum of the probability vectors for the "out group".
+#
 # It should be noted that Sergei (along with L. M. Lazebnaya and I. L. Laptev) wrote
 # a sequel "Signature Analysis of Images of Nucleotide Sequences (II)"
 # published in Pattern Recognition and Image Analysis, vol 5, no 3, 1995, pp 472-476.
@@ -1339,7 +1341,7 @@ sub signature_columns_in_ali {
 # columns that act as signatures.
 #
 # ---------------------
-# my $xin   = [1,2,0,0];  # These test data should produce a score of $din+$dout = 0.016 
+# my $xin   = [1,2,0,0];  # These test data should produce a score of $din+$dout = 0.016
 # my $xout  = [1,3,0,0];
 #
 # $din and $dout have a range of [0, 1]
@@ -1370,7 +1372,7 @@ sub vector_sum {
 
 sub scalar_product {
     my ($x,$y) = @_;
-    
+
     if (@$x != @$y) {
 	print STDERR Dumper($x,$y);
         die "Incompatible vectors:\n";
@@ -1432,7 +1434,7 @@ sub psiblast_search_old {
         my($sid, $sdef, $slen, $hsps) = @$sdata;
         my $explanation;
 
-        # if (@$hsps == 1) 
+        # if (@$hsps == 1)
         if ( one_real_hsp($hsps) ) {
             # [ scr, exp, p_n, pval, nmat, nid, nsim, ngap, dir, q1, q2, qseq, s1, s2, sseq ]
             #     0    1    2    3     4     5    6     7     8   9   10   11   12  13   14
@@ -1459,7 +1461,7 @@ sub psiblast_search_old {
         }
     }
     close REJ;
-    # &gjoseqlib::print_alignment_as_fasta("$dir/trim2$suffix-complete", \@trimmed);    
+    # &gjoseqlib::print_alignment_as_fasta("$dir/trim2$suffix-complete", \@trimmed);
     # printf "trim2$suffix-complete contains %d sequences\n", &num_seqs_in_fasta("$dir/trim2$suffix-complete");
 
     return \@trimmed;
@@ -1499,11 +1501,11 @@ sub trim_alignment_old {
 
         my $opts = {};
         my ( $trimmed, $reject, $scoreH ) = process_psiblast1( $blast, $opts );
-        
+
         push @trims, [ $_->[0], $_, $scoreH->{$_->[0]}, $i ] for @$trimmed;
         $successH{$_->[0]} = 1 for @$trimmed;
         push @{$rejectH{$_->[0]}}, $_ for @$reject;
-               
+
         my $rej = "$dir/psiblast1.rejects$suffix";
         open REJ, ">", $rej or die "Could not open $rej";
         foreach ( @$reject ) {
@@ -1517,7 +1519,7 @@ sub trim_alignment_old {
         # }
         # print "\n";
 
-        &gjoseqlib::print_alignment_as_fasta("$dir/trim1-reps-0.8$suffix", $trimmed);    
+        &gjoseqlib::print_alignment_as_fasta("$dir/trim1-reps-0.8$suffix", $trimmed);
         # printf "trim1-reps-0.8$suffix contains %d sequences\n", scalar@$trimmed;
         $profile = [@$trimmed];
 
@@ -1556,11 +1558,11 @@ sub trim_alignment_old {
         close $_ for @fhs[1..$i];
 
         @trims = map { $_->[1] } @trims;
-        &gjoseqlib::print_alignment_as_fasta("$dir/trim1-reps-0.8", \@trims);    
+        &gjoseqlib::print_alignment_as_fasta("$dir/trim1-reps-0.8", \@trims);
         $profile = [@trims];
-        
+
         printf "After merging, trim1-reps-0.8 contains %d sequences\n", &num_seqs_in_fasta("$dir/trim1-reps-0.8");
-        
+
         my $rej = "$dir/psiblast1.rejects";
         open REJ, ">", $rej or die "Could not open $rej";
         for (grep { @{$rejectH{$_}} == $i } keys %rejectH) {
