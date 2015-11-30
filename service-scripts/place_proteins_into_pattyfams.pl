@@ -166,7 +166,7 @@ while (<P>)
 	$gcount{$pgf}++;
 	$gscore{$pgf} += $score;
 
-	if ($plf =~ $genus_re)
+	if ($genus_re && ($plf =~ $genus_re))
         {
 	    $lcount{$plf}++;
 	    $lscore{$plf} += $score;
