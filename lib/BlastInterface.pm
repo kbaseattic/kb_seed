@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2003-2014 University of Chicago and Fellowship
+# Copyright (c) 2003-2015 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -29,6 +29,65 @@ use gjoseqlib;
 use gjoparseblast;
 
 #-------------------------------------------------------------------------------
+#  A unified interface to many of the NCBI blast programs.  It supports the
+#  blastall "programs" blastp, blastn, blastx, and tblastn.  It supports the
+#  blast+ programs blastp, blastn, blastx, tblastn, psiblast, and rpsblast.
+#
+#      @matches = blast( $query, $db, $blast_prog, \%options )
+#     \@matches = blast( $query, $db, $blast_prog, \%options )
+#
+#  The first two arguments supply the query and db data.
+#  The third argument is the blast tool: blastp, blastn, blastx, tblastn,
+#     psiblast or rpsblast
+#
+#  A slightly more intuitive version for specifying the program is provided
+#  by the following interfaces:
+#
+#      @matches =    blastn( $query, $db, \%options )
+#     \@matches =    blastn( $query, $db, \%options )
+#      @matches =    blastp( $query, $db, \%options )
+#     \@matches =    blastp( $query, $db, \%options )
+#      @matches =    blastx( $query, $db, \%options )
+#     \@matches =    blastx( $query, $db, \%options )
+#      @matches =   tblastn( $query, $db, \%options )
+#     \@matches =   tblastn( $query, $db, \%options )
+#      @matches = psiblast(  $query, $db, \%options )
+#     \@matches = psiblast(  $query, $db, \%options )
+#      @matches = rpsblast(  $query, $db, \%options )
+#     \@matches = rpsblast(  $query, $db, \%options )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Convert a multiple sequence alignment into a PSSM file suitable for the
+#  -in_pssm parameter of psiblast, or the input file list of build_rps_db.
+#  (Note: the psiblast -in_msa option takes the name of a fasta alignment
+#  file, not a pssm file.)
+#
+#      $db_name = alignment_to_pssm(  $align_file, \%options )
+#      $db_name = alignment_to_pssm( \@alignment,  \%options )
+#      $db_name = alignment_to_pssm( \*ALIGN_FH,   \%options )
+#
+#  The first argument supplies the MSA to be converted. It can be a list of
+#  sequence triple, a file name, or an open file handle.
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Build an RPS database from a list of alignments and/or alignment files
+#
+#      $db_file = build_rps_db( \@aligns, $db, \%options )
+#
+#  The first argument supplies the list of alignments and/or alignment files.
+#  The second argument supplies the file name for the created database.
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Fix a multiple sequence alignment to be appropriate for a psiblast
+#  -in_msa file.
+#
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa(  $align_file, \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \@alignment,  \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \*ALIGN_FH,   \%opts )
+#
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
 #  This is a general interface to NCBI blastall.  It supports blastp,
 #  blastn, blastx, and tblastn. The psiblast and rpsblast programs
 #  from the blast+ package are also supported.
@@ -46,7 +105,8 @@ use gjoparseblast;
 #      list of sequence triples
 #      undef or '' -> read from STDIN
 #
-#  The third argument is the blast tool (blastp, blastn, blastx, tblastn, psiblast or rpsblast)
+#  The third argument is the blast tool (blastp, blastn, blastx, tblastn,
+#  psiblast or rpsblast)
 #
 #  The fourth argument is an options hash. The available options have been
 #  expanded to better match those of the new blast+ set of programs.
@@ -344,7 +404,9 @@ sub alignment_to_pssm
 
 #-------------------------------------------------------------------------------
 #  Fix a multiple sequence alignment to be appropriate for a psiblast
-#  -in_msa file.
+#  -in_msa file.  This is often necessary due to arbitrary limitations on
+#  the acceptable sequence ordering and program options.  We recommend this
+#  for routine sanity checking.
 #
 #      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa(  $align_file, \%opts )
 #      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \@alignment,  \%opts )
@@ -366,6 +428,9 @@ sub alignment_to_pssm
 #
 #  General options:
 #
+#    file    => $path           #  path to file to be created (same as msa)
+#    msa     => $path           #  path to file to be created; this should not
+#                               #     be the same as $align_file.
 #    tmp_dir => $dir            #  directory for output file
 #
 #  Sequence filtering options:
@@ -399,16 +464,16 @@ sub alignment_to_pssm
 #    alignments are shown against the "msa_master" sequence, which defaults
 #    to the first sequence in the alignment supplied. The PSSM only includes
 #    alignment columns that are in the master sequence, so the reported
-#    match statistics (E-value, identity, positives, and gaps) and the
-#    alignment are all evaluated relative to the master sequence. For this
-#    reason, we provide a 'pseudo_master' option that adds a master sequence
-#    that is the plurality residue type in every column of the alignment.
-#    Thus, PSSM and the output alignments will reflect all columns in the
-#    original alignment, but the query sequence shown is unlikely to
-#    correspond to any of the input sequences. If this option is chosen,
-#    ignore_msa_master is set to true, so that the consensus is not included
-#    in the calculation of the PSSM. Any msa_master_id or msa_master_idx option
-#    value will be ignored.
+#    sequence alignment, identity, positives, and gaps are all evaluated
+#    relative to the master sequence. For this reason, we provide a
+#    'pseudo_master' option that adds a master sequence that is the plurality
+#    residue type in every column of the alignment.  Thus, PSSM and the output
+#    alignments will reflect all columns in the original alignment, but the
+#    query sequence shown is unlikely to correspond to any of the input
+#    sequences.  If this option is chosen, ignore_msa_master is set to true, so
+#    that this consensus sequence is not included in the calculation of the
+#    PSSM, and hence does not influence the alignment or e-value. Any user-
+#    supplied msa_master_id or msa_master_idx option value will be ignored.
 #
 #-------------------------------------------------------------------------------
 sub psiblast_in_msa
@@ -423,9 +488,10 @@ sub psiblast_in_msa
     my $max_sim        = $opts->{ max_sim };
     my $min_opt        = $opts->{ min_sim };
 
-    my %strip = map { $_ => 1 } qw( ignore_msa_master ignoreMaster
-                                    pseudo_master pseudoMaster
-                                    msa_master_id msa_master_idx
+    my %strip = map { $_ => 1 } qw( ignore_msa_master  ignoreMaster
+                                    pseudo_master      pseudoMaster
+                                    msa_master_id
+                                    msa_master_idx
                                     max_sim
                                     min_sim
                                   );
@@ -439,14 +505,23 @@ sub psiblast_in_msa
         @ref_ids = @{$ref_ids[0]} if ( ( @ref_ids == 1 ) && ( ref( $ref_ids[0] ) eq 'ARRAY' ) )
     }
 
-    my $alignF;
-    my $write_file;
+    my $alignF     = $opts->{ file }    #  Create a user-specified file
+                  || $opts->{ msa };
+    my $write_file = $alignF ? 1 : 0;   #  Do we need to write a file?
+    my $keep_file  = $write_file;       #  Keep the file if named
 
     my $is_file  = $align && ! ref( $align ) && -s $align;
     my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
     my $is_glob  = $align && ref( $align ) eq 'GLOB';
+    if ( ! ( $is_file || $is_array || $is_glob ) )
+    {
+        warn "BlastInterface::psiblast_in_msa: Unsupported data-type for alignment";
+        return undef;
+    }
 
-    if ( $is_array || $is_glob || $is_file
+    #  Is there anything that might require writing a file?
+    if ( $is_array || $is_glob
+                   || $write_file
                    || $msa_master_id
                    || $max_sim
                    || $min_sim
@@ -471,11 +546,7 @@ sub psiblast_in_msa
             @align  = gjoseqlib::read_fasta( $align );
             $alignF = $align;
         }
-	else {
-	    warn "BlastInterface::psiblast_in_msa: Unsupported data-type for alignment";
-	    return undef;
-	}
-	
+
         @align
             or warn "BlastInterface::psiblast_in_msa: No alignment supplied."
                 and return undef;
@@ -551,34 +622,58 @@ sub psiblast_in_msa
         if ( $write_file )
         {
             my $fh;
-            my @dir = $opts->{ tmp_dir } ? ( $opts->{ tmp_dir } ) : ();
-            ( $fh, $alignF ) = SeedAware::open_tmp_file( 'psiblast_in_msa', 'fasta', @dir );
-            gjoseqlib::write_fasta( $fh, \@align );
-            close( $fh );
+            if ( $alignF )
+            {
+                open( $fh, '>', $alignF );
+            }
+            else
+            {
+                my @dir = $opts->{ tmp_dir } ? ( $opts->{ tmp_dir } ) : ();
+                ( $fh, $alignF ) = SeedAware::open_tmp_file( 'psiblast_in_msa', 'fasta', @dir );
+            }
+
+            if ( $fh )
+            {
+                gjoseqlib::write_fasta( $fh, \@align );
+                close( $fh );
+            }
+            else
+            {
+                $alignF ||= 'unnamed_tmp_file';
+                warn "BlastInterface::psiblast_in_msa: failed to open '$alignF' for writing MSA file.";
+                return ();
+            }
         }
 
-        $opts2->{ in_msa }            = $alignF          if $alignF;
+        $alignF                     ||= $align;
         $opts2->{ ignore_msa_master } = 1                if $ignore_master;
         $opts2->{ msa_master_idx }    = $msa_master_idx  if $msa_master_idx > 1;
     }
 
-    wantarray ? ( $alignF, $opts2, $write_file ) : $alignF;
+    else
+    {
+        $alignF = $align;
+    }
+
+    $opts2->{ in_msa } = $alignF;
+
+    wantarray ? ( $alignF, $opts2, $write_file && ! $keep_file ) : $alignF;
 }
 
 
 #-------------------------------------------------------------------------------
 #  Build an RPS database from a list of alignments and/or alignment files
 #
-#      $db_file = build_rps_db( \@aligns, \%options )
+#      $db_file = build_rps_db( \@aligns, $db, \%options )
 #
 #  The first argument supplies the list of alignments and/or alignment files.
+#  The second argument supplies the file name for the created database.
 #
 #  Three forms of alignments are supported:
 #
 #       [ [ 'alignment-id', 'optional title', [ @seqs1 ] ], ... ]
 #       [ [ 'alignment-id', 'optional title', 'align1.fa' ], ... ];
 #       [ 'align1.pssm', ... ];
-#
 #
 #  Options:
 #

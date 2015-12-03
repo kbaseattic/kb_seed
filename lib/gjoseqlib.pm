@@ -195,11 +195,11 @@ Evaluate alignments:
 
 Guess type of a sequence:
 
-  $type = guess_seq_type(  $sequence )
-  $bool = is_dna(  $sequence )   # not RNA or prot
-  $bool = is_rna(  $sequence )   # not DNA or prot
-  $bool = is_na(  $sequence )    # nucleic acid, not prot
-  $bool = is_prot(  $sequence )  # not DNA or RNA
+  $type = guess_seq_type( $sequence )
+  $bool = is_dna( $sequence )   # not RNA or prot
+  $bool = is_rna( $sequence )   # not DNA or prot
+  $bool = is_na( $sequence )    # nucleic acid, not prot
+  $bool = is_prot( $sequence )  # not DNA or RNA
 
 $sequence can be a sequence string, a reference to a sequence string,
 or a [$id, $def, $seq] triple.
@@ -2841,11 +2841,11 @@ sub oligomer_similarity
 
 =head2 Guess Type of a Sequence
 
-     $type = guess_seq_type(  $sequence )
-     $bool = is_dna(  $sequence )   # not RNA or prot
-     $bool = is_rna(  $sequence )   # not DNA or prot
-     $bool = is_na(  $sequence )    # nucleic acid, not prot
-     $bool = is_prot(  $sequence )  # not DNA or RNA
+     $type = guess_seq_type( $sequence )
+     $bool = is_dna( $sequence )   # not RNA or prot
+     $bool = is_rna( $sequence )   # not DNA or prot
+     $bool = is_na( $sequence )    # nucleic acid, not prot
+     $bool = is_prot( $sequence )  # not DNA or RNA
 
   $sequence can be a string, a reference to a string, or an id_def_seq triple.
   $type will be a keyword: 'DNA', 'RNA' or 'protein', or '' in case of error.
@@ -2872,10 +2872,10 @@ sub guess_seq_type
           :                     'DNA';
 }
 
-sub is_dna  { local $_ = guess_seq_type( $_[0] ); /DNA/   }
-sub is_rna  { local $_ = guess_seq_type( $_[0] ); /RNA/   }
-sub is_na   { local $_ = guess_seq_type( $_[0] ); /^.NA$/ }
-sub is_prot { local $_ = guess_seq_type( $_[0] ); /^prot/ }
+sub is_dna  { guess_seq_type( $_[0] ) eq 'DNA' }
+sub is_rna  { guess_seq_type( $_[0] ) eq 'RNA' }
+sub is_na   { guess_seq_type( $_[0] ) =~ /^.NA$/ }
+sub is_prot { guess_seq_type( $_[0] ) =~ /^prot/ }
 
 
 =head2 Is (Array Of) Sequence Triple

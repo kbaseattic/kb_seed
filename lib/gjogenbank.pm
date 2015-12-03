@@ -536,7 +536,16 @@ sub parse_one_genbank_entry
             elsif ( $tag eq 'ORGANISM' )
             {
                 my $org = shift @value;
+		#
+		# Long genome names may split into additional lines in the value; we need
+		# to bring them into the org name. We will bring in values until we get
+		# one with a ; since that begins the taxonomy.
                 $entry{ ORGANISM } = $org;
+		while ($value[0] !~ /;/)
+		{
+		    my $ent = shift @value;
+		    $entry { ORGANISM } .= " $ent";
+		}
                 my $tax = @value ? join( ' ', @value ) : '';
                 $tax =~ s/\s*\.$//;
                 $entry{ TAXONOMY } = [ split /; */, $tax ] if $tax;

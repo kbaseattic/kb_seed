@@ -1,6 +1,6 @@
 # This is a SAS component
 #
-# Copyright (c) 2003-2014 University of Chicago and Fellowship
+# Copyright (c) 2003-2015 University of Chicago and Fellowship
 # for Interpretations of Genomes. All Rights Reserved.
 #
 # This file is part of the SEED Toolkit.
@@ -609,7 +609,7 @@ sub add_to_alignment
 
     #  Put sequences in a clean canonical form:
 
-    my $type = guess_seq_type( $seq->[2] );
+    my $type = gjoseqlib::guess_seq_type( $seq->[2] );
     my $clnseq = [ "seq000000", '', clean_for_clustal( $seq->[2], $type ) ];
     $clnseq->[2] =~ s/[^A-Z]//g;   # remove gaps
     my @clnali = map { [ $_->[0], '', clean_for_clustal( $_->[2], $type ) ] } @$ali;
@@ -771,7 +771,7 @@ sub add_to_alignment_v2
     my %id_map;
     $id = "seq000000";
     ( $seq ) = gjoseqlib::pack_sequences( $seq );
-    my $type = guess_seq_type( $seq->[2] );
+    my $type = gjoseqlib::guess_seq_type( $seq->[2] );
     my ( $clnseq, @clnali ) = map { $id_map{ $_->[0] } = $id;
                                     [ $id++, "", clean_for_clustal( $_->[2], $type ) ]
                                   }
@@ -1029,7 +1029,7 @@ sub add_to_alignment_v2a
     my %id_map;
     $id = "seq000000";
     ( $seq ) = gjoseqlib::pack_sequences( $seq );
-    my $type = guess_seq_type( $seq->[2] );
+    my $type = gjoseqlib::guess_seq_type( $seq->[2] );
     my ( $clnseq, @clnali ) = map { $id_map{ $_->[0] } = $id;
                                     [ $id++, "", clean_for_clustal( $_->[2], $type ) ]
                                   }
@@ -1173,7 +1173,7 @@ sub clustal_profile_alignment
     #  names (first sequence through the map {} is the sequence to be added):
 
     my $id = "seq000001";
-    my $type = guess_seq_type( $seqs1->[2] );
+    my $type = gjoseqlib::guess_seq_type( $seqs1->[2] );
 
     my %id_map;
     my @cln1 = map { $id_map{ $id } = $_; [ $id++, "", clean_for_clustal( $_->[2], $type ) ] }
@@ -1346,7 +1346,9 @@ sub identity_threshold
     return $p - $z * $sigma;
 }
 
-
+#
+#  Relic: Use gjoseqlib::guess_seq_type() instead
+#
 sub guess_seq_type
 {
     my $seq = shift;
@@ -1423,7 +1425,7 @@ sub trim_with_blastall
     gjoseqlib::write_fasta( $blastfile, scalar gjoseqlib::pack_sequences( $clnali ) );
     gjoseqlib::write_fasta( $seqfile,   scalar gjoseqlib::pack_sequences( $clnseq ) );
 
-    $type = guess_seq_type( $clnseq->[2] ) if ! $type;
+    $type = gjoseqlib::guess_seq_type( $clnseq->[2] ) if ! $type;
     my ( $is_prot, $prog, @opt ) = ( $type =~ m/^n/i ) ? qw( f blastn -r 1 -q -1 )
                                                        : qw( t blastp );
     my $formatdb = SeedAware::executable_for( 'formatdb' )
@@ -1540,7 +1542,7 @@ sub representative_alignment
     if ( $min_opt && ( ref($min_opt) eq 'ARRAY' ) && @$min_opt > 1 )
     {
         my ( $min_sim, @ref_ids ) = @$min_opt;
-        @ref_ids = @{ $ref_ids[0] } if @ref_ids == 1 && $ref_ids[0] && ref( $ref_ids[0] ) eq 'ARRAY';
+        @ref_ids = @{ $ref_ids[0] } if @ref_ids == 1 && ref( $ref_ids[0] ) eq 'ARRAY';
         my %ref_id  = map  { defined($_) ? ( $_ => 1 ) : () } @ref_ids;
         my @ref_seq = grep { $ref_id{ $_->[0] } } @$align;
         if ( @ref_seq )
@@ -1580,6 +1582,11 @@ sub representative_alignment
 
     my $n = 0;
     my %order = map { $_->[0] => ++$n } @align;
+
+    #  Reorder the sequences for those with the most residues in columns
+    #  that other sequences also use.
+
+    @align = reorder_by_useful_residues( \@align );
 
     my %id_to_group;
     my @groups;
@@ -1717,11 +1724,197 @@ sub filter_by_similarity
 
 
 #-------------------------------------------------------------------------------
+#  Reorder sequences in an alignment, prioritized by the residues per column
+#  of the columns in which the sequence has unambiguous residues.  That is,
+#  each column is scored by the number of unambiguous residues that it
+#  contains, and then for each sequence, these scores are summed for the
+#  columns in which that sequence has residues.
+#
+#       @align = reorder_by_useful_residues( \@align, \%options )
+#      \@align = reorder_by_useful_residues( \@align, \%options )
+#
+#  Options:
+#
+#    dna        => $bool   # Residues are nucleotides (D = guess)
+#    nucleotide => $bool   # Residues are nucleotides (D = guess)
+#    protein    => $bool   # Residues are amino acides (D = guess)
+#    rna        => $bool   # Residues are nucleotides (D = guess)
+#
+#-------------------------------------------------------------------------------
+sub reorder_by_useful_residues
+{
+    my ( $align, $opts ) = @_;
+    return () unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align && $align->[0];
+
+    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
+
+    my $aa = $opts->{ protein };
+    my $nt = $opts->{ rna } || $opts->{ RNA }
+          || $opts->{ dna } || $opts->{ DNA }
+          || $opts->{ nucleotide };
+
+    if ( ! ( $aa || $nt ) )
+    {
+        my $type = gjoseqlib::guess_seq_type( $align->[0] );
+        $nt = $type =~ /^.NA/i;
+    }
+
+    #  Get the per column residue counts as a string, where the ordinal
+    #  values of the characters are the values.
+    my $opt2 = { $nt ? ( dna => 1 ) : ( protein => 1 ) };
+    my $cnts = residues_per_column( $align, $opt2 );
+
+    my @wgt;
+    foreach my $entry ( @$align )
+    {
+        local $_ = $entry->[2];
+
+        #  Make a mask of the unambiguous characters in the sequence.
+        if ( $nt )
+        {
+            tr/ACGTUacgtu/\0/c;
+            tr/ACGTUacgtu/\x{FFFFFF}/;
+        }
+        else
+        {
+            tr/ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy/\0/c;
+            tr/ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy/\x{FFFFFF}/;
+        }
+
+        #  Mask column counts by unambiguous residues in sequence, and compress
+        $_ &= $cnts;
+        tr/\0//d;
+
+        #  Count the remaining column scores
+        my $scr = 0;
+        for ( my $i = 0; $i < length($_); $i++ )
+        {
+            $scr += ord( substr( $_, $i, 1 ) );
+        }
+
+        #  Tag the sequence entry for sorting
+        push @wgt, [ $entry, $scr ];
+    }
+
+    my @align = map  { $_->[0] }
+                sort { $b->[1] <=> $a->[1] }
+                @wgt;
+
+    wantarray ? @align : \@align;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Find the number of residues in each alignment column, with the idea of
+#  using these as column weights.
+#
+#       @counts = residues_per_column( \@align, \%options )
+#       @counts = residues_per_column( \@seq,   \%options )
+#       @counts = residues_per_column( \@seqR,  \%options )
+#
+#       $counts = residues_per_column( \@align, \%options )
+#       $counts = residues_per_column( \@seq,   \%options )
+#       $counts = residues_per_column( \@seqR,  \%options )
+#
+#  Where:
+#
+#      @counts is a list of numbers; and
+#      $counts is a string, in which the ordinal value of each character is
+#          the count.
+#
+#  In each group:
+#
+#     The first form takes a reference to an array of sequence triples.
+#     The second form takes a reference to an array of sequences.
+#     The third form takes a reference to an array of sequence references.
+#
+#  Options:
+#
+#    dna        => $bool   # Residues are nucleotides (D = guess)
+#    nucleotide => $bool   # Residues are nucleotides (D = guess)
+#    protein    => $bool   # Residues are amino acides (D = guess)
+#    rna        => $bool   # Residues are nucleotides (D = guess)
+#
+#-------------------------------------------------------------------------------
+sub residues_per_column
+{
+    my ( $align, $opts ) = @_;
+    return () unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align && $align->[0];
+
+    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
+
+    my $aa = $opts->{ protein };
+    my $nt = $opts->{ rna } || $opts->{ RNA }
+          || $opts->{ dna } || $opts->{ DNA }
+          || $opts->{ nucleotide };
+
+    if ( ! ( $aa || $nt ) )
+    {
+        my $type = gjoseqlib::guess_seq_type( $align->[0] );
+        $nt = $type =~ /^.NA/i;
+    }
+
+    #  Normalize the alignment to be references to the sequences, comparing
+    #  all lengths to that of first sequence.
+
+    my $len;
+    my @align;
+
+    #  Array of id_def_seq triples:
+    if ( gjoseqlib::is_array_of_sequence_triples( $align ) )
+    {
+        $len = length( $align->[0]->[2] );
+        @align = map { length( $_->[2] ) == $len ? \$_->[2] : () } @$align;
+    }
+
+    #  Array of sequences:
+    elsif ( ! ref( $align->[0] ) )
+    {
+        $len = length( $align->[0] );
+        @align = map { $_ && ! ref( $_ ) && length( $_ ) == $len ? \$_ : () } @$align;
+    }
+
+    #  Array of sequence references:
+    elsif ( ref( $align->[0] ) eq 'SCALAR' )
+    {
+        $len = length( ${$align->[0]} );
+        @align = map { $_ && ref( $_ ) eq 'SCALAR' && length( $$_ ) == $len ? $_ : () } @$align;
+    }
+    return () unless @align == @$align;
+
+    #  Set up the count array, and work through the sequences:
+
+    my @cnt = map { 0 } ( 1 .. $len );
+    foreach my $seqR ( @align )
+    {
+        local $_ = $$seqR;
+        if ( $nt )
+        {
+            tr/ACGTUacgtu/\0/c;
+            tr/ACGTUacgtu/\1/;
+        }
+        else
+        {
+            tr/ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy/\0/c;
+            tr/ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy/\1/;
+        }
+
+        for ( my $i = 0; $i < $len; $i++ )
+        {
+            $cnt[$i] += ord( substr( $_, $i, 1 ) );
+        }
+    }
+
+    wantarray ? @cnt : join( '', map { chr($_) } @cnt ); 
+}
+
+
+#-------------------------------------------------------------------------------
 #  Find the consensus sequence for an alignment.
 #
-#       $sequence = consensus_sequence( \@align, $options )
-#       $sequence = consensus_sequence( \@seq,   $options )
-#       $sequence = consensus_sequence( \@seqR,  $options )
+#       $sequence = consensus_sequence( \@align, \%options )
+#       $sequence = consensus_sequence( \@seq,   \%options )
+#       $sequence = consensus_sequence( \@seqR,  \%options )
 #
 #  The first form takes a reference to an array of sequence triples, while
 #  the second form takes a reference to an array of sequences, and the
@@ -1739,19 +1932,20 @@ sub filter_by_similarity
 sub consensus_sequence
 {
     my ( $align, $opts ) = @_;
-    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align &&  $align->[0];
+    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align && $align->[0];
 
     $opts = {} unless $opts && ref( $opts ) eq 'HASH';
 
-    my $aa  = $opts->{ protein };
-    my $rna = $opts->{ rna } || $opts->{ RNA };
-    my $nt  = $opts->{ dna } || $opts->{ DNA } || $rna;
+    my $aa = $opts->{ protein };
+    my $nt = $opts->{ rna } || $opts->{ RNA }
+          || $opts->{ dna } || $opts->{ DNA }
+          || $opts->{ nucleotide };
 
     if ( ! ( $aa || $nt ) )
     {
         my $type = gjoseqlib::guess_seq_type( $align->[0] );
         $nt = $type =~ /^.NA/i;
-        $opts->{ rna } = 1 if $type =~ /^RNA/i
+        $opts->{ rna } = 1 if $type =~ /^RNA/i;
     }
 
     $nt ? consensus_sequence_nt( $align, $opts )
@@ -1779,7 +1973,7 @@ sub consensus_sequence
 sub consensus_sequence_aa
 {
     my ( $align, $opts ) = @_;
-    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align &&  $align->[0];
+    return undef unless $align && ( ref( $align ) eq 'ARRAY' ) && @$align && $align->[0];
 
     $opts = {} unless $opts && ref( $opts ) eq 'HASH';
 
