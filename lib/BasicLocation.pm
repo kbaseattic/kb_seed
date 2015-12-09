@@ -540,6 +540,42 @@ sub Parse {
     return ($loc->Contig, $loc->Begin, $loc->EndPoint);
 }
 
+=head3 OverlapLoc
+
+    my $len = $loc->OverlapLoc($loc2);
+
+Determine how many positions in this location overlap the specified other location.
+
+=over 4
+
+=item loc2
+
+L<BasicLocation> object to check for overlap.
+
+=item RETURN
+
+Returns the number of overlapping positions, or 0 if there is no overlap (which is automatically the case if the
+locations are on different contigs.
+
+=back
+
+=cut
+
+sub OverlapLoc {
+    # Get the parameters.
+    my ($self, $loc2) = @_;
+    # Declare the return variable,
+    my $retVal = 0;
+    # Check for a contig match.
+    if ($self->Contig eq $loc2->Contig) {
+        # The contigs match, so check for overlap.
+        $retVal = $self->Overlap($loc2->Left, $loc2->Right);
+    }
+    # Return the result.
+    return $retVal;
+}
+
+
 =head3 Overlap
 
     my $len = $loc->Overlap($b,$e);

@@ -259,6 +259,18 @@ sub n_id {
     return $self->[11];
 }
 
+=head3 pct
+
+    my $pct = $hsp->pct;
+
+Return the percent identity.
+
+=cut
+
+sub pct {
+    my ($self) = @_;
+    return ($self->[11] * 100 / $self->[10]);
+}
 
 =head3 n_pos
 

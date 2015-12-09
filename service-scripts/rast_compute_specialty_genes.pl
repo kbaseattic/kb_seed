@@ -54,6 +54,28 @@ if (!$opt->no_cache)
     $dbh = DBI->connect("dbi:mysql:$cache_db;host=$cache_host", $cache_user, $cache_pass);
     $dbh or die "Error connecting: " . DBI->errstr;
 
+    #
+    # Check for existence of cache table; attempt to create.
+    #
+    my @res = $dbh->tables(undef, undef, 'specialty_gene');
+    if (@res == 0)
+    {
+	$dbh->do(qq(
+CREATE TABLE specialty_gene (
+  query_md5 char(33) NOT NULL DEFAULT '',
+  database_name varchar(100) NOT NULL DEFAULT '',
+  sub_id varchar(255) DEFAULT NULL,
+  sub_organism varchar(255) DEFAULT NULL,
+  query_coverage float DEFAULT NULL,
+  sub_coverage float DEFAULT NULL,
+  identity float DEFAULT NULL,
+  p_value double DEFAULT NULL,
+  PRIMARY KEY (query_md5,database_name),
+  KEY sub_id (sub_id)
+) ENGINE=InnoDB
+		    ));
+    }
+
     $sth = $dbh->prepare(qq(INSERT INTO specialty_gene
 			   (query_md5, database_name, sub_id, query_coverage, sub_coverage, identity, p_value)
 			   VALUES (?, ?, ?, ?, ?, ?, ?)));
