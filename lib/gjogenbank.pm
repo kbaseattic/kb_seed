@@ -541,7 +541,7 @@ sub parse_one_genbank_entry
 		# to bring them into the org name. We will bring in values until we get
 		# one with a ; since that begins the taxonomy.
                 $entry{ ORGANISM } = $org;
-		while ($value[0] !~ /;/)
+                while (@value && $value[0] !~ /\.$/ && $value[0] !~ /;/)
 		{
 		    my $ent = shift @value;
 		    $entry { ORGANISM } .= " $ent";
