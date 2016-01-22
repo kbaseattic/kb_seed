@@ -1855,7 +1855,7 @@ sub add_feature {
     }
 
     my @loc  = split( /,/, $location );
-    my @loc2 = grep { $_->[0] && $_->[1] && $_->[2] }    
+    my @loc2 = grep { defined($_->[0]) && $_->[1] && $_->[2] }    
                map  { [ $_ =~ m/^(.+)_(\d+)_(\d+)$/ ] }
                @loc;
 

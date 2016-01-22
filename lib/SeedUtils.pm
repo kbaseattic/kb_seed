@@ -989,6 +989,7 @@ sub hypo {
     $func =~ s/\s*\#.*$//;
     if ($func =~ /lmo\d+ protein/i)          { return 1 }
     if ($func =~ /hypoth/i)                  { return 1 }
+    if ($func =~ /^hypo$/i)                  { return 1 }
     if ($func =~ /conserved protein/i)       { return 1 }
     if ($func =~ /gene product/i)            { return 1 }
     if ($func =~ /interpro/i)                { return 1 }
@@ -1990,16 +1991,29 @@ Name of the relevant directory.
 sub verify_dir {
     # Get the parameters.
     my ($dirName) = @_;
+    warn "SeedUtils::verify_dir processing dirName \'$dirName\'\n" if $ENV{FIG_VERBOSE};
+
     # Strip off the final slash, if any.
     $dirName =~ s#/$##;
+
     # Only proceed if the directory does NOT already exist.
     if (! -d $dirName) {
         # If there is a parent directory, recursively insure it is there.
         if ($dirName =~ m#(.+)/[^/]+$#) {
+            warn "Creating directory \'$1\'\n" if $ENV{FIG_VERBOSE};
             verify_dir($1);
         }
+        else {
+            warn "Directory name \'$1\' is invalid";
+        }
+
         # Create this particular directory with full permissions.
-        mkdir $dirName, 0777;
+        warn "Creating directory \'$dirName\'\n" if $ENV{FIG_VERBOSE};
+        mkdir($dirName, 0777)
+            or warn "Directory name \'$1\' is invalid";
+    }
+    else {
+        warn "Directory \'$dirName\' exists" if $ENV{FIG_VERBOSE};
     }
 }
 

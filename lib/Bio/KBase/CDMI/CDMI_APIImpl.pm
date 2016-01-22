@@ -7642,6 +7642,8 @@ sub close_genomes
     use Bio::KBase::Utilities::ScriptThing;
     $parms->{-csObj} = Bio::KBase::CDMI::CDMIClient->new_for_script();
     my ($close,$coding) = &CloseGenomes::close_genomes_and_hits($contigs, $parms);
+    print STDERR ("In CloseGenomes::close_genomes:\n", $close, $coding, "\n");
+    
     my @tmp = @$close;
     if (@tmp > $n) { $#tmp = $n-1 }  # return the $n closest
     $return = \@tmp;

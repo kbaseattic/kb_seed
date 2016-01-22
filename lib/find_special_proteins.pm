@@ -291,6 +291,19 @@ sub find_selenoproteins
 #      tmp         =>  $directory           # directory for tmp_dir
 #      tmp_dir     =>  $directory           # directory for temporary files
 #
+#  Returned "locatons" are:
+#
+#    { location       => $contigid_begin_end,
+#      sequence       => $translated_region,
+#      comment        => $comment,
+#      reference_id   => $ref_seq_id,
+#      reference_def  => $ref_seq_def,
+#      bit_score      => $bit_score,
+#      e_value        => $e_value,
+#      align_length   => $align_length,
+#      fract_identity => $fract_identity
+#    }
+#
 #  Some keys can be shortened.
 #===============================================================================
 sub find_protein_homologs
@@ -441,15 +454,24 @@ sub find_protein_homologs
 
         my $key = "$sid\t$to\t$dir";
         my $len = length( $aaseq );
-        $hit{$key} = [ $sid, $from, $to, $aaseq, $len ] unless ( $hit{$key} && $hit{$key}->[4] >= $len );
+        $hit{$key} = [ $sid, $from, $to, $aaseq, $len,
+                      @$hsp[0,1,6,7,10], $hsp->[11]/$hsp->[10] 
+                     ]
+            unless ( $hit{$key} && $hit{$key}->[4] >= $len );
     }
 
     #  Sort by contig and midpoint location, and return a hash or location,
     #  sequence and comment for each:
 
-    my @prots = map  { scalar { location => join( '_', @$_[0..2] ),
-                                sequence => $_->[3],
-                                comment  => $comment
+    my @prots = map  { scalar { location       => join( '_', @$_[0..2] ),
+                                sequence       => $_->[3],
+                                comment        => $comment,
+                 ( $_->[5]  ? ( reference_id   => $_->[5]  ) : () ),
+                 ( $_->[6]  ? ( reference_def  => $_->[6]  ) : () ),
+                 ( $_->[7]  ? ( bit_score      => $_->[7]  ) : () ),
+                 ( $_->[8]  ? ( e_value        => $_->[8]  ) : () ),
+                 ( $_->[9]  ? ( align_length   => $_->[9]  ) : () ),
+                 ( $_->[10] ? ( fract_identity => $_->[10] ) : () )
                               }
                      }
                 sort { $a->[0] cmp $b->[0] || ( ( $a->[1]+$a->[2] ) <=> ( $b->[1]+$b->[2] ) ) }

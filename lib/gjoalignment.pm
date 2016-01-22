@@ -1594,8 +1594,8 @@ sub representative_alignment
     foreach my $try ( @align )
     {
         my $gr;
-        my $status = 0;            # Highest identity so far, or 2 for redundant
-        foreach ( reverse @reps )  # likely to produce hit sooner
+        my $status = 0;      #  Highest identity so far, or 2 for redundant
+        foreach ( @reps )
         {
             #  ( $nid/$nmat ) = fraction_aa_identity( $seq1, $seq2 )
             my $ident = fraction_aa_identity( $try->[2], $_->[2] ) || 0;
@@ -1637,38 +1637,28 @@ sub representative_alignment
     my %is_rep = ();
     foreach my $group ( @groups )
     {
-        #  The rep of a group of 1 is unambiguous
-        if ( @$group == 1 )
-        {
-            $is_rep{ $group->[0]->[0] } = 1;
-            next;
-        }
-
-        # A keep option can give a group multiple reps
+        #  A keep option can give a group multiple reps.
+        #  We might want to reconsider whether there are also conditions
+        #  in which we also keep the nucleating member of the group.
         my @gr_rep;
         if ( $keep && ( @gr_rep = grep { $keep{ $_->[0] } } @$group ) )
         {
             foreach ( @gr_rep ) { $is_rep{ $_->[0] } = 1 }
-            next;
         }
 
-        #  Prioritize by fewest gaps (counting terminal at 5x internal)
-         my $rep;
-         my $rep_scr = 1e100;
-         foreach ( @$group )
-         {
-             my ($gb) = $_->[2] =~ /^(-*)/;   #  the zero or more avoids undef
-             my ($ge) = $_->[2] =~ /(-*)$/;   #  the zero or more avoids undef
-             my $gall = $_->[2] =~ tr/-//;
-             my $scr  = $gall + 4 * ( length($gb) + length($ge) );
-             next if $scr >= $rep_scr;
-             $rep = $_;
-             $rep_scr = $scr;
+        #  If this did not get it, we just want the first member of the group,
+        #  because the sequences were examined in a prioritized order.
+        else
+        {
+            $is_rep{ $group->[0]->[0] } = 1;
         }
-        $is_rep{ $rep->[0] } = 1;
     }
 
-    @reps = grep { $is_rep{ $_->[0] } } @align;
+    @reps = map  { $_->[0] }                     #  strip order info
+            sort { $a->[1] <=> $b->[1] }         #  sort by input order
+            map  { [ $_, $order{ $_->[0] } ] }   #  tag entry with order
+            grep { $is_rep{ $_->[0] } } @align;  #  filter for reps
+
     @reps = gjoseqlib::pack_alignment( \@reps ) unless $opts->{ nopack };
     
     wantarray ? @reps : \@reps;

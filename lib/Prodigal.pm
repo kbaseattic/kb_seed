@@ -90,6 +90,12 @@ sub run_prodigal
 	       "-f", "sco",
 	       "-o", $sco_file,
 	       );
+
+    if ((-s $tmp_contigs_filename) < 25000) {
+	print STDERR "Genome is smaller than 25000 bp -- using 'metagenome' mode\n" if $ENV{DEBUG};
+	push @cmd, qw( -p meta );
+    }
+    
     my $cmd = join q( ), @cmd;
     
     my $hostname = `hostname`;

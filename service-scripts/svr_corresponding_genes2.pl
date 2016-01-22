@@ -179,26 +179,35 @@ use ProtSims;
 use SeedAware;
 use Getopt::Long;
 
-my $usage = "usage: svr_corresponding_genes [-u SERVERURL] [-o N1] [-n N2] [-d RASTdirectory] Genome1 Genome2";
+my $usage = "usage: svr_corresponding_genes2 [--u=SERVERURL] [--o=N1] [--n=N2] [--d=RASTdirectory] Genome1 Genome2";
 
 my $ignore_ov   = 1000000;
 my $sz_context  = 4;
 my $url;
 
-my $rc    = GetOptions("o"              => \$ignore_ov,
+my ($genome1_name, $genome2_name);
+
+my $rc    = GetOptions("o=i"            => \$ignore_ov,
                        "n=i"            => \$sz_context,
-                       "u=s"            => \$url
+                       "u=s"            => \$url,
+		       "d=s"            => \$genome2_name,
                       );
+<<<<<<< svr_corresponding_genes2.pl
+if (! $rc) { print STDERR "\n\n   $usage\n\n"; exit }
+=======
 if (! $rc) { print STDERR "$usage\n"; exit }
+>>>>>>> 1.3
 
 my $sapObject = SAPserver->new(url => $url);
 
-my($genome1_name, $genome2_name);
-(
- ($genome1_name = shift @ARGV) &&
- ($genome2_name = shift @ARGV) 
-)
-    || die $usage;
+
+$genome1_name = shift @ARGV;
+if (not $genome2_name) {
+    $genome2_name = shift @ARGV;
+}
+
+($genome1_name && $genome2_name)
+    || die "\n\n   $usage\n\n";
 
 
 my $genome1 = make_genome_source($genome1_name, $sapObject);

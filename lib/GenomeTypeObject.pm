@@ -536,6 +536,14 @@ sub update_event_index
 sub features
 {
     my($self) = @_;
+
+    #
+    # Patch incomplete genome object.
+    #
+    if (!exists $self->{features})
+    {
+	$self->{features} = [];
+    }
     wantarray ? @{$self->{features}} : $self->{features};
 }
 
@@ -597,6 +605,13 @@ sub fids_by_type
 sub contigs
 {
     my($self) = @_;
+    #
+    # Patch incomplete genome object.
+    #
+    if (!exists $self->{contigs})
+    {
+	$self->{contigs} = [];
+    }
     wantarray ? @{$self->{contigs}} : $self->{contigs};
 }
 
@@ -618,6 +633,15 @@ sub n_contigs
 sub analysis_events
 {
     my($self) = @_;
+
+    #
+    # Patch incomplete genome object.
+    #
+    if (!exists $self->{features})
+    {
+	$self->{analysis_events} = [];
+    }
+
     wantarray ? @{$self->{analysis_events}} : $self->{analysis_events};
 }
 
@@ -1180,7 +1204,7 @@ sub write_seed_dir
         for my $anno (@{$feature->{annotations}})
         {
             my($txt, $annotator, $time, $event_id) = @$anno;
-            print $anno_fh join("\n", $fid, $time, $annotator, $txt);
+            print $anno_fh join("\n", $fid, $time, defined($annotator) ? $annotator : "", $txt);
             print $anno_fh "\n" if substr($txt, -1) ne "\n";
             print $anno_fh "//\n";
         }

@@ -156,9 +156,9 @@ my $json = JSON::XS->new;
 my $genomeTO = GenomeTypeObject->create_from_file($in_fh);
 close($in_fh) if $input_file;
 
-if ($genomeTO->{domain} !~ m/^([ABV])/o) {
-    die "Invalid domain: \"$genomeTO->{domain}\"";
-}
+# if ($genomeTO->{domain} !~ m/^([ABV])/o) {
+#    die "Invalid domain: \"$genomeTO->{domain}\"";
+# }
 
 my $id_client;
 if ($id_server)

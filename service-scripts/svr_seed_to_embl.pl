@@ -33,8 +33,37 @@ use Data::Dumper;
 $0 =~ m/([^\/]+)$/;
 my $self = $1;
 
-my $usage = qq(usage: $self  LocusTag_Prefix  SEED_OrgDir > genbank.output);
+my $usage = qq(usage: $self  [--help] [--map_funcs=mapfile.2c] [--locus_tag=LocusTag_Prefix] [--project=project_number] [--org_dir=SEED_OrgDir] > genbank.output);
 
+
+
+my $trouble;
+
+use Getopt::Long;
+my $help;
+my $org_dir;
+my $project_ID;
+my $func_map_file;
+my $locus_tag_prefix = q(LocusTag_);
+my $rc = GetOptions(
+		    "help!"         => \$help,
+		    "map_funcs:s"   => \$func_map_file,
+		    "org_dir:s"     => \$org_dir,
+		    "project:i"     => \$project_ID,
+		    "locus_tag:s"   => \$locus_tag_prefix,
+		    );
+print STDERR qq(\nrc=$rc\n\n) if $ENV{VERBOSE};
+
+if (!$rc || $help) {
+    warn qq(\n   usage: $usage\n\n);
+    exit(0);
+}
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#...Insert code to grandfather in old syntax here...
+#-----------------------------------------------------------------------
 my ($locus_tag_prefix, $org_dir) = @ARGV;
 
 $org_dir =~ s/\/$//;
@@ -49,6 +78,7 @@ if ($org_dir =~ m/(\d+)\.\d+/) {
 else {
     die qq(Organism directory $org_dir does not end in a taxonomy ID (e.g., \'123456.7\'));
 }
+
 
 
 my $genome;
@@ -98,6 +128,27 @@ else {
 }
 
 
+my $map_func_to = {};
+if ($func_map_file) {
+    if (-s $func_map_file) {
+	my $line;
+	open(FUNC_MAP, q(<), $func_map_file)
+	    or die "COuld not read-open \'$func_map_file\'";
+	while (defined($line = <FUNC_MAP>)) {
+	    chomp $line;
+	    if ($line =~ m/^([^\t]+)\t([^\t]+)/o) {
+		$map_func_to{$1} = $2;
+	    }
+	    else {
+		$trouble = 1;
+		warn "Could not parse line: \'$line\'";
+	    }
+	}
+    }
+}
+die "\nCould not parse function map \'$func_map_file\' --- aborting" if $trouble;
+
+
 use constant FID    =>  0;
 use constant LOCUS  =>  1;
 use constant CONTIG =>  2;
@@ -112,6 +163,9 @@ use constant EC_NUM =>  9;
 opendir(ORG_DIR, $org_dir) || die "Could not opendir $org_dir";
 my @contig_files = map { "$org_dir/$_" } grep { m/^contigs\d*$/ } readdir(ORG_DIR);
 closedir(ORG_DIR) || die "Could not closedir $org_dir";
+
+if (
+
 
 my $EC_of = {};
 my $function_of = {};
@@ -166,13 +220,9 @@ foreach my $contig (sort keys %$len_of)
     my $features = $tbl->{$contig};
     foreach my $feature (@$features) {
 	
-	my $locus;
-	if ($feature->[STRAND] eq '+') {
-	    $locus = "$feature->[LEFT]\.\.$feature->[RIGHT]";
-        }
-	else {
-	    $locus = "complement($feature->[LEFT]\.\.$feature->[RIGHT])";
-        }
+	my $locus = $feature->[LOCUS];
+	my @exons = split /,/, $locus;
+	my ($gene_locus, $feature_locus) = &to_ncbi_locus($locus);
 	
 	my $feature_num;
 	if ($feature->[FID] =~ m/\.(\d+)$/) {
@@ -182,54 +232,58 @@ foreach my $contig (sort keys %$len_of)
 	    die qq(Could not extract feature-number from FIG=\'$feature->[FID]\');
 	}
 	
-	my $ltag;
+#...Process recognized feature types...
         if ($feature->[TYPE] eq 'peg') {
-	    $ltag = $locus_tag_prefix . &zero_pad(4, $feature_num);
-	    
-	    &WriteEMBL::form_feature(q(gene), $locus, $ltag);
-	    &WriteEMBL::form_feature(q(CDS), $locus, $ltag);
-	    
+	    my $field_pairs = [];
+	    my $ltag = $locus_tag_prefix . &zero_pad(4, $feature_num);
+
             if ($feature->[FUNC]) {
-		&WriteEMBL::form_multiline('product', $feature->[FUNC]);
+		push @$field_pairs, ['product', $feature->[FUNC]];
 	    }
 	    
 	    if ($feature->[EC_NUM]) {
 		foreach my $EC_num (@ { $feature->[EC_NUM] }) {
-		    &WriteEMBL::form_multiline(q(EC_number), $EC_num);
+		    push @$field_pairs, ['EC_number', $EC_num]
 		}
 	    }
 	    
-	    &WriteEMBL::form_multiline('translation', $peg_seq->{$feature->[FID]});
-	}
-	elsif ($feature->[TYPE] eq 'rRNA') {
-	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
+	    &WriteEMBL::form_feature(q(gene), $gene_locus, 
+				     [['locus_tag', $ltag],
+				      ['db_xref', "SEED:$feature->[FID]"]
+				      ]
+				     );
 	    
-	    &WriteEMBL::form_feature(q(gene), $locus, $ltag);
-	    &WriteEMBL::form_feature(q(rRNA), $locus, $ltag);
-	    
-            if ($feature->[FUNC]) {
-		&WriteEMBL::form_multiline('product', $feature->[FUNC]);
+	    if (@exons == 1) {
+		unshift @$field_pairs, ['locus_tag', $ltag], ['db_xref', "SEED:$feature->[FID]"];
+		push    @$field_pairs, ['translation', $peg_seq->{$feature->[FID]}];
+		
+		&WriteEMBL::form_feature(q(CDS),  $feature_locus, $field_pairs);
+	    }
+	    else {
+		my $n=0;
+		push @$field_pairs, ['pseudo', ''], ['note', 'Frameshift error fragment'];
+
+		if ($feature->[STRAND] eq '-') {
+		    @exons = reverse @exons;
+		}
+		
+		foreach my $exon (@exons) {
+		    ++$n;
+		    $feature_locus = &to_ncbi_locus($exon);
+		    unshift @$field_pairs, ['locus_tag', "$ltag\-$n"], ['db_xref', "SEED:$feature->[FID]"];
+		    &WriteEMBL::form_feature(q(CDS),  $feature_locus, $field_pairs);
+		}
 	    }
 	}
-	elsif ($feature->[TYPE] eq 'tRNA') {
-	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
-	    
-	    &WriteEMBL::form_feature(q(gene), $locus, $ltag);
-	    &WriteEMBL::form_feature(q(tRNA), $locus, $ltag);
-	    
-            if ($feature->[FUNC]) {
-		&WriteEMBL::form_multiline('product', $feature->[FUNC]);
-	    }
-	}
-	elsif ($feature->[TYPE] eq 'misc_RNA') {
-	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
-	    
-	    &WriteEMBL::form_feature(q(gene), $locus, $ltag);
-	    &WriteEMBL::form_feature(q(misc_RNA), $locus, $ltag);
+	elsif ($feature->[TYPE] =~ /rRNA|tRNA|misc_RNA/o) {
+	    my $field_pairs = [];
+	    my $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
+	    push @$field_pairs, ['locus_tag', $ltag];
 	    
             if ($feature->[FUNC]) {
-		&WriteEMBL::form_multiline('product', $feature->[FUNC]);
+		push @$field_pairs, ['product', $feature->[FUNC]];
 	    }
+	    &WriteEMBL::form_feature($feature->[TYPE], $locus, $field_pairs);
 	}
 	else {
 	    warn "Skipping unknown feature: ", join(", ", @$feature), "\n";
@@ -355,24 +409,45 @@ sub load_tbls {
 }
 
 
-sub from_locus
-{
+sub from_locus {
     my ($locus) = @_;
     
-    if ($locus =~ m/^(\S+)_(\d+)_(\d+)$/)
-    {
-	return ($1
-	       , &min($2, $3)
-	       , &max($2, $3)
-	       , (1+abs($3-$2))
-	       , (($2 < $3) ? '+' : '-')
-	       );
+    my ($contig, $left, $right, $strand) = &SeedUtils::boundaries_of($locus);
+
+    if ($contig && $left && $right && $strand) {
+	return ($contig, $left, $right, (1+abs($right-$left)), $strand)
     }
     else {
 	die "Invalid locus $locus";
     }
     
     return ();
+}
+
+sub to_ncbi_locus {
+    my ($locus) = @_;
+    my ($gene_locus, $feature_locus);
+    
+    
+    my @exons = split(/,/, $locus);
+    my (undef, $left, $right, $strand) = &SeedUtils::boundaries_of($locus);
+    
+    if ($strand eq '+') {
+	$gene_locus = "$left\.\.$right";
+	
+	$feature_locus = join(q(,), map { m/^\S+_(\d+)_(\d+)$/ ? $1.q(..).$2 : () } @exons);
+	if (@exons > 1) {
+	    $feature_locus = 'join(' . $feature_locus . ')';
+	} 
+    }
+    else {
+	$gene_locus = "complement($left\.\.$right)";
+	
+	@exons = reverse @exons;
+	$feature_locus = 'complement(' . join(q(,), map { m/^\S+_(\d+)_(\d+)$/ ? $2.q(..).$1 : () } @exons) . ')';
+    }
+    
+    return ($gene_locus, $feature_locus);
 }
 
 

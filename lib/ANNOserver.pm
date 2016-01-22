@@ -472,6 +472,10 @@ Common name of the species for this DNA.
 
 Domain of this DNA. The default is C<Bacteria>.
 
+=item -rnas
+
+Type of RNA desired. Allowed values are C<all> or any of C<tRNA, SSU, LSU, 5S> joined by commas. Default is C<all>.
+
 =back
 
 =item RETURN

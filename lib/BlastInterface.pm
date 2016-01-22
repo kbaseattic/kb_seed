@@ -28,33 +28,49 @@ use gjoalignment;
 use gjoseqlib;
 use gjoparseblast;
 
-#-------------------------------------------------------------------------------
-#  A unified interface to many of the NCBI blast programs.  It supports the
-#  blastall "programs" blastp, blastn, blastx, and tblastn.  It supports the
-#  blast+ programs blastp, blastn, blastx, tblastn, psiblast, and rpsblast.
+#===============================================================================
+#  A unified interface to many of the NCBI blast programs.  It supports:
+#
+#     blastall program options blastp, blastn, blastx, and tblastn
+#     blast+ programs blastp, blastn, blastx, tblastn, tblastx, psiblast,
+#          rpsblast and rpstblastn
+#          (tblastx has a problem reporting the translation frames)
 #
 #      @matches = blast( $query, $db, $blast_prog, \%options )
 #     \@matches = blast( $query, $db, $blast_prog, \%options )
 #
 #  The first two arguments supply the query and db data.
 #  The third argument is the blast tool: blastp, blastn, blastx, tblastn,
-#     psiblast or rpsblast
+#     tblastx, psiblast, rpsblast or rpsblastn
 #
 #  A slightly more intuitive version for specifying the program is provided
 #  by the following interfaces:
 #
-#      @matches =    blastn( $query, $db, \%options )
-#     \@matches =    blastn( $query, $db, \%options )
-#      @matches =    blastp( $query, $db, \%options )
-#     \@matches =    blastp( $query, $db, \%options )
-#      @matches =    blastx( $query, $db, \%options )
-#     \@matches =    blastx( $query, $db, \%options )
-#      @matches =   tblastn( $query, $db, \%options )
-#     \@matches =   tblastn( $query, $db, \%options )
-#      @matches = psiblast(  $query, $db, \%options )
-#     \@matches = psiblast(  $query, $db, \%options )
-#      @matches = rpsblast(  $query, $db, \%options )
-#     \@matches = rpsblast(  $query, $db, \%options )
+#      @matches =     blastn( $query, $db, \%options )
+#     \@matches =     blastn( $query, $db, \%options )
+#      @matches =     blastp( $query, $db, \%options )
+#     \@matches =     blastp( $query, $db, \%options )
+#      @matches =     blastx( $query, $db, \%options )
+#     \@matches =     blastx( $query, $db, \%options )
+#      @matches =    tblastn( $query, $db, \%options )
+#     \@matches =    tblastn( $query, $db, \%options )
+#      @matches =    tblastx( $query, $db, \%options )
+#     \@matches =    tblastx( $query, $db, \%options )
+#      @matches =  psiblast(  $query, $db, \%options )
+#     \@matches =  psiblast(  $query, $db, \%options )
+#      @matches =  rpsblast(  $query, $db, \%options )
+#     \@matches =  rpsblast(  $query, $db, \%options )
+#      @matches = rpstblastn( $query, $db, \%options )
+#     \@matches = rpstblastn( $query, $db, \%options )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Fix a multiple sequence alignment to be appropriate for a psiblast
+#  -in_msa file.
+#
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa(  $align_file, \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \@alignment,  \%opts )
+#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \*ALIGN_FH,   \%opts )
+#
 #
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Convert a multiple sequence alignment into a PSSM file suitable for the
@@ -77,17 +93,8 @@ use gjoparseblast;
 #  The first argument supplies the list of alignments and/or alignment files.
 #  The second argument supplies the file name for the created database.
 #
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#  Fix a multiple sequence alignment to be appropriate for a psiblast
-#  -in_msa file.
+#===============================================================================
 #
-#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa(  $align_file, \%opts )
-#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \@alignment,  \%opts )
-#      ( $msa_name, \%opts, $rm_msa ) = psiblast_in_msa( \*ALIGN_FH,   \%opts )
-#
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
 #  This is a general interface to NCBI blastall.  It supports blastp,
 #  blastn, blastx, and tblastn. The psiblast and rpsblast programs
 #  from the blast+ package are also supported.
@@ -95,28 +102,155 @@ use gjoparseblast;
 #      @matches = blast( $query, $db, $blast_prog, \%options )
 #     \@matches = blast( $query, $db, $blast_prog, \%options )
 #
-#  The first two arguments supply the query and db data.  These can be supplied
-#  in any of several forms:
+#  The first two arguments supply the query and db data.
+#  These can be supplied in any of several forms:
 #
-#      filename
-#      existing blast database name (for db only)
-#      open filehandle
-#      sequence triple (i.e., [id, def, seq])
+#      blast database name or path (db only)
+#      fasta file file handle
+#      fasta file name
+#      list of sequence alignments (rpsblast or rpstblstn db)
 #      list of sequence triples
-#      undef or '' -> read from STDIN
+#      rpsblast database (rpsblast or rpstblstn db)
+#      sequence alignment (psiblast query)
+#      sequence triple (i.e., [id, def, seq])
+#      undef or '' to read read fasta data from STDIN
 #
-#  The third argument is the blast tool (blastp, blastn, blastx, tblastn,
-#  psiblast or rpsblast)
+#  When data are supplied in forms other that existing files or databses,
+#     temporary files and/or databases are created and deleted upon completion.
 #
-#  The fourth argument is an options hash. The available options have been
-#  expanded to better match those of the new blast+ set of programs.
+#  $blast_prog is blastp, blastn, blastx, tblastn, tblastx, psiblast, rpsblast,
+#     or rpstblastn.
+#
+#  The fourth argument is an options hash.
 #
 #     For binary flag values: F = no = 0; and T = yes = 1.
 #     For query strand values: 1 = plus, 2 = minus and 3 = both.
 #
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Options, by category:
+#
+#  Program version:
+#
+#      blastall           => attempt to use blastall program
+#      blastplus          => attempt to use blast+ series of programs (D)
+#
+#  Query handling:
+#
+#      caseFilter         => ignore lowercase query residues in scoring (T/F) [D = F]
+#      dust               => define blastn filtering (yes, no or filter parameters)
+#      filtering_db       => database of sequences to filter from query (blastn)
+#      filteringDB        => database of sequences to filter from query (blastn)
+#      lcase_masking      => ignore lowercase query residues in scoring (T/F) [D = F]
+#      lcaseMasking       => ignore lowercase query residues in scoring (T/F) [D = F]
+#      lcFilter           => low complexity query sequence filter setting (T/F) [D = T]
+#      query_genetic_code => genetic code for query sequence [D = 1]
+#      query_loc          => range of residues in the query to search (begin-end)
+#      queryCode          => genetic code for query sequence [D = 1]
+#      queryGeneticCode   => genetic code for query sequence [D = 1]
+#      queryLoc           => range of residues in the query to search (begin-end)
+#      seg                => define protein sequence filtering (yes, no or filter parameters)
+#      soft_masking       => only use masking to filter initial hits, not final matches
+#      softMasking        => only use masking to filter initial hits, not final matches
+#      strand             => query strand(s) to search: 1 (or plus), 2 (or minus), 3 (or both) [D = both]
+#
+#  Database handling:
+#
+#      db_file            => place to put database file and formated database
+#      db_gen_code        => genetic code for DB sequences [D = 1]
+#      dbCode             => genetic code for DB sequences [D = 1]
+#      dbGenCode          => genetic code for DB sequences [D = 1]
+#
+#  Output filtering:
+#
+#      evalue             => maximum E-value [D = 0.01]
+#      excludeSelf        => suppress reporting matches of ID to itself (D = 0)
+#      includeSelf        => force reporting of matches of ID to itself (D = 1)
+#      maxE               => maximum E-value [D = 0.01]
+#      maxHSP             => maximum number of returned HSPs (before filtering)
+#      minCovQ            => minimum fraction of query covered by match
+#      minCovS            => minimum fraction of the DB sequence covered by the match
+#      minIden            => fraction (0 to 1) that is a minimum required identity
+#      minNBScr           => minimum normalized bit-score (bit-score per alignment position)
+#      minPos             => fraction of aligned residues with positive score
+#      minScr             => minimum required bit-score
+#      num_alignments     => maximum number of returned HSPs (before filtering)
+#      numAlignments      => maximum number of returned HSPs (before filtering)
+#      perc_identity      => minimum percent identity (blastn); see minIden
+#      percIdentity       => minimum percent identity (blastn); see minIden
+#
+#  Evaluation and scoring parameters:
+#
+#      dbLen              => effective length of DB for computing E-values
+#      dbsize             => effective length of DB for computing E-values
+#      dbSize             => effective length of DB for computing E-values
+#      gapextend          => cost (>0) for extending a gap
+#      gapExtend          => cost (>0) for extending a gap
+#      gapopen            => cost (>0) for opening a gap
+#      gapOpen            => cost (>0) for opening a gap
+#      matrix             => amino acid comparison matrix [D = BLOSUM62]
+#      max_intron_length  => maximum intron length in joining translated alignments
+#      maxIntronLength    => maximum intron length in joining translated alignments
+#      nucIdenScr         => score (>0) for identical nucleotides [D = 1]
+#      nucMisScr          => score (<0) for non-identical nucleotides [D = -1]
+#      penalty            => score (<0) for non-identical nucleotides [D = -1]
+#      reward             => score (>0) for identical nucleotides [D = 1]
+#      searchsp           => product of effective query and DB lengths for computing E-values
+#      searchSp           => product of effective query and DB lengths for computing E-values
+#      threshold          => minimum score included in word lookup table
+#      ungapped           => do not produce gapped blastn alignments
+#      use_sw_tback       => do final blastp alignment with Smith-Waterman algorithm
+#      word_size          => word size used for initiating matches
+#      wordSize           => word size used for initiating matches
+#      wordSz             => word size used for initiating matches
+#      xdrop_final        => score drop permitted in final gapped alignment
+#      xdrop_gap          => score drop permitted in initial gapped alignment
+#      xdrop_ungap        => score drop permitted in initial ungapped alignment
+#      xDropFinal         => score drop permitted in final gapped alignment
+#      xDropGap           => score drop permitted in initial gapped alignment
+#      xDropUngap         => score drop permitted in initial ungapped alignment
+#
+#  psiblast options:
+#
+#      asciiPSSM          => name of output file to store the ASCII version of PSSM
+#      ignore_msa_master  => ignore the master sequence when psiblast creates PSSM (D = 0)
+#      ignoreMaster       => ignore the master sequence when psiblast creates PSSM (D = 0)
+#      in_msa             => multiple sequence alignment to be start psiblast; can be filename or list of sequence triples
+#      in_pssm            => input checkpoint file for psiblast
+#      inclusion_ethresh  => e-value inclusion threshold for pairwise alignments in psiblast (D = 0.002)
+#      inclusionEvalue    => e-value inclusion threshold for pairwise alignments in psiblast (D = 0.002)
+#      inMSA              => multiple sequence alignment to be start psiblast; can be filename or list of sequence triples
+#      inPHI              => filename containing pattern to search in psiblast
+#      inPSSM             => input checkpoint file for psiblast
+#      iterations         => number of psiblast iterations
+#      msa_master_id      => ID of the sequence in in MSA for psiblast to use as a master
+#      msa_master_idx     => 1-based index of the sequence in MSA for psiblast to use as a master
+#      num_iterations     => number of psiblast iterations
+#      out_ascii_pssm     => name of output file to store the ASCII version of PSSM
+#      out_pssm           => name of output file to store PSSM
+#      outForm            => 'sim' => return Sim objects [D]; 'hsp' => return HSPs (as defined in gjoparseblast.pm)
+#      outPSSM            => name of output file to store PSSM
+#      phi_pattern        => filename containing pattern to search in psiblast
+#      profile_dir        => place to put the PSSM's use in an RPS blast db.
+#      pseudocount        => pseudo-count value used when constructing PSSM in psiblast
+#      pseudoCount        => pseudo-count value used when constructing PSSM in psiblast
+#      queryID            => ID of the sequence in in MSA for psiblast to use as a master
+#      queryIndex         => 1-based index of the sequence in MSA for psiblast to use as a master
+#
+#  Misc
+#
+#      num_threads        => number of threads that can be run in parallel
+#      numThreads         => number of threads that can be run in parallel
+#      save_dir           => boolean that causes the scratch directory to be retained (good for debugging)
+#      threads            => number of threads that can be run in parallel
+#      tmp_dir            => use as the file scratch directory
+#      warnings           => do not suppress blast warnings to stderr
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Options, alphabetically:
+#
 #      asciiPSSM          => name of output file to store the ASCII version of PSSM
 #      blastall           => attempt to use blastall program
-#      blastplus          => attempt to use blast+ series of programs
+#      blastplus          => attempt to use blast+ series of programs (D)
 #      caseFilter         => ignore lowercase query residues in scoring (T/F) [D = F]
 #      db_gen_code        => genetic code for DB sequences [D = 1]
 #      dbCode             => genetic code for DB sequences [D = 1]
@@ -175,6 +309,7 @@ use gjoparseblast;
 #      perc_identity      => minimum percent identity for blastn
 #      percIdentity       => minimum percent identity for blastn
 #      phi_pattern        => filename containing pattern to search in psiblast
+#      profile_dir        => place to put the PSSM's use in an RPS blast db.
 #      pseudocount        => pseudo-count value used when constructing PSSM in psiblast
 #      pseudoCount        => pseudo-count value used when constructing PSSM in psiblast
 #      query_genetic_code => genetic code for query sequence [D = 1]
@@ -218,6 +353,8 @@ use gjoparseblast;
 #     \@matches =   blastx( $query, $db, \%options )
 #      @matches =  tblastn( $query, $db, \%options )
 #     \@matches =  tblastn( $query, $db, \%options )
+#      @matches =  tblastx( $query, $db, \%options )
+#     \@matches =  tblastx( $query, $db, \%options )
 #      @matches = psiblast( $query, $db, \%options )
 #     \@matches = psiblast( $query, $db, \%options )
 #      @matches = rpsblast( $query, $db, \%options )
@@ -226,21 +363,21 @@ use gjoparseblast;
 #-------------------------------------------------------------------------------
 sub blast
 {
-    my( $query, $db, $blast_prog, $parms ) = @_;
+    my( $query, $db, $blast_prog, $opts ) = @_;
 
     #  Life is easier without tests against undef
 
     $query      = ''      if ! defined $query;
     $db         = ''      if ! defined $db;
     $blast_prog = 'undef' if ! defined $blast_prog;
-    $parms      = {}      if ! defined $parms || ref( $parms ) ne 'HASH';
+    $opts       = {}      if ! defined $opts || ref( $opts ) ne 'HASH';
 
-    #  Have temporary directory ready in case we need it
+    #  Have temporary directory ready in case we need it.
+    #  This should be rethought as it seems to blow away some output files.
+    # my( $tmp_dir, $save_temp ) = &SeedAware::temporary_directory( $opts );
+    # $opts->{tmp_dir}           = $tmp_dir;
 
-    my( $tempD, $save_temp ) = &SeedAware::temporary_directory($parms);
-    $parms->{tmp_dir}        = $tempD;
-
-    #  These are the file names that will be handed to blastall
+    #  These are the file names that will be handed to blast
 
     my ( $queryF, $dbF );
     my $user_output = [];
@@ -250,56 +387,657 @@ sub blast
     my $dbR = ( is_stdin( $query ) && is_stdin( $db ) ) ? \$queryF : \$db;
 
     #  Okay, let's work through the user-supplied data
+    #  Is this a valid program request?
 
-    my %valid_tool = map { $_ => 1 } qw( blastn blastp blastx tblastn psiblast rpsblast );
+    my %valid_tool = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx psiblast rpsblast rpstblastn );
     if ( ! $valid_tool{ lc $blast_prog } )
     {
         warn "BlastInterface::blast: invalid blast program '$blast_prog'.\n";
+        return wantarray ? () : [];
     }
-    elsif ( $blast_prog ne 'psiblast'
-         && ! ( $queryF = &get_query( $query, $tempD, $parms ) )
-       # && ! ( print STDERR Dumper($queryF = &get_query( $query, $tempD, $parms )) )
-          )
+
+    #  Do we have a valid query?
+    #  Do we have a PSSM file:
+
+    my $okay;
+
+    my $pssm = -s ( $opts->{ in_pssm } || $opts->{ inPSSM } );
+    if ( $pssm && ( $blast_prog eq 'psiblast' || $blast_prog eq 'tblastn' ) )
     {
-        warn "BlastInterface::get_query: failed to get query sequence data.\n";
+        if ( $query )
+        {
+            warn "BlastInterface::blast: query supplied with in_pssm option is being ignored.\n";
+            $query = '';
+        }
+        $okay = 1;
     }
-    elsif ( $blast_prog eq 'psiblast'
-         && $query
-         && ! ( ( $queryF, $parms ) = &psiblast_in_msa( $query, $parms ) )[0]
-       # && ! ( print STDERR Dumper(( $queryF, $parms ) = &psiblast_in_msa( $query, $parms )) )[0]
-          )
+
+    #  Are we given an MSA?
+
+    my $msa = $opts->{ in_msa } || $opts->{ inMSA };
+    if ( ! $okay && $msa && ( $blast_prog eq 'psiblast' ) )
     {
-        warn "BlastInterface::psiblast_in_msa: failed to get query msa data.\n";
+        if ( $query )
+        {
+            warn "BlastInterface::blast: query supplied with in_msa option is being ignored.\n";
+            $query = '';
+        }
+
+        my ( $msaF, $opts2 );
+        if ( ( ( $msaF, $opts2 ) = psiblast_in_msa( $msa, $opts ) )[0] )
+        {
+            $opts = $opts2;
+            $okay = 1;
+        }
+        else
+        {
+            warn "BlastInterface::psiblast_in_msa: failed to get query data.\n";
+            return wantarray ? () : [];
+        }
+
     }
-    elsif (
-            ! ( $dbF = &get_db( $$dbR, $blast_prog, $tempD, $parms ) )
-       #    ! ( print STDERR Dumper($dbF = &get_db( $$dbR, $blast_prog, $tempD, $parms )) )
-          )
+    elsif ( ! $okay && $msa && ( $blast_prog eq 'tblastn' ) )
+    {
+        if ( $query )
+        {
+            warn "BlastInterface::blast: query supplied with in_msa option is being ignored.\n";
+            $query = '';
+        }
+
+        my $pssm = verify_pssm( ['untitled', 'untitled profile', $msa], {}, $opts );
+        if ( $pssm )
+        {
+            my %opts2 = map { m/^in_?msa$/i ? () : ( $_ => $opts->{$_} ) }
+                        keys %$opts;
+            $opts2{ in_pssm } = $pssm;
+            $opts = \%opts2;
+            $okay = 1;
+        }
+        else
+        {
+            warn "BlastInterface::verify_pssm: failed to get query data.\n";
+            return wantarray ? () : [];
+        }
+    }
+
+    #  Can we make some sense of the query data supplied?
+
+    if ( ! $okay && ( $queryF = get_query( $query, $opts ) ) )
+    {
+        $okay = 1;
+    }
+
+    if ( ! $okay )
+    {
+        warn "BlastInterface::get_query: failed to get query data.\n";
+        return wantarray ? () : [];
+    }
+
+    #  Do we have a valid database?
+
+    if ( ! ( $dbF = get_db( $$dbR, $blast_prog, $opts ) ) )
     {
         warn "BlastInterface::get_db: failed to get database sequence data.\n";
-    }
-    elsif ( ! ( $user_output = &run_blast( $queryF, $dbF, $blast_prog, $parms ) ) )
-    {
-        warn "BlastInterface::blast: failed to run blastall.\n";
-        $user_output = [];
+        return wantarray ? () : [];
     }
 
-    if (! $save_temp)
+    #  If it all looks good, run the program:
+
+    if ( ! ( $user_output = run_blast( $queryF, $dbF, $blast_prog, $opts ) ) )
     {
-        delete $parms->{tmp_dir};
-        system( "rm", "-fr", $tempD );
+        warn "BlastInterface::blast: failed to run $blast_prog.\n";
+        return wantarray ? () : [];
     }
 
-    return wantarray ? @$user_output : $user_output;
+    #  The conditions for this need to be revisited:
+    #  I think that all temp directories and files are marked for deletion
+    #  when they are created.
+    #
+    # if (! $save_temp)
+    # {
+    #     delete $opts->{tmp_dir};
+    #     system( "rm", "-fr", $tmp_dir );
+    # }
+
+    wantarray ? @$user_output : $user_output;
 }
 
 
-sub    blastn { &blast( $_[0], $_[1],    'blastn', $_[2] ) }
-sub    blastp { &blast( $_[0], $_[1],    'blastp', $_[2] ) }
-sub    blastx { &blast( $_[0], $_[1],    'blastx', $_[2] ) }
-sub   tblastn { &blast( $_[0], $_[1],   'tblastn', $_[2] ) }
-sub psiblast  { &blast( $_[0], $_[1],  'psiblast', $_[2] ) }
-sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
+sub     blastn { &blast( $_[0], $_[1],     'blastn',  $_[2] ) }
+sub     blastp { &blast( $_[0], $_[1],     'blastp',  $_[2] ) }
+sub     blastx { &blast( $_[0], $_[1],     'blastx',  $_[2] ) }
+sub    tblastn { &blast( $_[0], $_[1],     'tblastn', $_[2] ) }
+sub    tblastx { &blast( $_[0], $_[1],     'tblastx', $_[2] ) }
+sub  psiblast  { &blast( $_[0], $_[1],   'psiblast',  $_[2] ) }
+sub  rpsblast  { &blast( $_[0], $_[1],   'rpsblast',  $_[2] ) }
+sub rpstblastn { &blast( $_[0], $_[1],  'rpstblastn', $_[2] ) }
+
+
+#-------------------------------------------------------------------------------
+#  Process the query source request, returning the name of a fasta file
+#  with the data.
+#
+#      $filename = get_query( $query_request, \%options )
+#
+#  Options:
+#
+#     tmp_dir => $dir  #  Place to write a temporary file
+#
+#  If the data are already in a file, that file name is returned.
+#  Otherwise the data are read into a file in the directory $tmp_dir.
+#-------------------------------------------------------------------------------
+sub get_query
+{
+    my( $query, $opts ) = @_;
+#   returns query-file
+
+    $opts ||= {};
+    valid_fasta( $query, "query_XXXXXX", $opts );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Process the database source request, returning the name of a formatted
+#  blast database with the data.
+#
+#      $dbname = get_db( $db_request, $blast_prog, $opts )
+#
+#  Options:
+#
+#      db_path => $path  #  Place to put the database; if not supplied, a
+#                        #      temporary database is created if needed.
+#      save_db => $bool  #  Keep temporary database
+#      tmp_dir => $dir   #  Place to write temporary files and/or databases
+#
+#  If the data are already in a database, that name is returned. If the
+#  data are in a file that is in writable directory, the database is built
+#  there and the name is returned. Otherwise the data are read into a file
+#  in the directory $tmp_dir and the database is built there.
+#-------------------------------------------------------------------------------
+sub get_db
+{
+    my( $db, $blast_prog, $opts ) = @_;
+#   returns db-file
+
+    my %db_type = ( blastp => 'protein',
+                    blastx => 'protein',
+                    blastn => 'nucleotide',
+                   tblastn => 'nucleotide',
+                   tblastx => 'nucleotide',
+                 psiblast  => 'protein',
+                 rpsblast  => 'rps',
+                rpstblastn => 'rps'
+                  );
+
+    my $db_type = $db_type{ $blast_prog }
+        or return undef;
+
+    #  It is possible to pass in a database without a fasta file, a case that
+    #  valid_fasta() cannot handle, so we check first:
+
+    my $db_path = $opts->{db_path};
+
+    #  This tests existence, not date:
+    if ( $db_path )
+    {
+        return $db_path if check_db( $db_path, $db_type );
+    }
+
+    #  This tests existence and date:
+    return $db if check_db( $db, $db_type );
+
+    #  Building an RPS database is a special case, but we might as well be able
+    #  to handle it:
+
+    if ( $db_type eq 'rps' )
+    {
+        return build_rps_db( $db, $db_path, $opts );
+    }
+
+    #  This is not an existing database, figure out what we have been handed,
+    #  and if is not a file, create a new directory for it, and make
+    #  the db in it:
+
+    if ( $db_path )
+    {
+    }
+
+    my $dir;
+    if ( ref( $db ) && ! $opts->{ db_dir } && ! $opts->{ db_file } )
+    {
+        eval { require File::Temp; }
+            or die "BlastInterface::get_db: failed in 'require File::Temp'.";
+        $dir = File::Temp::tempdir( 'blastdb_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+    }
+
+    my $dbF = valid_fasta( $db, "blastdb_XXXXXX", { tmp_dir => $dir } );
+
+    #  ... and build a blast database for it.
+
+    verify_db( $dbF, $db_type, $opts );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Build an RPS database from a list of alignments and/or alignment files
+#
+#      $db_file = build_rps_db( \@aligns, $db_path, \%options )
+#      $db_file = build_rps_db( \@aligns,           \%options )
+#
+#  The first argument supplies the list of alignments and/or alignment files.
+#  The second argument supplies the file path for the created database; this
+#     can also be supplied as an option.  If not supplied in either way,
+#     the database is viewed as temporary, and is subject to deletion after
+#     an associated rpsblast search.
+#
+#  Three forms of alignments are supported:
+#
+#       [ [ $align_id, $align_title, \@id_def_seq ], ... ]
+#       [ [ $align_id, $align_title,  $fasta_file ], ... ]
+#       [   $align_pssm_file,                        ... ]
+#
+#  Options:
+#
+#      db_path     => $db_path   #  Place to leave the database
+#      db_title    => $db_title  #  Title given to the blast database
+#      profile_dir => $dir       #  If profiles are being build, put them here
+#                                #     (has no effect if profiles are not
+#                                #     built or modified).
+#      title       => $db_title  #  Use db_title instead
+#
+#  Expert options:
+#
+#      index       => $bool      #  Build an index; for production db (D = false)
+#      matrix      => $matname   #  The martix used to build the profile (D = BLOSUM62)
+#      scale       => $float     #  Scaling of scores (D = 100)
+#      threshold   => $float     #  Threshold score for word index (D = 9.82)
+#
+#-------------------------------------------------------------------------------
+
+sub build_rps_db
+{
+    my $opts = ref( $_[-1] ) eq 'HASH' ? pop : {};
+    my ( $aligns, $db_path ) = @_;
+
+    return ''  unless $aligns && ref( $aligns ) eq 'ARRAY' && @$aligns;
+
+    $db_path ||= $opts->{ db_path };
+    my $db_dir;
+
+    #  If a path is specified, do some sanity checks:
+
+    if ( defined( $db_path )
+      && ! ref( $db_path )
+      && ( $db_path ne '' )
+       )
+    {
+        #  Cannot end with / or be an existing directory:
+
+        return '' if ( $db_path =~ m#/$# ) || ( -d $db_path );
+
+        #  If there is a parent directory, it must exist or be created:
+
+        if ( $db_path =~ m#^(.+)/[^/]+# )
+        {
+            $db_dir = $1;
+            verify_dir( $db_dir ) or return '';
+            $opts->{ profile_dir } ||= $db_dir;
+        }
+    }
+
+    #  If a path was not specified, create a temporary directory and build the
+    #  database there:
+
+    else
+    {
+        eval { require File::Temp; }
+            or die "Failed in 'require File::Temp'";
+        my $db_dir = File::Temp::tempdir( "RPS_blastdb_XXXXXX",
+                                           TMPDIR  => 1,
+                                           CLEANUP => 1
+                                        )
+            or return '';
+
+        $opts->{ profile_dir } ||= $db_dir;
+        $db_path = "$db_dir/RPS_db";
+    }
+
+    my @pssms;   # List of pssm files
+    my %id_map;  # A uniqueness check on the ids
+    my $i = 0;
+    foreach ( @$aligns )
+    {
+        $i++;
+        my $pssm = verify_pssm( $_ , \%id_map, $opts )
+            or print STDERR "build_rps_db(): verify_pssm() failed for alignment/profile number $i.\n"
+                and next;
+
+        push @pssms, $pssm;
+    }
+
+    @pssms
+        or warn "BlastInterface::build_rps_db: no valid pssm found.\n"
+            and return '';
+
+    #  Write the PSSM paths to a file:
+
+    my $listfile = "$db_path.pn";
+    open( DBLIST, ">", $listfile ) or die "Could not open '$listfile'.\n";
+    print DBLIST map { "$_\n" } @pssms;
+    close( DBLIST );
+
+    #
+    #  formatrpsdb (v2.2.26) supports text subject IDs given in the title
+    #  "subject_id" field.
+    #
+    # my $prog_name = 'formatrpsdb';
+    # my $title = $opts->{ title } || 'Untitled RPS DB';
+    # my @args = ( -i => $db_path, -t => $title );
+    #
+    #  makeprofiledb v2.2.27+ does not work.
+    #  makeprofiledb v2.2.29+ works.
+    #  makeprofiledb v2.2.31+ works.
+    #  The profile IDs need to be provided in the id field.
+    #  The profile descriptions need to be provided in the descr field.
+    #  Improvements in verify_pssm should help with this.
+    #
+
+    my $index = ! exists( $opts->{ index } ) ? 'false'
+              : $opts->{ index } =~ /^[ty]/i ? 'true'
+              : $opts->{ index } =~ /^[fn]/i ? 'false'
+              : $opts->{ index }             ? 'true'
+              :                                'false';
+
+    my $prog_name = 'makeprofiledb';
+    my $prog = SeedAware::executable_for( $prog_name );
+    if ( ! $prog )
+    {
+        warn "BlastInterface::build_rps_db: '$prog_name' not found.\n";
+        return '';
+    }
+
+    my $title = $opts->{ db_title }
+             || $opts->{ title }
+             || 'Untitled RPS database';
+
+    my @args =  ( -title     => $title,
+                  -in        => $listfile,
+                  -out       => $db_path,
+                  -dbtype    => 'rps',
+                  -scale     => $opts->{ scale }     || '100.0',
+                  -threshold => $opts->{ threshold } ||   '9.82',
+                  -index     => $index
+                );
+    push @args, ( -matrix    => $opts->{ matrix } ) if $opts->{ matrix };
+
+    my $rc = SeedAware::system_with_redirect( $prog, @args );
+    if ( $rc != 0 )
+    {
+        my $cmd = join( ' ', $prog, @args );
+        warn "BlastInterface::build_rps_db: $prog_name failed with rc = $rc: $cmd\n";
+        return '';
+    }
+
+    $db_path;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Verify the structure or build an new PSSM file suitable for
+#  psiblast -in_pssm, or a makeprofiledb profile.
+#  The preferred file extension now seems to be ".smp".
+#
+#      $pssm_file = verify_pssm( $align, $id_map, \%options )
+#
+#  The first argument supplies the list of alignments and/or alignment files.
+#  The second argument supplies the file path for the created database.
+#
+#  Three forms of in input alignment are supported:
+#
+#       [ $align_id, $align_title, \@id_def_seq ]
+#       [ $align_id, $align_title,  $fasta_file ]
+#         $align_pssm_file
+#
+#  Align_ids should be unique, and have no spaces.
+#  Titles are not displayed on all output formats.
+#
+#  Options:
+#
+#      file        => $file       #  Use pssm_file instead
+#      profile_dir => $dir        #  If profiles are being build, put them here
+#      pssm_file   => $file       #  The file name for the output pssm
+#      pssm_suffix => $extension  #  Profile file name extension (D = ".smp")
+#      suffix      => $extension  #  Use pssm_suffix instead
+#
+#  Expert options:
+#
+#      matrix      => $mat_name   #  Specify the scoring matrix (D = BLOSUM62)
+#      scale       => $float      #  Scaling of scores (D = 100)
+#      threshold   => $float      #  Threshold score for word index (D = 9.82)
+#
+#-------------------------------------------------------------------------------
+
+sub verify_pssm
+{
+    my ( $align, $id_map, $opts ) = @_;
+
+    $align
+        or warn "BlastInterface::verify_pssm: invalid alignment"
+            and return undef;
+
+    $id_map && ref($id_map) eq 'HASH'
+        or warn "BlastInterface::verify_pssm: invalid pssm id hash"
+            and return undef;
+
+    $opts = {} unless $opts && ref($opts) eq 'HASH';
+
+    my $file = $opts->{ pssm_file } || $opts->{ file };
+
+    my ( $id, $id2, $title );
+    my $pssm;
+
+    #  An existing pssm file:
+
+    if ( ! ref( $align ) )
+    {
+        ( $id, $title ) = pssm_id_title( $align );
+        if ( ! ( defined $id && length( $id ) ) )
+        {
+            $align ||= 'undefined';
+            warn "BlastInterface::verify_pssm: failed for alignment '$align'."
+                and return undef;
+        }
+
+        # check if the id has been seen before
+
+        ( $id2 = $id ) =~ s/^(?:lcl|gnl)\|//;
+        if ( $id_map->{ $id2 } )
+        {
+            warn "BlastInterface::verify_pssm: duplicated pssm id '$id2'."
+                and return undef;
+        }
+
+        $pssm = $align;
+
+        if ( $file && $file ne $align && open( IN, '<', $align ) )
+        {
+            if ( open( OUT, '>', $file ) )
+            {
+                while ( <IN> ) { print OUT }
+                close( OUT );
+                $pssm = $file;
+            }
+            close( IN );
+        }
+    }
+
+    #  Data to build a new pssm file:
+
+    elsif ( ref( $align ) eq 'ARRAY' && @$align == 3 )
+    {
+        my ( $id, $title, $data ) = @$align;
+        defined( $id ) && length( $id ) && $data
+            or warn "BlastInterface::verify_pssm: invalid alignment definition"
+                and return undef;
+
+        # check if the id has been seen before
+
+        ( $id2 = $id ) =~ s/^(?:lcl|gnl)\|//;
+        if ( $id_map->{ $id2 } )
+        {
+            warn "BlastInterface::verify_pssm: duplicated pssm id '$id2'."
+                and return undef;
+        }
+
+        if ( gjoseqlib::is_array_of_sequence_triples( $data )
+             || ( ! ref( $data ) && -s $data )
+           )
+        {
+            my $dir    = $opts->{ profile_dir };
+            my $suffix = $opts->{ pssm_suffix } || $opts->{ suffix } || "smp";
+            my ( $fh, $path_name );
+            if ( $file )
+            {
+                $path_name = $file;
+                open( $fh, '>', $path_name );
+            }
+            else
+            {
+                ( $fh, $path_name ) = SeedAware::open_tmp_file( $id2, $suffix, $dir ? $dir : () );
+            }
+
+            my %opts2 = %$opts;
+            $opts2{ pssm_id }    = $id;
+            $opts2{ pssm_title } = $title || $id;
+            $opts2{ out_pssm }   = $fh;
+
+            alignment_to_pssm( $data, \%opts2 )
+                or warn "BlastInterface::alignment_to_passm() failed for alignment $id."
+                    and return undef;
+
+            $pssm = $path_name;
+        }
+        else
+        {
+            warn "BlastInterface::verify_pssm: invalid alignment definition data"
+                and return undef;
+        }
+    }
+
+    else
+    {
+        warn "BlastInterface::verify_pssm: invalid alignment structure"
+            and return undef;
+    }
+
+    $id_map->{ $id2 } = $pssm;
+
+    $pssm;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Read the id and title from a PSSM file.
+#
+#    $title = pssm_id_title( $pssm_file, \%opts )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub pssm_id_title
+{
+    my ( $pssm, $opts ) = @_;
+    my ( $id, $title );
+
+    if ( $pssm && -s $pssm && open( PSSM, '<', $pssm ) )
+    {
+        while ( <PSSM> )
+        {
+            if    ( ! $id && /^\s+id \{/ )
+            {
+                $_ = <PSSM>;
+                chomp;
+                if ( s/^\s+local (?:id|str) // )
+                {
+                    s/""/"/g;
+                    s/^"//;
+                    s/"$//;
+                    $id = "lcl|$_";
+                }
+                elsif ( /\s+general / )
+                {
+                    $_ = <PSSM>;
+                    chomp;
+                    ( $id ) = / db "(.+)"$/;
+                    $_ = <PSSM>;
+                    chomp;
+                    s/^\s+tag (?:id|str) //;
+                    s/""/"/g;
+                    s/^"//;
+                    s/"$//;
+                    $id = $id ? "$id|$_" : $_;
+                    $id = "gnl|$id";
+                }
+            }
+            elsif ( s/^\s+title\s+// )
+            {
+                chomp;
+                $title = $_;
+                #  Read until the line ends with an odd number of "'s
+                #  (the substring extraction works fine for length 0):
+                while ( ( length((/("*)$/)[0]) % 2 == 0 ) && defined($_ = <PSSM>) )
+                {
+                    chomp;
+                    $title .= $_;
+                }
+                $title =~ s/""/"/g;  # Remove embedded quotes
+                $title =~ s/^"//;    # Remove openning quote
+                $title =~ s/"$//;    # Remove closing quote
+                last;
+            }
+        }
+        close( PSSM );
+    }
+
+    ( $id, $title );
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#  Read the title from a PSSM file.
+#
+#    $title = pssm_title( $pssm_file, \%opts )
+#
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub pssm_title
+{
+    my ( $pssm, $opts ) = @_;
+    my $title;
+
+    if ( $pssm && -s $pssm && open( PSSM, '<', $pssm ) )
+    {
+        while ( <PSSM> )
+        {
+            if ( s/^\s+title\s+// )
+            {
+                chomp;
+                $title = $_;
+                #  Read until the line ends with an odd number of "'s
+                #  (the substring extraction works fine for length 0):
+                while ( ( length((/("*)$/)[0]) % 2 == 0 ) && defined($_ = <PSSM>) )
+                {
+                    chomp;
+                    $title .= $_;
+                }
+                $title =~ s/""/"/g;  # Remove embedded quotes
+                $title =~ s/^"//;    # Remove openning quote
+                $title =~ s/"$//;    # Remove closing quote
+                last;
+            }
+        }
+        close( PSSM );
+    }
+
+    $title;
+}
 
 
 #-------------------------------------------------------------------------------
@@ -308,25 +1046,28 @@ sub rpsblast  { &blast( $_[0], $_[1],  'rpsblast', $_[2] ) }
 #  (Note: the psiblast -in_msa option takes the name of a fasta alignment
 #  file, not a pssm file.)
 #
-#      $db_name = alignment_to_pssm(  $align_file, \%options )
-#      $db_name = alignment_to_pssm( \@alignment,  \%options )
-#      $db_name = alignment_to_pssm( \*ALIGN_FH,   \%options )
+#      $pssm_file = alignment_to_pssm(  $align_file, \%options )
+#      $pssm_file = alignment_to_pssm( \@alignment,  \%options )
+#      $pssm_file = alignment_to_pssm( \*ALIGN_FH,   \%options )
 #
 #  The first argument supplies the MSA to be converted. It can be a list of
 #  sequence triple, a file name, or an open file handle.
 #
 #  General options:
 #
-#    out_pssm =>  $file   #  output PSSM filename or handle (D = STDOUT)
-#    outPSSM  =>  $file   #  output PSSM filename or handle (D = STDOUT)
-#    title    =>  $title  #  title of the PSSM (D = "untitled_$i")
+#    id         =>  $id     #  Use pssm_id instead
+#    out_pssm   =>  $file   #  output PSSM file name (D = STDOUT)
+#    out_pssm   => \*FH     #  output PSSM file handle (D = STDOUT)
+#    outPSSM    =>  $file   #  output PSSM file name (D = STDOUT)
+#    outPSSM    => \*FH     #  output PSSM file handle (D = STDOUT)
+#    pssm_id    =>  $id     #  id of the PSSM (D = $i)
+#    pssm_title =>  $title  #  title of the PSSM (D = "untitled_$i")
+#    title      =>  $title  #  Use pssm_title instead
 #
-#  In addition, alignment_to_pssm takes all of the options of psiblast_in_msa
-#  (see below)
-#
+#  alignment_to_pssm also takes most options of psiblast_in_msa (see below)
 #-------------------------------------------------------------------------------
 
-#  Keep a counter for untitled PSSMs, so that they get unique names.
+#  Keep a counter for untitled PSSMs, so that they get unique ids and names.
 
 my $n_pssm = 0;
 
@@ -335,7 +1076,11 @@ sub alignment_to_pssm
     my ( $align, $opts ) = @_;
     $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
 
+    #  Build the proper input MSA:
+
     my ( $alignF, $opts2, $rm_alignF ) = psiblast_in_msa( $align, $opts );
+
+    #  Write the file with a subject sequence:
 
     my $subject = [ 'subject', '', 'MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILS' ];
 
@@ -343,13 +1088,19 @@ sub alignment_to_pssm
     gjoseqlib::write_fasta( $fh, $subject );
     close( $fh );
 
+    #  Reserve the file for the intermediate PSSM output:
+
     my $pssm0F;
     ( $fh, $pssm0F ) = SeedAware::open_tmp_file( 'alignment_to_pssm', 'pssm0' );
     close( $fh );
 
+    #  Find the program:
+
     my $prog = SeedAware::executable_for( 'psiblast' )
         or warn "BlastInterface::alignment_to_pssm: psiblast program not found.\n"
             and return undef;
+
+    #  Build the program options list:
 
     my @args = ( -in_msa   => $alignF,
                  -subject  => $subjectF,
@@ -360,6 +1111,8 @@ sub alignment_to_pssm
     push @args, -msa_master_idx    => $msa_master_idx  if $msa_master_idx > 1;
     push @args, -ignore_msa_master => ()               if $opts2->{ ignore_master };
 
+    #  Run psiblast:
+
     my $rc = SeedAware::system_with_redirect( $prog, @args, { stdout => '/dev/null', stderr => '/dev/null' } );
     if ( $rc != 0 )
     {
@@ -368,35 +1121,65 @@ sub alignment_to_pssm
         return undef;
     }
 
+    #  Delete temporary psiblast input files:
+
     unlink $alignF if $rm_alignF;
     unlink $subjectF;
 
-    #  Edit the raw PSSM file:
+    #  Edit the PSSM file to integrate an id and title:
 
-    my $title = $opts->{ title } || ( 'untitled_' . ++$n_pssm );
+    my $id    = $opts->{ pssm_id }    || $opts->{ id }    || ++$n_pssm;
+    my $title = $opts->{ pssm_title } || $opts->{ title } || "Untitled PSSM $n_pssm";
+
+    $id    =~ s/\s.*$//;     #  id must be one word
+    $title = "$id $title";   #  It seems that psiblast does not report the id, just the title
+
+    my $gnl = $id =~ m/^gnl\|([^|]+)\|(.+)$/ ? 1
+            : $id =~ s/^lcl\|//              ? 0
+            : $id =~ m/^([^|]+)\|(.+)$/      ? 1
+            :                                  0;
+    my $id_str = $gnl ? qq(        general {\n          db "$1",\n          tag str "$2"\n        })
+                      : qq(        local str "$id"\n);
 
     my $close;
     my $pssmF = $opts->{ outPSSM } || $opts->{ out_pssm };
 
-    ( $fh, $close ) = output_file_handle( $pssmF );
+    my $pssmFH;
+    ( $pssmFH, $close ) = output_file_handle( $pssmF );
 
     my $skip;
-    open( PSSM0, "<", $pssm0F ) or die "Could not open $pssm0F";
+    open( PSSM0, "<", $pssm0F ) or die "Could not open intermediate PSSM '$pssm0F'";
     while ( <PSSM0> )
     {
-        if ( /inst \{/ ) {
-            print $fh "      descr {\n";
-            print $fh "        title \"$title\"\n";
-            print $fh "      },\n";
+        if ( /^      id \{$/ )
+        {
+            print $pssmFH $_;
+            print $pssmFH $id_str;
+            $_ = <PSSM0> || '';
+            if ( / general \{/ ) { <PSSM0>; <PSSM0>; <PSSM0> }
+            $_ = <PSSM0> || '';
         }
-        $skip = 1 if /intermediateData \{/;
-        $skip = 0 if /finalData \{/;
-        print $fh $_ unless $skip;
+
+        if ( /^      inst \{$/ )
+        {
+            $title =~ s/"/""/g;
+            print $pssmFH "      descr {\n";
+            print $pssmFH "        title \"$title\"\n";
+            print $pssmFH "      },\n";
+        }
+
+        $skip = 1 if / intermediateData \{/;
+        $skip = 0 if / finalData \{/;
+        print $pssmFH $_ unless $skip;
     }
     close( PSSM0 );
-    close $fh if $close;
+    close $pssmFH if $close;
+
+    #  Delete the initial PSSM file:
 
     unlink $pssm0F;
+
+    #  Success to to file is filename; success to STDOUT is 1
 
     $close ? $pssmF : 1;
 }
@@ -429,6 +1212,8 @@ sub alignment_to_pssm
 #  General options:
 #
 #    file    => $path           #  path to file to be created (same as msa)
+#    in_msa  => $alignment      #  bad alternative to supplying the alignment parameter
+#    inMSA   => $alignment      #  bad alternative to supplying the alignment parameter
 #    msa     => $path           #  path to file to be created; this should not
 #                               #     be the same as $align_file.
 #    tmp_dir => $dir            #  directory for output file
@@ -478,8 +1263,9 @@ sub alignment_to_pssm
 #-------------------------------------------------------------------------------
 sub psiblast_in_msa
 {
-    my ( $align, $opts ) = @_;
-    $opts = {}  unless $opts && ( ref( $opts ) eq 'HASH' );
+    my $opts = ref( $_[-1] ) eq 'HASH' ? pop : {};
+    my ( $align ) = @_;
+    $align ||= $opts->{ in_msa } || $opts->{ inMSA };
 
     my $ignore_master  = $opts->{ ignore_msa_master } || $opts->{ ignoreMaster };
     my $pseudo_master  = $opts->{ pseudo_master }     || $opts->{ pseudoMaster };
@@ -488,12 +1274,20 @@ sub psiblast_in_msa
     my $max_sim        = $opts->{ max_sim };
     my $min_opt        = $opts->{ min_sim };
 
-    my %strip = map { $_ => 1 } qw( ignore_msa_master  ignoreMaster
-                                    pseudo_master      pseudoMaster
-                                    msa_master_id
-                                    msa_master_idx
+    my $alignF         = $opts->{ file } || $opts->{ msa };
+    my $write_file     = $alignF ? 1 : 0;   #  Do we need to write a file?
+    my $keep_file      = $write_file;       #  Keep the file if named
+
+    my %strip = map { $_ => 1 } qw( file
+                                    ignore_msa_master  ignoreMaster
+                                    in_msa             inMSA
+                                    in_pssm            inPSSM
                                     max_sim
                                     min_sim
+                                    msa
+                                    msa_master_id
+                                    msa_master_idx
+                                    pseudo_master      pseudoMaster
                                   );
 
     my $opts2 = { map { ! $strip{$_} ? ( $_ => $opts->{$_} ) : () } keys %$opts };
@@ -505,11 +1299,6 @@ sub psiblast_in_msa
         @ref_ids = @{$ref_ids[0]} if ( ( @ref_ids == 1 ) && ( ref( $ref_ids[0] ) eq 'ARRAY' ) )
     }
 
-    my $alignF     = $opts->{ file }    #  Create a user-specified file
-                  || $opts->{ msa };
-    my $write_file = $alignF ? 1 : 0;   #  Do we need to write a file?
-    my $keep_file  = $write_file;       #  Keep the file if named
-
     my $is_file  = $align && ! ref( $align ) && -s $align;
     my $is_array = gjoseqlib::is_array_of_sequence_triples( $align );
     my $is_glob  = $align && ref( $align ) eq 'GLOB';
@@ -520,6 +1309,7 @@ sub psiblast_in_msa
     }
 
     #  Is there anything that might require writing a file?
+
     if ( $is_array || $is_glob
                    || $write_file
                    || $msa_master_id
@@ -551,16 +1341,57 @@ sub psiblast_in_msa
             or warn "BlastInterface::psiblast_in_msa: No alignment supplied."
                 and return undef;
 
-        $msa_master_id ||= $align[ $msa_master_idx - 1 ]->[0] if $msa_master_idx;
+        #  A one-based index of the ids:
+
+        my %ids;
+        my $i;
+        for ( $i = 0; $i < @align; $i++ )
+        {
+            my $id = $align[$i]->[0];
+            if ( $ids{ $id } )
+            {
+                warn "BlastInterface::psiblast_in_msa: Duplicate input id '$id'.";
+            }
+            else
+            {
+                $ids{ $id } = $i + 1;
+            }
+        }
+
+        #  Sanity check any requested master index number, and convert to the id.
+
+        if ( $msa_master_idx )
+        {
+            abs( $msa_master_idx ) <= @align
+                or warn "BlastInterface::psiblast_in_msa: Invalid value of msa_master_idx ($msa_master_idx) for $i sequence alignment."
+                    and return undef;
+            $msa_master_idx = @align + $msa_master_idx + 1 if $msa_master_idx < 0;
+            $msa_master_id ||= $align[ $msa_master_idx - 1 ]->[0];
+
+            #  The id won't change, but the index might, so we invalidate it
+            $msa_master_idx = undef;
+        }
+
+        #  If there is a master sequence, we need to keep it through any processing:
 
         my @keep = ();
-        push @keep, $msa_master_id if $msa_master_id;
+        if ( $msa_master_id )
+        {
+            $ids{ $msa_master_id }
+                or warn "BlastInterface::psiblast_in_msa: msa_master_id ($msa_master_id) not in the sequence alignment."
+                    and return undef;
+            push @keep, $msa_master_id if $msa_master_id;
+        }
+
+        #  Any other sequences that are specifically kept:
 
         my $keep = $opts->{ keep };
         if ( $keep )
         {
             push @keep, ( ref( $keep ) eq 'ARRAY' ? @$keep : $keep );
         }
+
+        #  Carry out any requested filtering:
 
         my $n_seq = @align;
         if ( $max_sim )
@@ -583,7 +1414,11 @@ sub psiblast_in_msa
             @align = gjoseqlib::pack_alignment( \@align ) if @align < $n_seq;
         }
 
+        #  If the number of sequences changed, we must write a file:
+
         $write_file ||= ( @align < $n_seq );
+
+        #  Add a pseudomaster, if requested:
 
         if ( $pseudo_master )
         {
@@ -603,8 +1438,10 @@ sub psiblast_in_msa
                 $msa_master_idx = $i + 1;
                 last;
             }
+
+            #  This should have been caught earlier, so this is a severe issue.
             $msa_master_idx
-                or warn "BlastInterface::psiblast_in_msa: msa_master_id '$msa_master_id' not found in alignment.";
+                or die "BlastInterface::psiblast_in_msa: msa_master_id '$msa_master_id' lost from alignment.";
         }
 
         #  In psiblast 2.2.29+ command flags -ignore_master and
@@ -658,194 +1495,6 @@ sub psiblast_in_msa
     $opts2->{ in_msa } = $alignF;
 
     wantarray ? ( $alignF, $opts2, $write_file && ! $keep_file ) : $alignF;
-}
-
-
-#-------------------------------------------------------------------------------
-#  Build an RPS database from a list of alignments and/or alignment files
-#
-#      $db_file = build_rps_db( \@aligns, $db, \%options )
-#
-#  The first argument supplies the list of alignments and/or alignment files.
-#  The second argument supplies the file name for the created database.
-#
-#  Three forms of alignments are supported:
-#
-#       [ [ 'alignment-id', 'optional title', [ @seqs1 ] ], ... ]
-#       [ [ 'alignment-id', 'optional title', 'align1.fa' ], ... ];
-#       [ 'align1.pssm', ... ];
-#
-#  Options:
-#
-#      title => DB title
-#
-#-------------------------------------------------------------------------------
-
-sub build_rps_db
-{
-    my ( $aligns, $db, $opts ) = @_;
-
-    return '' unless $aligns && ref( $aligns ) eq 'ARRAY' && @$aligns;
-    return '' unless defined( $db ) && ! ref( $db ) && $db ne '';
-    $opts = {} unless $opts && ref( $opts ) eq 'HASH';
-
-    my @pssms;
-    my %title_to_pssm;
-    foreach ( @$aligns )
-    {
-        my $pssm = verify_pssm( $_ , \%title_to_pssm, $opts )
-            or next;
-
-        push @pssms, $pssm;
-    }
-    @pssms
-        or warn "BlastInterface::build_rps_db: no valid pssm found.\n"
-            and return '';
-
-    open( DB, ">", $db ) or die "Could not open '$db'.\n";
-    print DB map { $_ . "\n" } @pssms;
-    close( DB );
-
-    #  makeprofiledb (v2.2.29+) works, but only supports numerical subject IDs
-    #  (v2.2.27+ does not work). The subject IDs need to be provided in the id
-    #  field.
-    #
-    # my $prog_name = 'makeprofiledb';
-    # my @args = ( -in => $db );
-    #
-    #  formatrpsdb (v2.2.26) supports text subject IDs given in the title
-    #  "subject_id" field.
-
-    my $prog_name = 'formatrpsdb';
-    my $title = $opts->{ title } || 'Untitled RPS DB';
-    my @args = ( -i => $db, -t => $title );
-
-    my $prog = SeedAware::executable_for( $prog_name );
-
-    if ( ! $prog )
-    {
-        warn "BlastInterface::build_rps_db: $prog_name program not found.\n";
-        return '';
-    }
-
-    my $rc = SeedAware::system_with_redirect( $prog, @args );
-    if ( $rc != 0 )
-    {
-        my $cmd = join( ' ', $prog, @args );
-        warn "BlastInterface::build_rps_db: $prog_name failed with rc = $rc: $cmd\n";
-        return '';
-    }
-
-    return $db;
-}
-
-
-sub verify_pssm
-{
-    my ( $align, $title_to_pssm, $opts ) = @_;
-
-    $align
-        or warn "BlastInterface::verify_pssm: invalid alignment"
-            and return undef;
-
-    $title_to_pssm && ref($title_to_pssm) eq 'HASH'
-        or warn "BlastInterface::verify_pssm: invalid title hash"
-            and return undef;
-
-    $opts = {} unless $opts && ref($opts) eq 'HASH';
-
-    my $title;
-    my $pssm;
-
-    if ( ! ref( $align ) )
-    {
-        $title = pssm_title( $align );
-
-        if ( ! ( defined $title && length( $title ) ) )
-        {
-            $align ||= 'undefined';
-            warn "BlastInterface::verify_pssm: failed for alignment '$align'."
-                and return undef;
-        }
-
-        $pssm = $align;
-    }
-    elsif ( ref( $align ) eq 'ARRAY' && @$align == 3 )
-    {
-        my ( $id, $desc, $data ) = @$align;
-        defined( $id ) && length( $id ) && $data
-            or warn "BlastInterface::verify_pssm: invalid alignment definition"
-                and return undef;
-
-        $title = $id;
-        $title .= " $desc" if $desc;
-        $title =~ s/\s+/_/g;    # rpsblast+ only returns the first word in outfmt 6
-
-        if ( gjoseqlib::is_array_of_sequence_triples( $data )
-             || ( ! ref( $data ) && -s $data )
-           )
-        {
-            my ( $fh, $path_name ) = SeedAware::open_tmp_file( "verify_pssm", "pssm" );
-
-            my %parms = %$opts;
-            $parms{ title } = $title;
-            $parms{ out_pssm } = $fh;
-
-            alignment_to_pssm( $data, \%parms );
-
-            $pssm = $path_name;
-        }
-        else
-        {
-            warn "BlastInterface::verify_pssm: invalid alignment definition data"
-                and return undef;
-        }
-
-    }
-    else
-    {
-        warn "BlastInterface::verify_pssm: invalid alignment structure"
-            and return undef;
-    }
-
-    # check if title is seen before
-    if ( $title_to_pssm->{ $title } )
-    {
-        warn "BlastInterface::verify_pssm: duplicated title '$title' in '$pssm'"
-            and return undef;
-    }
-
-    $title_to_pssm->{ $title } = $pssm;
-
-    return $pssm;
-}
-
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#  Read the title from a PSSM file.
-#
-#    $title = pssm_title( $pssm_file, \%opts )
-#
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub pssm_title
-{
-    my ( $pssm, $opts ) = @_;
-    my $title;
-
-    if ( $pssm && -s $pssm && open( PSSM, '<', $pssm ) )
-    {
-        while ( <PSSM> )
-        {
-            if (/\btitle\s+"(.*)"/)
-            {
-                $title = $1;
-                last;
-            }
-        }
-        close( PSSM );
-    }
-
-    return $title;
 }
 
 
@@ -1049,85 +1698,39 @@ sub is_stdin
 
 
 #-------------------------------------------------------------------------------
-#  Process the query source request, returning the name of a fasta file
-#  with the data.
-#
-#      $filename = get_query( $query_request, $tempD, \%options )
-#
-#  Options: none are currently used
-#
-#  If the data are already in a file, that file name is returned. Otherwise
-#  the data are read into a file in the directory $tempD.
-#-------------------------------------------------------------------------------
-sub get_query
-{
-    my( $query, $tempD, $parms ) = @_;
-#   returns query-file
-
-    &valid_fasta( $query, "$tempD/query" );
-}
-
-
-#-------------------------------------------------------------------------------
-#  Process the database source request, returning the name of a formatted
-#  blast database with the data.
-#
-#      $dbname = get_db( $db_request, $blast_prog, $tempD )
-#
-#  Options: none are currently used
-#
-#  If the data are already in a database, that name is returned. If the
-#  data are in a file that is in writable directory, the database is built
-#  there and the name is returned. Otherwise the data are read into a file
-#  in the directory $tempD and the database is built there.
-#-------------------------------------------------------------------------------
-sub get_db
-{
-    my( $db, $blast_prog, $tempD, $parms ) = @_;
-#   returns db-file
-
-    #  It should be possible to pass in a database without a fasta file,
-    #  a case that valid_fasta() cannot handle.
-
-    my $seq_type = ( ($blast_prog eq 'blastp')
-                  || ($blast_prog eq 'blastx')
-                  || ($blast_prog eq 'psiblast')
-                   ) ? 'P' : 'N' ;
-    return $db if check_db( $db, $seq_type );
-
-    #  This is not an existing database, figure out what we have been handed ...
-
-    my $dbF = &valid_fasta( $db, "$tempD/db" );
-
-    #  ... and build a blast database for it.
-
-    return &verify_db( $dbF, $seq_type, $tempD );
-}
-
-
-#-------------------------------------------------------------------------------
 #  Return a fasta file name for data supplied in any of the supported formats.
 #
-#      $file_name = valid_fasta( $seq_source, $temp_file )
+#      $file_name = valid_fasta( $seq_source, $template, \%opts )
+#      $file_name = valid_fasta( $seq_source, $filename, \%opts )
+#      $file_name = valid_fasta( $seq_source,            \%opts )
 #
 #  If supplied with a filename, return that. Otherwise determine the nature of
 #  the data, write it to $tmp_file, and return that name.
 #
-#  In psiblast, query might be a pssm file, an alignment file, or an alignment.
+#  Options:
+#
+#      tmp_dir => $dir   #  Location for temporary files
+#
+#  A filename template is recognized by ending with at leat 4 X characters,
+#  as in 'query_XXXX'.  A temporary file will be crated, and deleted at the
+#  end of the process.
+#  A filename does not end with 'XXXX', it will be used if needed, and not
+#  deleted at the end of the process.
+#  Otherwise, a temporary file will be created and deleted at the end of the
+#  process.
 #-------------------------------------------------------------------------------
 sub valid_fasta
 {
-    my( $seq_src, $tmp_file ) = @_;
+    my $opts = ref( $_[-1] ) eq 'HASH' ? pop : {};
+    my ( $seq_src, $file ) = @_;
+
     my $out_file;
 
     #  If we have a filename, leave the data where they are
 
-    if ( defined($seq_src) && (! ref($seq_src)) && ($seq_src ne '') )
+    if ( defined( $seq_src ) && (! ref($seq_src)) )
     {
-        if (-s $seq_src)
-        {
-            $out_file = $seq_src;
-        }
+        $out_file = $seq_src  if -s $seq_src;
     }
 
     #  Other sources need to be written to the file name supplied
@@ -1171,8 +1774,31 @@ sub valid_fasta
 
         if ($data && (@$data > 0))
         {
-            $out_file = $tmp_file;
-            &gjoseqlib::write_fasta( $out_file, $data );
+            my $fh;
+            if ( $file && $file !~ /XXXX$/ )
+            {
+                $out_file = $file;
+                open( $fh, '>', $out_file );
+            }
+            else
+            {
+                eval { require File::Temp; }
+                    or die "Could not require File::Temp.";
+                my $template = $file || "fasta_XXXXXXXX";
+                my $tmpdir = $opts->{ tmp_dir };
+                ( $fh, $out_file ) = $tmpdir ? File::Temp::tempfile( $template, UNLINK => 1, DIR => $tmpdir )
+                                             : File::Temp::tempfile( $template, UNLINK => 1, TMPDIR => 1 );
+            }
+
+            if ( $fh )
+            {
+                gjoseqlib::write_fasta( $out_file, $data );
+                close( $fh );
+            }
+            else
+            {
+                $out_file = undef;
+            }
         }
     }
 
@@ -1186,28 +1812,56 @@ sub valid_fasta
 #  broken out of verify_db to support checking for databases without a
 #  sequence file.
 #
-#      $okay = check_db( $db, $seq_type )
-#      $okay = check_db( $db )                 # assumes seq_type is protein
+#      $okay = check_db( $db, $db_type )
+#      $okay = check_db( $db )                 # assumes db_type is protein
 #
 #  Parameters:
 #
-#      $db       - file path to the data, or root name for an existing database
-#      $seq_type - begins with 'P' for protein data [D], or 'N' for nucleotide
+#      $db      - file path to the data, or root name for an existing database
+#      $db_type - begins with 'p' for protein data [D], or
+#                 begins with 'n' for nucleotide,
+#                 begins with 'r' for rps.
 #
 #-------------------------------------------------------------------------------
 sub check_db
 {
-    my ( $db, $seq_type ) = @_;
+    my ( $db, $db_type ) = @_;
 
     #  Need a valid name
 
     return '' unless ( defined( $db ) && ! ref( $db ) && $db ne '' );
 
-    my $suf = ( ! $seq_type || ( $seq_type =~ m/^p/i ) ) ? 'psq' : 'nsq';
+    my $suf = ! $db_type             ? 'psq'
+            : ( $db_type =~ m/^n/i ) ? 'nsq'
+            : ( $db_type =~ m/^r/i ) ? 'rps'
+            : ( $db_type =~ m/^p/i ) ? 'psq'
+            :                           undef;
+    $suf or return undef;
 
-    #         db exists        and, no source data or db is up-to-date
-    return ( (-s "$db.$suf")    && ( (! -f $db) || (-M "$db.$suf"    <= -M $db) ) )
-        || ( (-s "$db.00.$suf") && ( (! -f $db) || (-M "$db.00.$suf" <= -M $db) ) );
+    #  Check database as specified
+
+    #    db exists              and, no source data or db is up-to-date
+    if ( -s "$db.$suf" )   { return (! -f $db) || (-M "$db.$suf"    <= -M $db) }
+    if ( -s "$db.00.$suf") { return (! -f $db) || (-M "$db.00.$suf" <= -M $db) }
+
+    #  If a path is included in the database name, then we are done
+
+    return 0 if $db =~ qr(/);
+
+    #  If there is not $BLASTDB environment directory, then we are done
+
+    my $blastdb;
+    $blastdb = $ENV{ BLASTDB }
+        and -d $blastdb
+            or return 0;
+
+    #  Try finding the database in $BLASTDB
+
+    $db = "$blastdb/$db";
+    if ( -s "$db.$suf" )   { return (! -f $db) || (-M "$db.$suf"    <= -M $db) }
+    if ( -s "$db.00.$suf") { return (! -f $db) || (-M "$db.00.$suf" <= -M $db) }
+
+    return 0;
 }
 
 
@@ -1215,37 +1869,37 @@ sub check_db
 #  Verify that a formatted blast database exists and is up-to-date, otherwise
 #  create it. Return the db name, or empty string upon failure.
 #
-#      $db = verify_db( $db                               )  # Protein assumed
-#      $db = verify_db( $db,                    \%options )  # Protein assumed
-#      $db = verify_db( $db, $seq_type                    )  # Use specified type
-#      $db = verify_db( $db, $seq_type,         \%options )  # Use specified type
-#      $db = verify_db( $db, $seq_type, $tempD            )  # Move to tempD, if necessary
-#      $db = verify_db( $db, $seq_type, $tempD, \%options )  # Move to tempD, if necessary
+#      $db = verify_db( $db                      )  # Protein assumed
+#      $db = verify_db( $db,           \%options )  # Protein assumed
+#      $db = verify_db( $db, $db_type            )  # Use specified type
+#      $db = verify_db( $db, $db_type, \%options )  # Use specified type
 #
 #  Parameters:
 #
-#      $db       - file path to the data, or root name for an existing database
-#      $seq_type - begins with 'P' or 'p' for protein data, or with 'N' or 'n'
-#                  for nucleotide [Default = P]
-#      $tempD    - if the db directory is unwritable, build the database here
+#      $db       # file path to the data, or root name for an existing database
+#      $db_type  # begins with 'P' or 'p' for protein data, or with 'N' or 'n'
+#                #    for nucleotide [Default = P]
 #
 #  Options:
 #
-#      tmp_dir => $tempD   # the temporary directory of the database
+#      db_dir   => $dir     #  Directory for database, but name is temp
+#      db_path  => $path    #  Name (path) for the database; not temporary
+#      db_title => $title   #  Title of the database
+#      title    => $title   #  Use db_title instead
+#      tmp_dir  => $db_dir  #  Temporary directory for the database
 #
-#  If the datafile is readable, but is in a directory that is not writable, we
-#  copy it to $tempD or $options->{tmp_dir} and try to build the blast database
-#  there. If these are not available, it is built in SeedAware::
+#  If $db is a readable file, but is in a directory that is not writable, we
+#  put the database somewhere else.
 #-------------------------------------------------------------------------------
 sub verify_db
 {
     #  Allow a hash at the end of the parameters
 
-    my $opts = ( $_[-1] && ( ref( $_[-1] ) eq 'HASH') ) ? pop @_ : {};
+    my $opts = ref( $_[-1] ) eq 'HASH' ? pop @_ : {};
 
     #  Get the rest of the parameters
 
-    my ( $db, $seq_type, $tempD ) = @_;
+    my ( $db, $db_type, $db_dir ) = @_;
 
     #  Need a valid name
 
@@ -1253,9 +1907,9 @@ sub verify_db
 
     #  If the database is already okay, we are done
 
-    $seq_type ||= 'P';  #  Default to protein sequence
+    $db_type ||= 'P';  #  Default to protein sequence
 
-    return $db if &check_db( $db, $seq_type );
+    return $db if check_db( $db, $db_type );
 
     #  To build the database we need data
 
@@ -1264,20 +1918,45 @@ sub verify_db
     #  We need to format the database. Figure out if the db directory is
     #  writable, otherwise make a copy in a temporary location:
 
-    my $dir = eval { require File::Basename; } ? File::Basename::dirname( $db )
-            : ( $db =~ m#^(.*[/\\])[^/\\]+$# ) ? $1 : '.';
-    if ( ! -w $dir )
-    {
-        $tempD ||= $opts->{ tmp_dir } || SeedAware::tmp_file_name( 'tmp_blast_db' );
+    my ( $db_path, $db_dir );
 
-        mkdir $tempD if $tempD && ! -d $tempD && ! -e $tempD;
-        if ( ! $tempD || ! -d $tempD || ! -w $tempD )
+    if ( ( $db_path = $opts->{ db_path } )
+      && ( $db_dir  = dir_of( $db_path ) )
+      && -w $db_dir
+       )
+    {
+    }
+    elsif ( ( $db_dir = $opts->{ db_dir } ) && -w $db_dir )
+    {
+    }
+    else
+    {
+        $db_path = $db;
+        $db_dir  = dir_of( $db_path );
+    }
+
+    if ( ! -w $db_dir )
+    {
+        $db_dir ||= $opts->{ tmp_dir };
+        if ( ! -d $db_dir && ! -e $db_dir )
+        {
+            mkdir $db_dir;
+        }
+        else
+        {
+            eval { require File::Temp; }
+                or warn "BlastInterface::verify_db: failed in 'require File::Temp'."
+                    and return '';
+            $db_dir = File::Temp::tempdir( "blast_db_XXXXXX", CLEANUP => 1, TMPDIR => 1 );
+        }
+
+        if ( ! -d $db_dir || ! -w $db_dir )
         {
             warn "BlastInterface::verify_db: failed to locate or make a writeable directory for blast database.\n";
             return '';
         }
 
-        my $newdb = "$tempD/db";
+        my $newdb = "$db_dir/db";
         if ( system( 'cp', $db, $newdb ) )  # I would prefer /bin/cp, but ...
         {
             warn "BlastInterface::verify_db: failed to copy database file to a new location.\n";
@@ -1286,42 +1965,66 @@ sub verify_db
 
         #  This is just an informative message. If permissions are set correctly, it
         #  should never occur, but ....
-        print STDERR "BlastInterface::verify_db: Database '$db' copied to '$newdb'.\n";
+
+        warn "BlastInterface::verify_db: Database '$db' copied to '$newdb'.\n";
 
         $db = $newdb;
     }
 
-    #  Assemble the necessary data for format db
+    my ( $prog, @args );
+    my $title = $opts->{ db_title } || $opts->{ title } || 'Untitled blast database';
+    if    ( $prog = SeedAware::executable_for( 'makeblastdb' ) )
+    {
+        my $type = ( $db_type =~ m/^p/i ) ? 'prot' : 'nucl';
+        @args = ( -in      => $db,
+                  -dbtype  => $type,
+                  -title   => $title,
+                  -logfile => '/dev/null'
+                )
+    }
+    elsif ( $prog = SeedAware::executable_for( 'formatdb' ) )
+    {
+        #  Assemble the necessary data for formatdb
 
-    my $is_prot = ( $seq_type =~ m/^p/i ) ? 'T' : 'F';
-    my @args = ( -p => $is_prot,
-                 -i => $db
-               );
-
-    #  Find formatdb appropriate for the excecution environemnt.
-
-    my $prog = SeedAware::executable_for( 'formatdb' );
-    if ( ! $prog )
+        my $prot = ( $db_type =~ m/^p/i ) ? 'T' : 'F';
+        @args = ( -p => $prot,
+                  -i => $db,
+                  -t => $title
+                );
+    }
+    else
     {
         warn "BlastInterface::verify_db: formatdb program not found.\n";
         return '';
     }
 
-    #  Run formatdb, redirecting the annoying messages about unusual residues.
+    #  Run $prog, redirecting the annoying messages about unusual residues.
 
     my $rc = SeedAware::system_with_redirect( $prog, @args, { stderr => '/dev/null' } );
     if ( $rc != 0 )
     {
         my $cmd = join( ' ', $prog, @args );
-        warn "BlastInterface::verify_db: formatdb failed with rc = $rc: $cmd\n";
+        warn "BlastInterface::verify_db: $prog failed with rc = $rc: $cmd\n";
         return '';
     }
 
-    return $db;
+    $db;
+}
+
+
+sub dir_of
+{
+    local $_ = shift  or return undef;
+    return eval { require File::Basename; } ? File::Basename::dirname( $_ )
+         : ( m#^(.*[/\\])[^/\\]+$# )        ? $1
+         :                                    '.';
 }
 
 
 #-------------------------------------------------------------------------------
+#  This is being replaced by self-deleting directories.  I do not suggest
+#  using this.
+#
 #  Given that we can end up with a temporary blast database, provide a method
 #  to remove it.
 #
@@ -1344,14 +2047,14 @@ sub remove_blast_db_dir
 {
     my ( $db ) = @_;
     return unless $db && -f $db && $db =~ m#^((.*[/\\])tmp_blast_db_[^/\\]+)[/\\]db$#;
-    my $tempD = $1;
-    return if ! -d $tempD;
-    opendir( DIR, $tempD );
+    my $db_dir = $1;
+    return if ! -d $db_dir;
+    opendir( DIR, $db_dir );
     my @bad = grep { ! ( /^db$/ || /^db\../ || /^\.\.?$/ ) } readdir( DIR );
     close DIR;
     return if @bad;
 
-    ! system( 'rm', '-r', $tempD );
+    ! system( 'rm', '-r', $db_dir );
 }
 
 
@@ -1363,27 +2066,28 @@ sub remove_blast_db_dir
 #-------------------------------------------------------------------------------
 sub run_blast
 {
-    my( $queryF, $dbF, $blast_prog, $parms ) = @_;
+    my( $queryF, $dbF, $blast_prog, $opts ) = @_;
 
-    if ( lc ( $parms->{outForm} || '' ) ne 'hsp' )
+    if ( lc ( $opts->{outForm} || '' ) ne 'hsp' )
     {
         eval { require Sim; }
             or print STDERR "Failed in require Sim. Consider using outForm => 'hsp'.\n"
                 and return wantarray ? () : [];
     }
 
-    my $cmd   = &form_blast_command( $queryF, $dbF, $blast_prog, $parms )
+    my $cmd   = &form_blast_command( $queryF, $dbF, $blast_prog, $opts )
         or warn "BlastInterface::run_blast: Failed to create a blast command."
             and return wantarray ? () : [];
-    my $redir = { $parms->{ warnings } ? () : ( stderr => "/dev/null" ) };
+
+    my $redir = { $opts->{ warnings } ? () : ( stderr => "/dev/null" ) };
     my $fh    = &SeedAware::read_from_pipe_with_redirect( $cmd, $redir )
         or return wantarray ? () : [];
 
-    my $includeSelf = defined( $parms->{ includeSelf } ) ?   $parms->{ includeSelf }
-                    : defined( $parms->{ excludeSelf } ) ? ! $parms->{ excludeSelf }
+    my $includeSelf = defined( $opts->{ includeSelf } ) ?   $opts->{ includeSelf }
+                    : defined( $opts->{ excludeSelf } ) ? ! $opts->{ excludeSelf }
                     :                                        $queryF ne $dbF;
 
-    #  With blastall, we must parse the output; with the new blast programs
+    #  With blastall, we must parse the output; with the blast+ programs
     #  we can get the desired tabular output directly, so, hm, no alignments.
     #
     # my $blastall = $cmd->[0] =~ /blastall$/;
@@ -1391,9 +2095,9 @@ sub run_blast
     my @output;
     while ( my $hsp = &gjoparseblast::next_blast_hsp( $fh, $includeSelf ) )
     {
-        if ( &keep_hsp( $hsp, $parms ) )
+        if ( &keep_hsp( $hsp, $opts ) )
         {
-            push( @output, &format_hsp( $hsp, $blast_prog, $parms ) );
+            push( @output, &format_hsp( $hsp, $blast_prog, $opts ) );
         }
     }
 
@@ -1416,16 +2120,16 @@ sub run_blast
 #-------------------------------------------------------------------------------
 sub keep_hsp
 {
-    my( $hsp, $parms ) = @_;
+    my( $hsp, $opts ) = @_;
 
     local $_;
-    return 0 if (($_ = $parms->{minIden})  && ($_ > ($hsp->[11]/$hsp->[10])));
-    return 0 if (($_ = $parms->{minPos})   && ($_ > ($hsp->[12]/$hsp->[10])));
-    return 0 if (($_ = $parms->{minScr})   && ($_ >  $hsp->[6]));
+    return 0 if (($_ = $opts->{minIden})  && ($_ > ($hsp->[11]/$hsp->[10])));
+    return 0 if (($_ = $opts->{minPos})   && ($_ > ($hsp->[12]/$hsp->[10])));
+    return 0 if (($_ = $opts->{minScr})   && ($_ >  $hsp->[6]));
     #  This could be defined with the min aligned length, not the alignment length
-    return 0 if (($_ = $parms->{minNBScr}) && ($_ >  $hsp->[6]/$hsp->[10]));
-    return 0 if (($_ = $parms->{minCovQ})  && ($_ > ((abs($hsp->[16]-$hsp->[15])+1)/$hsp->[2])));
-    return 0 if (($_ = $parms->{minCovS})  && ($_ > ((abs($hsp->[19]-$hsp->[18])+1)/$hsp->[5])));
+    return 0 if (($_ = $opts->{minNBScr}) && ($_ >  $hsp->[6]/$hsp->[10]));
+    return 0 if (($_ = $opts->{minCovQ})  && ($_ > ((abs($hsp->[16]-$hsp->[15])+1)/$hsp->[2])));
+    return 0 if (($_ = $opts->{minCovS})  && ($_ > ((abs($hsp->[19]-$hsp->[18])+1)/$hsp->[5])));
     return 1;
 }
 
@@ -1438,9 +2142,9 @@ sub keep_hsp
 #-------------------------------------------------------------------------------
 sub format_hsp
 {
-    my( $hsp, $blast_prog, $parms ) = @_;
+    my( $hsp, $blast_prog, $opts ) = @_;
 
-    my $out_form = lc ( $parms->{outForm} || 'sim' );
+    my $out_form = lc ( $opts->{outForm} || 'sim' );
     $hsp->[7] =~ s/^e-/1.0e-/  if $hsp->[7];
     $hsp->[9] =~ s/^e-/1.0e-/  if $hsp->[9];
     return ($out_form eq 'hsp') ? $hsp
@@ -1457,85 +2161,99 @@ sub format_hsp
 #-------------------------------------------------------------------------------
 sub form_blast_command
 {
-    my( $queryF, $dbF, $blast_prog, $parms ) = @_;
-    $parms ||= {};
+    my( $queryF, $dbF, $blast_prog, $opts ) = @_;
+    $opts ||= {};
 
-    my %prog_ok = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx psiblast rpsblast);
-    $queryF && $dbF && $blast_prog && $prog_ok{ $blast_prog }
+    #  There are different ways for psiblast and tblastn to get a query, so
+    ( $queryF || ( $blast_prog eq 'psiblast' && ( $opts->{in_pssm} || $opts->{in_msa} ) )
+              || ( $blast_prog eq 'tblastn'  &&   $opts->{in_pssm} )
+        )
         or return wantarray ? () : [];
 
-    my $try_plus = $parms->{ blastplus }
-                || $blast_prog eq 'psiblast'
-                || $blast_prog eq 'rpsblast';
+    $dbF or return wantarray ? () : [];
 
-    my $blastplus = ! $try_plus ? ''
-                  : $blast_prog eq 'rpsblast' ? SeedAware::executable_for( 'rpsblast+' )
-                                              : SeedAware::executable_for( $blast_prog );
-
-    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/rpsblast+' if $blast_prog eq 'rpsblast';
-    $blastplus ||= '/home/fangfang/programs/ncbi-blast-2.2.27+/bin/psiblast'  if $blast_prog eq 'psiblast';
-
-    my $try_all = ! $blastplus
-               && $blast_prog ne 'psiblast'
-               && $blast_prog ne 'rpsblast';
-    my $blastall = $try_all ? SeedAware::executable_for( 'blastall' ) : '';
-
-    $blastplus || $blastall
+    my %prog_ok = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx psiblast rpsblast rpstblastn );
+    $blast_prog && $prog_ok{ $blast_prog }
         or return wantarray ? () : [];
 
-    my $threads          = $parms->{ threads }          || $parms->{ numThreads }       || $parms->{ num_threads };
+    #  Find an executable to perform the requested function:
 
-    my $dbCode           = $parms->{ dbCode }           || $parms->{ dbGenCode }        || $parms->{ db_gen_code };
-    my $giList           = $parms->{ giList }           || $parms->{ gilist };
+    my $blastall;
+    my $blastplus;
+    my %all_ok  = map { $_ => 1 } qw( blastn blastp blastx tblastn tblastx );
+    my $try_all = $opts->{ blastall } && $all_ok{ $blast_prog };
 
-    my $queryCode        = $parms->{ queryCode }        || $parms->{ queryGeneticCode } || $parms->{ query_genetic_code };
-    my $queryLoc         = $parms->{ queryLoc }         || $parms->{ query_loc };
-    my $strand           = $parms->{ strand };
-    my $lcFilter         = flag_value( $parms, qw( lcFilter seg dust ) );
-    my $dust             = $parms->{ dust };
-    my $seg              = $parms->{ seg };
-    my $caseFilter       = flag_value( $parms, qw( caseFilter lcaseMasking lcase_masking ) );
-    my $softMasking      = flag_value( $parms, qw( softMasking soft_masking ) );
-    my $filteringDB      = $parms->{ filteringDB }      || $parms->{ filtering_db };
+    #  If the user asks for it, look for blastall.
+    if    ( $try_all && ( $blastall = SeedAware::executable_for( 'blastall' ) ) ) {}
 
-    my $maxE             = $parms->{ maxE }             || $parms->{ evalue }           || 0.01;
-    my $percentIdentity  = $parms->{ percIdentity }     || $parms->{ perc_identity }    || 0;
-    my $maxHSP           = $parms->{ maxHSP }           || $parms->{ numAlignments }    || $parms->{ num_alignments };
-    my $dbLen            = $parms->{ dbLen }            || $parms->{ dbSize }           || $parms->{ dbsize };
-    my $searchSp         = $parms->{ searchSp }         || $parms->{ searchsp };
-    my $bestHitOverhang  = $parms->{ bestHitOverhang }  || $parms->{ best_hit_overhang };
-    my $bestHitScoreEdge = $parms->{ bestHitScoreEdge } || $parms->{ best_hit_score_edge };
+    #  If blastall was not explicitly requested, or we cannot find it, try the
+    #  blast+ program.
+    elsif ( $blastplus = SeedAware::executable_for( $blast_prog ) ) {}
 
-    my $wordSz           = $parms->{ wordSz }           || $parms->{ wordSize }         || $parms->{ word_size };
-    my $matrix           = $parms->{ matrix };
-    my $nucIdenScr       = $parms->{ nucIdenScr }       || $parms->{ reward };
-    my $nucMisScr        = $parms->{ nucMisScr }        || $parms->{ penalty };
-    my $gapOpen          = $parms->{ gapOpen }          || $parms->{ gapopen };
-    my $gapExtend        = $parms->{ gapExtend }        || $parms->{ gapextend };
-    my $threshold        = $parms->{ threshold };
-    my $xDropFinal       = $parms->{ xDropFinal }       || $parms->{ xdrop_final };
-    my $xDropGap         = $parms->{ xDropGap }         || $parms->{ xdrop_gap };
-    my $xDropUngap       = $parms->{ xDropUngap }       || $parms->{ xdrop_ungap };
+    #  If we could not find the blast+ program, and we did not try for blastall,
+    #  try looking for it now.
+    elsif ( ( ! $try_all ) && $all_ok{ $blast_prog } && ( $blastall = SeedAware::executable_for( 'blastall' ) ) ) {}
 
-    my $useSwTback       = flag_value( $parms, qw( useSwTback use_sw_tback ) );
-    my $ungapped         = flag_value( $parms, qw( ungapped ) );
-    my $maxIntronLength  = $parms->{ maxIntronLength }  || $parms->{ max_intron_length };
+    #  We have a problem here.
+    else
+    {
+        print STDERR "BlastInterface::blast: Could not locate an executable to run '$blast_prog' function.\n";
+        return wantarray ? () : [];
+    }
 
-    my $showGIs          = flag_value( $parms, qw( showGIs show_gis ) );
+    my $threads          = $opts->{ threads }          || $opts->{ numThreads }       || $opts->{ num_threads };
+
+    my $dbCode           = $opts->{ dbCode }           || $opts->{ dbGenCode }        || $opts->{ db_gen_code };
+    my $giList           = $opts->{ giList }           || $opts->{ gilist };
+
+    my $queryCode        = $opts->{ queryCode }        || $opts->{ queryGeneticCode } || $opts->{ query_genetic_code };
+    my $queryLoc         = $opts->{ queryLoc }         || $opts->{ query_loc };
+    my $strand           = $opts->{ strand };
+    my $lcFilter         = flag_value( $opts, qw( lcFilter seg dust ) );
+    my $dust             = $opts->{ dust };
+    my $seg              = $opts->{ seg };
+    my $caseFilter       = flag_value( $opts, qw( caseFilter lcaseMasking lcase_masking ) );
+    my $softMasking      = flag_value( $opts, qw( softMasking soft_masking ) );
+    my $filteringDB      = $opts->{ filteringDB }      || $opts->{ filtering_db };
+
+    my $maxE             = $opts->{ maxE }             || $opts->{ evalue }           || 0.01;
+    my $percentIdentity  = $opts->{ percIdentity }     || $opts->{ perc_identity }    || 0;
+    my $maxHSP           = $opts->{ maxHSP }           || $opts->{ numAlignments }    || $opts->{ num_alignments };
+    my $dbLen            = $opts->{ dbLen }            || $opts->{ dbSize }           || $opts->{ dbsize };
+    my $searchSp         = $opts->{ searchSp }         || $opts->{ searchsp };
+    my $bestHitOverhang  = $opts->{ bestHitOverhang }  || $opts->{ best_hit_overhang };
+    my $bestHitScoreEdge = $opts->{ bestHitScoreEdge } || $opts->{ best_hit_score_edge };
+
+    my $wordSz           = $opts->{ wordSz }           || $opts->{ wordSize }         || $opts->{ word_size };
+    my $matrix           = $opts->{ matrix };
+    my $nucIdenScr       = $opts->{ nucIdenScr }       || $opts->{ reward };
+    my $nucMisScr        = $opts->{ nucMisScr }        || $opts->{ penalty };
+    my $gapOpen          = $opts->{ gapOpen }          || $opts->{ gapopen };
+    my $gapExtend        = $opts->{ gapExtend }        || $opts->{ gapextend };
+    my $threshold        = $opts->{ threshold };
+    my $xDropFinal       = $opts->{ xDropFinal }       || $opts->{ xdrop_final };
+    my $xDropGap         = $opts->{ xDropGap }         || $opts->{ xdrop_gap };
+    my $xDropUngap       = $opts->{ xDropUngap }       || $opts->{ xdrop_ungap };
+
+    my $useSwTback       = flag_value( $opts, qw( useSwTback use_sw_tback ) );
+    my $ungapped         = flag_value( $opts, qw( ungapped ) );
+    my $maxIntronLength  = $opts->{ maxIntronLength }  || $opts->{ max_intron_length };
+
+    my $showGIs          = flag_value( $opts, qw( showGIs show_gis ) );
 
     # PSI-BLAST and PSSM engine options in blast+/psiblast
 
-    my $iterations       = $parms->{ iterations }       || $parms->{ num_iterations };
-    my $outPSSM          = $parms->{ outPSSM }          || $parms->{ out_pssm };
-    my $asciiPSSM        = $parms->{ asciiPSSM }        || $parms->{ out_ascii_pssm };
-    my $inMSA            = $parms->{ inMSA }            || $parms->{ in_msa };
-    my $queryIndex       = $parms->{ queryIndex }       || $parms->{ msa_master_idx };
-    my $queryID          = $parms->{ queryID }          || $parms->{ msa_master_id };
-    my $ignoreMaster     = flag_value( $parms, qw( ignoreMaster ignore_msa_master ) );
-    my $inPSSM           = $parms->{ inPSSM }           || $parms->{ in_pssm };
-    my $pseudoCount      = $parms->{ pseudoCount }      || $parms->{ pseudocount };
-    my $inclusionEvalue  = $parms->{ inclusionEvalue }  || $parms->{ inclusion_ethresh };
-    my $inPHI            = $parms->{ inPHI }            || $parms->{ phi_pattern };
+    my $iterations       = $opts->{ iterations }       || $opts->{ num_iterations };
+    my $outPSSM          = $opts->{ outPSSM }          || $opts->{ out_pssm };
+    my $asciiPSSM        = $opts->{ asciiPSSM }        || $opts->{ out_ascii_pssm };
+    my $inMSA            = $opts->{ inMSA }            || $opts->{ in_msa };
+    my $queryIndex       = $opts->{ queryIndex }       || $opts->{ msa_master_idx };
+    my $queryID          = $opts->{ queryID }          || $opts->{ msa_master_id };
+    my $ignoreMaster     = flag_value( $opts, qw( ignoreMaster ignore_msa_master ) );
+    my $inPSSM           = $opts->{ inPSSM }           || $opts->{ in_pssm };
+    my $pseudoCount      = $opts->{ pseudoCount }      || $opts->{ pseudocount };
+    my $inclusionEvalue  = $opts->{ inclusionEvalue }  || $opts->{ inclusion_ethresh };
+    my $inPHI            = $opts->{ inPHI }            || $opts->{ phi_pattern };
 
     my @cmd;
     if ( $blastall )
@@ -1579,8 +2297,10 @@ sub form_blast_command
         #  blastall does not have a percent identity option, so we must set the
         #  filter.
 
-        $parms->{minIden} ||= 0.01 * $percentIdentity if $blast_prog eq 'blastn';
+        $opts->{minIden} ||= 0.01 * $percentIdentity if $blast_prog eq 'blastn';
     }
+
+    #  We are using a blast+ program
     else
     {
         if ( defined $lcFilter )
@@ -1593,7 +2313,7 @@ sub form_blast_command
         my $alignF;
         if ( $blast_prog eq 'psiblast' )
         {
-            $alignF   = valid_fasta( $inMSA, $parms->{ tmp_dir }.'/inMSA' ) if defined $inMSA;
+            $alignF   = valid_fasta( $inMSA, $opts ) if defined $inMSA;
             $alignF ||= $queryF if ! defined $inPSSM ;
 
             # queryIndex is 1-based
@@ -1616,6 +2336,7 @@ sub form_blast_command
         }
 
         push @cmd, $blastplus;
+        push @cmd, -task                => 'blastn'           if $blast_prog eq 'blastn';
         push @cmd, -num_threads         => $threads           if $threads;
 
         push @cmd, -db                  => $dbF;
@@ -1675,13 +2396,14 @@ sub form_blast_command
     wantarray ? @cmd : \@cmd;
 }
 
+#  The change of option keywords is really annoying.
 
 sub flag_value
 {
-    my $parms = shift;
-    return undef unless $parms && ref($parms) eq 'HASH';
+    my $opts = shift;
+    return undef unless $opts && ref($opts) eq 'HASH';
 
-    my ( $val ) = map { $_ && defined( $parms->{$_} ) ? $parms->{$_} : () } @_;
+    my ( $val ) = map { $_ && defined( $opts->{$_} ) ? $opts->{$_} : () } @_;
     return undef if ! defined $val;
 
     ( ! $val || ( $val eq '0' ) || ( $val =~ /^f/i ) || ( $val =~ /^n/i ) ) ? 0 : 1;
@@ -2159,6 +2881,41 @@ sub output_file_handle
     }
 
     return ( $fh, $close );
+}
+
+
+#-------------------------------------------------------------------------------
+#  Ensure that a directory exists; modified from SeedUtils.pm
+#
+#   $path = verify_dir( $path )
+#
+#   returns undef on failure
+#
+#-------------------------------------------------------------------------------
+sub verify_dir
+{
+    my ( $dirName ) = @_;
+
+    $dirName =~ s#//+#/#g;  #  Compress consecutive slashes
+    $dirName =~ s#/$##;     #  Remove terminal slash
+
+    if ( ! -d $dirName )    #  If it does not already exist, try to create it
+    {
+        #  Ensure that any required parent directory is there.
+
+        if ( $dirName =~ m#^(.+)/[^/]+$# )
+        {
+            verify_dir( $1 )
+                or return undef;
+        }
+
+        # Create this directory with full permissions.
+
+        mkdir $dirName, 0777
+            or return undef;
+    }
+
+    $dirName;
 }
 
 

@@ -71,11 +71,17 @@ my $rc = GetOptions('help'       => \$help,
 		    'output=s'   => \$output_file,
 		    );
 
-if (@ARGV == 1) {
+if (@ARGV == 2) {
     $input_file  ||= shift @ARGV;
     if (!-s $input_file) {
 	$trouble = 1;
 	warn "ERROR: input_file=\'$input_file\' does not exist or is empty\n";
+    }
+    
+    $output_file  ||= shift @ARGV;
+    if (-e $output_file) {
+	$trouble = 1;
+	warn "ERROR: output_file=\'$output_file\' already exists\n";
     }
 }
 
@@ -93,14 +99,18 @@ if (!$rc || $help || $trouble || @ARGV != 0) {
 }
 
 
-my $out_fh;
+my $input_fh;
+if ($input_file) {
+    open($input_fh, "<", $input_file) or die "Cannot open $input_file: $!";
+} else { $input_fh = \*STDIN; }
+
+my $output_fh;
 if ($output_file) {
-    open($out_fh, ">", $output_file) or die "Cannot open $output_file: $!";
-} else { $out_fh = \*STDOUT; }
+    open($output_fh, ">", $output_file) or die "Cannot open $output_file: $!";
+} else { $output_fh = \*STDOUT; }
 
 
-my $tbl = &load_gto($input_file);
-
+my $tbl = &load_gto($input_fh);
 
 use constant FID     =>  0;
 use constant LOCUS   =>  1;
@@ -117,17 +127,14 @@ use constant ALT_IDS => 11;
 use constant ENTRY   => 12;
 
 foreach my $entry (@$tbl) {
-    print $out_fh (join("\t", ($entry->[FID], $entry->[LOCUS], $entry->[FUNC])), "\n");
+    print $output_fh (join("\t", ($entry->[FID], $entry->[LOCUS], $entry->[FUNC])), "\n");
 }
 exit(0);
 
 
 sub load_gto {
-    my ($filename) = @_;
+    my ($fh) = @_;
     my ($key, $id, $locus, $func, $contig, $beg, $end, $left, $right, $len, $strand, $type, $alt_ids);
-    
-    my $fh;
-    open($fh, "<", $filename) or die "Cannot open $filename: $!";
     
     my $tbl = [];
     
@@ -138,15 +145,20 @@ sub load_gto {
 	undef $/;
 	my $gto_txt = <$fh>;
 	$gto = $json->decode($gto_txt);
+	
+	my $contigs = [ map { [ $_->{id}, '', $_->{dna} ] }  @{ $gto->{contigs} } ];
+	my $length_of = {};
+	%$length_of = map { ( $_->[0] => length($_->[2]) ) } @$contigs;
+	
 	foreach my $feature (@ { $gto->{features} })
 	{
 	    ($id,   $contig, $strand,
 	     $left, $right,
 	     $beg,  $end,
-	     $len,  $locus) = &feature_bounds($feature);
+	     $len,  $locus) = &feature_bounds($feature, $length_of);
 	    
 	    $type = $feature->{type};
-	    next unless ($type =~ m/^peg|CDS$/i);
+#	    next unless ($type =~ m/^peg|CDS$/i);
 	    
 	    $func = $feature->{function} || q();
 	    
@@ -159,6 +171,8 @@ sub load_gto {
 		&& defined($strand) && $strand
 		)
 	    {
+		$locus = join(q(_), ($contig, $beg, $end));
+		
 		push @$tbl, [ $id, $locus, $contig, $strand, $beg, $end, $left, $right, $len, $type, $func, $alt_ids, $feature ];
 	    }
 	    else {
@@ -170,11 +184,11 @@ sub load_gto {
     
     @$tbl = sort { &by_locus($a,$b) } @$tbl;
     
-    return $tbl;
+    return ($gto, $tbl);
 }
 
 sub feature_bounds {
-    my ($feature) = @_;
+    my ($feature, $length_of) = @_;
     
     my $location = $feature->{location};
     
@@ -185,7 +199,7 @@ sub feature_bounds {
 	) = &parse_exon($location->[0]);
     
     foreach my $exon (@$location) {
-	my ($contig, $strand, $left, $right) = &parse_exon($exon);
+	my ($contig, $strand, $beg, $end) = &parse_exon($exon);
 	
 	if ($feature_contig) {
 	    if ($contig ne $feature_contig) {
@@ -201,8 +215,8 @@ sub feature_bounds {
 	    }
 	}
 	
-	$feature_left  = &SeedUtils::min($left,  $feature_left);
-	$feature_right = &SeedUtils::max($right, $feature_right);
+	$feature_left  = &SeedUtils::min($beg, $end  $feature_left);
+	$feature_right = &SeedUtils::max($beg, $end, $feature_right);
     }
     
     my ($feature_beg, $feature_end) = ($feature_strand eq q(+))
@@ -224,7 +238,7 @@ sub parse_exon {
     my ($contig, $beg, $strand, $len) = @$exon;
     my $end = ($strand eq '+') ? $beg + ($len-1) : $beg - ($len-1);
     
-    return ($contig, $strand, &SeedUtils::min($beg,$end), &SeedUtils::max($beg,$end));
+    return ($contig, $strand, $beg, $end);
 }
 
 

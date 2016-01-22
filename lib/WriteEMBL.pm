@@ -92,15 +92,25 @@ END
 
 
 sub form_feature {
-    my ($type, $locus, $ltag) = @_;
+    my ($type, $locus, $field_pairs) = @_;
     
-    $ltag = qq(\"$ltag\");
-    formline <<END, $type, $locus, $ltag;
-FT   @<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-FT                   /locus_tag=^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    my $old_split = $:;
+    $: = ',';
+    formline <<END, $type, $locus;
+FT   @<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 END
-
-   return;
+    formline <<END, $locus;
+FT~~                 ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+END
+    $: = $old_split;
+    
+    if ($field_pairs) {
+	foreach my $pair (@$field_pairs) {
+	    &form_multiline(@$pair);
+	}
+    }
+    
+    return;
 }
 
 
@@ -108,7 +118,7 @@ END
 sub form_multiline {
     my ($field, $text) = @_;
     
-    my $tmp = "/$field=\"$text\"";
+    my $tmp = $text ? qq(/$field="$text") : qq(/$field);
     
     formline <<END, $tmp;
 FT                   ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

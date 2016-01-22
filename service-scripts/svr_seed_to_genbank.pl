@@ -4,6 +4,7 @@
 # This is a SAS component.
 #
 
+use SeedUtils;
 use WriteGenbank;
 
 #########################################################################
@@ -31,23 +32,56 @@ use Data::Dumper;
 $0 =~ m/([^\/]+)$/;
 my $self = $1;
 
-my $usage = qq(usage: $self  LocusTag_Prefix  SEED_OrgDir > genbank.output);
+# my $usage = qq(usage: $self  LocusTag_Prefix  SEED_OrgDir > genbank.output);
+my $usage = qq(usage: $self  [--help] [--map_funcs=mapfile.2c] [--locus_tag=LocusTag_Prefix] [--project=project_number] [--org_dir=SEED_OrgDir] > genbank.output);
 
-my ($locus_tag_prefix, $org_dir) = @ARGV;
+
+
+my $trouble;
+
+use Getopt::Long;
+my $help;
+my $org_dir;
+my $project_ID;
+my $func_map_file;
+my $locus_tag_prefix;
+my $rc = GetOptions(
+		    "help!"         => \$help,
+		    "map_funcs:s"   => \$func_map_file,
+		    "org_dir:s"     => \$org_dir,
+		    "project:i"     => \$project_ID,
+		    "locus_tag:s"   => \$locus_tag_prefix,
+		    );
+print STDERR qq(\nrc=$rc\n\n) if $ENV{VERBOSE};
+
+if (!$rc || $help) {
+    warn qq(\n   usage: $usage\n\n);
+    exit(0);
+}
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#...Insert code to grandfather in old syntax here...
+#-----------------------------------------------------------------------
+if ((@ARGV == 2) && !$locus_tag_prefix && !$org_dir) {
+    ($locus_tag_prefix, $org_dir) = @ARGV;
+}
 
 $org_dir =~ s/\/$//;
 if (!-d $org_dir) {
     die "Organism directory $org_dir does not exist" unless (-d $org_dir);
 }
 
+my $genome_ID;
 my $taxon_ID;
-if ($org_dir =~ m/(\d+)\.\d+/) {
-    $taxon_ID = $1;
+if ($org_dir =~ m/((\d+)\.\d+)\D*$/) {
+    $genome_ID = $1;
+    $taxon_ID  = $2;
 }
 else {
     die qq(Organism directory $org_dir does not end in a taxonomy ID (e.g., \'123456.7\'));
 }
-
 
 my $genome;
 if (open(GENOME, "<$org_dir/GENOME")) {
@@ -58,7 +92,6 @@ if (open(GENOME, "<$org_dir/GENOME")) {
 else {
     die "could not read-open $org_dir/GENOME";
 }
-
 
 my $taxonomy;
 if (open(TAXONOMY, "<$org_dir/TAXONOMY")) {
@@ -96,6 +129,19 @@ else {
 }
 
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#...Load contigs files...
+#-----------------------------------------------------------------------
+opendir(ORG_DIR, $org_dir) || die "Could not opendir $org_dir";
+my @contig_files = map { "$org_dir/$_" } grep { m/^contigs\d*$/ } readdir(ORG_DIR);
+closedir(ORG_DIR) || die "Could not closedir $org_dir";
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#...Load tbl and function files...
+#-----------------------------------------------------------------------
 use constant FID    =>  0;
 use constant LOCUS  =>  1;
 use constant CONTIG =>  2;
@@ -107,9 +153,25 @@ use constant TYPE   =>  7;
 use constant FUNC   =>  8;
 use constant EC_NUM =>  9;
 
-opendir(ORG_DIR, $org_dir) || die "Could not opendir $org_dir";
-my @contig_files = map { "$org_dir/$_" } grep { m/^contigs\d*$/ } readdir(ORG_DIR);
-closedir(ORG_DIR) || die "Could not closedir $org_dir";
+my %map_func_to;
+if ($func_map_file) {
+    if (-s $func_map_file) {
+	my $line;
+	open(FUNC_MAP, q(<), $func_map_file)
+	    or die "COuld not read-open \'$func_map_file\'";
+	while (defined($line = <FUNC_MAP>)) {
+	    chomp $line;
+	    if ($line =~ m/^([^\t]+)\t([^\t]+)/o) {
+		$map_func_to{$1} = $2;
+	    }
+	    else {
+		$trouble = 1;
+		warn "Could not parse line: \'$line\'";
+	    }
+	}
+    }
+}
+die "\nCould not parse function map \'$func_map_file\' --- aborting" if $trouble;
 
 my $EC_of = {};
 my $function_of = {};
@@ -130,6 +192,11 @@ foreach my $assgn (qw(assigned_functions proposed_non_ff_functions proposed_func
 	    $EC_of->{$fid} = [@ECs]; 
 	    
 	    $func =~ s/\s+/ /sgo;
+	    my @roles = map { defined($map_func_to{$_})
+				  ? $map_func_to{$_} : $_
+			      } split /\s*;\s+|\s+[\@\/]\s+/, $func;
+	    $func = join( q( / ), @roles);
+	    
 	    if ($func) { $function_of->{$fid} = $func; }
 	}
 	close($fh);
@@ -160,13 +227,8 @@ foreach my $contig (sort keys %$len_of)
     my $features = $tbl->{$contig};
     foreach my $feature (@$features) {
 	
-	my $locus;
-	if ($feature->[STRAND] eq '+') {
-	    $locus = "$feature->[LEFT]\.\.$feature->[RIGHT]";
-        }
-	else {
-	    $locus = "complement($feature->[LEFT]\.\.$feature->[RIGHT])";
-        }
+	my $locus = $feature->[LOCUS];
+	my ($gene_locus, $feature_locus) = &to_ncbi_locus($feature);
 	
 	my $feature_num;
 	if ($feature->[FID] =~ m/\.(\d+)$/) {
@@ -177,11 +239,13 @@ foreach my $contig (sort keys %$len_of)
 	}
 	
 	my $ltag;
+	my $db_xref;
         if ($feature->[TYPE] eq 'peg') {
 	    $ltag = $locus_tag_prefix . q(_) . &zero_pad(4, $feature_num);
+	    $db_xref = q(SEED:).$feature->[FID];
 	    
-	    &form_feature(q(gene), $locus, $ltag);
-	    &form_feature(q(CDS), $locus, $ltag);
+	    &form_feature(q(gene), $gene_locus);
+	    &form_feature(q(CDS), $feature_locus, $ltag, $db_xref);
 	    
             if ($feature->[FUNC]) {
 		&form_multiline('product', $feature->[FUNC]);
@@ -198,8 +262,8 @@ foreach my $contig (sort keys %$len_of)
 	elsif ($feature->[TYPE] eq 'rRNA') {
 	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
 	    
-	    &form_feature(q(gene), $locus, $ltag);
-	    &form_feature(q(rRNA), $locus, $ltag);
+	    &form_feature(q(gene), $gene_locus, $ltag);
+	    &form_feature(q(rRNA), $feature_locus, $ltag);
 	    
             if ($feature->[FUNC]) {
 		&form_multiline('product', $feature->[FUNC]);
@@ -208,8 +272,8 @@ foreach my $contig (sort keys %$len_of)
 	elsif ($feature->[TYPE] eq 'tRNA') {
 	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
 	    
-	    &form_feature(q(gene), $locus, $ltag);
-	    &form_feature(q(tRNA), $locus, $ltag);
+	    &form_feature(q(gene), $gene_locus, $ltag);
+	    &form_feature(q(tRNA), $feature_locus, $ltag);
 	    
             if ($feature->[FUNC]) {
 		&form_multiline('product', $feature->[FUNC]);
@@ -218,8 +282,8 @@ foreach my $contig (sort keys %$len_of)
 	elsif ($feature->[TYPE] eq 'misc_RNA') {
 	    $ltag = $locus_tag_prefix . q(_r) . &zero_pad(3, $feature_num);
 	    
-	    &form_feature(q(gene), $locus, $ltag);
-	    &form_feature(q(misc_RNA), $locus, $ltag);
+	    &form_feature(q(gene),     $gene_locus, $ltag);
+	    &form_feature(q(misc_RNA), $feature_locus, $ltag);
 	    
             if ($feature->[FUNC]) {
 		&form_multiline('product', $feature->[FUNC]);
@@ -279,13 +343,11 @@ sub load_tbls {
     my $x;
     my $tbl = {};
     
-    foreach $file (@files)
-    {
+    foreach $file (@files) {
 	print STDERR "Loading $file ...\n" if $ENV{VERBOSE};
 	
 	open(TBL, "<$file") || die "Could not read-open $file";
-	while (defined($entry = <TBL>))
-	{
+	while (defined($entry = <TBL>)) {
 	    chomp $entry;
 	    
 	    ($fid, $locus, $alias) = split /\t/, $entry;
@@ -348,18 +410,13 @@ sub load_tbls {
 }
 
 
-sub from_locus
-{
+sub from_locus {
     my ($locus) = @_;
     
-    if ($locus =~ m/^(\S+)_(\d+)_(\d+)$/)
-    {
-	return ($1
-	       , &min($2, $3)
-	       , &max($2, $3)
-	       , (1+abs($3-$2))
-	       , (($2 < $3) ? '+' : '-')
-	       );
+    my ($contig, $left, $right, $strand) = &SeedUtils::boundaries_of($locus);
+
+    if ($contig && $left && $right && $strand) {
+	return ($contig, $left, $right, (1+abs($right-$left)), $strand)
     }
     else {
 	die "Invalid locus $locus";
@@ -368,16 +425,30 @@ sub from_locus
     return ();
 }
 
-
-sub min {
-    my ($x, $y) = @_; 
-    return (($x < $y) ? $x : $y);
+sub to_ncbi_locus {
+    my ($feature) = @_;
+    my ($gene_locus, $feature_locus);
+    
+    my $locus = $feature->[LOCUS];
+    my @exons = split(/,/, $locus);
+    if ($feature->[STRAND] eq '+') {
+	$gene_locus = "$feature->[LEFT]\.\.$feature->[RIGHT]";
+	
+	$feature_locus = join(q(,), map { m/^\S+_(\d+)_(\d+)$/ ? $1.q(..).$2 : () } @exons);
+	if (@exons > 1) {
+	    $feature_locus = 'join(' . $feature_locus . ')';
+	} 
+    }
+    else {
+	$gene_locus = "complement($feature->[LEFT]\.\.$feature->[RIGHT])";
+	
+	@exons = reverse @exons;
+	$feature_locus = 'complement(' . join(q(,), map { m/^\S+_(\d+)_(\d+)$/ ? $2.q(..).$1 : () } @exons) . ')';
+    }
+    
+    return ($gene_locus, $feature_locus);
 }
 
-sub max {
-    my ($x, $y) = @_; 
-    return (($x > $y) ? $x : $y);
-}
 
 sub zero_pad {
     my ($width, $num) = @_;
@@ -447,8 +518,8 @@ END
 END
 
     formline <<END, $genome;
-ACCESSION   Unknown Unknown
-VERSION     Unknown
+ACCESSION   $contig .
+VERSION     $contig.1  .
 KEYWORDS    WGS.
 SOURCE      @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 END
@@ -488,17 +559,37 @@ END
 
 
 sub form_feature {
-    my ($type, $locus, $ltag) = @_;
+    my ($type, $locus, $ltag, $db_xref) = @_;
     
-    $ltag = qq(\"$ltag\");
-    formline <<END, $type, $locus, $ltag;
-     @<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                     /locus_tag=^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    my $break_old;
+    ($break_old, $:) = ($:, q(,));
+    
+    formline <<END, $type, $locus;
+     @<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 END
 
-   return;
+    formline <<END, $locus;
+~~                   ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+END
+
+    &form_field(q(locus_tag), $ltag)    if ($ltag);
+    &form_field(q(db_xref),   $db_xref) if ($db_xref);
+    
+    $: = $break_old;
+    return;
 }
 
+sub form_field {
+    my ($field, $text) = @_;
+    
+    my $tmp = "/$field=\"$text\"";
+    formline <<END, $tmp;
+                     ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+END
+
+    return;
+}
+   
 
 
 sub form_multiline {

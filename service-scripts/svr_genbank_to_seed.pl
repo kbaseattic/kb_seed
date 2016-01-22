@@ -40,13 +40,9 @@ my $contigs_file = $org_dir.q(/contigs);
 open(my $contigs_fh, q(>), $contigs_file)
     || die qq(Could not write-open contigs file \'$contigs_file\');
 
-print STDERR qq(got to here\n);
 while(defined(my $accession = gjogenbank::parse_next_genbank($genbank_file))) {
-    print STDERR qq(Got an accession\n);
-    
-    my $contig_id   = $accession->{LOCUS};
+    my $contig_id   = $accession->{ACCESSION}->[0];
     my $contig_dna  = $accession->{SEQUENCE};
-    print STDERR qq(Writing contig=$contig_id\n);
     $figV->display_id_and_seq( $contig_id, \$contig_dna, $contigs_fh);
     
     foreach my $cds (@ { $accession->{FEATURES}->{CDS} }) {
@@ -65,10 +61,10 @@ while(defined(my $accession = gjogenbank::parse_next_genbank($genbank_file))) {
 	my @gene_nums   = map { m/GeneID\:(\d+)/o ? (q(GeneID|).$1) : () } @db_xrefs;
 	
 	my @aliases     = grep { $_ } ($gene_name, $locus_tag, $protein_id, @gi_nums, @db_xrefs, @gene_nums);
+	my $aliases     = join(q(,), @aliases);
 	
 	if ($locus && defined($func) && $translation) {
-	    print STDERR qq(Writing feature at loc=$locus\n);
-	    if (my $fid = $figV->add_feature(q(Initial Import), $taxID, q(peg), $locus, \@aliases, $translation)) {
+	    if (my $fid = $figV->add_feature(q(Initial Import), $taxID, q(peg), $locus, $aliases, $translation)) {
 		if ($func) {
 		    $figV->assign_function($fid, q(master:Initial Import), $func);
 		}
