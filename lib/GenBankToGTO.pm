@@ -153,13 +153,50 @@ sub new
                 };
     $opts->{ event } = $gto->add_analysis_event( $event );
 
+    #
+    # Determine which of VERSION, LOCUS, ACCESSION is unique for the purpose of naming
+    # contigs.
+    #
+
+    my %namekey;
+    for my $what (qw(VERSION LOCUS ACCESSION))
+    {
+	for my $entry (@entries)
+	{
+	    if (ref($entry->{$what}) && @{$entry->{$what}})
+	    {
+		$namekey{$what}->{$entry->{$what}->[0]}++;
+	    }
+	    elsif ($entry->{$what})
+	    {
+		$namekey{$what}->{$entry->{$what}}++;
+	    }		
+	}
+    }
+    print STDERR Dumper(\%namekey);
+    my $contig_key;
+    for my $what (qw(VERSION LOCUS ACCESSION))
+    {
+	if (keys %{$namekey{$what}} == @entries)
+	{
+	    $contig_key = $what;
+	    last;
+	}
+    }
+
+    if (!$contig_key)
+    {
+	die "Could not find a unique contig identifier";
+    }
+
+
     #  Fill the GenomeTO one contig at a time:
 
     foreach my $entry ( @entries )
     {
         #  Add the GenBank entry contig and associated features.
 
-        my $contig = add_contig( $gto, $entry, $opts );
+        my $contig = add_contig( $gto, $entry, $contig_key, $opts );
     }
 
     $gto;
@@ -169,10 +206,11 @@ sub new
 #===============================================================================
 #  Add one contig to the GenomeTO
 #
-#    $contig = add_contig( $gto, $gb_entry, $opts );
+#    $contig = add_contig( $gto, $gb_entry, $contig_key, $opts );
 #
 #       $gto       is the GenomeTO being assembled.
-#       $gb_entry  is the parsed GenBank entry. 
+#       $gb_entry  is the parsed GenBank entry.
+# 	$contig_key is the entry field to use as the identifier for the contig
 #       $opts      is not currently used, but it is passed just in case.
 #
 #       $contig    is the contig created and added to the GenomeTO
@@ -180,7 +218,7 @@ sub new
 #===============================================================================
 sub add_contig
 {
-    my ( $gto, $entry, $opts ) = @_;
+    my ( $gto, $entry, $contig_key, $opts ) = @_;
     $opts ||= {};
 
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -244,12 +282,18 @@ sub add_contig
 
     my $contig = {};
 
-	$contig->{ genbank_locus } = $locus;
-
-    $contig->{ id } = $locus->{ version }   && @{$locus->{ version }}   ? $locus->{ version }->[0]
-                    : $locus->{ accession } && @{$locus->{ accession }} ? $locus->{ accession }->[0]
-                    : $locus->{ locus }                                 ? $locus->{ locus }->[0]
-                    : die( "GenBank data without VERSION, ACCESSION or LOCUS" );
+    $contig->{ genbank_locus } = $locus;
+    
+    $contig->{ id } = $entry->{$contig_key};
+    if (ref($contig->{ id }))
+    {
+	$contig->{ id } = $contig->{ id }->[0];
+    }
+    
+#    $CONTIG->{ id } = $locus->{ version }   && @{$locus->{ version }}   ? $locus->{ version }->[0]
+#                    : $locus->{ accession } && @{$locus->{ accession }} ? $locus->{ accession }->[0]
+#                    : $locus->{ locus }                                 ? $locus->{ locus }->[0]
+#                    : die( "GenBank data without VERSION, ACCESSION or LOCUS" );
 
 	$contig->{ replicon_geometry } = $entry->{ geometry } if $entry->{ geometry };
 
@@ -538,7 +582,7 @@ sub feature_type
     elsif ( $_ eq 'prim_transcript' )         { $type = 'rna' }
     elsif ( $_ eq 'misc_feature' )
     {
-        if ( $qual->{ note } =~ /prophage/i ) { $type = 'pp' }
+        if ( $qual->{ note } && $qual->{ note } =~ /prophage/i ) { $type = 'pp' }
         else                                  { $type = $_ }
     }
     else                                      { $type = $_ }
