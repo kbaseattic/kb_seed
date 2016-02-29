@@ -111,6 +111,13 @@ sub propagate_trnas
 	next unless $f->{type} =~ /rna/i;
 	next unless exists $f->{genbank_feature};
 
+	# 
+	# From Set::IntervalTree doc:
+	# All intervals are half-open, i.e. [1,3), [2,6), etc.
+	# Thus we bump the right endpoint.
+	#
+	$max++;
+
 	my $tree = $trees{$ctg};
 	$tree->insert($f->{id}, $min, $max);
     }
@@ -127,7 +134,7 @@ sub propagate_trnas
 
 	my($ctg, $min, $max, $dir, $len) = GenomeTypeObject::bounds($f);
 	my $tree = $trees{$ctg};
-	my $overlap = $tree->fetch($min, $max);
+	my $overlap = $tree->fetch($min, $max+1);
 	my @overlap = grep { $_ ne $fid } @$overlap;
 	#
 	# @overlap contains the genbank feature we are mapping from.
