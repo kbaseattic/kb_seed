@@ -31,7 +31,7 @@ use gjoseqlib;
 
 =head2 Convert Protein FASTA to MD5 Protein IDs
 
-    svr_fasta_to_md5 < protein_list.fasta > protein_ids.tbl
+    svc_fasta_to_md5 < protein_list.fasta > protein_ids.tbl
 
 This script takes a FASTA file of protein sequences from the standard input and
 writes a tab-delimited file of protein IDs to the standard output. Each output record will

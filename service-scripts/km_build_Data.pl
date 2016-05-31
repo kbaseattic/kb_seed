@@ -117,6 +117,27 @@ sub build_otu_index {
 sub build_function_index {
     my($dataD,$use_pub_seed,$rast_dirs) = @_;
 
+    my %good_roles;
+    my %good_funcs;
+    if (open(my $fh, "<", "$dataD/subsystem.roles"))
+    {
+	while (<$fh>)
+	{
+	    chomp;
+	    $good_roles{$_}++;
+	}
+	close($fh);
+    }
+    if (open(my $fh, "<", "$dataD/additional.funcs"))
+    {
+	while (<$fh>)
+	{
+	    chomp;
+	    $good_funcs{$_}++;
+	}
+	close($fh);
+    }
+
     open(FI,">$dataD/function.index") || die "could not open $dataD/function.index :$!";
     if (-s "$dataD/genomes")
     {
@@ -156,7 +177,30 @@ sub build_function_index {
 #	    if ($funcs{$f} > 5) #  && ((! &SeedUtils::hypo($f)) || ($f =~ /FIG/)))
 
 	    my $gcount = keys %{$funcs{$f}};
+	    my $ok;
 	    if ($gcount >= $min_reps_required || $f =~ /\#/)
+	    {
+		$ok++;
+	    }
+	    else
+	    {
+		my @r = SeedUtils::roles_of_function($f);
+		if (grep { $_ }  @good_roles{@r})
+		{
+		    print STDERR "Adding function $f due to subsystem role membership\n";
+		    $ok++;
+		}
+
+		if (!$ok)
+		{
+		    if ($good_funcs{$f})
+		    {
+			print STDERR "Adding function $f due to additional-funcs membership\n";
+			$ok++;
+		    }
+		}
+	    }
+	    if ($ok)
 	    {
 		print FI "$nxt\t$f\n";
 		$nxt++;
@@ -235,7 +279,13 @@ sub build_reduced_kmers {
 #   First, we build a file containing [kmer,fI,oI,off-set,sequence-ID]
 #   sorted by kmer
 ###
-    open(RAW,"| sort -T . -S 80G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
+    my $sort = "sort";
+    if (-x "/scratch/olson/gnu-sort")
+    {
+	$sort = "/scratch/olson/gnu-sort --parallel 10";
+    }
+    open(RAW,"| $sort -S 160G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
+#    open(RAW,"| sort -T . -S 80G  > $dataD/sorted.kmers") || die "could not open $dataD/sorted.kmers: $!";
     my $seqID=0;
     my @genomes = map { chomp; $_ } ($properties ? `cut -f2 $dataD/properties` : `cut -f2 $dataD/genomes`);
 
@@ -290,7 +340,10 @@ sub build_reduced_kmers {
 	}
 	close(P);
     }
-    close(RAW);
+    if (!close(RAW))
+    {
+	die "Sort failed: close returns $?";
+    }
 
 ### Now, we reduce sets of adjacent lines with the same kmer to a single line (or none)
 ###
@@ -385,22 +438,11 @@ sub load_id_to_fI {
                   ($properties ? `cat $dataD/properties` : `cat $dataD/genomes`);
     foreach my $genome (keys(%genomes))
     {
-	my $cmd;
-	if ($use_pub_seed)
-	{
-	    $cmd = "echo '$genome' | svr_all_features peg | svr_function_of";
-	}
-	elsif ($rast_dirs)
-	{
-	    $cmd = "cat $rast_dirs/$genome/*functions";
-	}
-	else
-	{
-	    $cmd = "echo '$genome' | genomes_to_fids | grep peg | fids_to_functions | cut -f2,3";
-	}
-	foreach $_ (`$cmd`)
-	{
-	    if ($_ =~ /^(\S+)\t(\S.*\S)/)
+
+
+	my $proc_elt = sub {
+	    my($x) = @_;
+	    if ($x =~ /^(\S+)\t(\S.*\S)/)
 	    {
 		my $peg = $1;
 		my $func_or_prop = $properties ? $genomes{$genome} : $2;
@@ -410,7 +452,44 @@ sub load_id_to_fI {
 		    $id_to_fI->{$peg} = $to_fI->{$func_or_prop};
 		}
 	    }
+	};
+
+	my $cmd;
+	my @files;
+	if ($use_pub_seed)
+	{
+	    $cmd = "echo '$genome' | svr_all_features peg | svr_function_of";
 	}
+	elsif ($rast_dirs)
+	{
+	    @files = <$rast_dirs/$genome/*functions>;
+	}
+	else
+	{
+	    $cmd = "echo '$genome' | genomes_to_fids | grep peg | fids_to_functions | cut -f2,3";
+	}
+	if ($cmd)
+	{
+	    open(P, "$cmd|") or die "Cannot open $cmd: $!";
+	    while (<P>)
+	    {
+		$proc_elt->($_);
+	    }
+	    close(P);
+	}
+	elsif (@files)
+	{
+	    for my $f (@files)
+	    {
+		open(P, "<", $f) or die "Cannot open $f: $!";
+		while (<P>)
+		{
+		    $proc_elt->($_);
+		}
+		close(P);
+	    }
+	}
+
     }
 }
 

@@ -71,23 +71,21 @@ my $input_file;
 my $output_file;
 my $remove_temp;
 
-my $id_prefix = 'rast|0';
-my $id_server;
 my $nr_dir;
+my $nr_file;
 
 use Getopt::Long;
 my $rc = GetOptions('help'         => \$help,
 		    'input=s' 	   => \$input_file,
 		    'output=s'     => \$output_file,
 		    'nr-dir=s'     => \$nr_dir,
-		    'id_prefix=s'  => \$id_prefix,
-		    'id-prefix=s'  => \$id_prefix,
-		    'id-server=s'  => \$id_server,
+		    'nr-file=s'    => \$nr_file,
+		    'evalue=s'	   => \$evalue_thresh,
 		    'hypothetical_only|H' => \$hypo_only,
 		    );
 
 
-if (not ($help || $nr_dir)) {
+if (not ($help || $nr_dir || $nr_file)) {
     $rc ||= 1;
     die "ERROR: NR directory not specified\n";
 }    
@@ -115,18 +113,58 @@ if ($output_file) {
 } else { $out_fh = \*STDOUT; }
 
 my $genomeTO = GenomeTypeObject->create_from_file($in_fh);
-$genomeTO->update_indexes();
 
-my $id_client;
-if ($id_server)
+#
+# Tie the indexes.
+#
+
+my %genus_index;
+my @db_list;
+
+if ($nr_dir)
 {
-    $id_client = Bio::KBase::IDServer::Client->new($id_server);
+    tie %genus_index, 'DB_File', "$nr_dir/genus_index.btree", O_RDONLY, 0644, $DB_BTREE or die "Cannot tie $nr_dir/genus_index.btree: $!";
+    
+    #
+    # Determine set of NR files to examine.
+    #
+    
+    my $genus = $genomeTO->{scientific_name};
+    $genus =~ s/\s.*$//;
+    
+    my @list = ($genus);
+    my %seen = ( $genus => 1 );
+    
+    if (ref($genomeTO->{close_genomes}))
+    {
+	for my $close (@{$genomeTO->{close_genomes}})
+	{
+	    my $g = $close->{genome_name};
+	    $g =~ s/\s.*$//;
+	    if (!$seen{$g})
+	    {
+		push(@list, $g);
+		$seen{$g}++;
+	    }
+	}
+    }
+
+    for my $genus (@list)
+    {
+	my $file = $genus_index{lc($genus)};
+	if (!$file)
+	{
+	    warn "No file for genus $genus\n";
+	    next;
+	}
+	$file = "$nr_dir/$file";
+	push(@db_list, [$genus, $file]);
+    }
 }
 else
-{	
-    $id_client = IDclient->new($genomeTO);
+{
+    push(@db_list, ["all", $nr_file]);
 }
-
 
 #
 # Create event for logging in genome object.
@@ -134,49 +172,13 @@ else
 my $hostname = `hostname`;
 chomp $hostname;
 
-#
-# Remove this so we don't pollute the log.
-#
-
 my $event = {
     tool_name => "annotate_proteins_similarity",
     execute_time => scalar gettimeofday,
-    parameters => [ $nr_dir ],
+    parameters => [@db_list],
     hostname => $hostname,
 };
-my $event_id = GenomeTypeObject::add_analysis_event($genomeTO, $event);
-
-#
-# Tie the indexes.
-#
-
-my %genus_index;
-
-tie %genus_index, 'DB_File', "$nr_dir/genus_index.btree", O_RDONLY, 0644, $DB_BTREE or die "Cannot tie $nr_dir/genus_index.btree: $!";
-    
-#
-# Determine set of NR files to examine.
-#
-
-my $genus = $genomeTO->{scientific_name};
-$genus =~ s/\s.*$//;
-
-my @list = ($genus);
-my %seen = ( $genus => 1 );
-
-if (ref($genomeTO->{close_genomes}))
-{
-    for my $close (@{$genomeTO->{close_genomes}})
-    {
-	my $g = $close->{genome_name};
-	$g =~ s/\s.*$//;
-	if (!$seen{$g})
-	{
-	    push(@list, $g);
-	    $seen{$g}++;
-	}
-    }
-}
+my $event_id = $genomeTO->add_analysis_event($event);
 
     
 my %to_annotate;
@@ -196,19 +198,14 @@ for my $feature ($genomeTO->features)
     $to_annotate{$feature->{id}} = $ent;
 }
 
-
-while (%to_annotate && @list)
+while (%to_annotate && @db_list)
 {
-    my $genus = shift @list;
-    my $file = $genus_index{lc($genus)};
-    if (!$file)
-    {
-	warn "No file for genus $genus\n";
-	next;
-    }
+    my $db_ent = shift @db_list;
+    my($genus, $file) = @$db_ent;
+
     my @to_annotate = values %to_annotate;
     my $n = @to_annotate;
-    $file = "$nr_dir/$file";
+
     print STDERR "Annotate $n proteins with $file\n";
 
     my %function_index;

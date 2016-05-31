@@ -472,7 +472,7 @@ sub update_feature_index
 	$seen{$_->{id}}++ foreach @{$self->features};
 	my @dups = grep { $seen{$_} > 1 } keys %seen;
 	my $n = 10;
-	my $extra;
+	my $extra = '';
 	if (@dups > $n)
 	{
 	    $#dups = $n-1;
@@ -542,7 +542,7 @@ sub features
     #
     if (!exists $self->{features})
     {
-	$self->{features} = [];
+        $self->{features} = [];
     }
     wantarray ? @{$self->{features}} : $self->{features};
 }
@@ -610,7 +610,7 @@ sub contigs
     #
     if (!exists $self->{contigs})
     {
-	$self->{contigs} = [];
+        $self->{contigs} = [];
     }
     wantarray ? @{$self->{contigs}} : $self->{contigs};
 }
@@ -639,7 +639,7 @@ sub analysis_events
     #
     if (!exists $self->{features})
     {
-	$self->{analysis_events} = [];
+        $self->{analysis_events} = [];
     }
 
     wantarray ? @{$self->{analysis_events}} : $self->{analysis_events};
