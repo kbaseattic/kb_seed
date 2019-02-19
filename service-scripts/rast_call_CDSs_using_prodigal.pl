@@ -49,10 +49,6 @@ my $json = JSON::XS->new;
 
 my $genomeTO = GenomeTypeObject->create_from_file($in_fh);
 
-if ($genomeTO->{domain} !~ m/^([ABV])/o) {
-    die "Invalid domain: \"$genomeTO->{domain}\"";
-}
-
 
 my $id_client;
 if ($id_server)
@@ -69,7 +65,12 @@ my $contigs      = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{con
 
 my $params = { -contigs      => $contigs,
 	       -genetic_code => $genetic_code,
+		   -mode         => 'normal',
 	       };
+if ($genomeTO->{domain} !~ m/^([ABV])/o) {
+    $params->{-mode} = 'anon';  # Anonymous sequences and metagenomes
+}
+
 if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
 		   
 my($result, $event) = &Prodigal::run_prodigal($params);

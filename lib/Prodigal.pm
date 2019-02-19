@@ -44,6 +44,7 @@ sub run_prodigal
     
     my $genetic_code = $params->{-genetic_code} or die "missing -genetic_code parameter";
     my $contigs      = $params->{-contigs}      or die "missing -contigs parameter";
+    my $mode         = $params->{-mode}         or die "missing -mode parameter";
     
     #
     # Create temporary directory and FASTA for the contig data.
@@ -86,6 +87,7 @@ sub run_prodigal
 	       "-m",
 	       "-a", $trans_file,
 	       "-g", $genetic_code,
+           "-p", $mode,
 	       "-i", $tmp_contigs_filename,
 	       "-f", "sco",
 	       "-o", $sco_file,

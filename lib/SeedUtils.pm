@@ -1694,7 +1694,7 @@ sub sims {
 
 Return a hash containing the translation of nucleotide triples to proteins.
 Methods such as L</translate> can take a translation scheme as a parameter.
-This method returns the translation scheme for genetic code 11 or 4,
+This method returns the translation scheme for genetic code 11, 4 or 25,
 and an error for all other cocdes. The scheme is implemented as a reference to a
 hash that contains nucleotide triplets as keys and has protein letters as values.
 
@@ -1712,8 +1712,11 @@ sub genetic_code {
     elsif ($ncbi_genetic_code_num ==  4) {
         $code->{TGA} = 'W';
     }
+    elsif ($ncbi_genetic_code_num ==  25) {
+        $code->{TGA} = 'G';
+    }
     else {
-        die "Sorry, only genetic codes 1, 4, and 11 are currently supported";
+        die "Sorry, only genetic codes 1, 4, 11, and 25 are currently supported";
     }
 
     return $code;
