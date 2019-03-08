@@ -65,10 +65,10 @@ my $contigs      = [ map { [ $_->{id}, undef, $_->{dna} ] }  @ { $genomeTO->{con
 
 my $params = { -contigs      => $contigs,
 	       -genetic_code => $genetic_code,
-		   -mode         => 'normal',
+	       -mode         => 'normal',
 	       };
 if ($genomeTO->{domain} !~ m/^([ABV])/o) {
-    $params->{-mode} = 'anon';  # Anonymous sequences and metagenomes
+    $params->{-mode} = 'meta';  # Anonymous sequences and metagenomes
 }
 
 if ($temp_dir) { $params->{-tmpdir} = $temp_dir; }
