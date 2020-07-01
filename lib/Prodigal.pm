@@ -125,7 +125,7 @@ sub run_prodigal
 	my ($left, $right, $strand, $left_trunc, $right_trunc) 
 	    = ($comment =~ m/^\#\s+(\d+)\s+\#\s+(\d+)\s+\#\s+(-?1)\s+\#.*partial=([01])([01])/o);
 	
-	if ($contig_id && $left && $right && $strand && defined($left_trunc) && defined($right_trunc)) {
+	if (defined($contig_id) && $left && $right && $strand && defined($left_trunc) && defined($right_trunc)) {
 	    $seq =~ s/\*$//o;
 	    $strand = ($strand == 1) ? q(+) : q(-);
 	    $transH{"$contig_id\t$left\t$right\t$strand"} = [ $seq, $left_trunc, $right_trunc ];
